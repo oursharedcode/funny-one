@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1 in progress: T-1.1–T-1.3 done, **T-1.4 next**. |
-| **Build state** | typecheck / lint / format green · `npm test` **red: 7 expected failures** in `pools.test.ts` until T-1.5 authors the en+ru pools. |
+| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1 in progress: T-1.1–T-1.4 done, **T-1.5 next**. |
+| **Build state** | typecheck / lint / format green · `npm test` **red: 2 expected failures** in `pools.test.ts` (`en`/`ru` cover exactly the canonical id set) until T-1.5 authors the en+ru texts. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -68,9 +68,18 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       flips. Empty scaffolds created for `options.ts` and `text/{en,ru,index}.ts` so typecheck
       and lint stay green while the suite is red — the red is on real assertions, not on
       unresolved imports.*
-- [ ] **T-1.4 (M)** Canonical option ids + English prompt fragments (`pools/options.ts`):
+- [x] **T-1.4 (M)** Canonical option ids + English prompt fragments (`pools/options.ts`):
       author the full id set with `promptEn` for visual slots. Family-friendly, no real
       people/brands. → FM-POOL-1/6, FM-IMG-2
+      *106 ids: 10 per visual slot (10⁴ = 10,000 picture prompts, inside the 6.5k–20k window
+      design §4.3 sized the cache against; 10 > the 7-player max so same-slot auto-fill
+      exclusion never runs dry) and 22 per prose slot. The id set is now **frozen** — T-6.3 can
+      start. Slot 0 and slot 1 draw from disjoint kinds (leads vs. companions), so SRC's
+      `looksLikeSameSubject` / "two of them" chimera anchor is unreachable by construction and
+      T-4.2 need not port it. Slot-4 fragments are `are` + gerund to complete "They {4}"; every
+      slot-2 fragment was read back after "in" and two were rephrased. Worst-case assembled
+      prompt is 481 chars against SRC's 500 cap, so the builder cannot truncate — but only 19
+      chars of headroom remain.*
 - [ ] **T-1.5 (L)** Hand-author **en** and **ru** display texts (`pools/text/en.ts`, `ru.ts`);
       RU pre-declined per slot case, composed against the RU prose template. Pool tests green
       for en+ru (other languages temporarily excluded from the coverage matrix). → FM-POOL-3/5

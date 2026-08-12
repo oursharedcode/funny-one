@@ -89,7 +89,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `shared/languages.ts` | copy | 15-language registry, exhaustiveness sentinel |
 | `shared/events.ts` | adapt | payload deltas in §5 |
 | `server/src/index.ts` | adapt | socket wiring kept; remove filter imports; option validation |
-| `server/src/rooms.ts` | copy | room lifecycle, codes, rate limits |
+| `server/src/rooms.ts` | copy | room lifecycle, codes, capacity ceiling, nickname rules |
+| `server/src/rateLimit.ts` | **new** | spec §17's 5/30-per-IP-per-minute limits. Not a copy: SRC specifies them and ships `RATE_LIMITED` + 15 translated catalog strings, but never implemented the limiter (see T-2.2) |
 | `server/src/game.ts` | adapt | rotation kept (extracted to shared); submit/auto-fill/prompt paths change (§6) |
 | `server/src/game*.test.ts` | adapt | rewrite answer fixtures to option ids |
 | `server/src/image.ts` | adapt | Worker returns JSON `{url,width,height,cached}`; cap skips cache hits (§7.3) |
@@ -228,8 +229,16 @@ pool content because both import the same `packages/shared` build, deployed as o
   branch, no CSAM/hard-block calls). Cap reservation only when the Worker reports an actual
   generation is needed — see §7.3 for the two-step flow.
 
-`index.ts`: same socket wiring minus filter imports; nickname rules, rate limits, room caps,
-grace-window botification all per SRC (FM-CORE-3/4).
+`index.ts`: same socket wiring minus filter imports; nickname rules, room caps and grace-window
+botification all per SRC (FM-CORE-3/4). **Rate limits are the exception** — SRC never implemented
+them, so `rateLimit.ts` is written from spec §17 rather than copied (T-2.2). Two notes on how it
+wires in:
+
+- Buckets are per server instance, not module scope, and are stopped on Fastify's `onClose`.
+- A rate-limit hit follows each event's own error convention rather than spec §17's literal
+  "emit `error`": `room:create` emits (its ack has no error branch), `room:join` returns
+  `ack.error` — the copied `HomeScreen` join path only inspects the ack, so an emit would leave
+  its spinner stuck. Both carry the spec's `RATE_LIMITED` code.
 
 ## 7. Image pipeline
 
@@ -372,13 +381,18 @@ post-v1 phase; nothing in v1 may preclude it.
 
 ## 13. Testing strategy
 
-- **Unit (Vitest)**: rotation (first test in repo); pool validation suite (§4.2); prompt
-  determinism (same ids → same string; snapshot the skeleton; length bound); cap semantics
-  incl. cache-hit refund (§7.3); grammar.ts RU polish (SRC tests copied); i18n coverage
-  (SRC `i18n/index.test.ts` pattern extended to pools).
+- **Unit (Vitest)**: rotation (first test in repo); pool validation suite (§4.2); room lifecycle
+  (codes, capacity, nickname bounds, lobby-splice vs. in-game-botify — new here, SRC had no
+  dedicated `rooms.ts` suite); rate-limiter refill arithmetic against an injected clock,
+  including the across-the-boundary 2× case a fixed window would allow (§6, new code so no
+  inherited coverage); prompt determinism (same ids → same string; snapshot the skeleton; length
+  bound); cap semantics incl. cache-hit refund (§7.3); grammar.ts RU polish (SRC tests copied);
+  i18n coverage (SRC `i18n/index.test.ts` pattern extended to pools).
 - **Server integration**: SRC `game.test.ts` family adapted to option ids — full 3–7 player
   simulated games asserting rotation placement, bot fills, INVALID_OPTION rejection,
-  reveal payloads carrying resolved texts + PictureRef.
+  reveal payloads carrying resolved texts + PictureRef. Lobby events are driven over a real
+  Socket.IO connection on an ephemeral port rather than by calling handlers directly, since the
+  ack-vs-`error` split and broadcast fan-out are exactly what a direct call would not cover.
 - **Manual gates** (per SRC build-order discipline): two-tab lobby test; 3-tab full game;
   dead-Worker error path; `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice →
   second reveal instant, counter unchanged); phone PWA install; RU full game (declined texts

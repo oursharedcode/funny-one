@@ -119,6 +119,9 @@ Everything in this section is inherited from the source spec v4 unless marked **
   (`player:lost`). Lobby-phase leavers are simply removed; host migration per spec.
 - **FM-CORE-4 (MUST)** Rate limits and capacity per spec §17: `room:create` 5/IP/min,
   `room:join` 30/IP/min, max rooms per process 500 (`MAX_ROOMS` override), nickname 3–20 chars.
+  *Note (T-2.2): the source project specifies these limits and ships the `RATE_LIMITED` error
+  code and its 15 translations, but never implemented the limiter — this is net-new code here,
+  not inherited. Per-IP bucketing depends on `x-forwarded-for`; see OD-F9.*
 
 ### Rounds and rotation
 - **FM-CORE-5 (MUST)** 7 questions in the source order (Who? / And who else? / Where? / When? /
@@ -285,6 +288,7 @@ image library (the R2 cache fills organically; OD-9 stays closed).
 | OD-F6 | Premium one-time purchase alternative (docs OD-3) | Subscription $2.99/mo / $19.99/yr |
 | OD-F7 | Umbrella RU brand «Семейная Чепуха» approval (docs OD-10) | Not needed for MUL v1; HUB concern |
 | OD-F8 | ESLint 8.57.1 is end-of-life; ESLint 9 requires a flat-config migration that discards the `.eslintrc.json` copied from SRC (T-0.2) | Stay on ESLint 8 (no advisories against it); revisit before v1 ships |
+| OD-F9 | FM-CORE-4's per-IP buckets key on `x-forwarded-for`'s **first** hop (spec §17). That header is client-settable, so a caller can choose — and rotate — its own bucket key and evade the limit. Correct trust depends on the deployed proxy chain, which is not fixed until T-8.1 (T-2.2) | Ship spec §17 behavior rather than diverge silently; make the trusted-hop count configurable and count from the proxy-appended end at T-8.1, and correct DEPLOYMENT.md, which inherits SRC's claim that this already works |
 
 ## 13. Traceability
 

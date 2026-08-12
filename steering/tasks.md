@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). **T-2.1 next** — server bootstrap. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 43 tests, first fully green run in the repo. |
+| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1 and T-2.2 done. **T-2.3 next** — round flow. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 96 tests across 2 workspaces (43 shared + 53 server); `npm audit` 0 vulnerabilities. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -125,11 +125,90 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 
 ## Phase 2 — Server core (no images yet)
 
-- [ ] **T-2.1 (S)** `apps/funny-multi-server` bootstrap from `SRC/server`: Fastify + Socket.IO,
+- [x] **T-2.1 (S)** `apps/funny-multi-server` bootstrap from `SRC/server`: Fastify + Socket.IO,
       `/health`, CORS for dev, `env.ts` (minus dropped vars). **Do not copy** `filter/**`,
       `translate.ts`, stand-in arrays. → design §3
-- [ ] **T-2.2 (M)** Rooms: copy `rooms.ts` (codes, rate limits 5/30 per IP/min, MAX_ROOMS,
+      *Four files: `env.ts`, `types.ts`, `index.ts`, `index.test.ts`. Verified beyond CI by
+      booting the compiled `dist/index.js` and curling `/health` (200 + dev CORS header).*
+      *`env.ts` path depth: SRC resolved `../../.env` from `server/dist/env.js`; this app sits
+      one level deeper, so the repo root is `../../../.env`. `loadEnvFile`'s catch is silent, so
+      a wrong depth degrades to unset config rather than an error — the path is therefore
+      exported as `ENV_PATH` and asserted in a test, confirmed red by temporarily restoring
+      SRC's depth before it was accepted as green.*
+      *`buildServer()` split out of SRC's monolithic `main()` so the shell is testable without
+      binding a port; `main()` is now a thin entry guarded by a `pathToFileURL` argv check
+      (a `file://` template literal does not compose on Windows). T-2.2+ register their socket
+      handlers inside `buildServer`.*
+      ***`maxHttpBufferSize: 8e6` deliberately not carried.** SRC raised the 1 MB Socket.IO
+      default because `gallery:ready` shipped every player's picture as base64. Pictures are now
+      URLs (FM-IMG-3 / DD-5, the MUL-2 socket-size mandate), so a 7-player gallery is a few KB
+      of text. Carrying the override would preserve a workaround for a problem the design
+      removed — and would mask a regression if bytes ever crept back onto the socket.*
+      *Also dropped: `POST /test/image` — a dev-only harness for the Test\* client screens
+      design §3 drops, and its purpose was inspecting the translate stack DD-8 deletes
+      (`translationFailed` does not exist in this codebase). `DISCONNECT_GRACE_MS` is left for
+      T-2.4, since `noUnusedLocals` rejects it until the disconnect timers exist.*
+      *Handlers absent by design, each tagged in the file with the task that owns it: T-2.2
+      room:create/join/leave, T-2.3 game:start/round:submit/game:ready/restart/end, T-2.4
+      disconnect rules, T-4.4 reveal picture requests, T-5.1 gallery:share, T-5.3 stats:get.*
+      *Carry-over for T-2.3: SRC's `server/scripts/copy-i18n.mjs` post-build step is not ported
+      yet — nothing needs it until the i18n JSON lands. Add it to `build` at T-2.3, or the
+      compiled server will not find its prose templates at runtime.*
+      *Carry-over for T-3.1: root `dev` and `build` scripts still reference
+      `apps/funny-multi-client`, which does not exist — both fail until the client is
+      bootstrapped. CI is unaffected (it runs typecheck/lint/test only), and
+      `npm run build -w apps/funny-multi-server` works standalone.*
+
+**Toolchain deviations from SRC** (decided at T-2.1), same rationale as Gate 0's vitest bump:
+
+- **fastify `^4.28.1` → `^5.11.3`**, with `@fastify/cors` `^9` → `^11` and `@fastify/static`
+  `^7` → `^10` (the majors are coupled). Fastify 4 left LTS in June 2025 and no longer gets
+  security patches. The surface this repo touches is tiny — `Fastify()`, two `register`s,
+  one `get`, `setNotFoundHandler`, `ready`, `listen` — and none of it changed across the major,
+  so the migration cost was zero. Deferring would have meant migrating T-2.2/T-2.3/T-2.4 code
+  as well. `npm audit` is clean at 0 vulnerabilities.
+- **socket.io `^4.7.5` → `^4.8.3`** — in-major bump, no contract change.
+- **`nanoid` not added yet.** SRC's server depends on it for room codes; that belongs to T-2.2,
+  which should decide 5.x → 6.x (a major) at the point the dependency is actually used.
+- `socket.io-client` is a **devDependency** here, used only to drive the transport smoke test.
+- [x] **T-2.2 (M)** Rooms: copy `rooms.ts` (codes, rate limits 5/30 per IP/min, MAX_ROOMS,
       nickname 3–20) + lobby events wiring in `index.ts`. → FM-CORE-1/4
+      ***The rate limiter is not a copy — SRC never implemented it.*** Spec §17 mandates
+      5 `room:create` / 30 `room:join` per IP per minute, `RATE_LIMITED` ships in SRC's error
+      union, and all 15 SRC client catalogs carry a translated `errors.RATE_LIMITED` string —
+      but nothing in `SRC/server` reads `x-forwarded-for` or tracks a bucket, so `RATE_LIMITED`
+      is a code the SRC server can never emit. SRC's own `DEPLOYMENT.md` nevertheless tells
+      operators "the rate limiter reads `x-forwarded-for`", which is what makes the gap easy to
+      miss. Written here from the spec as `rateLimit.ts`, with 15 tests of its own.*
+      *Token bucket with **continuous** refill rather than a fixed window: a fixed window lets a
+      caller spend the full budget at 0:59 and again at 1:01, i.e. 2× the intended rate across
+      the boundary. There is a test for exactly that. Buckets are per server instance (not
+      module scope) so each `buildServer()` in a test gets a clean limiter, swept on an
+      `unref`'d interval and stopped on Fastify's `onClose`.*
+      ***Open item — `x-forwarded-for` is client-settable.** Taking the first hop (as spec §17
+      directs) means a caller who sends their own `X-Forwarded-For` chooses their own bucket key
+      and can rotate it to evade the limit. The spec'd behavior ships rather than a silent
+      divergence, but the real fix is a configurable trusted-hop count; raised against **T-8.1**,
+      where deploy/proxy config is settled.*
+      *`rooms.ts` itself is near-verbatim: only `shared` → `@funny/shared` and the removal of
+      `wobbleEngine` from `createRoom`'s signature and the `Room` it builds (DD-9 — a server
+      still setting it would not typecheck). Added `__resetRoomsForTest()`, since the store is a
+      module-level singleton and suites that create rooms must reset between cases.*
+      *SRC shipped `rooms.ts` with no dedicated suite (coverage came incidentally via
+      `game.test.ts`), so `rooms.test.ts` is new: 25 tests pinning the unambiguous code alphabet,
+      code uniqueness over 300 rooms, the `MAX_ROOMS` ceiling incl. nonsense values, nickname
+      bounds either side of 3/20, and the lobby-splice vs. in-game-botify split that rotation
+      integrity depends on.*
+      ***Divergence from the literal spec text, deliberate:** §17 says a rate-limit hit should
+      "emit `error`". That is right for `room:create` (whose ack has no error branch) but wrong
+      for `room:join` — the copied SRC `HomeScreen` join path only ever inspects `ack.error`, so
+      an emitted `error` would leave its busy spinner stuck forever. Each event keeps its own SRC
+      error convention; only the transport differs, and both carry the spec's code.*
+      *Not wired here: `broadcastStats(io)`, which SRC calls after create/leave. It belongs to
+      T-5.3 with the rest of `stats.ts`.*
+      *`nanoid` pinned to **`^5.1.16`, not 6.x** — nanoid 6 declares
+      `engines.node: ^22 || ^24 || >=26`, and this repo targets Node >= 20 with CI on Node 20.
+      Revisit only if the project's Node floor moves.*
 - [ ] **T-2.3 (L)** Round flow in `game.ts`: rotation from shared; `submitAnswer` validates
       `optionId` (reject `INVALID_OPTION`, no submitted mark); bot/timeout auto-fill = random
       pool pick with same-slot exclusion; 60 s timer; waiting broadcast; reveal entry resolving
@@ -219,6 +298,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
       `.dockerignore`, `.env.example`; deploy server to Render + Worker/R2/KV via wrangler;
       set secrets. → FM-NFR-3
+      *Carry-over from T-2.2: make the rate limiter's trusted-proxy-hop count configurable.
+      `clientIp()` currently takes `x-forwarded-for`'s first hop per spec §17, which a client can
+      set itself to pick — and rotate — its own bucket key. Once the real proxy chain is known,
+      count hops from the right-hand (proxy-appended) end instead, and document the assumption
+      in DEPLOYMENT.md rather than inheriting SRC's claim that it already works this way.*
 - [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
       run with 3 real phones on the production URL; include disconnect-mid-game → bot,
       cap flow, cache-hit flow. → design §13

@@ -17,12 +17,14 @@ import { LANGUAGES } from '../languages.js';
 import {
   ASCII_PRINTABLE,
   AUTHORED_LANGUAGES,
+  EN_WHY_CONNECTIVE,
   OPTION_ID_PATTERN,
   OPTION_TEXT_MAX_LENGTH,
   PROMPT_FRAGMENT_MAX_LENGTH,
   PROSE_MAX_OPTIONS,
   PROSE_MIN_OPTIONS,
   PROSE_SLOTS,
+  RU_ENDING_MIN_WORDS,
   RU_WITH_PREPOSITION,
   SLOT_COUNT,
   SLOTS,
@@ -215,6 +217,32 @@ describe('Russian authoring rules (FM-POOL-3, design §9)', () => {
         text,
         `ru/${option.id} must be instrumental with its preposition inline, e.g. «с большой обезьяной»`,
       ).toMatch(RU_WITH_PREPOSITION);
+    }
+  });
+
+  it('keeps every slot-6 text above the bare-noun threshold renderProse rewrites', () => {
+    const ru = POOL_TEXTS.ru;
+    for (const option of POOLS[6]) {
+      const text = ru[option.id];
+      if (text === undefined) continue;
+      expect(
+        text.split(/\s+/).length,
+        `ru/${option.id} is short enough that renderProse would prepend «это закончилось»`,
+      ).toBeGreaterThanOrEqual(RU_ENDING_MIN_WORDS);
+    }
+  });
+});
+
+describe('English authoring rules (design §9)', () => {
+  it('opens every slot-5 text with a connective, so renderProse adds no "for "', () => {
+    const en = POOL_TEXTS.en;
+    for (const option of POOLS[5]) {
+      const text = en[option.id];
+      if (text === undefined) continue;
+      expect(
+        text,
+        `en/${option.id} would render as "for ${text}" — open it with to/for/because/out of/...`,
+      ).toMatch(EN_WHY_CONNECTIVE);
     }
   });
 });

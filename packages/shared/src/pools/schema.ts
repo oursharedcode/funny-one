@@ -175,6 +175,26 @@ export function isVisualSlot(slot: SlotIndex): boolean {
  */
 export const RU_WITH_PREPOSITION = /^со? /u;
 
+/**
+ * A Russian slot-6 text of one or two words is read as a bare noun by
+ * `renderProse`, which then prepends «это закончилось» (SRC i18n/index.ts,
+ * `ruSlot6IsBareNoun`). Our endings are authored as full clauses and must stay
+ * above that threshold or the prose grows a phrase nobody wrote.
+ */
+export const RU_ENDING_MIN_WORDS = 3;
+
+/**
+ * English slot-5 texts must open with one of these connectives. `renderProse`
+ * prepends a literal `for ` to anything else (SRC i18n/index.ts,
+ * `EN_SLOT5_LEADING_CONNECTIVE`) — a rule written for free-typed answers that
+ * would render an authored option as "for out of pure stubbornness". This is
+ * the English counterpart of {@link RU_WITH_PREPOSITION}: both encode "the pool
+ * is authored to compose with the template, so the template needs no synthetic
+ * glue" (design §9).
+ */
+export const EN_WHY_CONNECTIVE =
+  /^(?:for|to|because|so\s+that|in\s+order|in\s+exchange|out\s+of|since)\b/iu;
+
 /** Option ids are `<prefix>.<kebab-slug>` — lowercase, no underscores (FM-ANS-2). */
 export const OPTION_ID_PATTERN = /^[a-z]+\.[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 

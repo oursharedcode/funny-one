@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1 in progress: T-1.1–T-1.4 done, **T-1.5 next**. |
-| **Build state** | typecheck / lint / format green · `npm test` **red: 2 expected failures** in `pools.test.ts` (`en`/`ru` cover exactly the canonical id set) until T-1.5 authors the en+ru texts. |
+| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1: T-1.1–T-1.5 done and **Gate 1 passed**; **T-1.6 next** (last task in the phase). |
+| **Build state** | typecheck / lint / format / `npm test` all green — 43 tests, first fully green run in the repo. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -80,12 +80,33 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       slot-2 fragment was read back after "in" and two were rephrased. Worst-case assembled
       prompt is 481 chars against SRC's 500 cap, so the builder cannot truncate — but only 19
       chars of headroom remain.*
-- [ ] **T-1.5 (L)** Hand-author **en** and **ru** display texts (`pools/text/en.ts`, `ru.ts`);
+- [x] **T-1.5 (L)** Hand-author **en** and **ru** display texts (`pools/text/en.ts`, `ru.ts`);
       RU pre-declined per slot case, composed against the RU prose template. Pool tests green
       for en+ru (other languages temporarily excluded from the coverage matrix). → FM-POOL-3/5
+      *212 texts (106 ids × 2). Verified by rendering sample stories through SRC's actual
+      `renderProse` + `polishRussianProse` — structure tests cannot tell whether prose reads,
+      and this caught a class of bug they missed: the RU template joins slots 0–4 with bare
+      spaces, so a text ending in an unclosed subordinate/participial phrase bleeds into the
+      next slot. Four RU texts were rephrased («с роботом, говорящим загадками» → «с говорящим
+      загадками роботом»). RU slot 4 is **plural past throughout** — the comitative «X с Y»
+      agrees with a plural verb, which is gender-free; SRC's masculine-singular stand-ins
+      silently misgendered every feminine slot-0 answer.*
+      *Two authoring invariants added to `schema.ts` + `pools.test.ts` (43 tests now): EN
+      slot-5 texts must open with a connective (`EN_WHY_CONNECTIVE`) or `renderProse` prepends
+      a literal "for " and yields "for out of pure stubbornness" — the English counterpart of
+      the documented RU «с/со» rule; and RU slot-6 texts must exceed `RU_ENDING_MIN_WORDS`, or
+      `ruSlot6IsBareNoun` prepends «это закончилось». Both were relied on while authoring, so
+      they are now enforced rather than remembered.*
+      *Not fixed here — **EN prose opens lowercase** ("a grumpy pirate and …"), exactly as SRC
+      shipped it: RU gets its capital from `polishRussianProse`, English has no equivalent
+      pass. Texts are deliberately left caseless (capitalization is presentation, and each
+      language puts a different slot first), so the fix belongs in T-2.3's prose assembly.*
 - [ ] **T-1.6 (M)** `events.ts` adapted per design §5: `optionId` submit, `PictureRef`,
       resolved-text reveal payloads, `INVALID_OPTION`, `wobbleEngine` removed. → FM-ANS-2, FM-IMG-3
-- **Gate 1**: `npm test -w packages/shared` green (rotation + pools en/ru + schema).
+- [x] **Gate 1**: `npm test -w packages/shared` green (rotation + pools en/ru + schema).
+      *Passed 2026-08-12: 43 tests green (16 rotation + 27 pool), typecheck / lint / prettier
+      clean. T-1.6 remains open but is protocol work, not pool content, and Gate 1 is defined
+      on the test suite.*
 
 ## Phase 2 — Server core (no images yet)
 
@@ -98,6 +119,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       `optionId` (reject `INVALID_OPTION`, no submitted mark); bot/timeout auto-fill = random
       pool pick with same-slot exclusion; 60 s timer; waiting broadcast; reveal entry resolving
       ids → room-language texts; RU `grammar.ts` polish copied. → FM-CORE-5..8, FM-BOT-1/2, FM-ANS-2/4/5
+      *Carry-over from T-1.5: give EN — and every language without its own polish pass — the
+      sentence-opening capitalization `polishRussianProse` already does for RU. Pool texts are
+      caseless by design, so EN prose currently renders "a grumpy pirate and …". SRC shipped
+      the same way, but it lands on the reveal screen, which is the payoff moment.*
 - [ ] **T-2.4 (M)** Disconnect rules per SRC `index.ts`: grace window, lobby leave, mid-game
       botification (auto-fill current round), host migration, `player:lost`. → FM-CORE-3
 - [ ] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full

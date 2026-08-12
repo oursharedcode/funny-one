@@ -254,6 +254,15 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       simulated 3- and 7-player games; INVALID_OPTION case; en+ru prose snapshots. → design §13
 - **Gate 2**: server tests green; manual 3-tab full 7-round game with combobox picks stubbed
   via test client, correct story assembly verified (rotation placement).
+  *Open question raised at T-2.3 — **there is no test client, and no task creates one.** The
+  automated half is already covered: `game.test.ts` runs full simulated 3- and 7-player games
+  asserting rotation placement in-process. What that does not exercise is the real socket
+  transport with concurrent clients, which is the part a 3-tab manual run actually tests.
+  Cheapest close: extend T-2.5 to drive a full 7-round game over real Socket.IO connections
+  (`index.test.ts` already does this for the lobby events), making Gate 2 automated end to end
+  and leaving genuinely-manual checks to Gate 3, where a real UI exists. The alternative —
+  writing a throwaway CLI stub client — costs about the same and rots immediately. Decide
+  before starting T-2.5.*
 
 ## Phase 3 — Client core
 
@@ -329,6 +338,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
       `.dockerignore`, `.env.example`; deploy server to Render + Worker/R2/KV via wrangler;
       set secrets. → FM-NFR-3
+      *Carry-over from T-2.3: bump `actions/checkout` and `actions/setup-node` from `@v4` to
+      `@v5` in `.github/workflows/ci.yml`. GitHub now warns that both target the deprecated
+      Node 20 runner and is force-running them on Node 24; nothing is broken today, but the
+      warning is on every run. Unrelated to the repo's own Node 20 target, which is what the
+      `node-version: 20` step pins and which the nanoid `^5` decision depends on.*
       *Carry-over from T-2.2: make the rate limiter's trusted-proxy-hop count configurable.
       `clientIp()` currently takes `x-forwarded-for`'s first hop per spec §17, which a client can
       set itself to pick — and rotate — its own bucket key. Once the real proxy chain is known,

@@ -11,6 +11,8 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import type { AddressInfo } from 'node:net';
+import { readFileSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { io as ioClient, type Socket } from 'socket.io-client';
 import { buildServer, type BuiltServer } from './index.js';
 import { ENV_PATH } from './env.js';
@@ -72,12 +74,25 @@ function once<T>(socket: Socket, event: string): Promise<T> {
 // ---------------------------------------------------------------------------
 
 describe('env', () => {
-  it('resolves .env at the repo root, not inside apps/', () => {
+  it('resolves .env at the workspace root, not inside apps/', () => {
     // The loadEnvFile catch in env.ts is silent, so a wrong depth would show
     // up only as mysteriously unset config. Assert the path instead.
-    const normalized = ENV_PATH.replace(/\\/g, '/');
-    expect(normalized.endsWith('/funnyone/.env')).toBe(true);
-    expect(normalized).not.toContain('/apps/');
+    //
+    // Identify the root by the workspace manifest that is actually there,
+    // never by directory name: this repo's folder is `funnyone` locally but
+    // `funny-one` in CI (GitHub checks out under the repo name), and an
+    // endsWith() on the local name passes for the wrong reason on one machine
+    // and fails on the other. SRC's depth lands on apps/, which has no
+    // package.json, so this still catches the regression it is here for.
+    const root = dirname(ENV_PATH);
+    const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
+      name?: string;
+      workspaces?: string[];
+    };
+    expect(manifest.name).toBe('funny-family');
+    expect(manifest.workspaces).toContain('apps/*');
+    expect(basename(ENV_PATH)).toBe('.env');
+    expect(ENV_PATH.replace(/\\/g, '/')).not.toContain('/apps/');
   });
 });
 

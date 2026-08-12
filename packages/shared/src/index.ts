@@ -2,12 +2,8 @@
 // product consume this package; it is built before every dev/build/test/typecheck
 // run via the root `pre*` scripts.
 //
-// Still to land in Phase 1:
-//   T-1.4 pools/options.ts — canonical ids + English prompt fragments (POOLS is
-//                            an empty scaffold until then, and pools.test.ts is
-//                            red because of it)
-//   T-1.5 pools/text/*.ts  — en + ru display texts
-//   T-1.6 events.ts        — socket contract (optionId submit, PictureRef)
+// Phase 1 is complete: languages, rotation, the answer pools with en + ru texts,
+// and the socket contract all land here.
 //
 // NodeNext resolution: relative re-exports need the .js extension.
 
@@ -43,3 +39,36 @@ export type {
 } from './pools/schema.js';
 export { ALL_OPTION_IDS, POOLS } from './pools/options.js';
 export { POOL_TEXTS } from './pools/text/index.js';
+
+// T-1.6 — socket contract (design §5). Types only: the protocol carries no
+// runtime values, so this whole module erases at build time.
+export type {
+  ClientToServerEvents,
+  ErrorCode,
+  ErrorPayload,
+  GalleryEntry,
+  GalleryReadyPayload,
+  GameReadyPayload,
+  GameRestartReadyPayload,
+  LobbyUpdatePayload,
+  PictureRef,
+  Player,
+  PlayerLostPayload,
+  RevealPictureErrorCode,
+  RevealPictureErrorPayload,
+  RevealPictureReadyPayload,
+  RevealStartPayload,
+  Room,
+  RoomCreateAck,
+  RoomCreatePayload,
+  RoomJoinAck,
+  RoomJoinPayload,
+  RoomPhase,
+  RoundStartPayload,
+  RoundSubmitPayload,
+  RoundWaitingPayload,
+  ServerTimerHandle,
+  ServerToClientEvents,
+  StatsPayload,
+  Story,
+} from './events.js';

@@ -6,7 +6,7 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1: T-1.1–T-1.5 done and **Gate 1 passed**; **T-1.6 next** (last task in the phase). |
+| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). **T-2.1 next** — server bootstrap. |
 | **Build state** | typecheck / lint / format / `npm test` all green — 43 tests, first fully green run in the repo. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
@@ -101,12 +101,27 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       shipped it: RU gets its capital from `polishRussianProse`, English has no equivalent
       pass. Texts are deliberately left caseless (capitalization is presentation, and each
       language puts a different slot first), so the fix belongs in T-2.3's prose assembly.*
-- [ ] **T-1.6 (M)** `events.ts` adapted per design §5: `optionId` submit, `PictureRef`,
+- [x] **T-1.6 (M)** `events.ts` adapted per design §5: `optionId` submit, `PictureRef`,
       resolved-text reveal payloads, `INVALID_OPTION`, `wobbleEngine` removed. → FM-ANS-2, FM-IMG-3
+      *All 28 types re-exported from the barrel (checked mechanically against the module's own
+      declarations, not by eye). Verified with a throwaway compile-time contract file —
+      `keyof`-based assertions that `pictureUrl`/`answer`/`wobbleEngine` are gone and
+      `picture`/`optionId` present, plus a deliberate negative control to prove the assertions
+      were not vacuously true — then deleted; the types are exercised for real by Phase 2/3.*
+      *Two judgement calls beyond the design text: `GameStartPayload` held nothing but
+      `wobbleEngine`, so rather than leave an empty interface it is dropped and `game:start`
+      takes no payload (DD-9's "removing the field is the honest protocol", applied to the
+      payload itself). And `Story.answers` is typed `(OptionId | null)[]` rather than
+      `(string | null)[]` — same type, but it names which of the two meanings the field
+      carries, since `RevealStartPayload.answers` and `GalleryEntry.answers` reuse the name for
+      resolved display texts. That collision is required (the copied client screens highlight
+      those strings inside the prose) and is flagged on all three types.*
+      *`entitlementToken` / `room.premium` deliberately NOT added: design §10 puts them in
+      T-9.3/T-9.4, and D-4 keeps premium risk in the final phase.*
 - [x] **Gate 1**: `npm test -w packages/shared` green (rotation + pools en/ru + schema).
       *Passed 2026-08-12: 43 tests green (16 rotation + 27 pool), typecheck / lint / prettier
-      clean. T-1.6 remains open but is protocol work, not pool content, and Gate 1 is defined
-      on the test suite.*
+      clean. Phase 1 closed out with T-1.6 the same day; `packages/shared` is now feature
+      complete for v1 apart from T-6.3's 13 remaining pool languages.*
 
 ## Phase 2 — Server core (no images yet)
 

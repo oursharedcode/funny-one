@@ -1,0 +1,45 @@
+// Public surface of @funny/shared (FM-ARC-2). Both apps and every future family
+// product consume this package; it is built before every dev/build/test/typecheck
+// run via the root `pre*` scripts.
+//
+// Still to land in Phase 1:
+//   T-1.4 pools/options.ts — canonical ids + English prompt fragments (POOLS is
+//                            an empty scaffold until then, and pools.test.ts is
+//                            red because of it)
+//   T-1.5 pools/text/*.ts  — en + ru display texts
+//   T-1.6 events.ts        — socket contract (optionId submit, PictureRef)
+//
+// NodeNext resolution: relative re-exports need the .js extension.
+
+// T-1.1 — 15-language registry (D-2)
+export { LANGUAGES, isLanguage } from './languages.js';
+export type { Language, LanguageOption } from './languages.js';
+
+// T-1.2 — story rotation (FM-CORE-6)
+export { storyIndex } from './rotation.js';
+
+// T-1.3 — answer-pool schema (FM-POOL-1/3/4)
+export {
+  AUTHORED_LANGUAGES,
+  getSlotConfig,
+  isSlotIndex,
+  isVisualSlot,
+  OPTION_TEXT_MAX_LENGTH,
+  PROMPT_FRAGMENT_MAX_LENGTH,
+  PROSE_SLOTS,
+  SLOT_COUNT,
+  SLOTS,
+  VISUAL_SLOTS,
+} from './pools/schema.js';
+export type {
+  AnswerOption,
+  AuthoredLanguage,
+  OptionId,
+  Pools,
+  PoolTextMap,
+  SlotConfig,
+  SlotIndex,
+  SlotKind,
+} from './pools/schema.js';
+export { ALL_OPTION_IDS, POOLS } from './pools/options.js';
+export { POOL_TEXTS } from './pools/text/index.js';

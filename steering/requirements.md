@@ -284,6 +284,7 @@ image library (the R2 cache fills organically; OD-9 stays closed).
 | OD-F5 | Native-speaker review completion for 13 machine-drafted pool languages | Ship flagged `needs-<code>-review`; review post-launch |
 | OD-F6 | Premium one-time purchase alternative (docs OD-3) | Subscription $2.99/mo / $19.99/yr |
 | OD-F7 | Umbrella RU brand «Семейная Чепуха» approval (docs OD-10) | Not needed for MUL v1; HUB concern |
+| OD-F8 | ESLint 8.57.1 is end-of-life; ESLint 9 requires a flat-config migration that discards the `.eslintrc.json` copied from SRC (T-0.2) | Stay on ESLint 8 (no advisories against it); revisit before v1 ships |
 
 ## 13. Traceability
 

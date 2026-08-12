@@ -1,0 +1,15 @@
+# Hand-wrapped requirement/design/plan documents (and the read-only reference
+# copy of the source project). Prettier reflows their tables and deliberate line
+# breaks, which makes review diffs unreadable.
+docs/
+steering/
+
+# Build output and dependencies
+node_modules/
+dist/
+build/
+coverage/
+package-lock.json
+
+# Verbatim upstream text
+LICENSE

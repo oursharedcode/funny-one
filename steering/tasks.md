@@ -6,6 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
+| **Progress** | Phase 0 complete (Gate 0 passed). Phase 1 in progress: T-1.1–T-1.3 done, **T-1.4 next**. |
+| **Build state** | typecheck / lint / format green · `npm test` **red: 7 expected failures** in `pools.test.ts` until T-1.5 authors the en+ru pools. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -17,24 +19,55 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 
 ## Phase 0 — Repo bootstrap
 
-- [ ] **T-0.1 (S)** Root workspace: `package.json` (workspaces `apps/*`, `packages/*`, scripts
+- [x] **T-0.1 (S)** Root workspace: `package.json` (workspaces `apps/*`, `packages/*`, scripts
       mirroring SRC root: dev/build/test/lint/typecheck with shared prebuilds),
       `tsconfig.base.json`, `.gitignore`, `LICENSE` (AGPL-3.0-only). → FM-ARC-1, FM-ARC-6
-- [ ] **T-0.2 (S)** Tooling copied from SRC and path-adapted: `.eslintrc.json`,
+      *Also created the `packages/shared` shell (package.json + tsconfigs + `src/index.ts`
+      placeholder) — without it the root `pre*` shared-build scripts cannot resolve.*
+- [x] **T-0.2 (S)** Tooling copied from SRC and path-adapted: `.eslintrc.json`,
       `.prettierrc.json`, `.env.example`. → FM-ARC-5
-- [ ] **T-0.3 (S)** CI: one GitHub Actions workflow — typecheck + lint + test. No deploy jobs. → FM-ARC-5
-- **Gate 0**: `npm install` clean; CI green on the empty skeleton.
+      *Added `.prettierignore` (new): keeps the read-only SRC copy and the hand-wrapped
+      `docs/` + `steering/` markdown out of `npm run format`.*
+- [x] **T-0.3 (S)** CI: one GitHub Actions workflow — typecheck + lint + test. No deploy jobs. → FM-ARC-5
+      *`master` → `main` is the only change from SRC's workflow.*
+- [x] **Gate 0**: `npm install` clean; CI green on the empty skeleton.
+      *Verified 2026-08-12: `npm ci` → 0 vulnerabilities; typecheck, lint, test, `prettier
+      --check` all exit 0.*
+
+**Toolchain deviations from SRC** (decided at Gate 0):
+
+- **vitest `^1.6.0` → `^4.1.10`.** SRC's pin carries 4 advisories, one critical (Vitest UI
+  arbitrary file read/execute). Migrating cost nothing with zero test files in the repo;
+  deferring would have meant porting every copied SRC test twice. Audit is now clean.
+- **vite** — SRC's client pins `^5.3.3`, inside the same vulnerable range. Bump when T-3.1
+  bootstraps the client.
+- **ESLint stays at `^8.57.1`** (EOL, no advisories) because T-0.2's deliverable *is*
+  `.eslintrc.json`, which ESLint 9 no longer reads. Tracked as OD-F8 in `requirements.md` §12.
 
 ## Phase 1 — packages/shared
 
-- [ ] **T-1.1 (S)** `languages.ts` copied verbatim from `SRC/shared/languages.ts` (15 languages,
+- [x] **T-1.1 (S)** `languages.ts` copied verbatim from `SRC/shared/languages.ts` (15 languages,
       exhaustiveness sentinel). → D-2
-- [ ] **T-1.2 (M)** `rotation.ts`: extract `storyIndex` from `SRC/server/src/game.ts` **with
+      *Code body verified byte-identical to SRC; only comment path references adapted
+      (`client/`→`apps/funny-multi-client/`, the dropped `filter/standins.ts` line replaced by
+      `pools/text/<code>.ts`). Re-exported from the package barrel.*
+- [x] **T-1.2 (M)** `rotation.ts`: extract `storyIndex` from `SRC/server/src/game.ts` **with
       `rotation.test.ts` written first** (≥ 5 known-value assertions + range guards; port SRC's
       cases). → FM-CORE-6, FM-ARC-2
-- [ ] **T-1.3 (M)** Pool schema (`pools/schema.ts`, slot config: visual 0/1/2/4 = 9–12,
+      *Test written first and confirmed red (module unresolved) before `rotation.ts` existed.
+      16 tests: SRC's 9 ported verbatim, plus N∈[3..7] bijection/coverage over the shipped room
+      range, `[0,N)` range guard, N=1 modulo boundary, period-N periodicity, and NaN/Infinity/
+      non-integer guards in every argument position. Function body verified byte-identical to
+      SRC. Added `test`/`test:watch` scripts to `packages/shared`.*
+- [x] **T-1.3 (M)** Pool schema (`pools/schema.ts`, slot config: visual 0/1/2/4 = 9–12,
       prose 3/5/6 = 20–30) + `pools.test.ts` validation suite per design §4.2 (coverage,
       uniqueness, ≤ 70 chars, promptEn rules, RU slot-1 «с/со» regex). Tests red until T-1.5. → FM-POOL-1/3/4
+      *41 assertions; **7 red by design** (one per slot: "slot 0 (who) has 0 options; author
+      9–12 of them"). `SLOTS` carries an id `prefix` per slot so a mis-filed option id fails
+      T-1.4, and `AuthoredLanguage`/`AUTHORED_LANGUAGES` is the en+ru→15 switch that T-6.3
+      flips. Empty scaffolds created for `options.ts` and `text/{en,ru,index}.ts` so typecheck
+      and lint stay green while the suite is red — the red is on real assertions, not on
+      unresolved imports.*
 - [ ] **T-1.4 (M)** Canonical option ids + English prompt fragments (`pools/options.ts`):
       author the full id set with `promptEn` for visual slots. Family-friendly, no real
       people/brands. → FM-POOL-1/6, FM-IMG-2

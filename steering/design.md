@@ -56,6 +56,7 @@ funnyone/
 ├── packages/
 │   └── shared/                   # FM-ARC-2 — consumed by both apps; future family products
 │       └── src/
+│           ├── index.ts          # package barrel (the only entry in `exports`)
 │           ├── languages.ts      # copied verbatim from SRC/shared/languages.ts (15 langs)
 │           ├── events.ts         # adapted from SRC/shared/events.ts (deltas in §5)
 │           ├── rotation.ts       # storyIndex() extracted from SRC/server/src/game.ts
@@ -64,6 +65,7 @@ funnyone/
 │               ├── schema.ts     # types + slot config
 │               ├── options.ts    # canonical ids + English prompt fragments
 │               ├── text/<lang>.ts# 15 files of localized display texts
+│               ├── text/index.ts # POOL_TEXTS registry, typed by AuthoredLanguage (§4.1)
 │               └── pools.test.ts # validation suite (FM-POOL-4)
 ├── apps/
 │   ├── funny-multi-server/       # from SRC/server, minus filter/translate (§6)
@@ -124,7 +126,9 @@ export type SlotIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface SlotConfig {
   slot: SlotIndex;
-  kind: 'visual' | 'prose';   // visual → options carry promptEn (FM-POOL-1)
+  label: string;               // dev-facing name: who/withWhom/where/when/did/why/ending
+  prefix: string;              // id namespace; every id in the slot starts `<prefix>.`
+  kind: 'visual' | 'prose';    // visual → options carry promptEn (FM-POOL-1)
   minOptions: number;          // visual 9, prose 20
   maxOptions: number;          // visual 12, prose 30
 }
@@ -137,6 +141,17 @@ export interface AnswerOption {
 // per-language display text, one file per language:
 //   text/ru.ts: export const ru: Record<OptionId, string> = { 'who.grumpy-pirate': 'сердитый пират', … }
 ```
+
+Two additions made when this was implemented (T-1.3):
+
+- **`prefix` per slot.** Ids were already namespaced by convention; making the namespace part
+  of the config lets `pools.test.ts` reject an option filed under the wrong slot during T-1.4 —
+  a mistake that would otherwise surface only as a silently wrong story.
+- **`AuthoredLanguage` / `AUTHORED_LANGUAGES`.** `POOL_TEXTS` is typed
+  `Record<AuthoredLanguage, PoolTextMap>`, where `AuthoredLanguage = Extract<Language,'en'|'ru'>`
+  until T-6.3 widens it to the full `Language` union. That turns "re-enable the 15-language
+  coverage matrix" from a step someone must remember into a compile error until all 15 text
+  files are registered (D-2, FM-POOL-5).
 
 - Ids are permanent once shipped (they key the R2 cache indirectly via prompts and appear in
   tests); texts are freely editable.

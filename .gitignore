@@ -1,0 +1,21 @@
+# Read-only local reference copy of oursharedcode/funny-stories (has its own
+# embedded .git and a local .env with secrets) — never committed here.
+docs/source_project/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.local
+
+# Tooling / OS
+.claude/
+.vite/
+*.log
+.DS_Store
+Thumbs.db

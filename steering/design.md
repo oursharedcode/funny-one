@@ -331,12 +331,26 @@ engine-selection UI and Lottie path are removed.
 - UI catalogs: all 15 SRC `client/src/i18n/*.json` copied; keys added for the combobox
   (e.g. `round.pickOne`, `round.submitPick`) across all 15 files (machine-drafted + flagged
   where not en/ru).
-- Server i18n: `QUESTIONS` and prose templates copied for all 15; stand-in arrays deleted.
-- Room (content) language: any of the 15 — pools guarantee coverage by test (§4.2).
-- Prose rendering stays server-side and identical to SRC (`renderProse` + RU polish); the RU
-  «и» slot-1 prefix rule carries over; pool texts are authored to compose with each
-  language's template (e.g. RU slot-1 options all start with «с/со» so no synthetic prefix
-  is needed — this authoring rule is enforced by a regex in the pool tests).
+- Server i18n: `QUESTIONS` and prose templates copied for all 15; stand-in arrays deleted. The
+  per-language `imagePrompt` field SRC kept in each JSON is **dropped** (T-2.3): DD-4 replaces
+  all 15 with one English skeleton built from pool fragments in `prompt.ts`, so a per-language
+  template here would be dead weight that later drifts from the real builder.
+- Room (content) language: any of the 15 — pools guarantee coverage by test (§4.2). **Until
+  Phase 6 this is gated to `AUTHORED_LANGUAGES` (en, ru)** at room creation (T-2.3). Accepting
+  a language whose texts land in T-6.2/T-6.3 would open a room that plays seven full rounds and
+  then throws at reveal, with the whole story already written. `rooms.isValidLanguage`, the i18n
+  boot check, and `POOL_TEXTS` all key off the same union, so Phase 6 widens them together.
+- Prose rendering stays server-side (`renderProse` + polish pass), but **SRC's three render-time
+  repair transforms are not carried** (T-2.3): the English slot-5 "for " prefix, the RU slot-1
+  «и » prefix, and the RU slot-6 «это закончилось» prefix. All three repaired *free-typed input*;
+  pool texts are authored to compose with each template directly, and `pools.test.ts` enforces
+  exactly those authoring rules (`EN_WHY_CONNECTIVE`, `RU_WITH_PREPOSITION`,
+  `RU_ENDING_MIN_WORDS`). `game.test.ts` re-derives SRC's own predicates and asserts no shipped
+  text would trigger one, so the removal is a checked claim rather than an assumption.
+- **Capitalisation is language-neutral** (T-2.3, carried over from T-1.5). SRC only polished
+  Russian, so its English reveal opened lowercase. `polishProse(language, prose)` gives every
+  language the opening capital, terminal period and space collapse; Russian additionally gets
+  its clause commas via the copied `polishRussianProse`.
 - es-419 / es-es are distinct pool text files (may start identical; regional review flagged).
 
 ## 10. Premium / entitlement (final phase — D-4, FM-TIER-2..4)

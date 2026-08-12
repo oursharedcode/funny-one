@@ -16,11 +16,14 @@ import type {
 import {
   RoomError,
   createRoom,
+  deleteRoom,
+  findRoomForSocket,
   isValidLanguage,
   joinRoom,
   removePlayer,
   validateNickname,
 } from './rooms.js';
+import { handleReadyToggle, prepareRestart, startGame, submitAnswer } from './game.js';
 import {
   RATE_WINDOW_MS,
   ROOM_CREATE_PER_MINUTE,
@@ -35,7 +38,6 @@ import {
 // the Socket.IO server. Every socket handler SRC wired up here is deliberately
 // absent and arrives with the task that owns it:
 //
-//   T-2.3  game:start / round:submit / game:ready / game:restart / game:end
 //   T-2.4  disconnect grace window, botification, host migration, player:lost
 //   T-4.4  reveal:requestPicture / reveal:retryPicture
 //   T-5.1  gallery:share      T-5.3  stats:get
@@ -222,6 +224,74 @@ export async function buildServer({ logger = true } = {}): Promise<BuiltServer> 
       if (!result) return;
       socket.leave(result.room.code);
       if (!result.deleted) broadcastLobby(result.room);
+    });
+
+    socket.on('game:start', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) {
+        socket.emit('error', { code: 'ROOM_NOT_FOUND', message: 'No room.' });
+        return;
+      }
+      if (room.hostId !== socket.id) {
+        socket.emit('error', { code: 'NOT_HOST', message: 'Only the host can start.' });
+        return;
+      }
+      if (room.phase !== 'lobby') {
+        socket.emit('error', { code: 'ROOM_LOCKED', message: 'Game already started.' });
+        return;
+      }
+      if (room.players.length < 3) {
+        socket.emit('error', {
+          code: 'NOT_ENOUGH_PLAYERS',
+          message: 'Need at least 3 players.',
+        });
+        return;
+      }
+      // SRC hard-locked room.wobbleEngine here and re-broadcast the lobby so
+      // every joiner recorded with the same engine. Both are gone with the
+      // field (DD-9), and with them the only reason this handler broadcast.
+      startGame(room, io);
+    });
+
+    socket.on('round:submit', (payload) => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      // Pass the raw value through: submitAnswer owns validation, and a
+      // non-string here is exactly the tampered-client case it rejects.
+      submitAnswer(room, socket.id, payload?.optionId, io);
+    });
+
+    socket.on('game:ready', (payload) => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      handleReadyToggle(room, socket.id, payload?.ready === true, io);
+    });
+
+    socket.on('game:restart', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) {
+        socket.emit('error', { code: 'ROOM_NOT_FOUND', message: 'No room.' });
+        return;
+      }
+      const result = prepareRestart(room, socket.id);
+      if (!result.ok) {
+        socket.emit('error', result.error);
+        return;
+      }
+      broadcastLobby(room);
+      startGame(room, io);
+    });
+
+    socket.on('game:end', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      if (room.hostId !== socket.id) {
+        socket.emit('error', { code: 'NOT_HOST', message: 'Only the host can end the game.' });
+        return;
+      }
+      room.phase = 'ended';
+      io.to(room.code).emit('game:over');
+      deleteRoom(room.code);
     });
 
     socket.on('disconnect', (reason) => {

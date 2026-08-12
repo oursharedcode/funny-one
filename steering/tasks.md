@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1 and T-2.2 done. **T-2.3 next** — round flow. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 96 tests across 2 workspaces (43 shared + 53 server); `npm audit` 0 vulnerabilities. |
+| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1, T-2.2, T-2.3 done. **T-2.4 next** — disconnect rules. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 147 tests across 2 workspaces (43 shared + 104 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -209,14 +209,45 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       *`nanoid` pinned to **`^5.1.16`, not 6.x** — nanoid 6 declares
       `engines.node: ^22 || ^24 || >=26`, and this repo targets Node >= 20 with CI on Node 20.
       Revisit only if the project's Node floor moves.*
-- [ ] **T-2.3 (L)** Round flow in `game.ts`: rotation from shared; `submitAnswer` validates
+- [x] **T-2.3 (L)** Round flow in `game.ts`: rotation from shared; `submitAnswer` validates
       `optionId` (reject `INVALID_OPTION`, no submitted mark); bot/timeout auto-fill = random
       pool pick with same-slot exclusion; 60 s timer; waiting broadcast; reveal entry resolving
       ids → room-language texts; RU `grammar.ts` polish copied. → FM-CORE-5..8, FM-BOT-1/2, FM-ANS-2/4/5
-      *Carry-over from T-1.5: give EN — and every language without its own polish pass — the
-      sentence-opening capitalization `polishRussianProse` already does for RU. Pool texts are
-      caseless by design, so EN prose currently renders "a grumpy pirate and …". SRC shipped
-      the same way, but it lands on the reveal screen, which is the payoff moment.*
+      *Carry-over from T-1.5 **now closed**: `polishProse(language, prose)` gives every language
+      the opening capital, terminal period and space collapse that only RU had; RU still routes
+      through the verbatim-copied `polishRussianProse` for its clause commas. EN prose now reads
+      "A grumpy pirate and a haunted toaster were …" — verified against a real assembled story,
+      not just asserted.*
+      *`INVALID_OPTION` rejects out-of-pool ids, valid-but-wrong-slot ids (the subtle tampering
+      case: a real id submitted in the wrong round), and non-strings — in every case with **no
+      submitted mark**, so a crafted payload cannot skip a slot and leave a hole in someone's
+      story; the player is auto-filled at the deadline like any silent one.*
+      *Auto-fill excludes ids already used at this slot in this room this round. The exclusion
+      cannot run dry — smallest pool is 10 against a 7-player max (T-1.4 sized it that way) — and
+      falls back to plain uniform if a future pool edit breaks that. A 7-bot room is asserted to
+      produce 7 distinct options at every one of the 7 slots.*
+      ***SRC's three render-time repair transforms dropped**, not carried: the EN slot-5 "for "
+      prefix, the RU slot-1 «и » prefix, the RU slot-6 «это закончилось» prefix. Each repaired
+      free-typed input that no longer exists; T-1.5 authored the texts to compose directly, and
+      `pools.test.ts` enforces those rules. `game.test.ts` re-derives SRC's own predicates and
+      asserts no shipped text triggers one, so this is checked, not assumed.*
+      ***Room language gated to `AUTHORED_LANGUAGES` (en, ru)** — a correctness fix on T-2.2's
+      `isValidLanguage`, which accepted all 15. `de` is a real registry entry, so a room could
+      be created in it, play seven full rounds, and throw at reveal with the whole story already
+      written. Rejecting at creation is the honest failure. `isValidLanguage`, the i18n boot
+      check and `POOL_TEXTS` all key off the same union so Phase 6 widens them together;
+      `rooms.test.ts` pins the current behavior with a note to flip it at T-6.3.*
+      *Per-language `imagePrompt` dropped from the i18n JSON (DD-4 — one English skeleton for all
+      15 lives in `prompt.ts` at T-4.2). `copy-i18n.mjs` ported from SRC and wired into `build`;
+      verified the hard way by deleting the copied JSON from `dist/` and confirming the boot
+      check throws `[i18n] Missing …` at startup rather than 500-ing mid-game.*
+      *32 game tests: rotation placement against `storyIndex` at 3 and 7 players, full simulated
+      games at both sizes, per-player-distinct reveals, no reveal to bot slots, timer-expiry
+      auto-fill under fake timers, en+ru prose snapshots, and a check that every resolved answer
+      survives the polish pass verbatim (case-insensitively) — the client highlights answers by
+      matching them inside the prose, so a stray inserted comma would orphan a highlight.*
+      *`game:start` no longer re-broadcasts the lobby: SRC did that solely to push the
+      hard-locked `wobbleEngine`, which DD-9 removed.*
 - [ ] **T-2.4 (M)** Disconnect rules per SRC `index.ts`: grace window, lobby leave, mid-game
       botification (auto-fill current round), host migration, `player:lost`. → FM-CORE-3
 - [ ] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full

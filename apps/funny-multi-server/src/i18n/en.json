@@ -1,0 +1,12 @@
+{
+  "questions": [
+    "Who?",
+    "And who else?",
+    "Where?",
+    "When?",
+    "What did they do?",
+    "What for?",
+    "What happened in the end?"
+  ],
+  "prose": "{0} and {1} were {2} {3}. They {4} {5}. In the end, {6}."
+}

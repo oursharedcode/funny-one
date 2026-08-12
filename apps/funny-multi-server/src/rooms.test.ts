@@ -109,12 +109,23 @@ describe('nickname rules (3–20, spec §17)', () => {
 });
 
 describe('language validation', () => {
-  it('accepts shipped languages and rejects anything else', () => {
+  it('accepts authored languages and rejects nonsense', () => {
     expect(isValidLanguage('en')).toBe(true);
     expect(isValidLanguage('ru')).toBe(true);
     expect(isValidLanguage('klingon')).toBe(false);
     expect(isValidLanguage(undefined)).toBe(false);
     expect(isValidLanguage(7)).toBe(false);
+  });
+
+  it('rejects a registry language that has no authored texts yet (T-2.3)', () => {
+    // Narrower than SRC on purpose. `de` is a real entry in the 15-language
+    // registry, so `isLanguage('de')` is true — but its pool texts and prose
+    // template land in T-6.2/T-6.3. Accepting it here would open a room that
+    // plays seven full rounds and then throws at reveal, with the whole story
+    // already written. This flips to `true` when Phase 6 widens
+    // AuthoredLanguage, and this expectation is meant to be updated then.
+    expect(isValidLanguage('de')).toBe(false);
+    expect(isValidLanguage('zh')).toBe(false);
   });
 });
 

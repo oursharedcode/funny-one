@@ -15,7 +15,7 @@
 // which is written from the spec rather than copied.
 
 import { customAlphabet } from 'nanoid';
-import { isLanguage } from '@funny/shared';
+import { AUTHORED_LANGUAGES, type AuthoredLanguage } from '@funny/shared';
 import type { ErrorCode, Language, Player, Room } from './types.js';
 
 // Constants from spec §17.
@@ -74,8 +74,24 @@ export function validateNickname(raw: unknown): ValidationResult {
   return { ok: true, nickname: trimmed };
 }
 
-export function isValidLanguage(value: unknown): value is Language {
-  return typeof value === 'string' && isLanguage(value);
+/**
+ * A room's content language must be one the server can *fully* render: the 7
+ * questions, the prose template, and a complete set of pool display texts.
+ *
+ * Narrowed from SRC (T-2.3). SRC checked `isLanguage`, accepting all 15,
+ * because its answers were free text and its stand-ins existed for every
+ * language. Here, `POOL_TEXTS` and `src/i18n/*.json` cover en and ru until
+ * T-6.2/T-6.3, so accepting `de` would create a room that plays fine for seven
+ * rounds and then throws at reveal — the worst possible moment, with the whole
+ * story already written. Rejecting at creation is the honest failure.
+ *
+ * Widening is a one-line change in the shared package: T-6.3 extends
+ * `AuthoredLanguage` to the full `Language` union and this follows, as does the
+ * i18n boot check. Deliberately keyed to that same union rather than a local
+ * list, so the three cannot drift apart.
+ */
+export function isValidLanguage(value: unknown): value is AuthoredLanguage {
+  return typeof value === 'string' && (AUTHORED_LANGUAGES as readonly string[]).includes(value);
 }
 
 export function createRoom(nickname: string, language: Language, hostSocketId: string): Room {

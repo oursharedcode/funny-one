@@ -42,13 +42,39 @@ interface RevealPayload {
 }
 
 /**
- * Plays a complete game over real sockets and returns everything needed to
- * assert on it.
- *
- * Each client answers by reacting to `round:start` exactly as a real client
+ * Makes every client answer the moment a round opens, exactly as a real client
  * would — the server drives the pace, the test never assumes a round boundary.
  * Player p answers round r with `optionAt(r, p)`, so every pick is distinct
- * within a round and traceable to its author.
+ * within a round and traceable to its author. `picks[round][player]` records
+ * what was actually sent, so assertions compare against that rather than
+ * against what the test intended to send.
+ *
+ * Returns a detach function, and that return value is load-bearing: these
+ * listeners outlive the game they were attached for. A test that then restarts
+ * the room has three clients racing to answer round 0 of the *second* game
+ * while it is still asserting on the freshly-reset board.
+ */
+function attachAutoPlay(sockets: Socket[], picks: OptionId[][]): () => void {
+  const handlers = sockets.map((socket, player) => {
+    const handler = (payload: { roundNumber: number }): void => {
+      const id = optionAt(payload.roundNumber, player);
+      picks[payload.roundNumber]![player] = id;
+      socket.emit('round:submit', { optionId: id });
+    };
+    socket.on('round:start', handler);
+    return handler;
+  });
+  return () => sockets.forEach((s, i) => s.off('round:start', handlers[i]!));
+}
+
+function emptyPicks(playerCount: number): OptionId[][] {
+  return Array.from({ length: ROUNDS }, () => new Array<OptionId>(playerCount).fill(''));
+}
+
+/**
+ * Plays a complete game over real sockets and returns everything needed to
+ * assert on it — including `stopAutoPlay`, which callers that keep using the
+ * room after the reveal must call before asserting on it.
  */
 async function playFullGame(
   playerCount: number,
@@ -58,6 +84,7 @@ async function playFullGame(
   sockets: Socket[];
   reveals: RevealPayload[];
   picks: OptionId[][];
+  stopAutoPlay: () => void;
 }> {
   const h = await startTestServer();
   harness = h;
@@ -77,26 +104,14 @@ async function playFullGame(
     expect(ack.error, `player ${i} failed to join`).toBeUndefined();
   }
 
-  // picks[round][player] — filled as each client answers, so the assertions
-  // below compare against what was actually sent, not what we intended to send.
-  const picks: OptionId[][] = Array.from({ length: ROUNDS }, () =>
-    new Array<OptionId>(playerCount).fill(''),
-  );
-
+  const picks = emptyPicks(playerCount);
   const revealPromises = sockets.map((s) => once<RevealPayload>(s, 'reveal:start'));
-
-  sockets.forEach((socket, player) => {
-    socket.on('round:start', (payload: { roundNumber: number }) => {
-      const id = optionAt(payload.roundNumber, player);
-      picks[payload.roundNumber]![player] = id;
-      socket.emit('round:submit', { optionId: id });
-    });
-  });
+  const stopAutoPlay = attachAutoPlay(sockets, picks);
 
   sockets[0]!.emit('game:start');
   const reveals = await Promise.all(revealPromises);
 
-  return { roomCode, sockets, reveals, picks };
+  return { roomCode, sockets, reveals, picks, stopAutoPlay };
 }
 
 describe('Gate 2 — full game over real sockets', () => {
@@ -263,9 +278,15 @@ describe('Gate 2 — round flow over real sockets', () => {
 
 describe('Gate 2 — restart into a second game', () => {
   it('replays a full game after game:restart', async () => {
-    const { roomCode, sockets } = await playFullGame(3);
+    const { roomCode, sockets, stopAutoPlay } = await playFullGame(3);
     const room = getRoom(roomCode)!;
     const firstStories = room.stories.map((s) => [...s.answers]);
+    expect(firstStories.every((s) => s.every((a) => a !== null))).toBe(true);
+
+    // Detach before restarting: with the first game's listeners still armed,
+    // all three clients answer round 0 of the second game the instant it opens
+    // and the board is no longer empty by the time it is checked below.
+    stopAutoPlay();
 
     const restarted = sockets.map((s) => once<{ roundNumber: number }>(s, 'round:start'));
     sockets[0]!.emit('game:restart');
@@ -275,6 +296,23 @@ describe('Gate 2 — restart into a second game', () => {
     expect(fresh.phase).toBe('playing');
     expect(fresh.currentRound).toBe(0);
     expect(fresh.stories.every((s) => s.answers.every((a) => a === null))).toBe(true);
-    expect(firstStories.every((s) => s.every((a) => a !== null))).toBe(true);
+
+    // The board resets — now prove the second game actually plays to a reveal
+    // on it, which is what "replays a full game" claims. Round 0 is already
+    // open, so it is submitted by hand; auto-play carries rounds 1-6.
+    const picks = emptyPicks(3);
+    const reveals = sockets.map((s) => once<RevealPayload>(s, 'reveal:start'));
+    attachAutoPlay(sockets, picks);
+    sockets.forEach((socket, player) => {
+      picks[0]![player] = optionAt(0, player);
+      socket.emit('round:submit', { optionId: picks[0]![player]! });
+    });
+
+    for (const reveal of await Promise.all(reveals)) {
+      expect(reveal.answers).toHaveLength(ROUNDS);
+      expect(reveal.answers.every((a) => a.length > 0)).toBe(true);
+    }
+    expect(getRoom(roomCode)!.phase).toBe('reveal');
+    expect(getRoom(roomCode)!.stories.every((s) => s.answers.every((a) => a !== null))).toBe(true);
   });
 });

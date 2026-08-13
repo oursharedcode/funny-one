@@ -94,6 +94,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `server/src/disconnect.ts` | **new** | extracted from SRC's inline `disconnectTimers` map (T-2.4). Same rules; a module so the window is testable on fake timers and can be cleared on server shutdown, which SRC — a process that never shut down — had no need for |
 | `server/src/game.ts` | adapt | rotation kept (extracted to shared); submit/auto-fill/prompt paths change (§6) |
 | `server/src/game*.test.ts` | adapt | rewrite answer fixtures to option ids |
+| `server/src/i18n/index.test.ts` | **new** | not adapted (T-2.5): every SRC case tests one of the three render-time repair transforms this design drops (§9). Rewritten to cover what the loader and `renderProse` guarantee instead — language coverage, slot completeness, verbatim substitution |
+| `server/vitest.config.ts` | **new** | 20 s test/hook timeout (T-2.5). Four suites run a real Fastify + Socket.IO server and vitest fans files across all cores; the 5 s default tripped on merely-slow runs, not stuck ones |
 | `server/src/image.ts` | adapt | Worker returns JSON `{url,width,height,cached}`; cap skips cache hits (§7.3) |
 | `server/src/prompt.ts` | adapt | deterministic builder (§7.1); STYLE_SUFFIX kept verbatim (spec §22 lock) |
 | `server/src/stats.ts` | copy | live stats broadcast |

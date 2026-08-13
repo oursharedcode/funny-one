@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1, T-2.2, T-2.3, T-2.4 done; Gate 2 passed. **T-2.5 next** — only the i18n coverage test remains of it. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 177 tests across 2 workspaces (43 shared + 134 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). **Phase 3 next — T-3.1.** |
+| **Build state** | typecheck / lint / format / `npm test` all green — 199 tests across 2 workspaces (43 shared + 156 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -279,15 +279,39 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       *Carry-overs, deferred to the tasks that own them: `finalizePlayerRemoval` should also
       re-broadcast stats (T-5.3) and, when the drop lands in the reveal phase, kick off bot-story
       pictures (T-4.4) — SRC does both here.*
-- [ ] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full
+- [x] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full
       simulated 3- and 7-player games; INVALID_OPTION case; en+ru prose snapshots. → design §13
       *Mostly landed early: T-2.3 shipped `game.test.ts` (32 tests — option-id fixtures, full
       in-process 3- and 7-player games, INVALID_OPTION, en+ru prose snapshots) and
       `game.socket.test.ts` (11 tests — the same games over real sockets, closing Gate 2; see
       the gate note below), and T-2.4 shipped `disconnect.socket.test.ts` (11) for the
-      disconnect/botification scenarios. **Remaining for T-2.5:** the i18n coverage test extending SRC's
-      `i18n/index.test.ts` pattern. Reuse `src/testutils/socket.ts` — the shared harness, kept
-      out of `dist` via a `tsconfig.build.json` exclude.*
+      disconnect/botification scenarios. This task closed the remainder:*
+      ***`src/i18n/index.test.ts` (22 tests) — written, not adapted.** Every case in SRC's
+      `i18n/index.test.ts` exercises one of the three render-time repair transforms, and all
+      three are deliberately gone (T-2.3; see design §9). Adapting the file would have meant
+      re-adding the code to keep its tests. `game.test.ts` already covers the **pool** side of
+      that removal — no shipped text would trigger a repair; this covers the **module** side:
+      loader coverage (questions + prose + `POOL_TEXTS` keyed by exactly `AUTHORED_LANGUAGES`,
+      so a stray half-translated JSON cannot become renderable), 7 non-blank non-duplicate
+      questions per language, every `{0}`–`{6}` present exactly once per template (a missing
+      slot silently discards an answer), verbatim substitution including the RU reordering,
+      no re-substitution of a brace inside an answer, blank-not-`undefined` for a short answers
+      array, and `requireAuthoredLanguage` rejecting a registered-but-unauthored `fr`.
+      Negative-controlled four ways, each confirmed red: an off-by-one slot index (8 failures),
+      re-adding SRC's slot-5 "for " repair (3), dropping `{5}` from the RU template (3), and
+      removing the `isAuthored` guard (3).*
+      ***Fixed a real flake found while verifying, not introduced by it.*** *`game.socket.test.ts`'s
+      restart case failed ~50% of runs. `playFullGame` attached a `round:start` auto-answer
+      listener per client and never detached it, so after `game:restart` all three clients raced
+      to answer round 0 of the second game while the test was still asserting the board was
+      empty. Extracted `attachAutoPlay`, which returns a detach function; the restart case now
+      detaches, asserts the reset deterministically, then re-attaches and plays the second game
+      through to a reveal — which is what its name claimed all along and it never actually did.*
+      ***Added `apps/funny-multi-server/vitest.config.ts`*** *(`testTimeout`/`hookTimeout` 20 s).
+      Four suites here each run a real Fastify + Socket.IO server, and vitest fans test files
+      out across all cores — vitest's default 5 s ceiling tripped on merely-slow runs under that
+      load, in two different files. Nothing here should take seconds, so a genuine hang still
+      fails; only the load-sensitivity is gone. Verified with 6 consecutive full-suite runs.*
 - **Gate 2**: server tests green; **full 7-round game over real Socket.IO connections**, correct
   story assembly verified (rotation placement). Runs in CI on every build.
   ***Resolved 2026-08-13 — the manual 3-tab run is replaced by an automated one.*** The gate as

@@ -104,7 +104,7 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `server/src/translate.ts` | **drop** | replaced by pre-authored prompt fragments |
 | `server/src/filter/**` | **drop** | FM-ANS consequences table; no untrusted text remains |
 | `server/src/env.ts` | adapt | new env vars (§11) |
-| `client/src/App.tsx` | adapt | phase routing carried; `wobbleEngine` dropped from `LobbyState` and the `lobby:update` handler (DD-9) |
+| `client/src/App.tsx` | adapt | phase routing carried; `wobbleEngine` dropped from `LobbyState` and the `lobby:update` handler (DD-9). `LobbyState.language` narrowed to `AuthoredLanguage` (T-3.3) — the server will not create a room in any other (T-2.3), and `POOL_TEXTS` is keyed by it, so the guarantee is stated once rather than cast at each use |
 | `client/src/socket.ts`, `swReload.ts`, `version.ts` | copy | package name is the only edit |
 | `client/src/sourceUrl.ts` | adapt | this repo's URL — the constant exists to identify the running binary's upstream |
 | `client/src/i18n/index.ts` | adapt | boot completeness check keyed to `AUTHORED_LANGUAGES`, not all 15 (§9) |
@@ -118,7 +118,7 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/screens/WaitingScreen/EndScreen` | copy | unchanged flows |
 | `client/vitest.config.ts` + `src/testSetup.ts` | **new** | T-3.2. jsdom environment for the first component tests; separate from `vite.config.ts` so test runs skip the PWA build, and repeats its `__APP_VERSION__`/`__BUILD_DATE__` defines. Setup stubs `ResizeObserver` and `matchMedia`, which jsdom lacks and shipped code reaches |
 | `client/src/testutils/socketMock.ts` | **new** | T-3.2. `socket.ts` connects at module scope, so every screen suite mocks it; the double `act`-wraps ack and broadcast callbacks, without which React had not re-rendered by the next assertion and absence-assertions passed vacuously |
-| `client/src/screens/RoundScreen.tsx` | adapt | textarea → combobox (§8.1) |
+| `client/src/screens/RoundScreen.tsx` | **rewrite** | not an adaptation in practice (T-3.3): SRC's body is a textarea, a character counter and a non-empty check, and none of it survives §8.1's combobox. Only the header — TimerBar, progress line, question, joiner gloss, story-language reminder — and the SubmitConfirm overlay carry over |
 | `client/src/screens/RevealScreen.tsx` | adapt | image by URL + dimensions (§8.2) |
 | `client/src/components/**` (TimerBar, PlayerList, QRCode, ProseText, RoomGallery, ShareButton, ScrollBox, SourceFooter, LogoStamp, art/*) | copy | design-system implementation (FM-ARC-4) |
 | `client/src/styles/*` | copy | tokens + motion presets |

@@ -162,14 +162,28 @@ export default function HomeScreen({ onJoined }: Props) {
         }
         return;
       }
+      // The room language enters the client here, and this is the only place it
+      // does. The server will not create a room in an unauthored language
+      // (T-2.3), so this holds for every room that exists — but the ack is
+      // typed `Language`, and `LobbyState` promises the narrower
+      // `AuthoredLanguage` that RoundScreen needs to index `POOL_TEXTS`.
+      // Narrowing at the boundary keeps that a compile-time fact everywhere
+      // downstream. The failure is reachable only if a newer server meets an
+      // older client mid-rollout; refusing the join is the honest outcome,
+      // since joining would mean seven rounds of blank options.
+      if (!isAuthoredLanguage(ack.language)) {
+        setError(t('home.unsupportedLanguage'));
+        return;
+      }
+      const roomLanguage = ack.language;
       // Default the joiner's UI to the room's content language — unless they
       // explicitly cycled to a different one on this screen, which we preserve.
-      if (!uiLangTouched) void i18n.changeLanguage(ack.language);
+      if (!uiLangTouched) void i18n.changeLanguage(roomLanguage);
       onJoined({
         roomCode: urlRoom,
         socketId: ack.socketId,
         hostId: ack.hostId,
-        language: ack.language,
+        language: roomLanguage,
         players: ack.players,
         donateUrl: null,
       });

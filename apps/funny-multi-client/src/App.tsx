@@ -23,10 +23,10 @@ import { snappy } from './styles/motion';
 import { socket } from './socket';
 import { APP_VERSION } from './version';
 import type {
+  AuthoredLanguage,
   ErrorPayload,
   GalleryReadyPayload,
   GameRestartReadyPayload,
-  Language,
   LobbyUpdatePayload,
   Player,
   PlayerLostPayload,
@@ -41,7 +41,18 @@ export interface LobbyState {
   roomCode: string;
   socketId: string;
   hostId: string;
-  language: Language;
+  /**
+   * The room's content language.
+   *
+   * Narrowed to `AuthoredLanguage`, not `Language`: the server refuses to
+   * create a room in a language whose answer pools are not authored (T-2.3's
+   * `isValidLanguage`), so every room that exists is one this client can fully
+   * render — and RoundScreen needs exactly that guarantee to index
+   * `POOL_TEXTS`, which is keyed by `AuthoredLanguage`. Stating it here makes
+   * it a compile-time fact for every screen instead of a cast in each one.
+   * HomeScreen does the narrowing where the value enters the client (T-3.3).
+   */
+  language: AuthoredLanguage;
   players: Player[];
   // Deployer's "Support this server" link, or null when unset (spec §20).
   donateUrl: string | null;

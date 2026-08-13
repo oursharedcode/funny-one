@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1 and T-3.2 done. **T-3.3 next.** |
-| **Build state** | typecheck / lint / format / `npm test` all green — 248 tests across 3 workspaces (43 shared + 156 server + 49 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1, T-3.2 and T-3.3 done. **T-3.4 next**, then Gate 3. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 283 tests across 3 workspaces (43 shared + 156 server + 84 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -441,11 +441,60 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       again reds 6 tests.*
       ***Verified beyond CI:*** *root `npm run build` (both workspaces, 37 precache entries) and
       the live-server language cross-check above.*
-- [ ] **T-3.3 (L)** **RoundScreen combobox** per design §8.1: tap-card radio list from shared
+- [x] **T-3.3 (L)** **RoundScreen combobox** per design §8.1: tap-card radio list from shared
       pools (room language), per-player-per-round shuffle, selection spring highlight, Submit
       gated on selection, SubmitConfirm overlay, question gloss kept, ScrollBox for 20–30-option
       slots. → FM-ANS-1/3/4, FM-CORE-8
+      *The one screen in the client that is **authored, not copied** — SRC's is a textarea, a
+      character counter and a non-empty check. Everything design §8.1 asks for landed:
+      `role="radiogroup"` over `<button role="radio">` cards (which keeps Space/Enter activation
+      native), arrow-key navigation with wrap plus Home/End, roving tabindex so the whole list is
+      one tab stop, the `snappy` selection spring, Submit gated on a selection with
+      `round.submitDisabled` as its title, the SubmitConfirm overlay, the joiner-only question
+      gloss and story-language reminder, and `ScrollBox` + `round.scrollHint` for the three
+      20–30-option prose slots (the visual slots' 9–12 sit in page flow).*
+      ***Options are rendered locally, never received*** *(DD-2): `round:start` carries only the
+      round number, question and deadline, so the screen reads `POOLS[slot]` and
+      `POOL_TEXTS[roomLanguage]` from the same `@funny/shared` build the server uses. One round
+      per slot, so the round number **is** the slot index — the client's `slot` and the server's
+      `slotOf` are the same statement made twice, and a test asserts each round renders exactly
+      its own pool.*
+      ***Shuffle is deliberately unseeded.*** *FM-ANS-3 wants the order to differ per player per
+      round; any shared seed — room code, round number — would give everyone in the room the same
+      order and defeat it. Fisher-Yates over `Math.random`, held in a `useMemo` keyed on the slot
+      so it is stable for every re-render **within** a round: reshuffling on render would move
+      the list under the player's finger on each selection, which is a way to commit an answer
+      you cannot take back.*
+      ***`LobbyState.language` narrowed from `Language` to `AuthoredLanguage`*** *(App.tsx), with
+      the narrowing done where the value enters the client — HomeScreen's join ack. `POOL_TEXTS`
+      is keyed by `AuthoredLanguage`, and the server already refuses to create a room in any
+      other (T-2.3), so the wide type was a fact the code knew and the types did not; stating it
+      once makes it compile-time for every screen instead of a cast in each. The unreachable
+      branch is handled rather than asserted away: a room language this build cannot render is
+      refused with a new `home.unsupportedLanguage` string, reachable only if a newer server
+      meets an older client mid-rollout. (Not an `errors.*` key — that record is pinned
+      exhaustively to the `ErrorCode` union by `catalogs.test.ts`.)*
+      ***`TimerBar` carried here, not at T-3.4*** *which lists it: this screen is what puts a 60 s
+      deadline on screen, and WaitingScreen has no timer of its own.*
+      ***35 new tests*** *(client 49 → 84), negative-controlled **eleven** ways. The two Gate 3
+      clauses that are properties of a rendered screen are now permanent guards: **no free-text
+      affordance** is asserted per round across all seven slots — no `input`, `textarea`,
+      `[contenteditable]` or `[placeholder]`, and no searchbox/textbox/combobox role, since a
+      filter field is a text field by the back door — and **shuffle differs between players**
+      compares two seeded renders and additionally asserts the second is a permutation of the
+      first, so a truncated list cannot pass as a shuffled one.*
+      ***One control failed to go red, and the test was wrong rather than the code.*** *Deleting
+      the `submitted` early-return inside `submit()` changed nothing: the button is already
+      disabled by then, so that guard never runs, and a test named "cannot be submitted twice"
+      was really testing the `disabled` attribute. Renamed to say so, with the redundancy
+      recorded in both the test and the component rather than left as a claim the suite did not
+      support. The guard stays — the action is irreversible — but it is explicitly not counted
+      as covered.*
 - [ ] **T-3.4 (S)** WaitingScreen copy; timer bar; forward-only screen transitions per SRC §17. → FM-ARC-4
+      *Reduced scope: `TimerBar` landed at T-3.3 (RoundScreen owns the 60 s deadline; WaitingScreen
+      has no timer), and App.tsx's forward slide-fade was carried at T-3.1. What remains is the
+      WaitingScreen copy itself and a pass confirming the transition is forward-only across the
+      now-real screens.*
 - **Gate 3**: two phones (or tabs) create/join/play 7 rounds end-to-end with real UI;
   no free-text affordance anywhere; shuffle differs between players.
   *Two of the three clauses are properties of a rendered screen, and T-3.2 landed the DOM test

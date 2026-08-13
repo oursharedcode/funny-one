@@ -70,8 +70,10 @@ funnyone/
 ├── apps/
 │   ├── funny-multi-server/       # from SRC/server, minus filter/translate (§6)
 │   └── funny-multi-client/       # from SRC/client (§8)
-├── cloudflare/
+├── cloudflare/                   # a workspace, unlike SRC's — see below
 │   ├── worker.js                 # rewritten — §7.2 (SRC worker.js as starting point)
+│   ├── worker.test.js            # T-4.1 — fakes for AI/R2/KV; the cache key is pinned
+│   ├── package.json              # name + `test` script only; no dependencies
 │   └── wrangler.toml             # + R2 bucket binding, KV binding
 ├── docs/                         # existing requirement docs + read-only source_project
 └── steering/                     # this document set
@@ -79,6 +81,11 @@ funnyone/
 
 `apps/hub` and `apps/funny-one` are added by later products; workspace globs (`apps/*`,
 `packages/*`) already cover them.
+
+`cloudflare` is listed as a third workspace entry (T-4.1), which SRC's copy explicitly was not.
+SRC's Worker was a pass-through with nothing to test; this one owns the cache, and root
+`npm test` — `npm run test -ws --if-present` — is how every other directory's suite reaches CI.
+It declares no dependencies: `wrangler deploy` still bundles `worker.js` alone.
 
 ## 3. Reuse map (SRC → this repo)
 
@@ -131,7 +138,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/screens/Test*` | drop v1 | dev-only harnesses; re-add on demand |
 | `client/src/screens/PlaceholderScreen.tsx` | **new** | T-3.1 scaffold. A phase router needs six destinations; the screens land across five later tasks, so each file renders this until its task replaces it wholesale |
 | `client/src/i18n/catalogs.test.ts` | **new** | T-3.1. Catalogue drift is the one silent failure in the bootstrap — i18next falls back to English without complaint. Key parity, interpolation parity, and a compile-time `Record<ErrorCode, true>` |
-| `cloudflare/worker.js` | adapt | R2 cache + serve routes (§7.2) |
+| `cloudflare/worker.js` | **rewrite** | T-4.1. Only the secret gate, the `/stats` route and the best-effort KV bump survive as SRC wrote them. The generate path inverts: SRC returned image bytes to the server, this one returns a URL into an R2 cache it owns (§7.2, DD-5), which is a different set of failure modes — a shifted key orphans every image, a hit reported as a miss spends a cap slot (§7.3) |
+| `cloudflare/worker.test.js`, `package.json` | **new** | T-4.1. SRC shipped the Worker untested; a `fetch(request, env)` export needs no miniflare, only fakes for the three bindings |
 | Root `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `render.yaml`, `.env.example` | adapt | workspace paths, new env vars |
 | `docs/DEPLOYMENT.md`, `DEVELOPMENT.md`, `CUSTOMIZATION.md` | adapt | rewrite for this repo at Phase 8 |
 | `docs/MODERATION.md` | adapt | shrinks to the FM-CPL-3 posture |
@@ -302,17 +310,39 @@ Bindings: `AI`, `STATS_KV` (existing), **new** `IMAGES` (R2 bucket). All routes 
 
 - `GET /generate?prompt=…` → `hash = hex(sha256(prompt))`; `IMAGES.head('i/'+hash+'.png')`:
   - **hit** → `200 {url, width, height, cached:true}` — no AI call, no KV bump.
-  - **miss** → Flux Schnell (4 steps, never raise), decode, `IMAGES.put` with
-    `contentType: image/png`, bump daily KV counter (best-effort, as SRC), return
-    `{url, width, height, cached:false}`. Flux output is 1024×768 by default; dimensions are
-    read from the request parameters we send (fixed), not parsed from bytes.
+  - **miss** → Flux Schnell (4 steps, never raise), decode, `IMAGES.put`, bump daily KV counter
+    (best-effort, as SRC), return `{url, width, height, cached:false}`. A `put` that fails is a
+    `502`: a success here would hand every phone in the room a URL that 404s.
+  - **dimensions are read from the stored bytes** (PNG `IHDR` / JPEG `SOF`), not from request
+    parameters — Flux Schnell accepts `prompt` and `steps` and nothing else, so there is no size
+    to ask for, and a hard-coded 1024×768 would be an unverifiable constant that RevealScreen
+    reserves layout from (T-4.4). They are written to R2 `customMetadata`, so a cache hit reports
+    the same numbers the fresh generation did; the documented 1024×768 remains only as the
+    fallback for bytes whose header cannot be read.
+  - **stored `contentType` is sniffed from the magic bytes.** Flux Schnell returns base64 **JPEG**
+    (SRC labelled it `image/jpeg` too), so declaring `image/png` would be a lie browsers happen to
+    tolerate. The `.png` in the key and the route is cosmetic — the content-addressed URL is never
+    read for its extension, and §8.3's download re-encodes through a canvas regardless.
   - `url` = `https://<worker-host>/i/<hash>.png` (Worker-served; R2 egress is free, and the
-    Worker route lets us set headers without a public bucket).
+    Worker route lets us set headers without a public bucket), built from the **incoming request's
+    own origin**: whatever host the server reached the Worker on is by construction one that
+    resolves, and that same URL then goes to every phone.
+- `GET /exists?prompt=…` → the R2 head and nothing else (the §7.3 probe): `{cached:false}` on a
+  miss, `{url, width, height, cached:true}` on a hit. Deliberately incapable of generating.
 - `GET /i/<hash>.png` → stream from R2 with `Cache-Control: public, max-age=31536000, immutable`,
-  `Access-Control-Allow-Origin: *` (needed by canvas download/share, §8.3). No secret — URLs
-  are unguessable (content-hash keyed) and images contain no user data (FM-IMG-4).
+  `ETag`, and `Access-Control-Allow-Origin: *` (needed by canvas download/share, §8.3). No secret —
+  URLs are unguessable (content-hash keyed) and images contain no user data (FM-IMG-4). Keys that
+  do not match `^i/[0-9a-f]{64}\.png$` are 404'd without asking R2. No `OPTIONS` handler: every
+  request we make for these URLs is a plain `GET` with no custom headers, which is never
+  preflighted.
 - `GET /stats` → unchanged from SRC.
-- `POST /entitlement` → premium phase, §10.
+- `POST /entitlement` → premium phase, §10. Routing dispatches on pathname first, leaving method
+  checks to the routes, so this lands without restructuring.
+
+Not carried from SRC: the raw-byte-stream fallback for pre-Flux image models. SRC streamed bytes
+straight through; this Worker has to **store** them, and a stream cannot be sniffed for type or
+size before it is stored. The model is pinned in the same file, so an unexpected response shape is
+a `502` rather than a silently mis-typed cache entry.
 
 ### 7.3 Daily cap semantics (FM-TIER-1)
 
@@ -456,6 +486,13 @@ post-v1 phase; nothing in v1 may preclude it.
   Gate 2 applied when it replaced its manual 3-tab run. Scope stays deliberately narrow:
   behaviour that encodes a cross-boundary contract, not markup or styling. Screens carried
   unchanged from SRC still get no suite of their own.*
+- **Worker**: `cloudflare/worker.test.js` (T-4.1) drives `fetch(request, env)` against fakes for
+  the three bindings — no miniflare, since the Worker's whole environment is those three objects.
+  What it holds is the part that cannot be checked by looking at a picture: the cache key is
+  pinned to a sha256 vector (a shifted key orphans every image ever generated), `cached` is
+  asserted on both the hit and the hit-after-miss race that §7.3 refunds on, the daily counter is
+  asserted **not** to move on a hit, and `steps` is pinned at 4 (spec §18 — the one edit here that
+  costs money without failing anything).
 - **Manual gates** (per SRC build-order discipline): dead-Worker error path;
   `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice → second reveal instant,
   counter unchanged); phone PWA install; RU full game (declined texts read grammatically); RTL

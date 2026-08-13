@@ -1,0 +1,61 @@
+name = "funny-multi-image"
+main = "worker.js"
+compatibility_date = "2026-08-13"
+# Disable the auto-generated *.workers.dev preview URL. The Worker is only
+# reached by the Render server via the shared-secret check (spec §15); exposing
+# a preview URL is unnecessary surface area.
+#
+# Note this does NOT hide the images: /i/<hash>.png is public by design (§7.2),
+# served from whichever hostname the server reached this Worker on.
+preview_urls = false
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+
+[ai]
+binding = "AI"
+
+# R2 — REQUIRED. The image cache itself (design §7.2): one generation per
+# distinct story for the whole world, and the reason a repeated story reveals
+# instantly. Without this binding /generate cannot store and /i/ cannot serve.
+#
+# Unlike the KV block below, this is safe to ship uncommented: a bucket *name*
+# is scoped to whichever account runs `wrangler deploy`, so no id from someone
+# else's account is baked in here. Create it once, in your own account:
+#
+#   wrangler r2 bucket create funny-multi-images
+#
+# The free tier (10 GB stored, 1 M writes/month) is far above our usage — a
+# Flux Schnell frame is ~100 KB, so 10 GB is ~100 000 distinct stories, and the
+# cache converges long before that (design §4).
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "funny-multi-images"
+
+# Workers KV — OPTIONAL. Persists the daily image counter across Render
+# free-tier spin-downs. The server's in-memory counter resets on each cold
+# start; this KV namespace is the cross-process source of truth.
+#
+# Left commented out by default so a one-click deploy works for ANY account: a
+# KV `id` belongs to the account that created it, so a hard-coded id from
+# another account makes `wrangler deploy` fail with "namespace not valid". The
+# Worker treats STATS_KV as optional (see worker.js: `if (!env.STATS_KV)`) and
+# runs fine without it — only the cross-cold-start "Images today" counter is
+# lost, which the Render free tier already resets.
+#
+# To enable persistent stats in YOUR account (one-time):
+#   wrangler kv namespace create STATS_KV            # prints your id
+#   wrangler kv namespace create STATS_KV --preview  # prints your preview_id
+# then uncomment the block below and paste YOUR returned ids. The free tier
+# (1 000 writes/day per key, 100 000 reads/day) is far above our usage.
+#
+# [[kv_namespaces]]
+# binding = "STATS_KV"
+# id = "<your-namespace-id>"
+# preview_id = "<your-preview-namespace-id>"
+
+# Set WORKER_SECRET via: wrangler secret put WORKER_SECRET
+# Then set the same value as CLOUDFLARE_WORKER_SECRET in the Render dashboard.

@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — T-3.1 to T-3.4 done; all six screens are real. **Gate 3's manual two-phone run is the only thing between here and Phase 4.** |
-| **Build state** | typecheck / lint / format / `npm test` all green — 307 tests across 3 workspaces (43 shared + 156 server + 108 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which has begun: T-4.1 done. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 346 tests across 4 workspaces (43 shared + 156 server + 108 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -546,6 +546,17 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   selection spring, the timer bar's colour turns and panic, PWA-shell scrolling on a small
   screen, and that the forward slide-fade reads as forward. Follow Gate 2's precedent: what can
   be automated has been, and the manual run is now only for what eyes and thumbs are for.
+  ***Three things the setup turned up*** *(2026-08-13, while preparing the run). The gate says
+  "two phones (or tabs)", but `game:start` rejects a room under three players (spec §4, enforced
+  since T-2.2) — so the run needs a third client; two phones plus a laptop tab, which also gives
+  somewhere to watch the log. It must be the **production** build (`npm run build` then
+  `NODE_ENV=production npm start`), not `npm run dev`: in dev the client hard-codes
+  `http://localhost:3000` for the socket, which on a phone means the phone itself. Production
+  serves both from one origin, so the QR's `window.location.origin` is the LAN address and join
+  by scan works. And the **service worker will not register over LAN HTTP** — a bare IP is not a
+  secure context — so this pass covers app-shell layout and scrolling in the mobile browser,
+  while the installed-standalone check stays with T-7.1, which already carries a real-device
+  install test.*
 
 **Toolchain deviations from SRC** (decided at T-3.1), same policy as Gate 0 — carry SRC's pins
 unless they carry advisories:
@@ -569,10 +580,58 @@ unless they carry advisories:
 
 ## Phase 4 — Image pipeline
 
-- [ ] **T-4.1 (M)** Worker rewrite per design §7.2: sha256 → R2 head → hit `{url,w,h,cached:true}` /
+- [x] **T-4.1 (M)** Worker rewrite per design §7.2: sha256 → R2 head → hit `{url,w,h,cached:true}` /
       miss → Flux 4 steps → R2 put → KV bump → `{…,cached:false}`; `GET /i/<hash>.png` route
       (immutable cache, CORS); `GET /exists`; `/stats` kept; wrangler.toml with R2 + KV
       bindings. → FM-IMG-3
+      *A rewrite, not an adaptation: only the secret gate, `/stats` and the best-effort KV bump
+      survive as SRC wrote them. SRC's Worker generated on every call and streamed bytes back for
+      the server to re-broadcast as base64; this one owns a content-addressed cache and returns a
+      URL (DD-5), which inverts the whole generate path and brings failure modes SRC could not
+      have — a key that shifts between deploys orphans every image ever generated, and a hit
+      reported as a miss spends a daily cap slot that was never needed (§7.3).*
+      ***Three divergences from design §7.2, all recorded there.*** *(1) **Dimensions are parsed
+      from the bytes** (PNG `IHDR` / JPEG `SOF`) rather than echoed from request parameters —
+      Flux Schnell accepts `prompt` and `steps` and nothing else, so there were no parameters to
+      echo and the design's "fixed 1024×768" would have been an unverifiable constant. It matters
+      because RevealScreen reserves layout space from these numbers (T-4.4): a wrong constant is a
+      visible jump on every phone, and it would go wrong silently the day the model's output size
+      changes. Parsed dimensions go into R2 `customMetadata` so a cache hit reports what the fresh
+      generation did; 1024×768 survives only as the fallback for unreadable headers. (2) The
+      stored `contentType` is **sniffed**, because Flux Schnell returns base64 JPEG — SRC labelled
+      it `image/jpeg` too — so the design's `contentType: image/png` was a lie browsers happen to
+      tolerate. The `.png` in the key and route stays: it is cosmetic, and §8.3's download
+      re-encodes through a canvas anyway. (3) SRC's **raw-stream fallback for pre-Flux models is
+      dropped** — a stream cannot be sniffed for type or size before it is stored, and this Worker
+      has to store it; the model is pinned in the same file, so an unexpected shape is a 502
+      rather than a mis-typed cache entry.*
+      ***`cloudflare/` is now an npm workspace***, *which SRC's copy explicitly was not. SRC had
+      nothing to test there; this Worker holds the cache, and root `npm test` is how every other
+      directory's suite reaches CI — a second mechanism for one directory would be worse than the
+      third workspace entry. It declares no dependencies, so `wrangler deploy` still bundles
+      `worker.js` alone.*
+      ***39 tests, negative-controlled thirteen ways, all thirteen red.*** *No miniflare: the
+      Worker's entire environment is three bindings, so fakes for `AI`, `IMAGES` and `STATS_KV`
+      are the whole harness, and each records what the real binding would have been asked. The
+      controls that matter are the ones guarding invisible failures — `SHA-256`→`SHA-1` (8 red),
+      `cached:true`→`false` on the hit path (6 red), a counter that bumps on a hit, `steps` 4→8,
+      a swallowed R2 `put` failure, and the secret gate disabled (5 red).*
+      *Also decided here: R2's binding ships **uncommented** in `wrangler.toml`, unlike the KV
+      block SRC had to comment out. A KV `id` belongs to the account that created it, so a
+      hard-coded one breaks anyone else's `wrangler deploy`; a bucket **name** is just a string in
+      whichever account runs the deploy, and the cache is not optional the way the stats counter
+      is. `wrangler r2 bucket create funny-multi-images` is the one-time step, documented in the
+      file.*
+      *Two smaller calls, both with the reasoning in the code: the public `/i/` route rejects
+      anything not matching `^i/[0-9a-f]{64}\.png$` without asking R2, which states the URL
+      contract in one place; and there is deliberately **no `OPTIONS` handler**, because every
+      request we make for these URLs is a plain `GET` with no custom headers and is therefore
+      never preflighted. Add one the day a request here carries a header.*
+      ***Not verifiable until Gate 4:*** *nothing here has met real Workers AI, real R2 or a real
+      deploy. The fakes encode the documented contracts (`{image: "<base64>"}`, `head()` carrying
+      `customMetadata`, `writeHttpMetadata`); if any of those is wrong, these 39 tests are green
+      against a fiction. Gate 4's cache-hit clause — same picks twice, second reveal instant,
+      counter unchanged — is the first thing that touches all three for real.*
 - [ ] **T-4.2 (M)** `prompt.ts` deterministic builder (skeleton + fragments, slots 0/1/2/4,
       STYLE_SUFFIX verbatim); determinism + snapshot + length tests. Tune skeleton wording
       against real Flux output on ~20 combos, then **lock it** (edits orphan the cache). → FM-IMG-2, DD-3

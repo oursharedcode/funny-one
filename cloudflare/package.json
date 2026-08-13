@@ -1,0 +1,11 @@
+{
+  "name": "funny-multi-image",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker: deterministic-prompt image generation, R2 cache and delivery (design §7.2).",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "test": "vitest run"
+  }
+}

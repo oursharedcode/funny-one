@@ -14,7 +14,8 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "cloudflare"
   ],
   "scripts": {
     "predev": "npm run build -w packages/shared",

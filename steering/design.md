@@ -491,6 +491,10 @@ post-v1 phase; nothing in v1 may preclude it.
   inherited coverage); prompt determinism (same ids → same string; snapshot the skeleton; length
   bound); cap semantics incl. cache-hit refund (§7.3); grammar.ts RU polish (SRC tests copied);
   i18n coverage (SRC `i18n/index.test.ts` pattern extended to pools).
+  *Prompt determinism landed stronger than planned (T-4.2): the assembled prompt is pinned in
+  full, all 10 000 visual combinations are walked for collisions and non-ASCII, and a prose slot
+  is asserted **not** to change the prompt — the only guard on DD-3's ×22 cache factor. The
+  length bound is checked against the pools rather than enforced by truncation.*
 - **Server integration**: SRC `game.test.ts` family adapted to option ids — full 3–7 player
   simulated games asserting rotation placement, bot fills, INVALID_OPTION rejection,
   reveal payloads carrying resolved texts + PictureRef. Lobby events are driven over a real

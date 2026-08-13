@@ -24,6 +24,8 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       `tsconfig.base.json`, `.gitignore`, `LICENSE` (AGPL-3.0-only). → FM-ARC-1, FM-ARC-6
       *Also created the `packages/shared` shell (package.json + tsconfigs + `src/index.ts`
       placeholder) — without it the root `pre*` shared-build scripts cannot resolve.*
+      *T-4.1 added a third workspace entry, `cloudflare`, so the Worker's suite runs under root
+      `npm test` like every other directory's. The two globs above are no longer the whole list.*
 - [x] **T-0.2 (S)** Tooling copied from SRC and path-adapted: `.eslintrc.json`,
       `.prettierrc.json`, `.env.example`. → FM-ARC-5
       *Added `.prettierignore` (new): keeps the read-only SRC copy and the hand-wrapped
@@ -683,6 +685,14 @@ unless they carry advisories:
 - **Gate 4**: manual — dead-Worker URL → error+retry path; `MAX_IMAGES_PER_DAY=1` → second
   distinct story capped; **same picks twice → second reveal instant from cache with counter
   unchanged**; RU room and EN room with same picks → same image URL.
+  ***This gate carries more than its checklist*** *(noted at T-4.1/T-4.2). It is the first time
+  anything in Phase 4 meets real Workers AI, real R2 and a real deploy: the Worker's 39 tests run
+  against fakes that encode the documented contracts (`{image: "<base64>"}`, `head()` carrying
+  `customMetadata`, `writeHttpMetadata`), and if any of those is wrong they are green against a
+  fiction. Two things to do while there, neither in the list above: **create the R2 bucket** —
+  `wrangler r2 bucket create funny-multi-images`, a step no other deploy needed — and run the
+  **skeleton tuning pass** (`npm run prompts -w apps/funny-multi-server -- --curl`), because
+  design §7.1 locks the wording at v0.1.0 and the window closes with it.*
 
 ## Phase 5 — Gallery, end, share
 

@@ -113,7 +113,11 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js` | adapt | product identity + this project's precached assets; PWA/workbox strategy carried verbatim |
 | `client/public/flags/*.png` | copy | language picker |
 | `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists |
-| `client/src/screens/HomeScreen/LobbyScreen/WaitingScreen/EndScreen` | copy | unchanged flows |
+| `client/src/screens/HomeScreen.tsx` | adapt | create-mode language picker gated to `AUTHORED_LANGUAGES` — it sets the room's *content* language, which the server narrowed at T-2.3; join-mode picker stays at all 15 (interface only). `wobbleEngine` dropped from `LobbyState`. Busy flag released on `error`, since a rejected `room:create` reports by event and never acks (T-3.2) |
+| `client/src/screens/LobbyScreen.tsx` | adapt | `game:start` emitted with no arguments — T-1.6 dropped the payload type with its only field |
+| `client/src/screens/WaitingScreen/EndScreen` | copy | unchanged flows |
+| `client/vitest.config.ts` + `src/testSetup.ts` | **new** | T-3.2. jsdom environment for the first component tests; separate from `vite.config.ts` so test runs skip the PWA build, and repeats its `__APP_VERSION__`/`__BUILD_DATE__` defines. Setup stubs `ResizeObserver` and `matchMedia`, which jsdom lacks and shipped code reaches |
+| `client/src/testutils/socketMock.ts` | **new** | T-3.2. `socket.ts` connects at module scope, so every screen suite mocks it; the double `act`-wraps ack and broadcast callbacks, without which React had not re-rendered by the next assertion and absence-assertions passed vacuously |
 | `client/src/screens/RoundScreen.tsx` | adapt | textarea → combobox (§8.1) |
 | `client/src/screens/RevealScreen.tsx` | adapt | image by URL + dimensions (§8.2) |
 | `client/src/components/**` (TimerBar, PlayerList, QRCode, ProseText, RoomGallery, ShareButton, ScrollBox, SourceFooter, LogoStamp, art/*) | copy | design-system implementation (FM-ARC-4) |
@@ -434,14 +438,22 @@ post-v1 phase; nothing in v1 may preclude it.
   reveal payloads carrying resolved texts + PictureRef. Lobby events are driven over a real
   Socket.IO connection on an ephemeral port rather than by calling handlers directly, since the
   ack-vs-`error` split and broadcast fan-out are exactly what a direct call would not cover.
-- **Client**: no DOM/component tests in v1 — the screens are copies or adaptations of SRC
-  screens whose behaviour Gates 3 and 5 exercise on real phones, and a render harness would be
-  new machinery guarding copied markup. What *is* tested is the part that fails silently:
-  `i18n/catalogs.test.ts` (T-3.1) holds the UI catalogues to one key set, matching
+- **Client**: `i18n/catalogs.test.ts` (T-3.1) holds the UI catalogues to one key set, matching
   `{{interpolations}}` and full `ErrorCode` coverage, because i18next falls back to English
   without complaint and a missed key surfaces as one English button in a Russian game. The
   error-code half is a compile-time `Record<ErrorCode, true>`, so a code added to the socket
   contract fails `npm run typecheck` until both catalogues explain it.
+  *Component tests were **ruled out at T-3.1 and ruled back in at T-3.2*** *— the earlier
+  position was that the screens are copies and a render harness would be new machinery guarding
+  copied markup. What changed is that the screens stopped being copies. Every client-side
+  divergence from SRC is a consequence of a server decision taken in Phase 1 or 2 — the content-
+  language picker narrowed to `AUTHORED_LANGUAGES` (T-2.3), `game:start` losing its payload
+  (T-1.6), a rejected `room:create` reporting by `error` event and never acking (T-2.2) — and
+  each is invisible in the markup, silent at runtime, and only observable by rendering the
+  screen and driving it. Those are exactly the assertions that pay, and the same reasoning
+  Gate 2 applied when it replaced its manual 3-tab run. Scope stays deliberately narrow:
+  behaviour that encodes a cross-boundary contract, not markup or styling. Screens carried
+  unchanged from SRC still get no suite of their own.*
 - **Manual gates** (per SRC build-order discipline): dead-Worker error path;
   `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice → second reveal instant,
   counter unchanged); phone PWA install; RU full game (declined texts read grammatically); RTL

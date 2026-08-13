@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1 done. **T-3.2 next.** |
-| **Build state** | typecheck / lint / format / `npm test` all green — 206 tests across 3 workspaces (43 shared + 156 server + 7 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1 and T-3.2 done. **T-3.3 next.** |
+| **Build state** | typecheck / lint / format / `npm test` all green — 248 tests across 3 workspaces (43 shared + 156 server + 49 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -373,8 +373,74 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       ***Verified:*** *`npm run build` at root (both workspaces) and a real dev server serving
       `index.html`, `main.tsx`, the catalogues and `icon.svg`; `vite preview` serving the built
       bundle with the generated manifest and precache (37 entries).*
-- [ ] **T-3.2 (S)** Home + Lobby screens copied (create/join modes, `?room=` link, QR,
+- [x] **T-3.2 (S)** Home + Lobby screens copied (create/join modes, `?room=` link, QR,
       player list, start). Remove wobble-engine toggle. → FM-CORE-1
+      *Components carried alongside them, all verbatim: `QRCode`, `ScrollBox`, `SourceFooter`,
+      `PlayerList` (package name only) and `capReset.ts`. `qrcode.react` is the one new runtime
+      dependency; `qrcode` + `@types/qrcode` are **not** installed — SRC needed them for the
+      canvas share card, which is T-5.2's.*
+      ***The create-mode language picker is gated to `AUTHORED_LANGUAGES` — the reason design §3
+      calls these screens a copy and they are not.*** *That picker sets the room's **content**
+      language, and T-2.3 narrowed the server's `isValidLanguage` to en+ru so a room cannot be
+      created in a language whose pools would throw at reveal. SRC offered all 15 here, so a host
+      picking German would have failed the create with no way to understand why. The join-mode
+      picker is deliberately untouched at all 15: it switches the **interface** only, where
+      i18next falling back to English is correct behaviour. Both lists derive from the same
+      `LANGUAGES` registry, so T-6.3 widens `AUTHORED_LANGUAGES` once and the picker follows.*
+      *Cross-checked against the real server rather than against a reading of it: a throwaway
+      script drove `room:create` for all 15 registry languages over real sockets (a fresh
+      `buildServer()` each, since 15 creates blow the 5-per-minute bucket) — accepted `en, ru`,
+      rejected the other 13, exactly the set the picker offers.*
+      ***Found by that cross-check and fixed here — a latched Create button.*** *An unacceptable
+      `room:create` **never acks**: its ack type has no error branch, so the server reports the
+      failure by emitting `error` (T-2.2's rate limiter does the same). Both screens set `busy`
+      before the emit and clear it only inside the ack, so a host who taps Create past the
+      5-per-minute budget — or who shares an IP behind CGNAT with someone who has — got App's
+      error toast and a permanently dead button, with a reload as the only escape. Now both
+      screens release `busy` on `error`; the toast is left to App rather than shown twice. The
+      language gating makes the invalid-language route unreachable, but the rate-limit route is
+      reachable by an ordinary impatient player.*
+      *Other adaptations, each forced by an earlier decision: `game:start` is emitted with no
+      arguments at all (T-1.6 dropped the payload type with its only field); `wobbleEngine` is
+      gone from both `LobbyState` constructions; `LANGUAGES`/`isLanguage` come from
+      `@funny/shared`, as T-3.1 carried no client-local registry.*
+      ***The stats block and the lobby's cap banner are carried but inert.*** *`stats:get` has no
+      server handler until T-5.3, and an unanswered Socket.IO ack simply never fires — so `stats`
+      stays null, `isCapReached(null)` is false, and neither renders. That degrades correctly,
+      but it is copied code that does nothing today; both are pinned by tests asserting the
+      current behaviour **and** the behaviour once a payload arrives, so T-5.3 has something to
+      flip rather than something to discover.*
+      ***Dropped SRC's `eslint-disable-next-line react-hooks/exhaustive-deps` in `ScrollBox`.***
+      *This repo does not configure that plugin — and neither did SRC's own `.eslintrc.json` —
+      so the directive was an unknown-rule lint **error**, suppressing nothing. Replaced by a
+      comment saying why the dependency array is empty.*
+      ***Client DOM test environment is new (the decision T-3.1 left open).*** *`jsdom`,
+      `@testing-library/react` + `@testing-library/dom`, and `vitest.config.ts` — deliberately
+      separate from `vite.config.ts` so a test run does not build a service worker, and carrying
+      the same `__APP_VERSION__`/`__BUILD_DATE__` `define`s, without which anything importing
+      `SourceFooter` throws at import time (which is how it was found). `src/testSetup.ts` stubs
+      the two things jsdom lacks that shipped code reaches — `ResizeObserver` and `matchMedia` —
+      and runs Testing Library's `cleanup`, which does not self-register without `globals: true`.
+      Taken here rather than at T-3.3 because T-3.3 is the largest task in the phase and Gate 3's
+      "no free-text affordance anywhere" is an assertion about a rendered screen.*
+      ***42 new tests*** *(client total 7 → 49). Assertions read rendered text, not translation
+      keys, so a screen naming a key that does not exist renders the bare key and fails —
+      `catalogs.test.ts` checks en and ru agree with each other, this checks the screens agree
+      with the catalogue. Negative-controlled six ways, each confirmed red before restoring:
+      reverting the picker to all 15 `LANGUAGES` (2 failures), restoring SRC's `game:start`
+      payload (1), restoring `wobbleEngine` on the created `LobbyState` (1), dropping the
+      `stats:update` subscription (1), and removing the busy-release (2).*
+      ***Two test-isolation traps, both caught by a failing run rather than by inspection.***
+      *i18next's active language is module-global and outlives unmount, so the tests that pick
+      Russian left six later tests asserting English strings against a Russian screen; the suite
+      now resets it per test, and the two Russian tests assert the Russian labels, which is the
+      host's language-preview behaviour made explicit. And a socket callback is a React state
+      update arriving from outside React: without an `act` wrap the re-render had not flushed by
+      the next assertion, which silently turned every "…is not shown" assertion into a vacuous
+      pass. The wrap lives in `testutils/socketMock.ts` so no suite can forget it — removing it
+      again reds 6 tests.*
+      ***Verified beyond CI:*** *root `npm run build` (both workspaces, 37 precache entries) and
+      the live-server language cross-check above.*
 - [ ] **T-3.3 (L)** **RoundScreen combobox** per design §8.1: tap-card radio list from shared
       pools (room language), per-player-per-round shuffle, selection spring highlight, Submit
       gated on selection, SubmitConfirm overlay, question gloss kept, ScrollBox for 20–30-option
@@ -382,6 +448,13 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-3.4 (S)** WaitingScreen copy; timer bar; forward-only screen transitions per SRC §17. → FM-ARC-4
 - **Gate 3**: two phones (or tabs) create/join/play 7 rounds end-to-end with real UI;
   no free-text affordance anywhere; shuffle differs between players.
+  *Two of the three clauses are properties of a rendered screen, and T-3.2 landed the DOM test
+  environment that makes them assertable — so automate them at T-3.3 rather than re-checking
+  them by hand: **no free-text affordance** is "RoundScreen renders no `input` or `textarea`",
+  a permanent guard on FM-ANS-1 rather than a one-off observation, and **shuffle differs
+  between players** is a comparison of two renders. Follow Gate 2's precedent (see its note):
+  the manual run stays for what is genuinely visual — tap-target size, the selection spring,
+  timer-bar animation, real two-phone play.*
 
 **Toolchain deviations from SRC** (decided at T-3.1), same policy as Gate 0 — carry SRC's pins
 unless they carry advisories:
@@ -397,6 +470,11 @@ unless they carry advisories:
   the same diff. `npm audit` is clean at these versions.
 - **`lottie-web` and `nanoid` are not installed at all** — the Lottie recorder is dropped
   (ARC-3) and nothing on the client generates ids.
+- **Added at T-3.2:** `qrcode.react ^3.2` (runtime — SRC's pin, no advisories) and, as
+  devDependencies, `jsdom ^28` + `@testing-library/react ^16` + `@testing-library/dom ^10` for
+  the DOM test environment. SRC had no client tests at all, so these are additions rather than
+  carried pins. `qrcode` and `@types/qrcode` stay uninstalled until T-5.2 needs the canvas share
+  card. `npm audit` is clean at 0 vulnerabilities.
 
 ## Phase 4 — Image pipeline
 
@@ -425,6 +503,11 @@ unless they carry advisories:
 - [ ] **T-5.2 (M)** Download/share adapted to URL images (fetch → blob → canvas, CORS);
       wobble video via CSS engine only; `videoFooter`, `capReset` copied. → design §8.3
 - [ ] **T-5.3 (S)** Home-screen stats + live `stats:update` (copy `stats.ts`, client hook). → FM-CORE-12
+      *The **client half already exists** — T-3.2 carried the Home-screen counter and the Lobby
+      cap banner, both subscribed and both inert because nothing answers `stats:get`. This task
+      is therefore server-side: `stats.ts`, the handler, and the `broadcastStats(io)` calls SRC
+      makes after create/leave (deferred from T-2.2) and in `finalizePlayerRemoval` (deferred
+      from T-2.4). The client tests already assert what should appear once a payload arrives.*
 - **Gate 5**: full game on two real phones: gallery share, story download (image renders with
   picture), share sheet, restart into second game.
 

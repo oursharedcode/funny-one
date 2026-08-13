@@ -356,8 +356,9 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       replaces it, and the live state App routed in, so the wiring is provably working and
       nothing reads as finished. All six are replaced wholesale, not extended.*
       ***`public/icon.svg` is a placeholder*** *— SRC shipped a 192/512 PNG pair of its own
-      branding, which is the wrong product's identity to carry. Stands in until real artwork
-      exists; the PWA manifest needs a valid icon to install at all.*
+      branding, which is the wrong product's identity to carry. Stands in because the PWA
+      manifest needs a valid icon to install at all; **replacing it is T-7.1's**, which owns
+      icons and the real-device install test.*
       ***Not carried yet, by task boundary:*** *`components/**` beyond `art/` (TimerBar,
       PlayerList, QRCode, ProseText, ScrollBox…) arrive with the screens that use them, as do
       `prose.ts`, `share.ts`, `downloadStory.ts`, `recordWobble.ts`, `capReset.ts`,
@@ -444,6 +445,13 @@ unless they carry advisories:
 
 - [ ] **T-7.1 (S)** PWA: manifest, icons, service worker, stale-cache reload strategy
       (`swReload.ts`); install test on a real iPhone and Android. → FM-NFR-1
+      *Partly landed at T-3.1, which had to: a PWA will not install without a manifest and an
+      icon, so `vite.config.ts` already carries the manifest, the NetworkFirst navigation
+      strategy and the un-precached `index.html`, and `swReload.ts` is copied.
+      **Remaining for T-7.1:** replace the placeholder `public/icon.svg` with real artwork
+      (SRC's icons are its own branding and were not carried), decide whether to ship raster
+      192/512 alongside it for stores that dislike SVG, and run the real-device install test —
+      which is the part of this task that was never automatable.*
 - [ ] **T-7.2 (M)** Design-system pass: motion presets on all transitions (forward-only),
       mascot triggers (waiting/timer/submit/reveal flourish/end/error), reduced-motion,
       wordmark, SourceFooter + LogoStamp. → FM-ARC-4, FM-CPL-3

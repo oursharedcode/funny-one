@@ -434,6 +434,14 @@ post-v1 phase; nothing in v1 may preclude it.
   reveal payloads carrying resolved texts + PictureRef. Lobby events are driven over a real
   Socket.IO connection on an ephemeral port rather than by calling handlers directly, since the
   ack-vs-`error` split and broadcast fan-out are exactly what a direct call would not cover.
+- **Client**: no DOM/component tests in v1 — the screens are copies or adaptations of SRC
+  screens whose behaviour Gates 3 and 5 exercise on real phones, and a render harness would be
+  new machinery guarding copied markup. What *is* tested is the part that fails silently:
+  `i18n/catalogs.test.ts` (T-3.1) holds the UI catalogues to one key set, matching
+  `{{interpolations}}` and full `ErrorCode` coverage, because i18next falls back to English
+  without complaint and a missed key surfaces as one English button in a Russian game. The
+  error-code half is a compile-time `Record<ErrorCode, true>`, so a code added to the socket
+  contract fails `npm run typecheck` until both catalogues explain it.
 - **Manual gates** (per SRC build-order discipline): dead-Worker error path;
   `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice → second reveal instant,
   counter unchanged); phone PWA install; RU full game (declined texts read grammatically); RTL

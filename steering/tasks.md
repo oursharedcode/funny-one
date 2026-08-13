@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which has begun: T-4.1 done. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 346 tests across 4 workspaces (43 shared + 156 server + 108 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which has begun: T-4.1 and T-4.2 done. **T-4.2's skeleton-tuning pass against real Flux output is outstanding and must happen before v0.1.0** — after that the wording is locked. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 363 tests across 4 workspaces (43 shared + 173 server + 108 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -632,9 +632,48 @@ unless they carry advisories:
       `customMetadata`, `writeHttpMetadata`); if any of those is wrong, these 39 tests are green
       against a fiction. Gate 4's cache-hit clause — same picks twice, second reveal instant,
       counter unchanged — is the first thing that touches all three for real.*
-- [ ] **T-4.2 (M)** `prompt.ts` deterministic builder (skeleton + fragments, slots 0/1/2/4,
+- [x] **T-4.2 (M)** `prompt.ts` deterministic builder (skeleton + fragments, slots 0/1/2/4,
       STYLE_SUFFIX verbatim); determinism + snapshot + length tests. Tune skeleton wording
       against real Flux output on ~20 combos, then **lock it** (edits orphan the cache). → FM-IMG-2, DD-3
+      ***Code complete; the tuning pass is outstanding and needs a deployed Worker*** *— see the
+      end of this entry. The builder is twelve lines, and almost nothing of SRC's 200 survives:
+      `STYLE_SUFFIX` verbatim, and that is all. Translation, the English profanity re-check, the
+      RU/EN slot-1 connective synthesis, `ruActionHint` and `looksLikeSameSubject` with its "two
+      of them" chimera anchor all existed to make free-typed text safe and grammatical. The pools
+      do that at authoring time, so what is left is a lookup and a substitution — which is the
+      clearest measure of what FM-ANS-1 bought.*
+      *The interesting work was therefore in the tests, not the code. The builder's output is a
+      **cache key** shared by every room in every language and permanent from v0.1.0, so the
+      properties worth asserting are determinism, uniqueness and the exact bytes: the assembled
+      prompt is **pinned in full**, all **10 000 combinations** are walked to prove no two stories
+      can collide onto one picture (and, in the same pass, that every prompt is printable ASCII —
+      a non-ASCII character would mean a display text had leaked into the picture, which is what
+      DD-4's one-cache-for-15-languages rests on), and changing a **prose** slot is asserted to
+      leave the prompt untouched. That last one is the only guard against the cache quietly
+      gaining a ×22 factor (DD-3).*
+      ***Three decisions design §7.1 had not settled, now recorded there.*** *(1) Fragments are
+      looked up **per slot** rather than from one flat id→fragment map: both are a line, but the
+      flat one renders a companion as the lead if anything upstream writes to the wrong index —
+      a plausible picture, cached forever, for a story nobody played. (2) An unfilled or
+      out-of-pool visual slot **throws**; unreachable in a played game, so the only question is
+      which failure is better, and a reveal taking the error-with-retry path T-4.4 already draws
+      beats a real image cached under a prompt describing a story that never happened. (3)
+      `MAX_PROMPT_LENGTH` is a **bound the pools are held to in the test**, not a runtime
+      truncation — SRC truncated because typed answers are unbounded; ours are static data in
+      this repo, so the worst case is computable (481 of 500, confirming T-1.4's measurement),
+      and truncating would silently turn a too-long prompt into a different one.*
+      ***17 tests, negative-controlled seven ways, all seven red.*** *The one worth naming is the
+      seventh: rewording a single `promptEn` fragment in `packages/shared` reds the pinned prompt.
+      That is the cache-orphan alarm working — after v0.1.0 that failure is the point, because
+      the edit would strand every image already generated from the old wording.*
+      ***Still to do, and it needs a deployed Worker:*** *design §7.1 says the skeleton is tuned
+      once against real Flux output and then locked. Nothing here has met Flux, so the current
+      wording is SRC's structural lessons carried over on reasoning, not on pictures.
+      `npm run prompts -w apps/funny-multi-server` prints a deterministic spread of 20 assembled
+      prompts for that pass, and `-- --curl` turns them into `/generate` calls against
+      `$CLOUDFLARE_WORKER_URL` — each of which really generates and really bumps the daily
+      counter. The window is open only while the cache is empty: **tune before v0.1.0, or accept
+      the wording as-is forever.***
 - [ ] **T-4.3 (M)** `image.ts` adapted: exists-check → reserve → generate → refund-on-cached
       flow per design §7.3; JSON response parsing; `releaseImageSlot()` + tests incl. cap and
       refund races; KV recovery (`max(local,worker)`) kept. → FM-TIER-1

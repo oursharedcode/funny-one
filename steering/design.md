@@ -104,7 +104,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `server/src/i18n/index.test.ts` | **new** | not adapted (T-2.5): every SRC case tests one of the three render-time repair transforms this design drops (§9). Rewritten to cover what the loader and `renderProse` guarantee instead — language coverage, slot completeness, verbatim substitution |
 | `server/vitest.config.ts` | **new** | 20 s test/hook timeout (T-2.5). Four suites run a real Fastify + Socket.IO server and vitest fans files across all cores; the 5 s default tripped on merely-slow runs, not stuck ones |
 | `server/src/image.ts` | adapt | Worker returns JSON `{url,width,height,cached}`; cap skips cache hits (§7.3) |
-| `server/src/prompt.ts` | adapt | deterministic builder (§7.1); STYLE_SUFFIX kept verbatim (spec §22 lock) |
+| `server/src/prompt.ts` | adapt | T-4.2. Deterministic builder (§7.1); `STYLE_SUFFIX` kept verbatim (spec §22 lock) and is the only line of SRC's that survives — translation, the profanity re-check, per-language connectives and the chimera anchor all existed to make typed text safe and grammatical, and the pools do that at authoring time |
+| `server/scripts/samplePrompts.mjs` | **new** | T-4.2. Prints a deterministic spread of assembled prompts (`--curl`: as `/generate` calls) for the one-time tuning pass §7.1 requires before the skeleton locks |
 | `server/src/stats.ts` | copy | live stats broadcast |
 | `server/src/grammar.ts` (+test) | copy | RU prose punctuation polish still applies |
 | `server/src/i18n/*` | adapt | QUESTIONS + prose templates kept; stand-in lists removed |
@@ -302,6 +303,31 @@ export function buildPrompt(story: Story): string {
 The exact skeleton wording is tuned once against Flux during Phase 4 (two-subject anchoring
 lessons from SRC — "on the left / on the right" — are preserved); after v0.1.0 it is locked
 like the style suffix, because edits orphan the entire R2 cache.
+`scripts/samplePrompts.mjs` (T-4.2) prints a deterministic spread of assembled prompts for that
+pass, and `--curl` turns them into `/generate` calls against a deployed Worker.
+
+Built at T-4.2, with three decisions the sketch above did not settle:
+
+- **Fragments are looked up per slot, not from one flat id→fragment map.** Both are one line;
+  the flat one would render a companion as the lead if anything upstream wrote to the wrong
+  index — a plausible-looking picture, permanently cached, for a story nobody played.
+- **An unfilled or out-of-pool visual slot throws** rather than substituting a placeholder.
+  Unreachable in a played game (`advanceRound` fills every slot before reveal, `submitAnswer`
+  rejects out-of-pool ids), so the choice is only about which failure is better: a reveal that
+  takes the error-with-retry path T-4.4 already draws, or a real image generated and cached
+  under a prompt describing a story that never happened.
+- **`MAX_PROMPT_LENGTH` is a bound the pools are held to in `prompt.test.ts`, not a runtime
+  truncation.** SRC truncated because its answers were typed and unbounded; ours are static data
+  in this repo, so the worst case is computable — the longest fragment per visual slot, plus
+  skeleton, plus suffix — and it is 481 of 500. Truncating instead would silently turn a
+  too-long prompt into a *different* prompt, and cache the picture under a key nobody intended.
+
+Not ported from SRC's `prompt.ts`, each absence load-bearing: `translateToEnglish` (DD-8 removes
+the translate stack — fragments are authored English), the English profanity re-check (no
+untrusted text remains, FM-ANS), the RU/EN slot-1 connective synthesis and `ruActionHint`
+(fragments are authored to compose with this one skeleton), and `looksLikeSameSubject` with its
+"two of them" chimera anchor — slots 0 and 1 draw from disjoint kinds, leads versus companions
+(T-1.4), so a duplicate pair is unreachable by construction.
 
 ### 7.2 Cloudflare Worker — `cloudflare/worker.js` (FM-IMG-3)
 

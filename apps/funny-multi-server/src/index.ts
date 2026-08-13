@@ -22,8 +22,16 @@ import {
   joinRoom,
   removePlayer,
   validateNickname,
+  type RemoveResult,
 } from './rooms.js';
-import { handleReadyToggle, prepareRestart, startGame, submitAnswer } from './game.js';
+import {
+  handleMidGameBotification,
+  handleReadyToggle,
+  prepareRestart,
+  startGame,
+  submitAnswer,
+} from './game.js';
+import { createDisconnectRegistry, type DisconnectRegistry } from './disconnect.js';
 import {
   RATE_WINDOW_MS,
   ROOM_CREATE_PER_MINUTE,
@@ -38,7 +46,6 @@ import {
 // the Socket.IO server. Every socket handler SRC wired up here is deliberately
 // absent and arrives with the task that owns it:
 //
-//   T-2.4  disconnect grace window, botification, host migration, player:lost
 //   T-4.4  reveal:requestPicture / reveal:retryPicture
 //   T-5.1  gallery:share      T-5.3  stats:get
 //
@@ -64,23 +71,39 @@ const DEV_CLIENT_ORIGIN = 'http://localhost:5173';
 const CLIENT_DIST = fileURLToPath(new URL('../../funny-multi-client/dist/', import.meta.url));
 
 // Bounded disconnect grace window (spec §7). A client that returns within
-// RECOVERY_WINDOW_MS keeps its slot via Socket.IO connection-state recovery.
-// SRC paired this with a slightly longer DISCONNECT_GRACE_MS removal timer so
-// recovery always wins the race; that timer lands with T-2.4's disconnect rules.
+// RECOVERY_WINDOW_MS keeps its slot via Socket.IO connection-state recovery;
+// the removal timer is a touch longer so recovery always wins the race. Both
+// values are SRC's.
 export const RECOVERY_WINDOW_MS = 60_000;
+export const DISCONNECT_GRACE_MS = RECOVERY_WINDOW_MS + 5_000;
 
 export type GameIO = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 
 export interface BuiltServer {
   fastify: FastifyInstance;
   io: GameIO;
+  /** Pending disconnect-grace timers (T-2.4), exposed for tests. */
+  disconnects: DisconnectRegistry;
 }
 
 // Split out of SRC's monolithic main() so the transport shell is testable
 // without binding a port or racing a listen (index.test.ts drives it via
 // fastify.inject). main() below is the thin production entry point; T-2.2+
 // register their socket handlers inside this function.
-export async function buildServer({ logger = true } = {}): Promise<BuiltServer> {
+export interface BuildServerOptions {
+  logger?: boolean;
+  /**
+   * Overrides the spec §7 removal window. Production never passes this — the
+   * default is the only value that satisfies "longer than recovery". Tests use
+   * a few milliseconds so a grace window can actually elapse inside a case.
+   */
+  disconnectGraceMs?: number;
+}
+
+export async function buildServer({
+  logger = true,
+  disconnectGraceMs = DISCONNECT_GRACE_MS,
+}: BuildServerOptions = {}): Promise<BuiltServer> {
   const fastify = Fastify({ logger });
 
   await fastify.register(fastifyCors, {
@@ -138,10 +161,59 @@ export async function buildServer({ logger = true } = {}): Promise<BuiltServer> 
     io.to(room.code).emit('lobby:update', payload);
   }
 
+  // ---- T-2.4: disconnect grace window (spec §7, FM-CORE-3) ----------------
+  //
+  // A dropped socket is not removed at once. It is removed only if the grace
+  // window elapses with no return — which is what makes a tunnel, a locked
+  // phone or a Wi-Fi handover survivable mid-game (FM-CORE-3).
+
+  /**
+   * Runs the real removal — either because a grace window elapsed with no
+   * return, or because the player left on purpose. Returns the removal result
+   * so an explicit leave can also drop the socket from its Socket.IO room.
+   */
+  function finalizePlayerRemoval(socketId: string): RemoveResult | null {
+    const result = removePlayer(socketId);
+    if (!result) return null;
+
+    if (result.becameBot && !result.deleted) {
+      // Mid-game: the slot stays (rotation integrity) and turns into a bot, so
+      // the current round must not stall waiting for an answer that can no
+      // longer come. This auto-fills it and advances if it was the last one.
+      handleMidGameBotification(result.room, socketId, io);
+
+      // Tell the host a player was lost (spec §12). `removePlayer` has already
+      // promoted a new host if the lost player *was* the host, so hostId here
+      // is whoever should now receive the notice. The botified player keeps
+      // their slot and nickname, which is what the message names.
+      const lost = result.room.players.find((p) => p.id === socketId);
+      if (lost) io.to(result.room.hostId).emit('player:lost', { nickname: lost.nickname });
+    }
+
+    if (!result.deleted) broadcastLobby(result.room);
+    // SRC also re-broadcast stats here (T-5.3) and kicked off bot-story
+    // pictures when the drop landed in the reveal phase (T-4.4). Both arrive
+    // with the tasks that own them.
+    return result;
+  }
+
+  const disconnects = createDisconnectRegistry({
+    graceMs: disconnectGraceMs,
+    onExpire: finalizePlayerRemoval,
+  });
+  // Without this a pending window outlives the server it belongs to: in tests
+  // it would fire against a room store the next case has already reset, and
+  // emit on a closed io. See disconnect.ts.
+  fastify.addHook('onClose', async () => {
+    disconnects.clearAll();
+  });
+
   io.on('connection', (socket) => {
-    // T-2.4 replaces this with the real grace-window handling; until then the
-    // logging proves the transport is live and mirrors SRC's log lines.
     if (socket.recovered) {
+      // Returned inside the window (spec §7) — cancel the pending removal. The
+      // socket keeps its id, its rooms and any events it missed, so from the
+      // game's point of view the player never left.
+      disconnects.cancel(socket.id);
       fastify.log.info({ socketId: socket.id }, 'socket recovered');
     } else {
       fastify.log.info({ socketId: socket.id }, 'socket connected');
@@ -218,12 +290,16 @@ export async function buildServer({ logger = true } = {}): Promise<BuiltServer> 
     });
 
     socket.on('room:leave', () => {
-      // An explicit leave is intentional and takes effect immediately — it is
-      // never routed through T-2.4's disconnect grace window.
-      const result = removePlayer(socket.id);
-      if (!result) return;
-      socket.leave(result.room.code);
-      if (!result.deleted) broadcastLobby(result.room);
+      // An explicit leave is intentional: it takes effect immediately and is
+      // never routed through the grace window. It does share the *removal*
+      // path, which is a deliberate divergence from SRC — SRC called
+      // `removePlayer` directly here, so a player who quit mid-game was
+      // botified but their current round was never auto-filled, and everyone
+      // else waited out the full 60 s round timer for an answer that could not
+      // arrive. Same end state, so the same handling; only the delay differs.
+      disconnects.cancel(socket.id);
+      const result = finalizePlayerRemoval(socket.id);
+      if (result) socket.leave(result.room.code);
     });
 
     socket.on('game:start', () => {
@@ -296,10 +372,13 @@ export async function buildServer({ logger = true } = {}): Promise<BuiltServer> 
 
     socket.on('disconnect', (reason) => {
       fastify.log.info({ socketId: socket.id, reason }, 'socket disconnected');
+      // Defer the removal (spec §7). Only a window that elapses with no return
+      // botifies or removes the player.
+      disconnects.schedule(socket.id);
     });
   });
 
-  return { fastify, io };
+  return { fastify, io, disconnects };
 }
 
 async function main(): Promise<void> {

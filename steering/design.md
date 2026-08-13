@@ -91,6 +91,7 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `server/src/index.ts` | adapt | socket wiring kept; remove filter imports; option validation |
 | `server/src/rooms.ts` | copy | room lifecycle, codes, capacity ceiling, nickname rules |
 | `server/src/rateLimit.ts` | **new** | spec §17's 5/30-per-IP-per-minute limits. Not a copy: SRC specifies them and ships `RATE_LIMITED` + 15 translated catalog strings, but never implemented the limiter (see T-2.2) |
+| `server/src/disconnect.ts` | **new** | extracted from SRC's inline `disconnectTimers` map (T-2.4). Same rules; a module so the window is testable on fake timers and can be cleared on server shutdown, which SRC — a process that never shut down — had no need for |
 | `server/src/game.ts` | adapt | rotation kept (extracted to shared); submit/auto-fill/prompt paths change (§6) |
 | `server/src/game*.test.ts` | adapt | rewrite answer fixtures to option ids |
 | `server/src/image.ts` | adapt | Worker returns JSON `{url,width,height,cached}`; cap skips cache hits (§7.3) |
@@ -239,6 +240,20 @@ wires in:
   "emit `error`": `room:create` emits (its ack has no error branch), `room:join` returns
   `ack.error` — the copied `HomeScreen` join path only inspects the ack, so an emit would leave
   its spinner stuck. Both carry the spec's `RATE_LIMITED` code.
+
+Disconnect handling (T-2.4) follows SRC, with two deltas:
+
+- **`room:leave` shares the removal path** instead of calling `removePlayer` directly. SRC's
+  explicit-leave handler botified a mid-game quitter but never auto-filled their current round,
+  so everyone else waited out the full 60 s round timer for an answer that could not arrive. A
+  deliberate leave and an elapsed grace window reach the same end state, so they get the same
+  handling; only the delay differs.
+- **`buildServer` accepts `disconnectGraceMs`.** Production never passes it — the default is
+  `RECOVERY_WINDOW_MS + 5 s`, and being longer than the recovery window is the whole point. Tests
+  pass a few milliseconds, because a 65 s window cannot otherwise close inside a test.
+
+Deferred into the tasks that own them: `finalizePlayerRemoval` also re-broadcasts stats (T-5.3)
+and, when the drop lands in the reveal phase, kicks off bot-story pictures (T-4.4).
 
 ## 7. Image pipeline
 

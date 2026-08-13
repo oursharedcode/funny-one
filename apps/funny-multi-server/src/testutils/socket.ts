@@ -8,22 +8,28 @@
 
 import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket } from 'socket.io-client';
-import { buildServer, type BuiltServer } from '../index.js';
+import { buildServer, type BuildServerOptions, type BuiltServer } from '../index.js';
 
 const DEFAULT_TIMEOUT_MS = 5000;
 
 export interface TestServer {
   url: string;
   server: BuiltServer;
-  /** Opens a client connection, tracked for teardown. */
-  connect(): Promise<Socket>;
+  /**
+   * Opens a client connection, tracked for teardown.
+   *
+   * `reconnection` is off by default: a test that calls `socket.disconnect()`
+   * to simulate a drop must not have the client quietly reconnect underneath
+   * it. Disconnect tests that *want* a return pass `{ reconnection: true }`.
+   */
+  connect(opts?: { reconnection?: boolean }): Promise<Socket>;
   /** Disconnects every client, then closes io + fastify. */
   close(): Promise<void>;
 }
 
 /** Boots on port 0 so concurrent runs cannot collide on a fixed port. */
-export async function startTestServer(): Promise<TestServer> {
-  const server = await buildServer({ logger: false });
+export async function startTestServer(options: BuildServerOptions = {}): Promise<TestServer> {
+  const server = await buildServer({ logger: false, ...options });
   await server.fastify.listen({ port: 0, host: '127.0.0.1' });
   const { port } = server.fastify.server.address() as AddressInfo;
   const url = `http://127.0.0.1:${port}`;
@@ -32,8 +38,15 @@ export async function startTestServer(): Promise<TestServer> {
   return {
     url,
     server,
-    async connect() {
-      const socket = ioClient(url, { transports: ['websocket'], forceNew: true });
+    async connect({ reconnection = false } = {}) {
+      const socket = ioClient(url, {
+        transports: ['websocket'],
+        forceNew: true,
+        reconnection,
+        // Default is 1000 ms, which would outlast any grace window a test can
+        // afford to wait for. Ignored unless `reconnection` is on.
+        reconnectionDelay: 20,
+      });
       clients.push(socket);
       await new Promise<void>((resolve, reject) => {
         socket.on('connect', () => resolve());

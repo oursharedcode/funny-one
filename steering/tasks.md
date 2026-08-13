@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1, T-2.2, T-2.3 done. **T-2.4 next** — disconnect rules. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 158 tests across 2 workspaces (43 shared + 115 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1, T-2.2, T-2.3, T-2.4 done; Gate 2 passed. **T-2.5 next** — only the i18n coverage test remains of it. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 177 tests across 2 workspaces (43 shared + 134 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -248,15 +248,44 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       matching them inside the prose, so a stray inserted comma would orphan a highlight.*
       *`game:start` no longer re-broadcasts the lobby: SRC did that solely to push the
       hard-locked `wobbleEngine`, which DD-9 removed.*
-- [ ] **T-2.4 (M)** Disconnect rules per SRC `index.ts`: grace window, lobby leave, mid-game
+- [x] **T-2.4 (M)** Disconnect rules per SRC `index.ts`: grace window, lobby leave, mid-game
       botification (auto-fill current round), host migration, `player:lost`. → FM-CORE-3
+      *`disconnect.ts` is **new** — SRC kept its pending-removal timers in a bare Map inline in
+      `main()`. Extracted to a factory (the `rateLimit.ts` shape) for two reasons SRC did not
+      have: a server that shuts down needs `clearAll()` on Fastify's `onClose`, or a pending
+      65 s window fires against a room store the next test has already reset and emits on a
+      closed io; and the 65 s window itself is only checkable on fake timers, which cannot be
+      used in a socket test without also freezing Socket.IO's heartbeats.*
+      *`buildServer` gained `disconnectGraceMs`. Production never passes it — being longer than
+      the recovery window is the point — but without the seam no test can watch a window close.*
+      ***Divergence from SRC: `room:leave` now shares the removal path.*** SRC called
+      `removePlayer` directly there, so a player who quit mid-game was botified but their current
+      round was never auto-filled — the rest of the room then waited out the full 60 s round
+      timer for an answer that could not arrive. Not a hang (the timer rescues it), but a minute
+      of dead air with an obvious cause. Deliberate leave and elapsed window reach the same end
+      state, so they share the handling; only the delay differs.*
+      *18 new tests. `disconnect.test.ts` (7) pins the timing on fake timers: survival right up
+      to the deadline, cancel-on-return, no double-fire when a flapping socket re-arms, and
+      `cancel` refusing to claim a removal that already ran. `disconnect.socket.test.ts` (11)
+      drives real sockets: slot held until the window closes, **connection-state recovery
+      restoring the slot with the same socket id**, host migration in both lobby and mid-game,
+      botification auto-filling and advancing the round, `player:lost` reaching the promoted host
+      when the host is the one lost, all-bot room deletion, and no `player:lost` for a lobby
+      departure.*
+      *Negative-controlled three ways, each confirmed red before restoring: dropping the
+      recovery `cancel` (pending stayed 1), removing `handleMidGameBotification` (both auto-fill
+      tests timed out — the round genuinely stalls), and removing the grace window entirely
+      (slot-held and recovery tests both failed).*
+      *Carry-overs, deferred to the tasks that own them: `finalizePlayerRemoval` should also
+      re-broadcast stats (T-5.3) and, when the drop lands in the reveal phase, kick off bot-story
+      pictures (T-4.4) — SRC does both here.*
 - [ ] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full
       simulated 3- and 7-player games; INVALID_OPTION case; en+ru prose snapshots. → design §13
       *Mostly landed early: T-2.3 shipped `game.test.ts` (32 tests — option-id fixtures, full
       in-process 3- and 7-player games, INVALID_OPTION, en+ru prose snapshots) and
       `game.socket.test.ts` (11 tests — the same games over real sockets, closing Gate 2; see
-      the gate note below). **Remaining for T-2.5:** disconnect/botification scenarios over
-      sockets once T-2.4 lands, and the i18n coverage test extending SRC's
+      the gate note below), and T-2.4 shipped `disconnect.socket.test.ts` (11) for the
+      disconnect/botification scenarios. **Remaining for T-2.5:** the i18n coverage test extending SRC's
       `i18n/index.test.ts` pattern. Reuse `src/testutils/socket.ts` — the shared harness, kept
       out of `dist` via a `tsconfig.build.json` exclude.*
 - **Gate 2**: server tests green; **full 7-round game over real Socket.IO connections**, correct

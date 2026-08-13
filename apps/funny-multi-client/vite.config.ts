@@ -1,0 +1,109 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Adapted from SRC/client/vite.config.ts. Three changes:
+//
+//  1. The version is read from this package.json directly. SRC ran
+//     `scripts/bump-version.mjs` in a `prebuild` hook; that script is not
+//     carried (no task creates it), so the version moves when someone edits
+//     package.json rather than on every build.
+//  2. `includeAssets` lists this project's assets. SRC precached its own
+//     branding (`monkeys-on-bus.png`); ours is `icon.svg` plus the language
+//     picker's flags, which a player needs on the very first screen.
+//  3. Manifest identity is Funny Multi (FM-ID-1), and the icon is a single
+//     SVG rather than SRC's 192/512 PNG pair — see `public/icon.svg`.
+//
+// Everything else — the NetworkFirst navigation strategy, the deliberately
+// un-precached index.html, the Google Fonts rules — is carried verbatim,
+// including the reasoning: it is what makes a deploy visible to a player
+// whose PWA shell is already installed (spec §13).
+
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
+
+const pkg = JSON.parse(
+  readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'),
+) as { version: string };
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
+
+export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __BUILD_DATE__: JSON.stringify(BUILD_DATE),
+  },
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['icon.svg', 'flags/*.png'],
+      manifest: {
+        name: 'Funny Multi «Чепуха 37»',
+        short_name: 'Funny Multi',
+        description: 'Pick absurd answers together, then watch an AI cartoon the story.',
+        display: 'standalone',
+        orientation: 'portrait',
+        theme_color: '#fef3c7',
+        background_color: '#fef3c7',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          {
+            src: '/icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+      workbox: {
+        // Precache hashed assets only — index.html is intentionally NOT in
+        // the precache so a fresh navigation always picks up the latest
+        // shell (spec §13). Socket.IO traffic is never cached; neither are
+        // the Worker's `/i/<hash>.png` cartoons, which carry their own
+        // immutable cache headers (design §7.2).
+        globPatterns: ['**/*.{js,css,png,svg,webmanifest}'],
+        // Disable the default precached-index.html fallback for SPA
+        // navigations — the NetworkFirst rule below handles them.
+        navigateFallback: null,
+        navigateFallbackDenylist: [/^\/socket\.io/, /^\/health/],
+        runtimeCaching: [
+          {
+            // Navigation requests (`/`, `/anything`) — NetworkFirst so a
+            // deploy is visible on the next page open. Falls back to the
+            // cache only when the network is slow or unreachable, which
+            // for a multiplayer game is already a degraded mode.
+            urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'app-shell',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 4 },
+            },
+          },
+          {
+            // Google Fonts stylesheet — revalidate in the background.
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'google-fonts-stylesheets' },
+          },
+          {
+            // Google Fonts files — immutable, cache for a year.
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
+  ],
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+});

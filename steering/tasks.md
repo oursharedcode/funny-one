@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). **Phase 3 next — T-3.1.** |
-| **Build state** | typecheck / lint / format / `npm test` all green — 199 tests across 2 workspaces (43 shared + 156 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1 done. **T-3.2 next.** |
+| **Build state** | typecheck / lint / format / `npm test` all green — 206 tests across 3 workspaces (43 shared + 156 server + 7 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -40,7 +40,8 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   arbitrary file read/execute). Migrating cost nothing with zero test files in the repo;
   deferring would have meant porting every copied SRC test twice. Audit is now clean.
 - **vite** — SRC's client pins `^5.3.3`, inside the same vulnerable range. Bump when T-3.1
-  bootstraps the client.
+  bootstraps the client. ***Done at T-3.1: `^8.2.1`***, with `@vitejs/plugin-react ^6` and
+  `vite-plugin-pwa ^1.3`. Audit clean.
 - **ESLint stays at `^8.57.1`** (EOL, no advisories) because T-0.2's deliverable *is*
   `.eslintrc.json`, which ESLint 9 no longer reads. Tracked as OD-F8 in `requirements.md` §12.
 
@@ -157,7 +158,8 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       *Carry-over for T-3.1: root `dev` and `build` scripts still reference
       `apps/funny-multi-client`, which does not exist — both fail until the client is
       bootstrapped. CI is unaffected (it runs typecheck/lint/test only), and
-      `npm run build -w apps/funny-multi-server` works standalone.*
+      `npm run build -w apps/funny-multi-server` works standalone.
+      **Resolved by T-3.1** — root `npm run build` runs both workspaces.*
 
 **Toolchain deviations from SRC** (decided at T-2.1), same rationale as Gate 0's vitest bump:
 
@@ -330,9 +332,46 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 
 ## Phase 3 — Client core
 
-- [ ] **T-3.1 (M)** `apps/funny-multi-client` bootstrap from `SRC/client`: Vite/Tailwind/PWA
+- [x] **T-3.1 (M)** `apps/funny-multi-client` bootstrap from `SRC/client`: Vite/Tailwind/PWA
       config, `App.tsx` phase routing, `socket.ts`, styles, art components, en+ru UI catalogs
       (full 15 wired in Phase 6). **Do not copy** `recordWobbleLottie.ts`, Test* screens. → design §3
+      *Copied as-is: the 9 `components/art/*` mascots, `styles/{index.css,motion.ts}`,
+      `swReload.ts`, `version.ts`, `socket.ts` (package name only), `public/flags/*.png`,
+      `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`.*
+      ***`App.tsx` — one change:*** *`wobbleEngine` is gone from `LobbyState` and the
+      `lobby:update` handler. T-2.1 removed it from the socket contract (ARC-3/DD-9, single CSS
+      recorder), so carrying it would store a value the server never sends. The phase machine,
+      the subscription set, the §17 forward slide-fade and both overlays are carried verbatim.*
+      ***`main.tsx`:*** *SRC branched on a `?test=` parameter to mount one of five dev-only
+      harness screens; design §3 drops those, and the branch with them.*
+      ***`i18n/index.ts`:*** *carried, except the boot completeness check is keyed to
+      `AUTHORED_LANGUAGES` rather than all 15 `LANGUAGES` — the same en+ru→15 switch the
+      server's i18n loader and `POOL_TEXTS` use, so T-6.2 widens all three at once.*
+      ***Catalogues (`en.json`, `ru.json`) are adapted, not copied.*** *Identity is Funny Multi /
+      «Чепуха 37» (FM-ID-1); the rules text says players *pick* rather than write; `round.placeholder`
+      ("Type your answer…") is gone and the combobox keys T-3.3 needs are in
+      (`round.pick/optionsLabel/scrollHint/submitDisabled`); `errors.INVALID_OPTION` added.*
+      ***Screen scaffolds.*** *A phase router needs six destinations, but the screens land across
+      five later tasks. Each screen file renders `PlaceholderScreen` — its phase, the task that
+      replaces it, and the live state App routed in, so the wiring is provably working and
+      nothing reads as finished. All six are replaced wholesale, not extended.*
+      ***`public/icon.svg` is a placeholder*** *— SRC shipped a 192/512 PNG pair of its own
+      branding, which is the wrong product's identity to carry. Stands in until real artwork
+      exists; the PWA manifest needs a valid icon to install at all.*
+      ***Not carried yet, by task boundary:*** *`components/**` beyond `art/` (TimerBar,
+      PlayerList, QRCode, ProseText, ScrollBox…) arrive with the screens that use them, as do
+      `prose.ts`, `share.ts`, `downloadStory.ts`, `recordWobble.ts`, `capReset.ts`,
+      `videoFooter.ts` (T-3.2→T-5.2), along with their dependencies (`qrcode`, `qrcode.react`).*
+      ***Tests:*** *`src/i18n/catalogs.test.ts` (7) — the one part of a bootstrap that can break
+      silently, since i18next falls back to English without complaint. Key-set parity between
+      catalogues, no blanks, matching `{{interpolations}}`, 7 questions each, and a
+      `Record<ErrorCode, true>` that makes a missing error translation a **typecheck** failure
+      rather than a runtime fallback. Negative-controlled five ways, each confirmed red: a
+      dropped key, a drifted interpolation, a missing `INVALID_OPTION` in the catalogue, a
+      returning `round.placeholder`, and a missing `INVALID_OPTION` in the record (`error TS2741`).*
+      ***Verified:*** *`npm run build` at root (both workspaces) and a real dev server serving
+      `index.html`, `main.tsx`, the catalogues and `icon.svg`; `vite preview` serving the built
+      bundle with the generated manifest and precache (37 entries).*
 - [ ] **T-3.2 (S)** Home + Lobby screens copied (create/join modes, `?room=` link, QR,
       player list, start). Remove wobble-engine toggle. → FM-CORE-1
 - [ ] **T-3.3 (L)** **RoundScreen combobox** per design §8.1: tap-card radio list from shared
@@ -342,6 +381,21 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-3.4 (S)** WaitingScreen copy; timer bar; forward-only screen transitions per SRC §17. → FM-ARC-4
 - **Gate 3**: two phones (or tabs) create/join/play 7 rounds end-to-end with real UI;
   no free-text affordance anywhere; shuffle differs between players.
+
+**Toolchain deviations from SRC** (decided at T-3.1), same policy as Gate 0 — carry SRC's pins
+unless they carry advisories:
+
+- **vite `^5.3.3` → `^8.2.1`**, with `@vitejs/plugin-react ^4` → `^6` and `vite-plugin-pwa
+  `^0.20` → `^1.3`. This is the bump Gate 0 deferred to this task.
+- **Tailwind stays at `^3.4`.** v4 moves configuration into CSS; taking it would mean rewriting
+  the copied design system as part of a bootstrap task, and v3.4 carries no advisories — so
+  nothing forces the move. Revisit when the design system is next touched for its own reasons.
+- **React stays at `^18.3.1`** with `framer-motion ^11`, `i18next ^23`, `react-i18next ^14` —
+  SRC's pins, no advisories. Every screen in Phases 3–5 is a copy or an adaptation of an SRC
+  screen written against these; moving to React 19 mid-copy would mix two kinds of change in
+  the same diff. `npm audit` is clean at these versions.
+- **`lottie-web` and `nanoid` are not installed at all** — the Lottie recorder is dropped
+  (ARC-3) and nothing on the client generates ids.
 
 ## Phase 4 — Image pipeline
 

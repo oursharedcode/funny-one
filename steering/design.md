@@ -104,7 +104,15 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `server/src/translate.ts` | **drop** | replaced by pre-authored prompt fragments |
 | `server/src/filter/**` | **drop** | FM-ANS consequences table; no untrusted text remains |
 | `server/src/env.ts` | adapt | new env vars (§11) |
-| `client/src/App.tsx`, `socket.ts`, `i18n/*` (15 catalogs), `swReload.ts`, `version.ts`, `sourceUrl.ts` | copy | phase routing, UI catalogs, PWA reload |
+| `client/src/App.tsx` | adapt | phase routing carried; `wobbleEngine` dropped from `LobbyState` and the `lobby:update` handler (DD-9) |
+| `client/src/socket.ts`, `swReload.ts`, `version.ts` | copy | package name is the only edit |
+| `client/src/sourceUrl.ts` | adapt | this repo's URL — the constant exists to identify the running binary's upstream |
+| `client/src/i18n/index.ts` | adapt | boot completeness check keyed to `AUTHORED_LANGUAGES`, not all 15 (§9) |
+| `client/src/i18n/{en,ru}.json` | adapt | Funny Multi identity; "pick" not "write"; `round.placeholder` removed, combobox keys added; `INVALID_OPTION` |
+| `client/src/main.tsx` | adapt | SRC's `?test=` harness branch dropped with the Test* screens |
+| `client/index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js` | adapt | product identity + this project's precached assets; PWA/workbox strategy carried verbatim |
+| `client/public/flags/*.png` | copy | language picker |
+| `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists |
 | `client/src/screens/HomeScreen/LobbyScreen/WaitingScreen/EndScreen` | copy | unchanged flows |
 | `client/src/screens/RoundScreen.tsx` | adapt | textarea → combobox (§8.1) |
 | `client/src/screens/RevealScreen.tsx` | adapt | image by URL + dimensions (§8.2) |
@@ -115,6 +123,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/recordWobbleLottie.ts` | **drop** | ARC-3: no Lottie |
 | `client/src/capReset.ts`, `videoFooter.ts` | copy | cap UX helpers, share footer |
 | `client/src/screens/Test*` | drop v1 | dev-only harnesses; re-add on demand |
+| `client/src/screens/PlaceholderScreen.tsx` | **new** | T-3.1 scaffold. A phase router needs six destinations; the screens land across five later tasks, so each file renders this until its task replaces it wholesale |
+| `client/src/i18n/catalogs.test.ts` | **new** | T-3.1. Catalogue drift is the one silent failure in the bootstrap — i18next falls back to English without complaint. Key parity, interpolation parity, and a compile-time `Record<ErrorCode, true>` |
 | `cloudflare/worker.js` | adapt | R2 cache + serve routes (§7.2) |
 | Root `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `render.yaml`, `.env.example` | adapt | workspace paths, new env vars |
 | `docs/DEPLOYMENT.md`, `DEVELOPMENT.md`, `CUSTOMIZATION.md` | adapt | rewrite for this repo at Phase 8 |

@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  background-color: #fef3c7; /* spec design system §2 brand-cream */
+  color: #1f2937; /* brand-ink */
+}
+
+/* ── Mascot idle animations (DESIGN_SYSTEM §5) ──────────────────────────
+   All applied to inner <g> elements so they don't fight Framer Motion's
+   transforms on outer elements. */
+
+@keyframes mascot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes mascot-wobble {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+@keyframes mascot-tap {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: rotate(-14deg);
+  }
+  50% {
+    transform: rotate(20deg);
+  }
+}
+@keyframes mascot-shrug {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+}
+@keyframes timer-panic {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-2px) rotate(-6deg);
+  }
+  75% {
+    transform: translateX(2px) rotate(6deg);
+  }
+}
+
+.bot-blink,
+.mascot-wobble,
+.mascot-tap,
+.mascot-wave,
+.mascot-shrug {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.bot-blink {
+  animation: mascot-blink 5s ease-in-out infinite;
+}
+.mascot-wobble {
+  animation: mascot-wobble 2.4s ease-in-out infinite;
+}
+.mascot-tap {
+  animation: mascot-tap 0.55s ease-in-out infinite;
+}
+.mascot-wave {
+  animation: mascot-wave 0.9s ease-in-out infinite;
+}
+.mascot-shrug {
+  animation: mascot-shrug 5s ease-in-out infinite;
+}
+.timer-panic {
+  animation: timer-panic 0.16s linear infinite;
+}
+
+/* ── Picture wobble (reveal + gallery animated preview) ─────────────────
+   Four-axis wobble applied to the AI cartoon so it reads as animated in
+   the gallery. The same math is mirrored in JS in `recordWobble.ts` so
+   the recorded WebM matches what the player sees. Five-second loop. */
+
+@keyframes picture-wobble-zoom {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+@keyframes picture-wobble-drift {
+  0%,
+  100% {
+    transform: translate(-6px, 4px);
+  }
+  25% {
+    transform: translate(6px, -3px);
+  }
+  50% {
+    transform: translate(4px, 5px);
+  }
+  75% {
+    transform: translate(-5px, -4px);
+  }
+}
+@keyframes picture-wobble-jiggle {
+  0%,
+  100% {
+    transform: rotate(-1.4deg);
+  }
+  33% {
+    transform: rotate(1.4deg);
+  }
+  66% {
+    transform: rotate(-0.8deg);
+  }
+}
+@keyframes picture-wobble-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* Wrappers stack so each transform has its own element and they compose
+   cleanly (CSS can't add multiple animated transforms to one element). */
+.picture-wobble-zoom {
+  animation: picture-wobble-zoom 2.4s ease-in-out infinite;
+}
+.picture-wobble-drift {
+  animation: picture-wobble-drift 5s ease-in-out infinite;
+}
+.picture-wobble-jiggle {
+  animation: picture-wobble-jiggle 1.6s ease-in-out infinite;
+}
+.picture-wobble-pulse {
+  animation: picture-wobble-pulse 0.6s ease-in-out infinite;
+}
+
+/* Reduced motion: idle loops stop; color cues stay (DESIGN_SYSTEM §4). */
+@media (prefers-reduced-motion: reduce) {
+  .bot-blink,
+  .mascot-wobble,
+  .mascot-tap,
+  .mascot-wave,
+  .mascot-shrug,
+  .timer-panic,
+  .picture-wobble-zoom,
+  .picture-wobble-drift,
+  .picture-wobble-jiggle,
+  .picture-wobble-pulse {
+    animation: none;
+  }
+}
+
+/* ── Hide native scrollbar (used by ScrollBox) ──────────────────────────
+   Mobile browsers (Samsung Internet, Android Chrome, iOS Safari) draw overlay
+   scrollbars that fade out when idle and ignore `::-webkit-scrollbar` styling,
+   so a native bar can't be kept on screen there. ScrollBox hides the native bar
+   with this class and paints its own always-visible thumb instead. */
+.hide-native-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+.hide-native-scrollbar::-webkit-scrollbar {
+  display: none; /* WebKit / Blink */
+}

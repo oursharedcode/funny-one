@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Funny Multi">
+  <!--
+    PLACEHOLDER app icon. SRC shipped a 192/512 PNG pair of its own branding,
+    which is the wrong product's identity to carry over. This stands in until
+    real artwork is commissioned: the "37" of «Чепуха 37» (FM-ID-1, the 3-7
+    player range) on the brand-cream ground, in the design system's display
+    face. Maskable, so the safe zone is the middle 80%.
+  -->
+  <rect width="512" height="512" fill="#fef3c7" />
+  <circle cx="256" cy="256" r="168" fill="#ec4899" />
+  <text
+    x="256"
+    y="256"
+    font-family="Fredoka, system-ui, sans-serif"
+    font-size="180"
+    font-weight="700"
+    fill="#ffffff"
+    text-anchor="middle"
+    dominant-baseline="central"
+  >
+    37
+  </text>
+</svg>

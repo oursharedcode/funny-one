@@ -19,7 +19,7 @@ import WaitingScreen from './screens/WaitingScreen';
 import RevealScreen from './screens/RevealScreen';
 import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
-import { snappy } from './styles/motion';
+import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { APP_VERSION } from './version';
 import type {
@@ -194,16 +194,15 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <BackgroundDoodle />
       <div className="relative min-h-screen overflow-x-hidden">
-        {/* Forward slide-fade per spec §17: new screen in from the left,
-            old screen out to the right. */}
+        {/* Forward slide-fade per spec §17 — see `screenSlide`, which holds the
+            values precisely so that they stay direction-independent. No
+            `mode="wait"`: the outgoing screen leaves as the incoming arrives. */}
         <AnimatePresence initial={false}>
           <motion.div
             key={phase}
+            data-phase={phase}
             className="absolute inset-0 overflow-y-auto"
-            initial={{ x: '-100%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
-            transition={snappy}
+            {...screenSlide}
           >
             {body}
           </motion.div>

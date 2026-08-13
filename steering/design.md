@@ -115,13 +115,15 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists |
 | `client/src/screens/HomeScreen.tsx` | adapt | create-mode language picker gated to `AUTHORED_LANGUAGES` — it sets the room's *content* language, which the server narrowed at T-2.3; join-mode picker stays at all 15 (interface only). `wobbleEngine` dropped from `LobbyState`. Busy flag released on `error`, since a rejected `room:create` reports by event and never acks (T-3.2) |
 | `client/src/screens/LobbyScreen.tsx` | adapt | `game:start` emitted with no arguments — T-1.6 dropped the payload type with its only field |
-| `client/src/screens/WaitingScreen/EndScreen` | copy | unchanged flows |
+| `client/src/screens/WaitingScreen.tsx` | copy | T-3.4. Only change: SRC's local `WaitingData` interface dropped for the `RoundWaitingPayload` already on the contract |
+| `client/src/screens/EndScreen.tsx` | copy | unchanged flow (T-5.1) |
 | `client/vitest.config.ts` + `src/testSetup.ts` | **new** | T-3.2. jsdom environment for the first component tests; separate from `vite.config.ts` so test runs skip the PWA build, and repeats its `__APP_VERSION__`/`__BUILD_DATE__` defines. Setup stubs `ResizeObserver` and `matchMedia`, which jsdom lacks and shipped code reaches |
 | `client/src/testutils/socketMock.ts` | **new** | T-3.2. `socket.ts` connects at module scope, so every screen suite mocks it; the double `act`-wraps ack and broadcast callbacks, without which React had not re-rendered by the next assertion and absence-assertions passed vacuously |
 | `client/src/screens/RoundScreen.tsx` | **rewrite** | not an adaptation in practice (T-3.3): SRC's body is a textarea, a character counter and a non-empty check, and none of it survives §8.1's combobox. Only the header — TimerBar, progress line, question, joiner gloss, story-language reminder — and the SubmitConfirm overlay carry over |
 | `client/src/screens/RevealScreen.tsx` | adapt | image by URL + dimensions (§8.2) |
 | `client/src/components/**` (TimerBar, PlayerList, QRCode, ProseText, RoomGallery, ShareButton, ScrollBox, SourceFooter, LogoStamp, art/*) | copy | design-system implementation (FM-ARC-4) |
-| `client/src/styles/*` | copy | tokens + motion presets |
+| `client/src/styles/*` | adapt | tokens + the three motion presets copied. `motion.ts` gains `screenSlide` (T-3.4): the §17 phase transition, lifted out of App.tsx so the forward-only lock — direction never varies — is a named value a test can hold rather than four inline literals |
+| `client/src/App.test.tsx` | **new** | T-3.4. The phase machine had no coverage: screen suites render their screen directly, so nothing checked that an event reaches the right screen with the right state. Also holds the §17 transition assertions, which are behavioural — framer-motion writes real transforms under jsdom |
 | `client/src/prose.ts`, `downloadStory.ts`, `share.ts` | adapt | fetch image URL → blob (CORS) instead of base64 (§8.3) |
 | `client/src/recordWobble.ts` | copy | CSS engine only |
 | `client/src/recordWobbleLottie.ts` | **drop** | ARC-3: no Lottie |

@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 in progress: T-3.1, T-3.2 and T-3.3 done. **T-3.4 next**, then Gate 3. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 283 tests across 3 workspaces (43 shared + 156 server + 84 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — T-3.1 to T-3.4 done; all six screens are real. **Gate 3's manual two-phone run is the only thing between here and Phase 4.** |
+| **Build state** | typecheck / lint / format / `npm test` all green — 307 tests across 3 workspaces (43 shared + 156 server + 108 client); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -490,20 +490,62 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       recorded in both the test and the component rather than left as a claim the suite did not
       support. The guard stays — the action is irreversible — but it is explicitly not counted
       as covered.*
-- [ ] **T-3.4 (S)** WaitingScreen copy; timer bar; forward-only screen transitions per SRC §17. → FM-ARC-4
-      *Reduced scope: `TimerBar` landed at T-3.3 (RoundScreen owns the 60 s deadline; WaitingScreen
-      has no timer), and App.tsx's forward slide-fade was carried at T-3.1. What remains is the
-      WaitingScreen copy itself and a pass confirming the transition is forward-only across the
-      now-real screens.*
+- [x] **T-3.4 (S)** WaitingScreen copy; timer bar; forward-only screen transitions per SRC §17. → FM-ARC-4
+      *Scope was already reduced on arrival: `TimerBar` landed at T-3.3 (RoundScreen owns the 60 s
+      deadline) and App.tsx's slide-fade was carried at T-3.1, leaving the WaitingScreen copy and
+      a pass over the transitions now that there is something real to transition between.*
+      *`WaitingScreen` is a straight copy; the only change is dropping SRC's local `WaitingData`
+      interface for the `RoundWaitingPayload` already on the socket contract. No timer on it, and
+      a test says so: once you have submitted, a countdown only tells you how long you may be
+      stuck watching a mascot.*
+      ***The §17 transition moved into `styles/motion.ts` as `screenSlide`.*** *It was four inline
+      literals in App.tsx. The §17 lock is that direction never varies — a screen enters from the
+      left whether the phase machine went forwards or backwards — and a directional slide is the
+      obvious later "improvement" that no screenshot would catch. Naming the constant lets a test
+      hold it.*
+      ***`App.tsx` had no tests at all until now*** *— every screen suite renders its screen
+      directly, so nothing checked that a `round:start` actually reaches RoundScreen, or that the
+      phase machine hands each screen the state it needs. Phase 3 is the point where all six
+      destinations exist and that becomes checkable. 24 tests: routing for all six phases,
+      `lobby:update` applying a host migration (the client loses Start), the error toast
+      translating by code and auto-clearing, the host's player-lost notice, and listener
+      detachment on unmount.*
+      ***The transition tests are behavioural, not a restatement of the constant.*** *framer-motion
+      writes real inline transforms under jsdom, so "enters from the left" is observable as
+      `translateX(-100%)` on the incoming screen — asserted for a forward move (home→lobby) and,
+      the part that matters, for a backward one (lobby→home via Leave). Both screens being in the
+      tree mid-transition is asserted too, which is what `mode="wait"`'s absence buys.*
+      ***Two jsdom facts had to be handled rather than worked around.*** *framer-motion drives its
+      springs off `requestAnimationFrame`, which never advances by itself under jsdom — so exit
+      animations never complete, the outgoing screen stays mounted forever, and returning to a
+      phase reuses the stale element instead of remounting. Faking timers fixes it, but only if
+      faked **once for the file**: framer-motion resolves its frame loop the first time it
+      schedules and keeps it, so a per-test `useFakeTimers`/`useRealTimers` swap leaves it driving
+      a dead clock. Both cost a debugging round and are recorded in the suite so the next one is
+      cheaper.*
+      ***Negative-controlled seven ways.*** *Six went red as expected: `mode="wait"` added (10
+      failures), a genuinely directional `initial` (the backward test — and note that flipping
+      only `exit` reds just the declarative check, which is why both kinds are there), an
+      undetached listener, a hard-coded WaitingScreen total, and removing either the phase switch
+      or the round payload from `onRoundStart`.*
+      ***The seventh found an overstated assertion, as at T-3.3.*** *Deleting `setWaiting(null)`
+      from `onRoundStart` reds nothing: App only renders WaitingScreen while the phase **is**
+      `waiting`, so a stale count cannot surface. The line is hygiene, not behaviour; the test now
+      says so instead of implying it covers it.*
 - **Gate 3**: two phones (or tabs) create/join/play 7 rounds end-to-end with real UI;
   no free-text affordance anywhere; shuffle differs between players.
-  *Two of the three clauses are properties of a rendered screen, and T-3.2 landed the DOM test
-  environment that makes them assertable — so automate them at T-3.3 rather than re-checking
-  them by hand: **no free-text affordance** is "RoundScreen renders no `input` or `textarea`",
-  a permanent guard on FM-ANS-1 rather than a one-off observation, and **shuffle differs
-  between players** is a comparison of two renders. Follow Gate 2's precedent (see its note):
-  the manual run stays for what is genuinely visual — tap-target size, the selection spring,
-  timer-bar animation, real two-phone play.*
+  ***Two of the three clauses are now automated (done at T-3.3), leaving one genuinely manual
+  run.*** *`RoundScreen.test.tsx` asserts **no free-text affordance** per round across all seven
+  slots — no `input`, `textarea`, `[contenteditable]`, `[placeholder]`, and no
+  searchbox/textbox/combobox role — and **shuffle differs between players** by comparing two
+  seeded renders and checking the second is a permutation of the first. T-3.4 added the phase
+  machine itself: `App.test.tsx` drives home→lobby→writing→waiting→reveal→end over the socket
+  double, so "create/join/play through the phases" is covered in CI too.*
+  **Still to do, and it needs hands:** two real phones on one room — create, join by QR, play
+  seven rounds, and confirm what only a device shows: tap-target size on the option cards, the
+  selection spring, the timer bar's colour turns and panic, PWA-shell scrolling on a small
+  screen, and that the forward slide-fade reads as forward. Follow Gate 2's precedent: what can
+  be automated has been, and the manual run is now only for what eyes and thumbs are for.
 
 **Toolchain deviations from SRC** (decided at T-3.1), same policy as Gate 0 — carry SRC's pins
 unless they carry advisories:

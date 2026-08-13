@@ -7,7 +7,7 @@
 | **Date** | 2026-08-12 |
 | **Status** | for review |
 | **Progress** | Phases 0 and 1 complete (Gates 0 and 1 passed). Phase 2 in progress: T-2.1, T-2.2, T-2.3 done. **T-2.4 next** — disconnect rules. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 147 tests across 2 workspaces (43 shared + 104 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 158 tests across 2 workspaces (43 shared + 115 server); `npm audit` 0 vulnerabilities; CI green on `main`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -252,17 +252,28 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       botification (auto-fill current round), host migration, `player:lost`. → FM-CORE-3
 - [ ] **T-2.5 (M)** Adapt SRC `game.test.ts` + i18n coverage tests: option-id fixtures; full
       simulated 3- and 7-player games; INVALID_OPTION case; en+ru prose snapshots. → design §13
-- **Gate 2**: server tests green; manual 3-tab full 7-round game with combobox picks stubbed
-  via test client, correct story assembly verified (rotation placement).
-  *Open question raised at T-2.3 — **there is no test client, and no task creates one.** The
-  automated half is already covered: `game.test.ts` runs full simulated 3- and 7-player games
-  asserting rotation placement in-process. What that does not exercise is the real socket
-  transport with concurrent clients, which is the part a 3-tab manual run actually tests.
-  Cheapest close: extend T-2.5 to drive a full 7-round game over real Socket.IO connections
-  (`index.test.ts` already does this for the lobby events), making Gate 2 automated end to end
-  and leaving genuinely-manual checks to Gate 3, where a real UI exists. The alternative —
-  writing a throwaway CLI stub client — costs about the same and rots immediately. Decide
-  before starting T-2.5.*
+      *Mostly landed early: T-2.3 shipped `game.test.ts` (32 tests — option-id fixtures, full
+      in-process 3- and 7-player games, INVALID_OPTION, en+ru prose snapshots) and
+      `game.socket.test.ts` (11 tests — the same games over real sockets, closing Gate 2; see
+      the gate note below). **Remaining for T-2.5:** disconnect/botification scenarios over
+      sockets once T-2.4 lands, and the i18n coverage test extending SRC's
+      `i18n/index.test.ts` pattern. Reuse `src/testutils/socket.ts` — the shared harness, kept
+      out of `dist` via a `tsconfig.build.json` exclude.*
+- **Gate 2**: server tests green; **full 7-round game over real Socket.IO connections**, correct
+  story assembly verified (rotation placement). Runs in CI on every build.
+  ***Resolved 2026-08-13 — the manual 3-tab run is replaced by an automated one.*** The gate as
+  written depended on a "test client" that no task created, and Phase 3 is where a real UI first
+  exists. Rather than write a throwaway stub that would be run once and rot,
+  `game.socket.test.ts` drives real clients through a real Fastify + Socket.IO server: create,
+  join, start, seven rounds of `round:submit`, reveal — asserting both what each client received
+  and what the server stored. That covers what the manual run was for (an answer landing in the
+  wrong player's story, a broadcast reaching the wrong room, a reveal going to the wrong socket)
+  and now regression-guards it forever. Genuinely visual checks — combobox layout, timer-bar
+  animation — were always Gate 3's job and stay there.*
+  *This immediately paid for itself: the first run failed because the fixtures used the nickname
+  `'p0'`, which is 2 characters against a 3-character minimum. `game.test.ts` never caught it
+  because it calls `createRoom` directly and bypasses `validateNickname` — exactly the class of
+  gap that only appears on the wire.*
 
 ## Phase 3 — Client core
 

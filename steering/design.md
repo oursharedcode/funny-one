@@ -407,10 +407,16 @@ post-v1 phase; nothing in v1 may preclude it.
   reveal payloads carrying resolved texts + PictureRef. Lobby events are driven over a real
   Socket.IO connection on an ephemeral port rather than by calling handlers directly, since the
   ack-vs-`error` split and broadcast fan-out are exactly what a direct call would not cover.
-- **Manual gates** (per SRC build-order discipline): two-tab lobby test; 3-tab full game;
-  dead-Worker error path; `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice →
-  second reveal instant, counter unchanged); phone PWA install; RU full game (declined texts
-  read grammatically); RTL sanity for `he`.
+- **Manual gates** (per SRC build-order discipline): dead-Worker error path;
+  `MAX_IMAGES_PER_DAY=1` cap path; cache-hit path (same picks twice → second reveal instant,
+  counter unchanged); phone PWA install; RU full game (declined texts read grammatically); RTL
+  sanity for `he`.
+  *The two-tab lobby test and the 3-tab full game are **no longer manual** (Gate 2, resolved
+  2026-08-13): `index.test.ts` and `game.socket.test.ts` drive real Socket.IO clients against a
+  real server, so both run in CI on every build. A manual run needed a stub client no task
+  created, and would have been performed once; the automated one regression-guards the same
+  behaviour permanently. Checks that genuinely need eyes — combobox layout, timer-bar
+  animation, phone install — remain manual at Gate 3 and later.*
 - **Acceptance** (Phase 8): SRC spec §19 checklist adapted to combobox + URL images, run on
   real Android + iOS phones.
 

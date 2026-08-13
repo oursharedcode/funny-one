@@ -10,19 +10,24 @@
 // pass — a bootstrap with no tests would look green while proving nothing.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import type { AddressInfo } from 'node:net';
 import { readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
-import { io as ioClient, type Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { buildServer, type BuiltServer } from './index.js';
 import { ENV_PATH } from './env.js';
 import { __resetRoomsForTest } from './rooms.js';
+import { emitWithAck, once, startTestServer, type TestServer } from './testutils/socket.js';
 
+// Two shapes of test here: HTTP checks that only need a built (unlistened)
+// Fastify via `inject`, and socket checks that need a real listener. The
+// shared harness in testutils/socket.ts covers the latter and is also used by
+// game.socket.test.ts.
 let built: BuiltServer | null = null;
-const clients: Socket[] = [];
+let harness: TestServer | null = null;
 
 afterEach(async () => {
-  for (const c of clients.splice(0)) c.disconnect();
+  await harness?.close();
+  harness = null;
   if (built) {
     await built.io.close();
     await built.fastify.close();
@@ -37,36 +42,14 @@ async function boot(): Promise<BuiltServer> {
   return server;
 }
 
-// Boots on port 0 so concurrent runs cannot collide on a fixed port.
-async function listen(): Promise<string> {
-  const server = await boot();
-  await server.fastify.listen({ port: 0, host: '127.0.0.1' });
-  const { port } = server.fastify.server.address() as AddressInfo;
-  return `http://127.0.0.1:${port}`;
+async function listen(): Promise<TestServer> {
+  const h = await startTestServer();
+  harness = h;
+  return h;
 }
 
-function connect(url: string): Promise<Socket> {
-  const socket = ioClient(url, { transports: ['websocket'], forceNew: true });
-  clients.push(socket);
-  return new Promise((resolve, reject) => {
-    socket.on('connect', () => resolve(socket));
-    socket.on('connect_error', reject);
-    setTimeout(() => reject(new Error('timed out waiting for connect')), 5000);
-  });
-}
-
-function emitWithAck<T>(socket: Socket, event: string, payload: unknown): Promise<T> {
-  return new Promise((resolve, reject) => {
-    socket.emit(event, payload, (response: T) => resolve(response));
-    setTimeout(() => reject(new Error(`timed out waiting for ${event} ack`)), 5000);
-  });
-}
-
-function once<T>(socket: Socket, event: string): Promise<T> {
-  return new Promise((resolve, reject) => {
-    socket.once(event, (payload: T) => resolve(payload));
-    setTimeout(() => reject(new Error(`timed out waiting for ${event}`)), 5000);
-  });
+function connect(h: TestServer): Promise<Socket> {
+  return h.connect();
 }
 
 // ---------------------------------------------------------------------------
@@ -126,8 +109,8 @@ describe('http', () => {
 
 describe('socket.io', () => {
   it('accepts a websocket connection', async () => {
-    const url = await listen();
-    const socket = await connect(url);
+    const h = await listen();
+    const socket = await connect(h);
     expect(socket.id).toBeTruthy();
   });
 });
@@ -138,8 +121,8 @@ describe('socket.io', () => {
 
 describe('room:create', () => {
   it('acks with a room code and the socket id', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const ack = await emitWithAck<{ roomCode: string; socketId: string }>(host, 'room:create', {
       nickname: 'Ada',
       language: 'en',
@@ -149,8 +132,8 @@ describe('room:create', () => {
   });
 
   it('broadcasts lobby:update to the creator', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const lobby = once<{ players: { nickname: string }[]; hostId: string; donateUrl: unknown }>(
       host,
       'lobby:update',
@@ -166,8 +149,8 @@ describe('room:create', () => {
   it('emits error (not an ack) for a bad nickname', async () => {
     // RoomCreateAck has no error branch, so create failures must travel on the
     // `error` event — the convention the copied HomeScreen listens for.
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const err = once<{ code: string }>(host, 'error');
     host.emit('room:create', { nickname: 'ab', language: 'en' }, () => {
       throw new Error('ack must not fire on a rejected create');
@@ -176,8 +159,8 @@ describe('room:create', () => {
   });
 
   it('emits error for an unknown language', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const err = once<{ code: string }>(host, 'error');
     host.emit('room:create', { nickname: 'Ada', language: 'klingon' }, () => {});
     expect((await err).code).toBe('INVALID_NICKNAME');
@@ -186,14 +169,14 @@ describe('room:create', () => {
 
 describe('room:join', () => {
   it('acks with the player list and room language', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
       nickname: 'Ada',
       language: 'ru',
     });
 
-    const joiner = await connect(url);
+    const joiner = await connect(h);
     const ack = await emitWithAck<{
       players: { nickname: string }[];
       language: string;
@@ -206,14 +189,14 @@ describe('room:join', () => {
   });
 
   it('broadcasts lobby:update to players already in the room', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
       nickname: 'Ada',
       language: 'en',
     });
 
-    const joiner = await connect(url);
+    const joiner = await connect(h);
     const hostSees = once<{ players: { nickname: string }[] }>(host, 'lobby:update');
     void emitWithAck(joiner, 'room:join', { roomCode, nickname: 'Bob' });
     expect((await hostSees).players.map((p) => p.nickname)).toEqual(['Ada', 'Bob']);
@@ -222,8 +205,8 @@ describe('room:join', () => {
   it('returns errors through the ack, never the error event', async () => {
     // The copied HomeScreen inspects `ack.error`; an emitted `error` would
     // leave its busy spinner stuck forever.
-    const url = await listen();
-    const joiner = await connect(url);
+    const h = await listen();
+    const joiner = await connect(h);
     const ack = await emitWithAck<{ error: { code: string } }>(joiner, 'room:join', {
       roomCode: 'ZZZZZZ',
       nickname: 'Bob',
@@ -232,8 +215,8 @@ describe('room:join', () => {
   });
 
   it('returns INVALID_NICKNAME through the ack', async () => {
-    const url = await listen();
-    const joiner = await connect(url);
+    const h = await listen();
+    const joiner = await connect(h);
     const ack = await emitWithAck<{ error: { code: string } }>(joiner, 'room:join', {
       roomCode: 'ZZZZZZ',
       nickname: 'x',
@@ -244,13 +227,13 @@ describe('room:join', () => {
 
 describe('room:leave', () => {
   it('removes the player and broadcasts to those remaining', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
       nickname: 'Ada',
       language: 'en',
     });
-    const joiner = await connect(url);
+    const joiner = await connect(h);
     // The handlers ack before broadcasting (SRC's order), so the join's
     // lobby:update is still in flight when its ack resolves. Drain it before
     // listening for the leave broadcast, or this test reads the wrong one.
@@ -266,8 +249,8 @@ describe('room:leave', () => {
 
 describe('rate limiting (spec §17)', () => {
   it('allows 5 room:create per IP per minute, then emits RATE_LIMITED', async () => {
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
 
     for (let i = 0; i < 5; i++) {
       const ack = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
@@ -285,8 +268,8 @@ describe('rate limiting (spec §17)', () => {
   });
 
   it('rate-limits room:join through the ack branch', async () => {
-    const url = await listen();
-    const joiner = await connect(url);
+    const h = await listen();
+    const joiner = await connect(h);
 
     // 30 per minute; all of these miss (unknown room) but still spend a token,
     // which is the point — the limit guards the attempt, not the outcome.
@@ -306,8 +289,8 @@ describe('rate limiting (spec §17)', () => {
 
   it('does not let the create limit block joins', async () => {
     // Separate buckets per action — exhausting create must leave join usable.
-    const url = await listen();
-    const host = await connect(url);
+    const h = await listen();
+    const host = await connect(h);
     const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
       nickname: 'Ada',
       language: 'en',
@@ -316,7 +299,7 @@ describe('rate limiting (spec §17)', () => {
       host.emit('room:create', { nickname: 'Ada', language: 'en' }, () => {});
     }
 
-    const joiner = await connect(url);
+    const joiner = await connect(h);
     const ack = await emitWithAck<{ players?: unknown[]; error?: unknown }>(joiner, 'room:join', {
       roomCode,
       nickname: 'Bob',

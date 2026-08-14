@@ -120,9 +120,9 @@ const FRAGMENTS: ReadonlyMap<SlotIndex, ReadonlyMap<OptionId, string>> = new Map
  * before reveal, and `submitAnswer` rejects out-of-pool ids — so a throw here
  * means an invariant broke upstream. It is deliberately not softened into a
  * fallback: a placeholder fragment would generate and cache a real image under
- * a prompt describing a story nobody played. The caller (T-4.3) turns this into
- * the reveal's error-with-retry path, which is where a missing picture is
- * already handled.
+ * a prompt describing a story nobody played. The caller (T-4.4, `game.ts`)
+ * turns this into the reveal's error-with-retry path, which is where a
+ * missing picture is already handled.
  */
 export function buildPrompt(story: Story): string {
   const body = SKELETON.replace(/\{([0-6])\}/g, (_match, digit: string) =>

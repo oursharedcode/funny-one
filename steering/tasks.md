@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-12 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which has begun: T-4.1 and T-4.2 done. **T-4.2's skeleton-tuning pass against real Flux output is outstanding and must happen before v0.1.0** — after that the wording is locked. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 363 tests across 4 workspaces (43 shared + 173 server + 108 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main`. |
+| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which is now **code complete**: T-4.1–T-4.4 done, Worker deployed, skeleton wording tuned and locked, reveal wiring built and tested against a mocked Worker (2026-08-14). **Gate 4's manual run — real Worker, real devices — is outstanding**, same shape as Gate 3. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 417 tests across 4 workspaces (43 shared + 214 server + 121 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main` as of the last push (this session's work is not yet pushed). |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -629,16 +629,49 @@ unless they carry advisories:
       contract in one place; and there is deliberately **no `OPTIONS` handler**, because every
       request we make for these URLs is a plain `GET` with no custom headers and is therefore
       never preflighted. Add one the day a request here carries a header.*
-      ***Not verifiable until Gate 4:*** *nothing here has met real Workers AI, real R2 or a real
-      deploy. The fakes encode the documented contracts (`{image: "<base64>"}`, `head()` carrying
-      `customMetadata`, `writeHttpMetadata`); if any of those is wrong, these 39 tests are green
-      against a fiction. Gate 4's cache-hit clause — same picks twice, second reveal instant,
-      counter unchanged — is the first thing that touches all three for real.*
+      ***Verified for real, 2026-08-14.*** *Deployed to `funny-multi-image.oursharedcode.workers.dev`
+      (R2 bucket `funny-multi-images` created, `WORKER_SECRET` set). All three fakes' contracts
+      held: `/exists` correctly reported a miss then a hit, `/generate` returned real Flux Schnell
+      output at 1024×1024 (not the documented 1024×768 fallback — dimension-from-bytes parsing is
+      what caught that, exactly as designed), and a repeated `/generate` call on an already-cached
+      prompt returned in 312 ms with `cached:true` and the identical URL — no second AI call. One
+      config bug found and fixed in the same pass: `wrangler.toml` had `preview_urls = false` under
+      a comment claiming it disabled the `*.workers.dev` route; that key only controls per-version
+      preview aliases (a different, newer Cloudflare feature) — `wrangler deploy` warned that
+      `workers_dev` defaulted to enabled regardless. Corrected the comment rather than the setting:
+      SRC's own security doc is explicit that the route being guessable is fine (`funny-stories-
+      image.<account>.workers.dev` was published in SRC's own repo) because `X-Secret` is the
+      entire boundary on every route but `/i/*`, and this route **is** what becomes
+      `CLOUDFLARE_WORKER_URL` — disabling it would have left the server nothing to call.*
 - [x] **T-4.2 (M)** `prompt.ts` deterministic builder (skeleton + fragments, slots 0/1/2/4,
       STYLE_SUFFIX verbatim); determinism + snapshot + length tests. Tune skeleton wording
       against real Flux output on ~20 combos, then **lock it** (edits orphan the cache). → FM-IMG-2, DD-3
-      ***Code complete; the tuning pass is outstanding and needs a deployed Worker*** *— see the
-      end of this entry. The builder is twelve lines, and almost nothing of SRC's 200 survives:
+      ***SKELETON tuned against real Flux output and locked, 2026-08-14 — unchanged from the
+      reasoned-but-unverified wording below.*** *`npm run prompts -w apps/funny-multi-server --
+      --curl` generated all 20 of the deterministic spread against the deployed Worker; each of the
+      20 images was inspected. Verdict: ship as-is, no skeleton edit.*
+      - *The **left/right anchoring held on every one of the 20** — slot 0's subject rendered on
+        the left and slot 1's on the right with no exceptions, including the case designed to
+        stress it hardest (`cats-in-a-trench-coat`, a three-cat chimera in slot 0): it composed as
+        one lead figure beside its slot-1 companion, never merging into the companion or splitting
+        across the frame.*
+      - *No merged/fused bodies observed on any sample; scene (slot 2) and action (slot 4) both
+        legible in every image.*
+      - *8–9 of the 20 (~40–45%) carry a hallucinated corner squiggle resembling a painter's
+        signature. Checked against SRC's own decision on the identical suffix (spec §22): SRC tried
+        appending "no text, no words" in earlier pre-v0.1.0 iterations, reverted it because
+        CLIP-conditioned models interpret negation poorly and naming the unwanted concept
+        reinforces rather than suppresses it, then formally accepted the artefact — nonsense
+        letterforms, not a reproduction of any real signature, cost of every mitigation (false-
+        positive corner crops, a heavier model's Neuron-budget hit, reopening the `STYLE_SUFFIX`
+        lock) judged higher than the cost of the squiggle itself. `STYLE_SUFFIX` is verbatim-locked
+        from SRC independent of this task, so it was never in scope to change here regardless —
+        this is a confirmation of an inherited decision, not a new one.*
+      - *One dimension fact the pass confirmed rather than assumed: real output is **1024×1024**,
+        not the design's documented 1024×768 fallback. Harmless by construction — T-4.1 reads
+        dimensions from the bytes rather than trusting a constant, which is exactly the failure
+        this would have been if it hadn't.*
+      The builder is twelve lines, and almost nothing of SRC's 200 survives:
       `STYLE_SUFFIX` verbatim, and that is all. Translation, the English profanity re-check, the
       RU/EN slot-1 connective synthesis, `ruActionHint` and `looksLikeSameSubject` with its "two
       of them" chimera anchor all existed to make free-typed text safe and grammatical. The pools
@@ -668,31 +701,136 @@ unless they carry advisories:
       seventh: rewording a single `promptEn` fragment in `packages/shared` reds the pinned prompt.
       That is the cache-orphan alarm working — after v0.1.0 that failure is the point, because
       the edit would strand every image already generated from the old wording.*
-      ***Still to do, and it needs a deployed Worker:*** *design §7.1 says the skeleton is tuned
-      once against real Flux output and then locked. Nothing here has met Flux, so the current
-      wording is SRC's structural lessons carried over on reasoning, not on pictures.
       `npm run prompts -w apps/funny-multi-server` prints a deterministic spread of 20 assembled
-      prompts for that pass, and `-- --curl` turns them into `/generate` calls against
-      `$CLOUDFLARE_WORKER_URL` — each of which really generates and really bumps the daily
-      counter. The window is open only while the cache is empty: **tune before v0.1.0, or accept
-      the wording as-is forever.***
-- [ ] **T-4.3 (M)** `image.ts` adapted: exists-check → reserve → generate → refund-on-cached
+      prompts, and `-- --curl` turns them into `/generate` calls against `$CLOUDFLARE_WORKER_URL` —
+      the tuning pass above is that command, run for real.
+- [x] **T-4.3 (M)** `image.ts` adapted: exists-check → reserve → generate → refund-on-cached
       flow per design §7.3; JSON response parsing; `releaseImageSlot()` + tests incl. cap and
       refund races; KV recovery (`max(local,worker)`) kept. → FM-TIER-1
-- [ ] **T-4.4 (M)** Reveal wiring: auto-trigger on reveal, bot-story server-side generation,
+      *The counter half (`reserveImageSlot`, `imagesGeneratedToday`, `syncImageCounterFromWorker`,
+      `maybeSyncImageCounter`, the `max(local,worker)` KV-recovery logic) is a near-verbatim port
+      of SRC's `image.ts` — same constants, same rollover-at-UTC-midnight behaviour, same
+      silently-absorbed sync failures. `generateImage` itself is new: SRC's version streamed base64
+      bytes back over the socket; this one calls the Worker's `/exists` probe first (capless), and
+      only reserves + calls `/generate` on a genuine miss, returning a `PictureRef` instead of a
+      data URL (design §7.3, DD-5).*
+      ***`releaseImageSlot()`, new, closes the race `/exists` cannot.*** *Two rooms can land on the
+      same story in the gap between this room's probe (a miss) and this room's own `/generate`
+      call; the Worker's own head check inside `serveGenerate` (worker.js) then reports
+      `cached:true` for a call that already reserved a slot. `generateImage` refunds that
+      reservation on exactly that signal — net zero cost for a request that turned out to be free.
+      Floors at zero and re-checks the UTC day before decrementing, matching `reserveImageSlot`'s
+      own rollover guard, so a refund arriving just after midnight cannot borrow against the new
+      day's (empty) counter — pinned by a `vi.setSystemTime` test that crosses the boundary mid-test
+      rather than asserting the floor in the abstract.*
+      ***A failed `/exists` probe degrades to a miss, not a thrown error.*** *Network failure or a
+      non-2xx status is swallowed and treated as `{cached:false}` rather than surfaced, because
+      `/generate` repeats the identical R2 head server-side and will report `cached:true` anyway if
+      the prompt really is cached — at which point the refund above fires. The only cost of a flaky
+      probe is one redundant (and then refunded) reservation, never a wrong picture or a reveal
+      that fails just because the cheap check happened to time out.*
+      ***`ImageCapReachedError`, a new exported class, is the cap/failure discriminator T-4.4
+      needs.*** *SRC's caller checked `reserveImageSlot()` itself before calling `generateImage` and
+      built the `CAP_REACHED` vs `GENERIC` wire code from that boolean. That pattern cannot survive
+      here: whether to reserve at all now depends on the `/exists` result, so the reserve check
+      moved inside `generateImage`, and the caller needs a way to tell "cap was full" apart from
+      "the Worker call failed" without re-implementing the reserve logic. A distinct thrown type,
+      checked with `instanceof`, is that signal.*
+      ***JSON response parsing is defensive, not because the Worker is untrusted, but because it's
+      an HTTP boundary.*** *`parseHit`/`parseGenerated` validate the shape (`cached`, `url`,
+      `width`, `height` with the right types) rather than casting; a `/generate` response missing a
+      field throws with a message naming the defect instead of handing `undefined` on to a
+      `PictureRef` the client will try to render with `<img src={undefined}>`.*
+      ***23 tests.*** *The counter suite (11) is the closest thing to a straight SRC port in this
+      task. The rest is new: cache-hit costs no slot and calls `/exists` only; genuine miss reserves
+      and calls `/generate`; cap-full on a miss throws `ImageCapReachedError` before ever calling
+      `/generate`; the refund race (`/generate` reports `cached:true` after a reserved miss) nets
+      the counter back to zero; a broken `/exists` probe still reaches a correct result via the
+      miss path, tested both for a network throw and a non-2xx status; `/generate` failure — network
+      throw and a malformed success body alike — leaves the reservation standing (attempts, not
+      successes, carried over from SRC's own reasoning) and is retried exactly as many times as the
+      carried-over `MAX_RETRIES` constant says; missing Worker configuration throws before any
+      fetch. Retry-path tests run on real timers (`RETRY_DELAY_MS` is 1 s, unchanged from SRC) with
+      a raised per-test timeout rather than mocked, matching this repo's existing convention
+      (`translate.test.ts` in SRC did the same at a shorter delay) over fake-timer bookkeeping for
+      a cost of a few real seconds on the suite.*
+- [x] **T-4.4 (M)** Reveal wiring: auto-trigger on reveal, bot-story server-side generation,
       `PictureRef` payloads, RevealScreen URL images with dimensions + fade-in, retry,
       CAP_REACHED caption, error mascot. → FM-IMG-1, FM-CORE-9
+      *Server: `game.ts` gains `generateStoryPicture` (write-once cache around `buildPrompt` +
+      `generateImage`, `buildPrompt`'s invariant-throw caught defensively even though
+      unreachable in a played game), `handlePictureRequest` (identical handler for
+      `reveal:requestPicture`/`retryPicture`, per spec §11 — a retry is just another request
+      against the same write-once story), and `generateBotStoryPictures` (sequential, so a
+      multi-bot room doesn't burn the shared daily cap in one tick ahead of a human still
+      waiting). `enterRevealPhase` fires the bot generation before emitting any `reveal:start`,
+      matching SRC's ordering rationale: the request must not wait on text rendering.
+      `index.ts` wires the two socket events and, in `finalizePlayerRemoval`, fires
+      `generateBotStoryPictures` again for a player who botifies **during** reveal — the case
+      `enterRevealPhase`'s own call cannot reach, since that player was still human when reveal
+      began.*
+      ***Not carried from SRC, both load-bearing absences.*** *(1) No `translationFailed`/CSAM/
+      hard-block branch in `generateStoryPicture` — `buildPrompt` here is a pure synchronous
+      function of curated pool ids (DD-8, FM-ANS-1), so the only two outcomes are "generated"
+      and "the Worker/cap failed", collapsing SRC's five-way `PictureOutcome` union to four. (2)
+      No `broadcastStats`/gallery re-broadcast call sites — `stats.ts` (T-5.3) and `buildGallery`/
+      `gallery:share` (T-5.1) don't exist in this repo yet; SRC called both from the exact
+      pipeline this task owns, but adding calls into modules that don't exist would be scope
+      creep dressed as fidelity. `generateBotStoryPictures` takes no `io` parameter as a result —
+      bots have no client to notify and there is no gallery to refresh — noted in its docstring
+      as a parameter to add back the day T-5.1's call site exists, not before.*
+      ***Client: `RevealScreen.tsx` replaces the T-4.4-scaffolded `PlaceholderScreen` wrapper.***
+      *`prose.ts` and `ProseText.tsx` ported verbatim from SRC (design §3: unchanged reuse — the
+      resolved-display-text contract on `reveal:start`/gallery payloads means the highlighting
+      logic needs no PictureRef-era changes) since nothing had brought them into this repo yet.
+      The one production adaptation is `<img src width height>` instead of `<img src>`: SRC's
+      base64 `pictureUrl` carried no dimensions to reserve, so the browser could only lay out
+      the image after it decoded; `PictureRef.width`/`height` (T-2.3/T-4.3) let the layout space
+      exist before the first byte arrives (design §8.2). `<LogoStamp />` is not carried — it
+      doesn't exist in this repo yet and arrives at T-7.2 with the rest of the design-system
+      polish pass; the picture renders correctly without the branding overlay, which is the only
+      thing missing until then.*
+      ***CAP_REACHED wiring reused `capReset.ts`'s `hoursUntilUtcMidnight` exactly as T-3.2 flagged
+      it would, resolving that carry-over.*** *The i18n keys (`reveal.capReached` and siblings)
+      were already present in both catalogs from an earlier bootstrap pass and needed no changes.*
+      ***`imagePrompt` rides the wire but is not rendered***, *matching SRC's own production
+      screen: SRC only ever displayed it on the dev-only `TestImageScreen`/`TestDemoImageScreen`,
+      which design §3 explicitly drops from this repo. Carrying the field without a debug UI to
+      show it in is not a gap — it is the same choice SRC's real players' screen already made.*
+      ***A real-timing bug, not a logic bug, surfaced while writing the socket-level test.***
+      *`Promise.reject(new ImageCapReachedError())` assigned directly to a mock's captured
+      variable is an unhandled rejection until something awaits it — invisible in the two
+      in-process test files because the mock is consumed same-tick, but exposed by
+      `game.picture.socket.test.ts`'s real socket round-trip, which leaves the promise
+      unconsumed for several ticks. Fixed by making the mock a factory (`() => Promise.reject(…)`)
+      called only when `generateImage` actually runs, applied to all three files that share the
+      pattern for consistency rather than leaving two fixed and one fragile.*
+      ***23 new tests across three files, plus one fix to an existing one.*** *`game.pictureError
+      .test.ts` (6, ported from SRC's item 4 of BUGS_AND_IMPROVEMENTS_02.md, adapted for
+      `PictureRef`/`ImageCapReachedError`) covers `handlePictureRequest`'s CAP_REACHED/GENERIC/
+      success/wrong-phase/no-story/write-once-retry paths. `game.botPictures.test.ts` (8, ported
+      from SRC's item 3) covers the bot-generation loop including a genuinely sequential-not-
+      parallel assertion (order-of-events, not just end-state — a concurrent implementation would
+      pass an end-state-only check). `game.picture.socket.test.ts` (4, new — SRC never had a
+      real-socket equivalent) proves the events are wired under their real names end to end,
+      including the mid-game-botify-then-reveal path with a short `disconnectGraceMs`, the same
+      technique `disconnect.socket.test.ts` already established. `RevealScreen.test.tsx` (13,
+      new) covers the wait-control delay, the fade-in/flourish sequencing, both error codes, the
+      write-once retry, and listener detachment on unmount. `App.test.tsx`'s reveal-routing
+      assertion, written against the placeholder screen's plain-text prose, is updated for
+      `ProseText`'s span-per-phrase rendering — the fix is a different query, not a behaviour
+      change.*
 - **Gate 4**: manual — dead-Worker URL → error+retry path; `MAX_IMAGES_PER_DAY=1` → second
   distinct story capped; **same picks twice → second reveal instant from cache with counter
   unchanged**; RU room and EN room with same picks → same image URL.
-  ***This gate carries more than its checklist*** *(noted at T-4.1/T-4.2). It is the first time
-  anything in Phase 4 meets real Workers AI, real R2 and a real deploy: the Worker's 39 tests run
-  against fakes that encode the documented contracts (`{image: "<base64>"}`, `head()` carrying
-  `customMetadata`, `writeHttpMetadata`), and if any of those is wrong they are green against a
-  fiction. Two things to do while there, neither in the list above: **create the R2 bucket** —
-  `wrangler r2 bucket create funny-multi-images`, a step no other deploy needed — and run the
-  **skeleton tuning pass** (`npm run prompts -w apps/funny-multi-server -- --curl`), because
-  design §7.1 locks the wording at v0.1.0 and the window closes with it.*
+  ***The Worker/R2/deploy half of this gate is done*** *(T-4.1/T-4.2, 2026-08-14): the R2 bucket
+  exists, the Worker is live, the fakes' contracts held against real Workers AI and real R2, and
+  the cache-hit path (same prompt twice → second call 312 ms, `cached:true`, identical URL) is
+  already confirmed at the Worker level.* ***The server+client wiring half is also done*** *(T-4.3/
+  T-4.4, same day): every path in the checklist above is now exercised by an automated test —
+  against a *mocked* Worker. What is left for this gate is exactly what mocking cannot prove: a
+  played game against the real deployed Worker, on real devices, where a dead-Worker URL, a
+  `MAX_IMAGES_PER_DAY=1` room, a repeated pick, and an RU/EN pair really happen.*
 
 ## Phase 5 — Gallery, end, share
 

@@ -1,12 +1,15 @@
 name = "funny-multi-image"
 main = "worker.js"
 compatibility_date = "2026-08-13"
-# Disable the auto-generated *.workers.dev preview URL. The Worker is only
-# reached by the Render server via the shared-secret check (spec §15); exposing
-# a preview URL is unnecessary surface area.
+# Disables per-VERSION preview aliases (<prefix>-<name>.<subdomain>.workers.dev),
+# a separate Cloudflare feature from the workers.dev route itself. Not needed
+# here since deploys are not versioned/aliased.
 #
-# Note this does NOT hide the images: /i/<hash>.png is public by design (§7.2),
-# served from whichever hostname the server reached this Worker on.
+# The main *.workers.dev route stays enabled (default) — it IS the URL that
+# becomes CLOUDFLARE_WORKER_URL below. SRC's own security doc is explicit that
+# this is fine: the URL gives zero security either way (it is knowable from
+# the public repo's Worker name), and the shared secret (X-Secret / WORKER_
+# SECRET) is the entire boundary, same as every other route except /i/*.
 preview_urls = false
 
 [observability]

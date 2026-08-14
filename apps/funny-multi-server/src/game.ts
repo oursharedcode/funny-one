@@ -30,10 +30,18 @@
 //     rendering prose. `Story.answers` holds ids; `RevealStartPayload.answers`
 //     holds the resolved texts the client highlights inside the prose.
 //
-// Not here, by task boundary: picture generation and `reveal:pictureReady`
-// (Phase 4 — T-4.4), the room gallery (T-5.1), and `broadcastStats` (T-5.3).
-// SRC's `enterRevealPhase` kicked off bot-story pictures; that call arrives
-// with T-4.4.
+//  5. **Picture generation goes through `image.ts`'s `generateImage`**, which
+//     owns the whole exists→reserve→generate→refund flow (design §7.3, T-4.3)
+//     and returns a `PictureRef` — not a base64 data URL — so `story.picture`
+//     replaces SRC's `story.pictureUrl`. There is no translation, no CSAM/
+//     hard-block guard and no `translationFailed` branch: `buildPrompt` is a
+//     pure, synchronous function of four option ids (DD-8, FM-ANS-1), so the
+//     only two outcomes here are "generated" and "the Worker/cap failed".
+//
+// Not here, by task boundary: the room gallery (`buildGallery`, `gallery:
+// share`) and its re-broadcast on a late picture (T-5.1), and `broadcastStats`
+// (T-5.3) — SRC called both from the picture pipeline this file now owns, but
+// neither exists yet in this repo.
 
 import type { Server as SocketIOServer } from 'socket.io';
 import {
@@ -47,12 +55,15 @@ import {
 import type {
   ClientToServerEvents,
   ErrorPayload,
+  PictureRef,
   Room,
   ServerToClientEvents,
   Story,
 } from './types.js';
 import { QUESTIONS, renderProse, requireAuthoredLanguage } from './i18n/index.js';
 import { polishProse } from './grammar.js';
+import { buildPrompt } from './prompt.js';
+import { ImageCapReachedError, generateImage } from './image.js';
 
 // One round per pool slot. Tied to the shared schema rather than restated, so
 // adding a slot cannot silently leave a round unplayed.
@@ -258,6 +269,12 @@ export function revealProse(room: Room, answers: readonly string[]): string {
 // their own assembled story as private prose. Bots have no client to send to.
 export function enterRevealPhase(room: Room, io: IO): void {
   room.phase = 'reveal';
+  // Bot-owned stories never fire reveal:requestPicture — there is no client —
+  // so without this their picture stays null forever and the room gallery
+  // (T-5.1) shows a permanent gap. Fire-and-forget, before any prose is sent:
+  // the request must not wait on text rendering. Failures fall back to the
+  // same null-picture state a human's failed generation leaves.
+  void generateBotStoryPictures(room);
   room.players.forEach((player, i) => {
     if (player.isBot) return;
     const answers = resolveAnswers(room, room.stories[i]);
@@ -266,6 +283,127 @@ export function enterRevealPhase(room: Room, io: IO): void {
       prose: revealProse(room, answers),
     });
   });
+}
+
+// ============================================================================
+// Reveal — picture generation (design §7.3, FM-IMG-1)
+// ============================================================================
+
+// Outcome of a single picture-generation attempt. Lets the caller decide
+// whether to notify a specific socket (human path) or stay silent (bot path).
+type PictureOutcome =
+  | { kind: 'cached'; picture: PictureRef; imagePrompt: string }
+  | { kind: 'ready'; picture: PictureRef; imagePrompt: string }
+  | { kind: 'capped' }
+  | { kind: 'failed' };
+
+/**
+ * Core picture-generation pipeline, shared by the human request path
+ * (`handlePictureRequest`) and the server-side bot-owned-story path
+ * (`generateBotStoryPictures`).
+ *
+ * `buildPrompt` is synchronous and, per its own contract, only throws on an
+ * invariant that cannot hold for a story reaching reveal (every visual slot
+ * is filled by `advanceRound` before `currentRound` reaches `ROUNDS`) — caught
+ * here anyway rather than left to crash the request, because "unreachable"
+ * is a claim about today's callers, not a guarantee `game.ts` can enforce by
+ * itself. `generateImage` owns the whole exists→reserve→generate→refund flow
+ * (design §7.3, T-4.3); this function's only job is to route its outcome.
+ */
+async function generateStoryPicture(story: Story): Promise<PictureOutcome> {
+  let prompt: string;
+  try {
+    prompt = buildPrompt(story);
+  } catch {
+    return { kind: 'failed' };
+  }
+
+  // Write-once cache (spec-carried behaviour): a retry after a picture
+  // already landed just re-serves it rather than spending a second slot.
+  if (story.picture) {
+    return { kind: 'cached', picture: story.picture, imagePrompt: prompt };
+  }
+
+  try {
+    const picture = await generateImage(prompt);
+    story.picture = picture;
+    return { kind: 'ready', picture, imagePrompt: prompt };
+  } catch (err) {
+    if (err instanceof ImageCapReachedError) return { kind: 'capped' };
+    return { kind: 'failed' };
+  }
+}
+
+/**
+ * Handles `reveal:requestPicture` / `reveal:retryPicture` — identical
+ * handler, per spec §11: a retry is just another request against the same
+ * write-once story.
+ */
+export async function handlePictureRequest(room: Room, socketId: string, io: IO): Promise<void> {
+  if (room.phase !== 'reveal') return;
+
+  const story = getStoryForPlayer(room, socketId);
+  if (!story) return;
+
+  const outcome = await generateStoryPicture(story);
+  switch (outcome.kind) {
+    case 'cached':
+    case 'ready':
+      io.to(socketId).emit('reveal:pictureReady', {
+        picture: outcome.picture,
+        imagePrompt: outcome.imagePrompt,
+      });
+      return;
+    case 'capped':
+      // The `code` discriminator lets the client switch to its i18n'd
+      // "oven is full, new cartoons in ~N hours" caption and derive the
+      // hours-until-reset from UTC midnight locally. The English `message`
+      // is a wire fallback for any client that doesn't know `code`.
+      io.to(socketId).emit('reveal:pictureError', {
+        message: 'The cartoon oven is full for today. Try again tomorrow!',
+        code: 'CAP_REACHED',
+      });
+      return;
+    case 'failed':
+      io.to(socketId).emit('reveal:pictureError', {
+        message: 'Generation failed. Try again.',
+        code: 'GENERIC',
+      });
+      return;
+  }
+}
+
+/**
+ * Bot-owned stories never receive `reveal:requestPicture` from any client, so
+ * the server fires their generation here. Sequential rather than parallel:
+ * humans race bots on the shared daily cap, and serialising bot work keeps a
+ * multi-bot room from burning the last few slots in a single tick.
+ *
+ * Called from `enterRevealPhase` for players who were already bots at reveal
+ * time, and from the disconnect path (T-2.4/index.ts) when a player botifies
+ * *during* reveal, so their story still gets a picture.
+ *
+ * Idempotent: a story with a picture already set is skipped by
+ * `generateStoryPicture`'s write-once cache, so calling this twice for the
+ * same room is harmless.
+ *
+ * Takes no `io`: bots have no client to notify, and the room gallery's
+ * re-broadcast-on-late-picture (spec §24, T-5.1) doesn't exist yet in this
+ * repo. Add it back the day that call site does.
+ */
+export async function generateBotStoryPictures(room: Room): Promise<void> {
+  for (const [i, player] of room.players.entries()) {
+    if (!player.isBot) continue;
+    if (room.phase !== 'reveal') return;
+    const story = room.stories[i];
+    if (!story || story.picture) continue;
+
+    const outcome = await generateStoryPicture(story);
+    // Cap exhausted — stop trying so a human still waiting on a slot isn't
+    // pre-empted by a stream of further bot attempts, and so this loop
+    // doesn't keep paying the no-op check for the rest of the room.
+    if (outcome.kind === 'capped') return;
+  }
 }
 
 // stories[i] belongs to players[i] (spec §4). A player's own story is at

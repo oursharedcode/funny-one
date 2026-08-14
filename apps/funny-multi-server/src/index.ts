@@ -25,7 +25,9 @@ import {
   type RemoveResult,
 } from './rooms.js';
 import {
+  generateBotStoryPictures,
   handleMidGameBotification,
+  handlePictureRequest,
   handleReadyToggle,
   prepareRestart,
   startGame,
@@ -46,8 +48,9 @@ import {
 // the Socket.IO server. Every socket handler SRC wired up here is deliberately
 // absent and arrives with the task that owns it:
 //
-//   T-4.4  reveal:requestPicture / reveal:retryPicture
 //   T-5.1  gallery:share      T-5.3  stats:get
+//
+// reveal:requestPicture / reveal:retryPicture land at T-4.4, below.
 //
 // Not carried from SRC:
 //   - POST /test/image — dev-only harness for the dropped Test* client screens
@@ -180,7 +183,18 @@ export async function buildServer({
       // Mid-game: the slot stays (rotation integrity) and turns into a bot, so
       // the current round must not stall waiting for an answer that can no
       // longer come. This auto-fills it and advances if it was the last one.
+      // A no-op when the room is already in reveal (nothing here checks phase
+      // beyond what handleMidGameBotification itself guards).
       handleMidGameBotification(result.room, socketId, io);
+
+      // Reveal-phase drop: this player will never fire reveal:requestPicture
+      // now that they're a bot, so their story's picture would otherwise stay
+      // null forever — the same gap enterRevealPhase's call closes for anyone
+      // who was already a bot when reveal began. Fire-and-forget, same as
+      // there.
+      if (result.room.phase === 'reveal') {
+        void generateBotStoryPictures(result.room);
+      }
 
       // Tell the host a player was lost (spec §12). `removePlayer` has already
       // promoted a new host if the lost player *was* the host, so hostId here
@@ -191,9 +205,8 @@ export async function buildServer({
     }
 
     if (!result.deleted) broadcastLobby(result.room);
-    // SRC also re-broadcast stats here (T-5.3) and kicked off bot-story
-    // pictures when the drop landed in the reveal phase (T-4.4). Both arrive
-    // with the tasks that own them.
+    // SRC also re-broadcast stats here (T-5.3), which arrives with the task
+    // that owns it.
     return result;
   }
 
@@ -335,6 +348,20 @@ export async function buildServer({
       // Pass the raw value through: submitAnswer owns validation, and a
       // non-string here is exactly the tampered-client case it rejects.
       submitAnswer(room, socket.id, payload?.optionId, io);
+    });
+
+    // Identical handler for both events (spec §11): a retry is just another
+    // request against the same write-once story (design §7.3, T-4.4).
+    socket.on('reveal:requestPicture', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      void handlePictureRequest(room, socket.id, io);
+    });
+
+    socket.on('reveal:retryPicture', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      void handlePictureRequest(room, socket.id, io);
     });
 
     socket.on('game:ready', (payload) => {

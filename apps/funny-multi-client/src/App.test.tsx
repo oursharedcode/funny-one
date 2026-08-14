@@ -121,7 +121,11 @@ describe('phase routing', () => {
     renderInLobby();
     socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
     socketMock.fire('reveal:start', REVEAL);
-    expect(screen.getByText(REVEAL.prose)).toBeTruthy();
+    // RevealScreen's own suite covers the prose rendering itself (it's split
+    // into highlighted spans, not one text node) — this only needs to prove
+    // App handed the payload to the right screen.
+    expect(screen.getByText("Here's your story")).toBeTruthy();
+    expect(screen.getByText(/a grumpy pirate/)).toBeTruthy();
   });
 
   it('routes game:over to the end screen', () => {

@@ -4,10 +4,10 @@
 |---|---|
 | **Document** | `steering/tasks.md` |
 | **Version** | 1.0 draft |
-| **Date** | 2026-08-12 |
+| **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0, 1 and 2 complete (Gates 0, 1 and 2 passed). Phase 3 **code complete** — all six screens are real. **Gate 3's manual two-phone run is outstanding**, running in parallel with Phase 4, which is now **code complete**: T-4.1–T-4.4 done, Worker deployed, skeleton wording tuned and locked, reveal wiring built and tested against a mocked Worker (2026-08-14). **Gate 4's manual run — real Worker, real devices — is outstanding**, same shape as Gate 3. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 417 tests across 4 workspaces (43 shared + 214 server + 121 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main` as of the last push (this session's work is not yet pushed). |
+| **Progress** | Phases 0–4 complete (Gates 0, 1 and 2 passed). **Gate 3 passed** (2026-08-15): real two-phone-plus-laptop-tab session, multiple full 7-round games, device-only visual checklist clean. **Gate 4 passed** (2026-08-15) on the two checks that need a live adversarial device — dead-Worker retry, daily cap; the cache-hit-timing and RU/EN-same-URL checks were deliberately skipped as low-risk given existing Worker-level and unit-test coverage (see Gate 4's note). Phase 5 not yet started. |
+| **Build state** | typecheck / lint / format / `npm test` all green — 417 tests across 4 workspaces (43 shared + 214 server + 121 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main` as of the last push. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -543,11 +543,6 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   seeded renders and checking the second is a permutation of the first. T-3.4 added the phase
   machine itself: `App.test.tsx` drives home→lobby→writing→waiting→reveal→end over the socket
   double, so "create/join/play through the phases" is covered in CI too.*
-  **Still to do, and it needs hands:** two real phones on one room — create, join by QR, play
-  seven rounds, and confirm what only a device shows: tap-target size on the option cards, the
-  selection spring, the timer bar's colour turns and panic, PWA-shell scrolling on a small
-  screen, and that the forward slide-fade reads as forward. Follow Gate 2's precedent: what can
-  be automated has been, and the manual run is now only for what eyes and thumbs are for.
   ***Three things the setup turned up*** *(2026-08-13, while preparing the run). The gate says
   "two phones (or tabs)", but `game:start` rejects a room under three players (spec §4, enforced
   since T-2.2) — so the run needs a third client; two phones plus a laptop tab, which also gives
@@ -559,6 +554,18 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   secure context — so this pass covers app-shell layout and scrolling in the mobile browser,
   while the installed-standalone check stays with T-7.1, which already carries a real-device
   install test.*
+  ***Resolved 2026-08-15 — the manual run is done.*** *Two phones plus a laptop tab (the required
+  third client), one Wi-Fi, production build, LAN address. Multiple full 7-round games played end
+  to end across several room codes — host on the laptop tab, guests joining both phones. One early
+  run produced a picture on the laptop but not on either phone; server logs showed no app-level
+  errors, only real Wi-Fi disconnects, so flaky LAN wireless is the leading explanation rather than
+  a code fault. A fresh room afterward, and every run since, generated and displayed pictures
+  correctly on all three devices. The device-only visual checklist (tap-target size, selection
+  spring, timer-bar colour turns/panic, PWA-shell scrolling, forward slide-fade direction) came
+  back clean. Separately, after roughly an hour idle, one tab's socket outlived the 60 s
+  `connectionStateRecovery` window and stopped reflecting new joins until reloaded — the client has
+  no resync-on-reconnect logic; reload-and-rejoin is the workaround. Worth a follow-up task, not a
+  gate blocker.*
 
 **Toolchain deviations from SRC** (decided at T-3.1), same policy as Gate 0 — carry SRC's pins
 unless they carry advisories:
@@ -831,6 +838,18 @@ unless they carry advisories:
   against a *mocked* Worker. What is left for this gate is exactly what mocking cannot prove: a
   played game against the real deployed Worker, on real devices, where a dead-Worker URL, a
   `MAX_IMAGES_PER_DAY=1` room, a repeated pick, and an RU/EN pair really happen.*
+  ***Resolved 2026-08-15 — two of four checks run against the real deployed Worker on real
+  devices, two skipped by decision.*** *Confirmed on real devices: a dead-Worker URL produces the
+  error state and a working retry (mascot, `reveal.error` caption, story text unaffected);
+  `MAX_IMAGES_PER_DAY=1` let exactly one of three distinct stories in a room generate a picture
+  and correctly capped the other two with the `reveal.capReached` caption (`.env` reverted to the
+  default cap afterward). Skipped by explicit call, not oversight: same-picks-twice cache-hit
+  timing and the RU/EN same-picks-same-URL check. Both are already covered short of a live device
+  — the cache-hit path is confirmed at the Worker level in the T-4.1/T-4.2 note above (312 ms,
+  `cached:true`), and the RU/EN case follows directly from the prompt builder using only the four
+  shared visual slots hashed as the cache key regardless of room language, which T-4.2's unit
+  tests already assert. Residual risk is silent cache-cost fragmentation if that path ever broke,
+  but nothing in it changed today, so the existing coverage was judged sufficient.*
 
 ## Phase 5 — Gallery, end, share
 

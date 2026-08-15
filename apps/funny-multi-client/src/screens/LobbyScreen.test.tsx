@@ -149,7 +149,7 @@ describe('leaving', () => {
   });
 });
 
-describe('cap banner (inert until T-5.3)', () => {
+describe('cap banner', () => {
   it('stays hidden while the stats ack goes unanswered', () => {
     renderLobby();
     expect(socketMock.emitsOf('stats:get')).toHaveLength(1);

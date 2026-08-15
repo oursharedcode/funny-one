@@ -128,10 +128,24 @@ describe('phase routing', () => {
     expect(screen.getByText(/a grumpy pirate/)).toBeTruthy();
   });
 
+  it("routes RevealScreen's continue action to the end screen, not-yet-over", () => {
+    // The reveal→end move is client-only (RevealScreen's onContinue), unlike
+    // every other phase change, which is server-driven. gameOver stays false
+    // here — only a real game:over (above) sets it.
+    renderInLobby();
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    socketMock.fire('reveal:start', REVEAL);
+    fireEvent.click(screen.getByText('Continue'));
+    expect(screen.getByText('Rounds are over')).toBeTruthy();
+    expect(screen.queryByText('Game is over')).toBeNull();
+  });
+
   it('routes game:over to the end screen', () => {
     renderInLobby();
     socketMock.fire('game:over', undefined);
-    expect(screen.getByText('Game over')).toBeTruthy();
+    // EndScreen's own suite covers ready/restart/gallery behaviour — this
+    // only needs to prove App handed gameOver: true to the right screen.
+    expect(screen.getByText('Game is over')).toBeTruthy();
   });
 
   it('returns to Home when the player leaves the lobby', () => {

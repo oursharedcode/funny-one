@@ -299,11 +299,11 @@ describe('failures reported as an error event, not an ack', () => {
   });
 });
 
-describe('stats (inert until T-5.3)', () => {
+describe('stats', () => {
   it('renders no counter while the stats ack goes unanswered', () => {
     renderHome();
-    // The emit happens — this is not dead code, it is code waiting for a
-    // handler. When T-5.3 lands, the ack fires and the counter appears.
+    // T-5.3's real server does answer this ack; the mock here just hasn't,
+    // which is what the rest of this file exercises deliberately.
     expect(socketMock.emitsOf('stats:get')).toHaveLength(1);
     expect(screen.queryByText(/Open rooms/)).toBeNull();
   });

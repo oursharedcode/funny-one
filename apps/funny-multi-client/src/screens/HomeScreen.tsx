@@ -20,9 +20,9 @@
 //    adds. T-6.1/T-6.3 widen `AUTHORED_LANGUAGES` and this list follows.
 // 3. `LANGUAGES`/`isLanguage` come from `@funny/shared`; T-3.1 did not carry a
 //    client-local language registry.
-// 4. The stats block is copied but inert: `stats:get` has no server handler
-//    until T-5.3, and an unanswered Socket.IO ack never fires, so `stats` stays
-//    null and the counter does not render. Deliberate — see the T-3.2 log.
+// 4. The stats block was copied but inert at T-3.2 (`stats:get` had no server
+//    handler yet, so `stats` stayed null and the counter never rendered).
+//    T-5.3 wired the handler; no client change was needed to light it up.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -247,6 +247,91 @@ describe('room:leave', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// T-5.3 — stats
+// ---------------------------------------------------------------------------
+
+describe('stats:get', () => {
+  it('acks with the current room count and image counters', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    await emitWithAck(host, 'room:create', { nickname: 'Ada', language: 'en' });
+
+    // stats:get carries no payload — only an ack callback (see HomeScreen.tsx's
+    // `socket.emit('stats:get', (s) => setStats(s))`). emitWithAck always
+    // inserts a payload slot before the ack, which would shift the server's
+    // single-argument handler's `ack` parameter onto that slot instead.
+    const stats = await new Promise<{
+      openRooms: number;
+      imagesGeneratedToday: number;
+      imagesLimit: number;
+    }>((resolve) => host.emit('stats:get', resolve));
+    expect(stats.openRooms).toBe(1);
+    expect(stats.imagesGeneratedToday).toBe(0);
+    expect(stats.imagesLimit).toBeGreaterThan(0);
+  });
+});
+
+describe('stats:update broadcasts', () => {
+  it('fires after a room is created', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    const stats = once<{ openRooms: number }>(host, 'stats:update');
+    void emitWithAck(host, 'room:create', { nickname: 'Ada', language: 'en' });
+    expect((await stats).openRooms).toBe(1);
+  });
+
+  it('fires when the last player leaves and the room is deleted', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    // room:create's own stats:update may still be in flight when its ack
+    // resolves (same race the room:leave suite above documents for
+    // lobby:update) — drain it before listening for the deletion broadcast,
+    // or this test can read the wrong one.
+    const created = once(host, 'stats:update');
+    await emitWithAck(host, 'room:create', { nickname: 'Ada', language: 'en' });
+    await created;
+
+    const stats = once<{ openRooms: number }>(host, 'stats:update');
+    host.emit('room:leave');
+    expect((await stats).openRooms).toBe(0);
+  });
+
+  it('does not fire when a room empties partially', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
+      nickname: 'Ada',
+      language: 'en',
+    });
+    const joiner = await connect(h);
+    const joinBroadcast = once(host, 'lobby:update');
+    await emitWithAck(joiner, 'room:join', { roomCode, nickname: 'Bob' });
+    await joinBroadcast;
+
+    let sawStatsUpdate = false;
+    host.on('stats:update', () => {
+      sawStatsUpdate = true;
+    });
+    const leftBroadcast = once(host, 'lobby:update');
+    joiner.emit('room:leave');
+    await leftBroadcast;
+    expect(sawStatsUpdate).toBe(false);
+  });
+
+  it('fires after game:end deletes the room', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    const created = once(host, 'stats:update');
+    await emitWithAck(host, 'room:create', { nickname: 'Ada', language: 'en' });
+    await created;
+
+    const stats = once<{ openRooms: number }>(host, 'stats:update');
+    host.emit('game:end');
+    expect((await stats).openRooms).toBe(0);
+  });
+});
+
 describe('rate limiting (spec §17)', () => {
   it('allows 5 room:create per IP per minute, then emits RATE_LIMITED', async () => {
     const h = await listen();

@@ -201,6 +201,19 @@ describe('mid-game botification (FM-CORE-3)', () => {
     await settle();
     expect(getRoom(roomCode)).toBeUndefined();
   });
+
+  it('broadcasts stats:update when the grace window deletes the room (T-5.3)', async () => {
+    // The all-bot deletion above goes through the same finalizePlayerRemoval
+    // path room:leave uses; this checks the broadcast reaches a socket that
+    // is still connected to see it, not just that the room is gone. A
+    // fourth, uninvolved socket outlives every player's disconnect and is
+    // the one that observes the broadcast.
+    const { sockets } = await started(3);
+    const observer = await harness!.connect();
+    const stats = once<{ openRooms: number }>(observer, 'stats:update');
+    for (const s of sockets) s.disconnect();
+    expect((await stats).openRooms).toBe(0);
+  });
 });
 
 describe('explicit leave', () => {

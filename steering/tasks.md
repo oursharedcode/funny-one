@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–4 complete (Gates 0, 1 and 2 passed). **Gate 3 passed** (2026-08-15): real two-phone-plus-laptop-tab session, multiple full 7-round games, device-only visual checklist clean. **Gate 4 passed** (2026-08-15) on the two checks that need a live adversarial device — dead-Worker retry, daily cap; the cache-hit-timing and RU/EN-same-URL checks were deliberately skipped as low-risk given existing Worker-level and unit-test coverage (see Gate 4's note). Phase 5 not yet started. |
-| **Build state** | typecheck / lint / format / `npm test` all green — 417 tests across 4 workspaces (43 shared + 214 server + 121 client + 39 worker); `npm audit` 0 vulnerabilities; CI green on `main` as of the last push. |
+| **Progress** | Phases 0–4 complete (Gates 0, 1 and 2 passed). **Gate 3 passed** (2026-08-15): real two-phone-plus-laptop-tab session, multiple full 7-round games, device-only visual checklist clean. **Gate 4 passed** (2026-08-15) on the two checks that need a live adversarial device — dead-Worker retry, daily cap; the cache-hit-timing and RU/EN-same-URL checks were deliberately skipped as low-risk given existing Worker-level and unit-test coverage (see Gate 4's note). Phase 5 under way: T-5.3 and T-5.1 done (2026-08-15); T-5.2 (download/share) not yet started, Gate 5 not yet run. |
+| **Build state** | typecheck / lint / format / `npm test` all green locally — 470 tests across 4 workspaces (43 shared + 242 server + 146 client + 39 worker); `npm audit` 0 vulnerabilities; CI result pending on the push carrying T-5.1/T-5.3. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -853,17 +853,110 @@ unless they carry advisories:
 
 ## Phase 5 — Gallery, end, share
 
-- [ ] **T-5.1 (M)** Room gallery (host share, self-heal on late pictures, `PictureRef`
+- [x] **T-5.1 (M)** Room gallery (host share, self-heal on late pictures, `PictureRef`
       entries) + EndScreen (ready toggle, one-more-game guard ≥ 3 non-bots, finish → finale
       image) + restart reset. → FM-CORE-10/11
+      *Restart reset and the App-level plumbing for this whole task **already existed** — App.tsx
+      has subscribed `gallery:ready`/`game:restartReady`/`game:over` and passed `gallery`/
+      `readyIds`/`gameOver` down to `EndScreen` since an earlier bootstrap pass, and
+      `handleReadyToggle`/`prepareRestart` were already in `game.ts` with `game:ready`/
+      `game:restart` wired in `index.ts`. What this task actually added: `buildGallery` +
+      `shareGallery` in `game.ts`, the `gallery:share` handler in `index.ts`, the late-picture
+      re-broadcast (`handlePictureRequest`'s `'ready'` branch and `generateBotStoryPictures`, which
+      gained an `io` parameter it deliberately lacked before this task existed), and the client's
+      `RoomGallery` + real `EndScreen`.*
+      ***`buildGallery` reuses `resolveAnswers`/`revealProse`*** *(already in `game.ts` from T-2.3)
+      rather than SRC's inline `.map((a) => a ?? '')` — SRC's answers were already display text;
+      ours are option ids that still need resolving, so the gallery must resolve them the same way
+      `reveal:start` does, or a story could read differently in the gallery than the player already
+      saw it. A test asserts exactly that equivalence.*
+      ***The re-broadcast only fires on a fresh `'ready'` outcome, never `'cached'`*** *(matching
+      SRC): a `'cached'` result means the picture already existed before this call, which means it
+      already passed through `'ready'` once — and already re-broadcast then, if the gallery was
+      shared at that point. `buildGallery` also reads `room.stories[i]?.picture` live, so a
+      `gallery:share` itself always sees whatever is cached at share time with no separate
+      broadcast needed.*
+      ***Client: `RoomGallery.tsx` is new, adapted from SRC's, with three things deliberately
+      absent.*** *Download/share/video buttons (SRC's `downloadStory.ts`/`share.ts`/
+      `recordWobble.ts`) are T-5.2's — this screen browses the gallery, it doesn't export it yet.
+      `<LogoStamp />` is T-7.2's, same absence T-4.4 already noted for RevealScreen. The
+      `wobbleEngine` prop is gone because the type it read no longer exists in this repo's wire
+      contract at all (ARC-3/DD-9, T-1.6) — there is only the CSS engine, so there is nothing left
+      to choose between. What's carried: the `picture-wobble-*` CSS classes, sitting unused in
+      `styles/index.css` since T-3.1 with a comment naming "reveal + gallery animated preview" as
+      their intended use — this is the first place that actually uses them for the gallery half.*
+      ***EndScreen.tsx replaces the T-3.1-era `PlaceholderScreen` wrapper wholesale.*** *Purely
+      presentational — App.tsx already owns every subscription this screen needs, so unlike
+      RevealScreen it has no `useEffect` of its own, only outgoing emits (`game:restart`,
+      `game:end`, `game:ready`, `gallery:share`). Two things SRC's version had are gone: the
+      `monkeys-on-bus.png` header photo (SRC's own branding — design §3's file-treatment table
+      already drops it, and no replacement raster asset exists in this repo), and the inline QR +
+      source-link footer markup, replaced by the already-carried `SourceFooter` component (its own
+      doc comment already names "the Home and End screens" as its two call sites — this is the
+      second).*
+      ***A design judgement call, recorded here since nothing upstream settled it.*** *`EndMascots`
+      (already ported at T-3.1 for exactly this screen, previously unused) stands in as the sole
+      hero visual in place of SRC's photo + mascot-duo pairing, sized up from the small overlay SRC
+      used. This is FM-CORE-11's "pre-bundled finale image" — bundled with the app rather than
+      generated, shown regardless of `gameOver` exactly as SRC's own mascots were.*
+      *43 new tests: server-side `game.gallery.test.ts` (8, unit — `buildGallery` shape/ordering/
+      picture-presence/answer-resolution-equivalence, `shareGallery`'s host/phase/broadcast paths),
+      `game.gallery.socket.test.ts` (6, real sockets — room-wide broadcast including to the host
+      itself, isolation from a second uninvolved room, `NOT_HOST` rejection, the self-heal
+      re-broadcast reaching every player on a late picture, and its two negative cases: no
+      broadcast before any share, none on a cache-hit retry), 4 more in `game.botPictures.test.ts`
+      for the bot-generation path's own re-broadcast (18 server tests total: 224 → 242). Client-side
+      `EndScreen.test.tsx` (24, new) and 1 new in `App.test.tsx` for the reveal→end-not-yet-over
+      transition, which is client-only — the one phase change in the whole app that isn't
+      server-driven (its `game:over` case was updated for the real screen's text, not added; 25
+      client tests total: 121 → 146).*
+      ***Found and fixed while writing the socket tests, not introduced by them: a latent
+      test-isolation bug in `game.botPictures.test.ts`.*** *Its "sequential, not parallel" case set
+      the image mock's behaviour via `vi.mocked(generateImage).mockImplementation(...)` directly
+      instead of the file's own `__setImageResult` indirection — which **replaces** the mock's
+      whole body, permanently bypassing `__setImageResult` for every test that runs afterward in
+      the same file. Harmless while it was the last test in its `describe` block; broke silently
+      the moment this task's new `describe` block landed after it (a leaked call counter changed a
+      URL one test asserted on, and a leaked always-succeeds implementation made a cap-reached test
+      observe two broadcasts it expected zero of). Fixed by routing that test through
+      `__setImageResult` like every other test in the file already does.*
 - [ ] **T-5.2 (M)** Download/share adapted to URL images (fetch → blob → canvas, CORS);
       wobble video via CSS engine only; `videoFooter`, `capReset` copied. → design §8.3
-- [ ] **T-5.3 (S)** Home-screen stats + live `stats:update` (copy `stats.ts`, client hook). → FM-CORE-12
-      *The **client half already exists** — T-3.2 carried the Home-screen counter and the Lobby
-      cap banner, both subscribed and both inert because nothing answers `stats:get`. This task
-      is therefore server-side: `stats.ts`, the handler, and the `broadcastStats(io)` calls SRC
-      makes after create/leave (deferred from T-2.2) and in `finalizePlayerRemoval` (deferred
-      from T-2.4). The client tests already assert what should appear once a payload arrives.*
+- [x] **T-5.3 (S)** Home-screen stats + live `stats:update` (copy `stats.ts`, client hook). → FM-CORE-12
+      *The **client half already existed** — T-3.2 carried the Home-screen counter and the Lobby
+      cap banner, both subscribed and both inert because nothing answered `stats:get`. This task
+      was server-side only: `apps/funny-multi-server/src/stats.ts` (near-verbatim port —
+      `buildStats`/`broadcastStats` over the already-ported `roomCount`/`imagesGeneratedToday`/
+      `maxImagesPerDay`), the `stats:get` ack handler (`await maybeSyncImageCounter(); ack(
+      buildStats())`), and `broadcastStats(io)` calls after `room:create` and `game:end`, plus one
+      inside `finalizePlayerRemoval` gated on `result.deleted` — which covers both the deferred
+      T-2.2 (`room:leave`) and T-2.4 (disconnect-grace-expiry) call sites in one place, since T-2.4
+      already unified those two paths. Neither client screen needed a code change; only their
+      "inert until T-5.3" comments and test-describe titles were updated to say so.*
+      *Eager startup sync (`void syncImageCounterFromWorker()`) added to `main()`, not
+      `buildServer()` — SRC ran it after `fastify.listen()` for the same fire-and-forget reason
+      (a dead Worker at boot must not block accepting connections), and keeping it out of
+      `buildServer()` means the ~200 tests that call `buildServer()` directly never trigger a real
+      network call.*
+      ***Deliberately not wired: `broadcastStats` inside `game.ts`'s picture-generation
+      pipeline.*** *SRC also called it right after `reserveImageSlot()` succeeded, so the
+      Home-screen counter ticked live mid-generation rather than only on remount — `game.ts`'s own
+      header comment still named this as T-5.3's. Not carried: T-4.3 deliberately moved reservation
+      inside `image.ts`'s `generateImage()`, which owns the whole exists→reserve→generate→refund
+      flow with no socket.io dependency by design. Threading `io` through it to recover one live
+      tick would re-couple a module that flow intentionally decoupled, for a gain the `stats:get`
+      ack's TTL-bounded `maybeSyncImageCounter` already approximates on every mount. Recorded as a
+      follow-up in `game.ts` rather than done here.*
+      *14 new tests (`stats.test.ts` (4): `buildStats` shape against live room/image counters,
+      `broadcastStats` emits `stats:update` with that shape; `index.test.ts` (+6): `stats:get` ack
+      contents, broadcast on create, broadcast on `room:leave`-to-empty, **no** broadcast on a
+      partial leave, broadcast on `game:end`; `disconnect.socket.test.ts` (+1): the grace-window
+      all-bot deletion also broadcasts, observed by a fourth socket that outlives every player's
+      disconnect). Two of the new `index.test.ts` cases hit the same race the `room:leave` suite
+      already documents for `lobby:update` — `room:create`'s own `stats:update` can still be in
+      flight when its ack resolves, so a `once()` registered right after reads that broadcast
+      instead of the deletion one two calls later. Fixed the same way: drain the create's
+      broadcast before listening for the one under test.*
 - **Gate 5**: full game on two real phones: gallery share, story download (image renders with
   picture), share sheet, restart into second game.
 

@@ -30,6 +30,7 @@ import {
   handlePictureRequest,
   handleReadyToggle,
   prepareRestart,
+  shareGallery,
   startGame,
   submitAnswer,
 } from './game.js';
@@ -41,16 +42,19 @@ import {
   clientIp,
   createRateLimiter,
 } from './rateLimit.js';
+import { maybeSyncImageCounter, syncImageCounterFromWorker } from './image.js';
+import { buildStats, broadcastStats } from './stats.js';
 
 // ---------------------------------------------------------------------------
 // T-2.1 — bootstrap only (design §3). This is SRC/server/src/index.ts reduced
 // to the transport shell: Fastify, CORS, /health, static client serving, and
-// the Socket.IO server. Every socket handler SRC wired up here is deliberately
-// absent and arrives with the task that owns it:
-//
-//   T-5.1  gallery:share      T-5.3  stats:get
+// the Socket.IO server. Every socket handler SRC wired up here was
+// deliberately absent from this bootstrap and arrived with the task that
+// owns it:
 //
 // reveal:requestPicture / reveal:retryPicture land at T-4.4, below.
+// stats:get / stats:update land at T-5.3, below.
+// gallery:share / gallery:ready land at T-5.1, below.
 //
 // Not carried from SRC:
 //   - POST /test/image — dev-only harness for the dropped Test* client screens
@@ -193,7 +197,7 @@ export async function buildServer({
       // who was already a bot when reveal began. Fire-and-forget, same as
       // there.
       if (result.room.phase === 'reveal') {
-        void generateBotStoryPictures(result.room);
+        void generateBotStoryPictures(result.room, io);
       }
 
       // Tell the host a player was lost (spec §12). `removePlayer` has already
@@ -205,8 +209,12 @@ export async function buildServer({
     }
 
     if (!result.deleted) broadcastLobby(result.room);
-    // SRC also re-broadcast stats here (T-5.3), which arrives with the task
-    // that owns it.
+    // Room count only changes when the room itself is gone (spec's
+    // "action changes the counter" rule) — covers both the all-bot deletion
+    // above and the lobby-phase empty-room deletion in `removePlayer`. This
+    // one call site serves both the disconnect-grace-expiry path and the
+    // explicit room:leave path below, which share this function (T-2.4).
+    if (result.deleted) broadcastStats(io);
     return result;
   }
 
@@ -257,6 +265,7 @@ export async function buildServer({
         socket.join(room.code);
         ack({ roomCode: room.code, socketId: socket.id });
         broadcastLobby(room);
+        broadcastStats(io);
       } catch (err) {
         if (err instanceof RoomError) {
           socket.emit('error', { code: err.code, message: err.message });
@@ -370,6 +379,15 @@ export async function buildServer({
       handleReadyToggle(room, socket.id, payload?.ready === true, io);
     });
 
+    // Host-only; broadcasts the room gallery to every player (spec §24).
+    // shareGallery itself emits the NOT_HOST error, so no ack or pre-check
+    // is needed here.
+    socket.on('gallery:share', () => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) return;
+      shareGallery(room, socket.id, io);
+    });
+
     socket.on('game:restart', () => {
       const room = findRoomForSocket(socket.id);
       if (!room) {
@@ -395,6 +413,16 @@ export async function buildServer({
       room.phase = 'ended';
       io.to(room.code).emit('game:over');
       deleteRoom(room.code);
+      broadcastStats(io);
+    });
+
+    // One-shot fetch for the Home screen (spec §13). Refreshes the
+    // Worker-side image counter first (TTL-bounded — see
+    // `maybeSyncImageCounter`), so a process that just restarted on Render's
+    // free tier doesn't hand back a stale 0 for today's image count.
+    socket.on('stats:get', async (ack) => {
+      await maybeSyncImageCounter();
+      ack(buildStats());
     });
 
     socket.on('disconnect', (reason) => {
@@ -411,6 +439,14 @@ export async function buildServer({
 async function main(): Promise<void> {
   const { fastify } = await buildServer();
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
+
+  // Eager initial sync of the Worker-side daily counter. Fire-and-forget: a
+  // Worker that's unreachable at startup must not block the server from
+  // accepting connections. The first `stats:get` retries via the TTL path in
+  // `maybeSyncImageCounter` regardless. Placed in `main()` rather than
+  // `buildServer()` so tests (which call `buildServer()` directly) never
+  // trigger a real network call.
+  void syncImageCounterFromWorker();
 }
 
 // Only run when executed directly, not when imported by a test. pathToFileURL

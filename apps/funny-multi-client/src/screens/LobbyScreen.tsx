@@ -7,9 +7,9 @@
 //    since it was the payload's only member, the payload type with it.
 // 2. `StatsPayload` comes from `@funny/shared`.
 //
-// The cap banner is carried as-is but is inert until T-5.3 wires the server's
-// `stats:get` handler: the ack never fires, `stats` stays null, and
-// `isCapReached(null)` is false. See the T-3.2 log in steering/tasks.md.
+// The cap banner is carried as-is. At T-3.2 it was inert — no server
+// `stats:get` handler, so the ack never fired and `isCapReached(null)` was
+// false. T-5.3 wired the handler; this file did not need to change.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

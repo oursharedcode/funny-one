@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–4 complete (Gates 0, 1 and 2 passed). **Gate 3 passed** (2026-08-15): real two-phone-plus-laptop-tab session, multiple full 7-round games, device-only visual checklist clean. **Gate 4 passed** (2026-08-15) on the two checks that need a live adversarial device — dead-Worker retry, daily cap; the cache-hit-timing and RU/EN-same-URL checks were deliberately skipped as low-risk given existing Worker-level and unit-test coverage (see Gate 4's note). Phase 5 under way: T-5.3 and T-5.1 done (2026-08-15); T-5.2 (download/share) not yet started, Gate 5 not yet run. |
-| **Build state** | typecheck / lint / format / `npm test` all green locally — 470 tests across 4 workspaces (43 shared + 242 server + 146 client + 39 worker); `npm audit` 0 vulnerabilities; CI result pending on the push carrying T-5.1/T-5.3. |
+| **Progress** | Phases 0–5 complete (Gates 0–4 passed). **Gate 5 passed** (2026-08-16): real two-phone-plus-laptop-tab session — full 7-round game, live gallery share, story download (verified picture-inclusive), restart into a clean second game; the Share button's absence over plain LAN HTTP was expected (secure-context gate) and accepted per Gate 4's precedent for low-risk skips. Phase 6 (15-language breadth) not yet started. |
+| **Build state** | typecheck / lint / format / `npm test` all green locally — 510 tests across 4 workspaces (43 shared + 242 server + 186 client + 39 worker); `npm audit` 0 vulnerabilities; CI green through the T-5.1/T-5.3 push (run 31889192897); result pending on the push carrying T-5.2. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -920,8 +920,64 @@ unless they carry advisories:
       URL one test asserted on, and a leaked always-succeeds implementation made a cap-reached test
       observe two broadcasts it expected zero of). Fixed by routing that test through
       `__setImageResult` like every other test in the file already does.*
-- [ ] **T-5.2 (M)** Download/share adapted to URL images (fetch → blob → canvas, CORS);
+- [x] **T-5.2 (M)** Download/share adapted to URL images (fetch → blob → canvas, CORS);
       wobble video via CSS engine only; `videoFooter`, `capReset` copied. → design §8.3
+      *`capReset.ts` needed nothing here — already copied and wired at both call sites since
+      T-3.2 ([LobbyScreen.tsx](../apps/funny-multi-client/src/screens/LobbyScreen.tsx), reveal
+      cap-reached caption). The real scope was four new client files (`downloadStory.ts`,
+      `share.ts`, `videoFooter.ts`, `recordWobble.ts`) plus `ShareButton.tsx`, and wiring all
+      three buttons into `RoomGallery.tsx` — exactly the hole its own header comment had been
+      naming since T-5.1.*
+      ***The CORS adaptation design §8.3 calls for only applies to the still-image download.***
+      *SRC's `downloadStory.ts` drew a base64 data URL straight into a canvas via `<img src>` +
+      `img.decode()` — same-origin by construction, so `canvas.toBlob()` never tainted. Our
+      `PictureRef.url` is served by the Cloudflare Worker (T-4.1), a different origin from the
+      client, so the same `<img>` path would taint the canvas and throw on `toBlob()`. Adapted to
+      `fetch(url)` → `blob()` → `createImageBitmap(blob)`, which never touches an `<img>` element
+      at all — `ctx.drawImage()` accepts an `ImageBitmap` exactly like it accepts an
+      `HTMLImageElement`, so nothing else in SRC's composite logic changes. This depends on the
+      Worker route already sending `Access-Control-Allow-Origin: *` (T-4.1, confirmed still
+      present at [worker.js:97](../cloudflare/worker.js#L97)) — without it the `fetch` itself
+      would fail, not just the canvas draw.*
+      ***`recordWobble.ts` needed no equivalent change.*** *SRC's version already loads the
+      picture via `img.crossOrigin = 'anonymous'` before `img.src = pictureUrl` — the standard
+      way to load a cross-origin image into a canvas without tainting it, paired with exactly the
+      `Access-Control-Allow-Origin: *` response header the Worker already sends. So unlike
+      `downloadStory.ts`, whose SRC version assumed a same-origin data URL and had to change
+      approach entirely, `recordWobble.ts`'s approach was already correct for a cross-origin URL
+      and carried over unchanged (copied verbatim, only the header comment updated to say why no
+      change was needed). SRC's `recordWobbleLottie.ts` sibling isn't carried — ARC-3/DD-9 (T-1.6)
+      dropped the wire-level `WobbleEngine` choice entirely, so `RoomGallery.tsx` always uses the
+      CSS engine, matching what T-5.1's header comment already said the missing prop would resolve
+      to once this task landed.*
+      *Two components stay deliberately absent from `RoomGallery.tsx`, both already called out by
+      T-5.1 as belonging to later tasks and untouched by this one: `<LogoStamp />` (T-7.2) and the
+      `wobbleEngine` prop (doesn't exist in this repo's wire contract, per above). The video
+      recorder's best-effort `/deployer-logo.png` stamp is left in as-is even though the asset
+      doesn't exist here yet — its `try/catch` already degrades to "no stamp" on the resulting
+      404, the same non-breaking gap `<LogoStamp />` leaves in-app until T-7.2 supplies branding.*
+      *New dependency: `qrcode ^1.5.4` + `@types/qrcode` (client). Already present in SRC's
+      `client/package.json` — this repo had only carried `qrcode.react` (the SVG React component
+      used by the in-app `<QRCode />`), not `qrcode` (the canvas renderer `downloadStory.ts` and
+      `videoFooter.ts` lazy-`import()` for the downloadable/recorded QR). `npm audit`: 0
+      vulnerabilities with it added.*
+      *40 new client tests: `share.test.ts` (12 — `canShareFiles`/`shareFiles` capability and
+      fallback branches, `downloadFile`'s anchor-click/revoke sequence), `downloadStory.test.ts`
+      (5 — asserts the fetch→createImageBitmap path is actually exercised and that an `<img>`
+      element is never involved, plus filename sanitization and fetch-failure propagation),
+      `videoFooter.test.ts` (6 — QR sizing, footer height floor, story-font auto-shrink under a
+      tight height budget), `recordWobble.test.ts` (7 — capability detection, a full simulated
+      5-second recording loop, the best-effort logo 404 path), `components/RoomGallery.test.tsx`
+      (10 — button visibility per capability/picture combination, each click's call-through with
+      the resolved args, the recording-disabled state). `share.ts`/`videoFooter.ts` and
+      `recordWobble.ts`/`downloadStory.ts` draw through a shared `testutils/canvasStub.ts` (new,
+      mirrors `testutils/socketMock.ts`'s role for the screen suites): jsdom implements the
+      `<canvas>` element but neither its 2D context, `toBlob`, nor `captureStream`, so exercising
+      real draw calls needs a fake context in the same way the socket suites need a fake
+      transport. `recordWobble.test.ts`'s full-recording test fakes `performance.now()` and
+      `requestAnimationFrame` to advance in fixed 200 ms steps rather than racing real timers —
+      25 synchronous frames to close out the 5000 ms loop deterministically. Client total:
+      146 → 186.*
 - [x] **T-5.3 (S)** Home-screen stats + live `stats:update` (copy `stats.ts`, client hook). → FM-CORE-12
       *The **client half already existed** — T-3.2 carried the Home-screen counter and the Lobby
       cap banner, both subscribed and both inert because nothing answered `stats:get`. This task
@@ -959,6 +1015,18 @@ unless they carry advisories:
       broadcast before listening for the one under test.*
 - **Gate 5**: full game on two real phones: gallery share, story download (image renders with
   picture), share sheet, restart into second game.
+  ***Resolved 2026-08-16 — real two-phone-plus-laptop-tab session, production build, LAN
+  address (same setup as Gates 3/4).*** *Decided upfront: `navigator.share` requires a secure
+  context, which a plain LAN address isn't, so the Share button was expected to be entirely
+  absent on phones — confirmed absent, matching `canShareFiles()`'s gate. Treated as covered by
+  `share.ts`'s 12 unit tests rather than blocking on a tunnel, the same kind of explicit low-risk
+  call Gate 4 made for two of its own four checks. Everything else confirmed on real devices: a
+  full 7-round game across three clients; the host's gallery share reaching both other devices
+  live with pictures; a downloaded story PNG genuinely containing the picture, story text and QR
+  footer (past a Chrome "insecure download" prompt — same secure-context root cause as the Share
+  button, non-blocking, confirmed by tapping through); the ready-quorum → host-restart flow
+  starting a clean second game on all three devices. Bonus, not in the gate's literal text but
+  landed alongside it: the 5-second wobble-video download also confirmed working.*
 
 ## Phase 6 — Full 15-language breadth (D-2)
 

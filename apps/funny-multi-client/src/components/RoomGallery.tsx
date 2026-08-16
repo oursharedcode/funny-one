@@ -1,26 +1,29 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Adapted from SRC/client/src/components/RoomGallery.tsx (spec §24). Three
+// Adapted from SRC/client/src/components/RoomGallery.tsx (spec §24). Two
 // things SRC's version had are deliberately not here, each arriving with the
 // task that owns it:
 //
-//   - Download/share/video buttons (`downloadStory.ts`, `share.ts`,
-//     `recordWobble.ts`) — T-5.2's. This screen browses the gallery; it does
-//     not yet export it.
 //   - `<LogoStamp />` over the picture — T-7.2's, same as RevealScreen (T-4.4)
 //     already noted. The picture renders correctly without the branding
 //     overlay.
 //   - The `wobbleEngine` prop — the type it read (`WobbleEngine`) doesn't
 //     exist in this repo's wire contract at all (ARC-3/DD-9, T-1.6): there is
 //     only the CSS engine now, so there is nothing to choose between.
+//     `downloadVideo` below always uses `recordWobble.ts`.
 //
-// What's carried: the picture-wobble CSS classes (styles/index.css, already
-// present since T-3.1 — its own comment names "reveal + gallery animated
-// preview" as their intended use) and the prev/next browsing UI.
+// Landed by this task (T-5.2, design §8.3): download/share/video buttons,
+// wired to `downloadStory.ts`, `share.ts` and `recordWobble.ts`. What's
+// carried unchanged from the earlier pass: the picture-wobble CSS classes
+// (styles/index.css, present since T-3.1) and the prev/next browsing UI.
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ProseText from './ProseText';
+import ShareButton from './ShareButton';
+import { buildStoryImageFile, downloadStoryImage } from '../downloadStory';
+import { buildWobbleVideoFile, isVideoRecordingSupported } from '../recordWobble';
+import { canShareFiles, downloadFile, shareFiles } from '../share';
 import type { GalleryEntry } from '@funny/shared';
 
 interface Props {
@@ -32,6 +35,12 @@ interface Props {
 export default function RoomGallery({ entries }: Props) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
+  const [recording, setRecording] = useState(false);
+  const videoSupported = isVideoRecordingSupported();
+  // Whether to offer the native-share buttons. Web Share with files is present
+  // on mobile + Chromium desktop and absent on desktop Firefox; there the
+  // download buttons alone remain. It's a static browser capability.
+  const shareSupported = canShareFiles();
 
   if (entries.length === 0) return null;
   // entries is re-broadcast as late pictures arrive (self-heal, spec §24);
@@ -41,6 +50,41 @@ export default function RoomGallery({ entries }: Props) {
 
   function step(delta: number): void {
     setIndex((safeIndex + delta + entries.length) % entries.length);
+  }
+
+  // Short title/text that ride along with the shared file where the platform
+  // surfaces them (e.g. the suggested message). The file is the real payload.
+  function shareMeta(): { title: string; text: string } {
+    return {
+      title: t('home.title'),
+      text: t('gallery.storyBy', { nickname: entry.nickname }),
+    };
+  }
+
+  // Native-share the still image; fall back to a download if the platform
+  // declines the file (so the button is never a dead end).
+  async function shareImage(): Promise<void> {
+    const file = await buildStoryImageFile({
+      nickname: entry.nickname,
+      prose: entry.prose,
+      pictureUrl: entry.picture?.url ?? null,
+    });
+    if ((await shareFiles([file], shareMeta())) === 'unsupported') downloadFile(file);
+  }
+
+  async function downloadVideo(): Promise<void> {
+    if (!entry.picture || recording) return;
+    setRecording(true);
+    try {
+      const file = await buildWobbleVideoFile({
+        nickname: entry.nickname,
+        prose: entry.prose,
+        pictureUrl: entry.picture.url,
+      });
+      downloadFile(file);
+    } finally {
+      setRecording(false);
+    }
   }
 
   return (
@@ -74,6 +118,37 @@ export default function RoomGallery({ entries }: Props) {
       )}
 
       <ProseText prose={entry.prose} answers={entry.answers} className="text-lg" />
+
+      {/* Download the still image, with a native Share button on its right
+          (supported browsers only). */}
+      <div className="flex gap-2">
+        <button
+          className="flex-1 rounded border border-amber-300 bg-white px-4 py-3 font-semibold text-pink-500"
+          onClick={() =>
+            void downloadStoryImage({
+              nickname: entry.nickname,
+              prose: entry.prose,
+              pictureUrl: entry.picture?.url ?? null,
+            })
+          }
+        >
+          {entry.picture ? t('gallery.download') : t('gallery.downloadStoryOnly')}
+        </button>
+        {shareSupported && (
+          <ShareButton label={t('gallery.shareButton')} onClick={() => void shareImage()} />
+        )}
+      </div>
+
+      {entry.picture && videoSupported && (
+        // Download the 5-second video.
+        <button
+          className="w-full rounded border border-amber-300 bg-white px-4 py-3 font-semibold text-pink-500 disabled:cursor-wait disabled:opacity-60"
+          disabled={recording}
+          onClick={() => void downloadVideo()}
+        >
+          {recording ? t('gallery.recording') : t('gallery.downloadVideo')}
+        </button>
+      )}
 
       <div className="flex items-center justify-between pt-1">
         <button

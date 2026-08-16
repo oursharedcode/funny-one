@@ -231,7 +231,7 @@ export default function HomeScreen({ onJoined }: Props) {
                 phone; clamp to h-40 so it scrolls within the same slot. */}
             <ScrollBox
               className="h-40 w-28"
-              contentClassName="flex flex-col gap-2 pr-2"
+              contentClassName="flex flex-col gap-2 pe-2"
               role="group"
               aria-label="Language"
             >
@@ -319,7 +319,7 @@ export default function HomeScreen({ onJoined }: Props) {
 
             <ScrollBox
               className="h-40 w-28"
-              contentClassName="flex flex-col gap-2 pr-2"
+              contentClassName="flex flex-col gap-2 pe-2"
               role="group"
               aria-label={t('home.uiLanguage')}
             >

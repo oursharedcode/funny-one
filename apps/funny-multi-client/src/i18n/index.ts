@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Adapted from SRC/client/src/i18n/index.ts. The auto-discovery, the RTL
-// direction sync and the boot-time completeness check are carried as-is; the
-// one change is what "complete" means.
+// direction sync and the boot-time completeness check are carried as-is.
 //
-// SRC checked every catalog against all 15 `LANGUAGES` because it shipped all
-// 15. Here only en and ru are authored until T-6.2, so the check is keyed to
-// `AUTHORED_LANGUAGES` — the same en+ru→15 switch the server's i18n loader and
-// `POOL_TEXTS` use. T-6.2 widens that union in one place and this follows
-// automatically, which is the point: a language the game *offers* must be one
-// it can fully render, and the three sources that make it renderable should
-// agree about which those are.
+// SRC checked every catalog against all 15 `LANGUAGES`, and so does this
+// (T-6.1): the UI catalogue is a different axis from the room's *content*
+// language, which stays gated to `AUTHORED_LANGUAGES` (rooms.ts, POOL_TEXTS)
+// until T-6.3 finishes the pool texts. i18next falling back to English for an
+// unrendered UI string is the correct degrade for a language nobody has
+// reviewed yet — see catalogs.test.ts for the coverage test this mirrors.
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { AUTHORED_LANGUAGES, isLanguage } from '@funny/shared';
+import { LANGUAGES, isLanguage } from '@funny/shared';
 
 // Auto-discovery via Vite's `import.meta.glob`: every `<code>.json` next to
 // this file is registered as an i18next resource. Eager mode bundles all of
@@ -34,10 +32,11 @@ for (const [path, content] of Object.entries(modules)) {
   }
 }
 
-// Sanity check at module load: every authored language must have a catalogue.
-// A missing entry means an incomplete language addition — say so at boot
-// rather than silently falling back to English in the middle of a game.
-const missing = AUTHORED_LANGUAGES.filter((code) => !resources[code]);
+// Sanity check at module load: every registered language must have a
+// catalogue. A missing entry means an incomplete language addition — say so
+// at boot rather than silently falling back to English in the middle of a
+// game.
+const missing = LANGUAGES.map((l) => l.code).filter((code) => !resources[code]);
 if (missing.length > 0) {
   // eslint-disable-next-line no-console
   console.error(`[i18n] Missing src/i18n/<code>.json for: ${missing.join(', ')}`);

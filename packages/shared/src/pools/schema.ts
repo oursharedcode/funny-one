@@ -203,10 +203,29 @@ export const ASCII_PRINTABLE = /^[\x20-\x7E]+$/u;
 
 /**
  * Languages whose pool texts are authored and therefore enforced by the
- * coverage matrix. T-1.5 ships en + ru as hand-authored references; T-6.3
- * machine-drafts the remaining 13 and widens this to the full `Language`
- * union, at which point the matrix covers all 15 (D-2, FM-POOL-2/5).
+ * coverage matrix. T-1.5 shipped en + ru as hand-authored references; T-6.3
+ * machine-drafted the remaining 13 (each flagged `needs-<code>-review`) and
+ * widened this to the full `Language` union, so the matrix now covers all 15
+ * (D-2, FM-POOL-2/5). Every consumer keyed off `AUTHORED_LANGUAGES` — the
+ * server's i18n loader, `rooms.isValidLanguage`, this package's own coverage
+ * tests — widened for free the moment this list did.
  */
-export type AuthoredLanguage = Extract<Language, 'en' | 'ru'>;
+export type AuthoredLanguage = Language;
 
-export const AUTHORED_LANGUAGES: readonly AuthoredLanguage[] = ['en', 'ru'];
+export const AUTHORED_LANGUAGES: readonly AuthoredLanguage[] = [
+  'en',
+  'fr',
+  'de',
+  'ru',
+  'id',
+  'it',
+  'zh',
+  'ja',
+  'ko',
+  'pt-br',
+  'es-419',
+  'es-es',
+  'uk',
+  'he',
+  'ta',
+];

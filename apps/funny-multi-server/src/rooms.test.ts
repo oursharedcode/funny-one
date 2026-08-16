@@ -7,6 +7,7 @@
 // lobby-vs-in-game removal split that rotation integrity depends on.
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { LANGUAGES } from '@funny/shared';
 import {
   MAX_PLAYERS,
   RoomError,
@@ -117,15 +118,21 @@ describe('language validation', () => {
     expect(isValidLanguage(7)).toBe(false);
   });
 
-  it('rejects a registry language that has no authored texts yet (T-2.3)', () => {
-    // Narrower than SRC on purpose. `de` is a real entry in the 15-language
-    // registry, so `isLanguage('de')` is true — but its pool texts and prose
-    // template land in T-6.2/T-6.3. Accepting it here would open a room that
-    // plays seven full rounds and then throws at reveal, with the whole story
-    // already written. This flips to `true` when Phase 6 widens
-    // AuthoredLanguage, and this expectation is meant to be updated then.
-    expect(isValidLanguage('de')).toBe(false);
-    expect(isValidLanguage('zh')).toBe(false);
+  it('now accepts every registry language, since T-6.3 authored all 15 (T-2.3)', () => {
+    // Narrower than SRC until Phase 6: `de` and `zh` are real registry
+    // entries, so `isLanguage()` accepted them, but their pool texts and
+    // prose template didn't land until T-6.2/T-6.3 — accepting them here
+    // earlier would have opened a room that played seven full rounds and
+    // then threw at reveal, with the whole story already written. Now that
+    // AUTHORED_LANGUAGES covers the full Language union, this gate and
+    // `isLanguage` agree on every code.
+    for (const language of LANGUAGES) {
+      expect(isValidLanguage(language.code), language.code).toBe(true);
+    }
+  });
+
+  it('still rejects a code that is not in the registry at all', () => {
+    expect(isValidLanguage('klingon')).toBe(false);
   });
 });
 

@@ -190,7 +190,7 @@ export default function RoundScreen({ round, language, isHost }: Props) {
             onClick={() => setSelected(option.id)}
             animate={{ scale: isSelected ? 1.02 : 1 }}
             transition={snappy}
-            className={`w-full rounded-xl border-2 px-4 py-4 text-left font-prose text-xl leading-snug disabled:opacity-60 ${
+            className={`w-full rounded-xl border-2 px-4 py-4 text-start font-prose text-xl leading-snug disabled:opacity-60 ${
               isSelected
                 ? 'border-pink-500 bg-pink-500 text-white'
                 : 'border-amber-300 bg-white text-gray-800'
@@ -229,7 +229,7 @@ export default function RoundScreen({ round, language, isHost }: Props) {
 
       {scrolls ? (
         <>
-          <ScrollBox className="h-[26rem]" contentClassName="pr-3">
+          <ScrollBox className="h-[26rem]" contentClassName="pe-3">
             {list}
           </ScrollBox>
           <p className="text-center text-xs text-gray-500">{t('round.scrollHint')}</p>

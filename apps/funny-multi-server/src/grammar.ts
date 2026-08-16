@@ -102,11 +102,14 @@ function capitalizeFirst(text: string): string {
 
 // Adds a period when the prose doesn't already end in sentence-final
 // punctuation (the RU template ends in "." already, but a player's final-slot
-// answer can carry its own terminal mark or none).
+// answer can carry its own terminal mark or none). The zh/ja templates end in
+// the fullwidth ideographic full stop "。" rather than ASCII ".", so it (and
+// its fullwidth siblings) must count as already-terminated too — otherwise
+// this appends a second, ASCII period after it (T-6.4 spot-check).
 function ensureTerminalPeriod(text: string): string {
   const trimmed = text.trimEnd();
   if (trimmed === '') return trimmed;
-  return /[.!?…]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+  return /[.!?…。！？]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
 
 // Full offline pass: collapse the space runs empty answer slots leave behind,

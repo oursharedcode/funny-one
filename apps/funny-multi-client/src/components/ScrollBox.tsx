@@ -12,7 +12,9 @@ interface Props {
   // "flex-1" inside a fixed-height flex column) or there is nothing to scroll.
   className?: string;
   // Layout/padding for the scrolling content (e.g. "p-3 text-base" or
-  // "flex flex-col gap-2 pr-2").
+  // "flex flex-col gap-2 pe-2"). Use logical `ps-`/`pe-` rather than
+  // `pl-`/`pr-` here: the thumb below is pinned with `end-0.5`/`start-0`, so a
+  // physical gutter would land on the wrong side under `dir="rtl"`.
   contentClassName?: string;
   role?: string;
   'aria-label'?: string;
@@ -94,10 +96,10 @@ export default function ScrollBox({
       {thumb && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0.5 w-1.5 rounded-full bg-amber-200/70"
+          className="pointer-events-none absolute inset-y-0 end-0.5 w-1.5 rounded-full bg-amber-200/70"
         >
           <span
-            className="absolute left-0 w-full rounded-full bg-pink-500"
+            className="absolute start-0 w-full rounded-full bg-pink-500"
             style={{ height: `${thumb.h}px`, transform: `translateY(${thumb.top}px)` }}
           />
         </span>

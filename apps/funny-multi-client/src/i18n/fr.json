@@ -1,0 +1,114 @@
+{
+  "_note": "needs-fr-review — machine-translated stub awaiting native French review per CONTRIBUTING.md.",
+  "questions": [
+    "Qui ?",
+    "Avec qui ?",
+    "Où ?",
+    "Quand ?",
+    "Qu'ont-ils fait ?",
+    "Pourquoi ?",
+    "Comment ça s'est terminé ?"
+  ],
+  "home": {
+    "title": "Histoires Drôles",
+    "subtitle": "Écrivez des histoires absurdes ensemble. Optimisé pour mobile.",
+    "nicknamePlaceholder": "Choisis un pseudo",
+    "gameRules": "Règles du jeu",
+    "rules": "À chaque manche, réponds à une question amusante. Tes réponses sont mélangées à celles des autres pour former des histoires absurdes. Chaque histoire devient ensuite un dessin et on les révèle toutes.",
+    "create": "Créer une salle",
+    "join": "Rejoindre",
+    "joining": "Vous rejoignez la salle",
+    "roomGone": "Cette salle n'existe plus — la partie est peut-être terminée ou le lien est trop ancien.",
+    "createNew": "Créer une nouvelle salle",
+    "openRooms": "Salles ouvertes : {{count}}",
+    "imagesToday": "Jusqu'à {{total}} images par jour. Réinitialisation chaque jour à 00h00 UTC.",
+    "uiLanguage": "Touche pour changer la langue de l'interface",
+    "unsupportedLanguage": "Cette salle est dans une langue que cette version de l'application ne peut pas encore afficher. Essaie de recharger la page, ou crée une nouvelle salle."
+  },
+  "lobby": {
+    "roomCodeLabel": "Code de la salle",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !",
+    "qrCaption": "Scanne pour rejoindre",
+    "waitingForHost": "En attente de l'hôte…",
+    "startGame": "Lancer la partie",
+    "startDisabled": "Il faut au moins 3 joueurs",
+    "leave": "Quitter",
+    "host": "Hôte",
+    "capReached": "La génération d'images est indisponible pour les ~{{hours}} prochaines heures. Vous pouvez encore jouer — le texte de l'histoire s'affichera à la place des dessins.",
+    "capReachedHost": "Appuie sur Lancer la partie quand tu es prêt, ou attends que le quota quotidien d'images se réinitialise."
+  },
+  "round": {
+    "progress": "Manche {{current}} sur {{total}}",
+    "pick": "Choisis ta réponse",
+    "optionsLabel": "Réponses au choix",
+    "scrollHint": "Fais défiler pour en voir plus",
+    "submit": "Envoyer",
+    "submitDisabled": "Choisis d'abord une réponse",
+    "submitted": "Envoyé",
+    "storyLanguage": "Langue de l'histoire"
+  },
+  "waiting": {
+    "title": "En attente des autres",
+    "progress": "{{submitted}} / {{total}} envoyés",
+    "ellipsis": "Patience."
+  },
+  "reveal": {
+    "title": "Voici ton histoire",
+    "spinner": "Convocation du chaos…",
+    "retry": "Réessayer",
+    "error": "La génération a échoué. Réessaie.",
+    "capReached": "Le four à dessins est plein. De nouveaux dessins dans ~{{hours}} heures.",
+    "pictureAlt": "Dessin généré par IA de ton histoire",
+    "continue": "Continuer"
+  },
+  "end": {
+    "title": "Partie terminée",
+    "roundsOver": "Les manches sont terminées",
+    "oneMoreGame": "Encore une partie",
+    "finishGame": "Terminer la partie",
+    "ready": "Je suis prêt pour une nouvelle partie",
+    "readyActive": "Prêt ✓",
+    "waitingForHost": "En attente de l'hôte…",
+    "needPlayers": "Il faut au moins 3 joueurs pour une autre partie",
+    "waitingForReady": "On attend que tout le monde soit prêt"
+  },
+  "endScreen": {
+    "supportServer": "Soutenir ce serveur"
+  },
+  "gallery": {
+    "share": "Partager les images de la salle",
+    "shareButton": "Partager",
+    "title": "Galerie de la salle",
+    "storyBy": "Histoire de {{nickname}}",
+    "noPicture": "Pas d'image pour cette histoire",
+    "pictureAlt": "Dessin pour l'histoire de {{nickname}}",
+    "counter": "{{index}} / {{total}}",
+    "prev": "Histoire précédente",
+    "next": "Histoire suivante",
+    "download": "Télécharger l'histoire et l'image fixe",
+    "downloadStoryOnly": "Télécharger l'histoire",
+    "downloadVideo": "Télécharger la vidéo de 5 s",
+    "recording": "Enregistrement…"
+  },
+  "playerLost": {
+    "label": "{{nickname}} est sorti",
+    "ignore": "Ignorer, continuer la partie",
+    "newRoom": "Créer une nouvelle salle"
+  },
+  "footer": {
+    "source": "Source sur GitHub",
+    "contentNotice": "Les réponses des joueurs et les images IA sont sous la responsabilité de l'opérateur de ce serveur, pas du projet en amont."
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "Salle introuvable",
+    "ROOM_LOCKED": "La partie a déjà commencé",
+    "ROOM_FULL": "Salle complète",
+    "NOT_HOST": "Seul l'hôte peut faire ça",
+    "NOT_ENOUGH_PLAYERS": "Il faut au moins 3 joueurs",
+    "INVALID_NICKNAME": "Pseudo invalide",
+    "INVALID_OPTION": "Cette réponse n'est plus disponible — choisis-en une autre",
+    "RATE_LIMITED": "Du calme une seconde",
+    "SERVER_BUSY": "Le serveur est occupé"
+  }
+}

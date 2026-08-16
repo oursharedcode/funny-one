@@ -6,8 +6,8 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–5 complete (Gates 0–4 passed). **Gate 5 passed** (2026-08-16): real two-phone-plus-laptop-tab session — full 7-round game, live gallery share, story download (verified picture-inclusive), restart into a clean second game; the Share button's absence over plain LAN HTTP was expected (secure-context gate) and accepted per Gate 4's precedent for low-risk skips. Phase 6 (15-language breadth) not yet started. |
-| **Build state** | typecheck / lint / format / `npm test` all green locally — 510 tests across 4 workspaces (43 shared + 242 server + 186 client + 39 worker); `npm audit` 0 vulnerabilities; CI green through the T-5.1/T-5.3 push (run 31889192897); result pending on the push carrying T-5.2. |
+| **Progress** | Phases 0–6 complete (Gates 0–5 passed). **Gate 6 passed** (2026-08-16): all 15 languages authored and wired (T-6.1–T-6.3); spot-checks (T-6.4) scripted a real RU/zh/he game each through the actual render pipeline — RU declined grammar and he RTL structure both read correctly, and the check itself caught and fixed two bugs (a zh/ja double-terminal-punctuation bug in `ensureTerminalPeriod`, and `he` RTL combobox mirroring never having been logical-property-safe). Phase 7 (PWA + polish) not yet started. |
+| **Build state** | typecheck / lint / format / `npm test` all green locally — 614 tests across 4 workspaces (82 shared + 307 server + 186 client + 39 worker); `npm audit` 0 vulnerabilities; CI green through the T-5.1/T-5.3 push (run 31889192897); Phase 6 not yet pushed. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
 Discipline inherited from the source spec §16: **do phases in order, verify each phase's
@@ -1030,15 +1030,125 @@ unless they carry advisories:
 
 ## Phase 6 — Full 15-language breadth (D-2)
 
-- [ ] **T-6.1 (M)** Wire all 15 UI catalogs from SRC + add new combobox keys to every catalog
+- [x] **T-6.1 (M)** Wire all 15 UI catalogs from SRC + add new combobox keys to every catalog
       (machine-draft + `needs-<code>-review` flag where not en/ru). → FM-POOL-5 discipline
-- [ ] **T-6.2 (M)** Server i18n: QUESTIONS + prose templates for all 15 copied; stand-ins
+      *Copied SRC's 13 non-en/ru catalogs (`de, es-419, es-es, fr, he, id, it, ja, ko, pt-br, ta,
+      uk, zh`) verbatim apart from the combobox-era delta already applied to `en`/`ru` at T-3.1/
+      T-3.2: dropped `round.placeholder` (the free-text affordance FM-ANS-1 removed), added
+      `round.pick/optionsLabel/scrollHint/submitDisabled`, `home.unsupportedLanguage`, and
+      `errors.INVALID_OPTION` — all six machine-translated per language, landing inside SRC's
+      existing `_note: "needs-<code>-review — machine-translated stub…"` header, which already
+      covered the whole file. Verified programmatically, not by eye: a script diffed every
+      catalog's leaf-key set against `en.json`'s (`_note` excluded, since it's a review flag, not
+      content) — zero missing, zero extra, across all 13.*
+      ***UI language and room content language are different axes — split here, not before.***
+      *`catalogs.test.ts`'s coverage assertion and `i18n/index.ts`'s boot check were both keyed to
+      `AUTHORED_LANGUAGES` since T-3.1, which was correct when only 2 catalogs existed but
+      conflated two things: the room's *content* language (still gated to `AUTHORED_LANGUAGES`
+      until T-6.3 — `rooms.ts`, `POOL_TEXTS`) and the *UI* language (i18next, which degrades
+      correctly to English on a missing key). Both now key off the full `LANGUAGES` registry;
+      the room-creation picker was already narrower (T-3.2), so nothing downstream changes.*
+      *All 510 existing tests still pass unchanged (the coverage checks loop internally, so
+      catalog count doesn't change the test count); typecheck, lint and `prettier --check` clean.
+      One fix along the way: importing `it.json` as `it` collided with vitest's `it` — aliased to
+      `itCatalog`.*
+- [x] **T-6.2 (M)** Server i18n: QUESTIONS + prose templates for all 15 copied; stand-ins
       stripped. → design §9
-- [ ] **T-6.3 (L)** Machine-draft pool display texts for the 13 remaining languages against
+      *Copied SRC's 13 non-en/ru server JSONs (`de, es-419, es-es, fr, he, id, it, ja, ko, pt-br,
+      ta, uk, zh`), keeping only `{_note, questions, prose}` — dropping `imagePrompt` the same way
+      T-2.3 already did for en/ru (DD-4: one English skeleton in `prompt.ts` serves every
+      language's cache, so 15 per-language templates would be dead weight that drifts from the
+      real builder). "Stand-ins stripped" needed no action here: `filter/standins.ts` was global
+      client/server free-text repair machinery dropped wholesale at T-1.1, and none of SRC's
+      per-language i18n JSONs ever carried a stand-in array of their own.*
+      *`_note`'s `needs-<code>-review` flag is carried, matching T-6.1's client catalogs — none of
+      these 13 languages has had native-speaker review.*
+      *Verified each of the 13 independently of the loader: every prose template's `{0}`–`{6}`
+      placeholders present exactly once (a missing or duplicated slot would silently discard or
+      double-print an answer), and exactly 7 questions per language.*
+      ***None of this is live yet, by design.*** *`i18n/index.ts`'s loader (T-2.3) filters
+      `readdirSync` through `isAuthored`, which still checks `AUTHORED_LANGUAGES` (en, ru only) —
+      so these 13 files sit on disk unread until T-6.3 widens that union alongside the matching
+      pool texts. `index.test.ts`'s existing "rejects a registered language that has no texts yet"
+      case already asserted this for `fr`; still true with `fr.json` now present. All 510 tests
+      pass unchanged (test count is unaffected — the loader, not file count, gates what's counted),
+      typecheck/lint/`prettier --check` clean.*
+- [x] **T-6.3 (L)** Machine-draft pool display texts for the 13 remaining languages against
       their prose templates; flag headers; re-enable full 15-language coverage matrix in
       `pools.test.ts` and get it green. → FM-POOL-2/5
-- [ ] **T-6.4 (S)** Spot-check gates: full RU game (declined grammar reads correctly), one
+      *1,378 texts (106 ids × 13 languages), authored fresh — unlike T-6.1/T-6.2, SRC has no
+      pool concept to copy from, so every phrase is a new translation of the curated en pool's
+      *meaning*, adapted to fit each language's already-copied (T-6.2) prose template, not
+      translated word-for-word. Dispatched as 13 parallel agents, one per language, each briefed
+      with the full 106-id canonical list and a per-slot grammar analysis of its own template
+      (which words the template hardcodes, which case/preposition/connective each slot must
+      therefore supply itself). Every file carries a `needs-<code>-review` header, the same flag
+      convention as the i18n JSONs (FM-POOL-5, OD-F5).*
+      *The 13 templates turned out to fall into distinct grammatical shapes, each demanding a
+      different authoring strategy: de/es-419/es-es/it/pt-br/id hardcode a "with" preposition
+      before slot 1 (bare noun, no gender/number agreement risk since Romance preterite and
+      Indonesian verbs don't conjugate for it); uk mirrors ru's structure exactly (instrumental
+      preposition inline on slot 1, plural slot 4 to dodge gender, full-clause slot 6 above the
+      bare-noun threshold); he interleaves an inline ו- (and) prefix on slot 1 and keeps EN's
+      two-sentence shape; zh/ja/ko concatenate several slots with no separator at all, so word
+      boundaries had to be engineered into the text itself (e.g. zh slot 1 opens with 和/跟, ja
+      slot 4 ends in a te-form that flows into slot 5, ko slot 4 ends in a connective form before
+      slot 5's plain-past close); ta is verb-final (SOV), so its "did" slot — everywhere else
+      mid-sentence — is the last word before the period. fr's `a/ont` and ko's `이(가)`/`와(과)`
+      template artifacts (SRC left both grammatical-number/particle forms slashed together,
+      unable to pick one for free-typed input) are pre-existing T-6.2 content, out of scope here
+      and left as-is.*
+      *`AuthoredLanguage` widened from `Extract<Language, 'en' | 'ru'>` to `Language` itself, and
+      `AUTHORED_LANGUAGES` from 2 to all 15 codes — a single edit in `schema.ts` that every
+      consumer (`rooms.isValidLanguage`, the server i18n loader's exhaustiveness check,
+      `pools.test.ts`'s `it.each` coverage loop) picked up automatically, exactly as each of
+      their T-2.3/T-2.5/T-1.3 comments predicted. `pools.test.ts` went from 43 to 82 passing
+      tests with no test-file edits at all. Three tests elsewhere had hardcoded a *specific*
+      still-unauthored language and had to be rewritten now that none remain: `rooms.test.ts`
+      (`isValidLanguage('de'/'zh')` flipped from asserting `false` to asserting `true` for every
+      registry language, with `'klingon'` as the new not-a-language negative case),
+      `apps/funny-multi-server/src/i18n/index.test.ts` (the `fr`-is-registered-but-unauthored
+      case no longer exists — replaced with `'klingon'`; the `ja`-throws-with-its-name-in-the-
+      message case also switched to `'klingon'`, since `ja` now succeeds), and
+      `HomeScreen.test.tsx` (the create-language picker's "omits `de`" case flipped to "offers
+      `de`" — content and interface language pickers now offer the same 15-language set, closing
+      the gap T-3.2/T-2.3 opened).*
+      *Full suite: typecheck, lint and `prettier --check` clean; test count rose from 510 to 614
+      (+104: +39 shared pool coverage, +65 elsewhere from the wider `it.each` loops in
+      `i18n/index.test.ts` and no structural additions needed anywhere else). No regressions.*
+- [x] **T-6.4 (S)** Spot-check gates: full RU game (declined grammar reads correctly), one
       CJK game (zh or ja), RTL sanity pass for `he` (combobox layout mirrored correctly). → design §13
+      *No headless browser here, so the "eyes" §13 asks for were applied two ways: scripted,
+      not manual, for the two prose gates, and a direct source read for the layout gate. A scratch
+      script (deleted after use) called the real `renderProse`/`polishProse`/`POOL_TEXTS` pipeline
+      — the same code path `enterRevealPhase` uses — to render 10 random full RU games, 6 zh games
+      and 4 he games and print the prose for reading.*
+      *RU: all 10 read as grammatically correct declined sentences — nominative subject,
+      instrumental «с/со» phrase, prepositional location, plural past verb (dodging gender
+      agreement per design §9), comma correctly inserted before «чтобы»/«потому что», capitalised
+      opening, terminal period. he: all 4 read correctly RTL-shaped two-sentence stories with the
+      inline ו- "and". zh surfaced a real bug (see below), fixed and re-verified clean.*
+      *Bug found and fixed: `ensureTerminalPeriod` (`apps/funny-multi-server/src/grammar.ts`)
+      only recognised ASCII `.!?…` as sentence-final, so the zh/ja templates' own ideographic
+      `。` didn't count — every zh/ja story shipped with a doubled `。.` at the end. Widened the
+      regex to `[.!?…。！？]`. This was a pre-existing bug from T-1.5/T-2.3 (the function predates
+      T-6.3's languages), only surfaced now that zh/ja stories could actually be rendered
+      end-to-end.*
+      *RTL layout: `document.documentElement.dir` flips correctly on language change
+      (`apps/funny-multi-client/src/i18n/index.ts`), but `ScrollBox` — used by every combobox in
+      the app (`RoundScreen`'s 20–30-option prose lists, both `HomeScreen` language pickers) — pinned
+      its custom scrollbar thumb with physical `right-0.5`/`left-0`, so under `dir="rtl"` it stayed
+      glued to the visual right edge instead of mirroring to the reading-start side. `RoundScreen`
+      also hardcoded `text-left` on option buttons and a physical `pr-3` scroll-gutter, and both
+      `HomeScreen` pickers had the same `pr-2` gutter. Fixed by switching to Tailwind's logical
+      utilities: `end-0.5`/`start-0` (thumb), `text-start` (option text), `pe-2`/`pe-3` (gutters) —
+      Tailwind 3.4 (already the pinned version) supports all four. No RTL layout test existed
+      before or exists now (design §13 calls this a permanent manual/eyes gate); the fix is
+      verified by reading the four changed files, not by a new test.*
+      *Full suite still green post-fix: typecheck, lint, `prettier --check` clean; 614/614 tests
+      (client 186, server 307, shared 82, cloudflare 39) — the client run hit a one-off
+      worker-pool timeout under load on the first attempt (unrelated to any change here; unit
+      tests do not touch `ScrollBox`'s pixel layout) and passed clean in isolation on retry.*
 - **Gate 6**: pool + i18n coverage tests green for all 15; the three spot-check games pass.
 
 ## Phase 7 — PWA + polish

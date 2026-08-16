@@ -136,19 +136,15 @@ describe('requireAuthoredLanguage', () => {
     });
   }
 
-  it('rejects a registered language that has no texts yet', () => {
-    // `fr` is a real `Language` and will pass `isValidLanguage` at room
-    // creation from T-6.2 onward. Until its texts land, reaching the renderer
-    // with it must fail loudly here rather than emit "undefined and undefined".
-    expect(() => requireAuthoredLanguage('fr')).toThrow(/no authored texts yet/);
-  });
-
   it('rejects a code that is not a language at all', () => {
+    // T-6.3 widened AUTHORED_LANGUAGES to the full registry, so every real
+    // `Language` now has texts — the only way to reach this branch is a code
+    // that was never in the registry to begin with.
     expect(() => requireAuthoredLanguage('klingon')).toThrow(/\[i18n\]/);
   });
 
   it('names the offending language so the log identifies the room', () => {
-    expect(() => requireAuthoredLanguage('ja')).toThrow(/"ja"/);
+    expect(() => requireAuthoredLanguage('klingon')).toThrow(/"klingon"/);
   });
 
   it('narrows to AuthoredLanguage for the renderer', () => {

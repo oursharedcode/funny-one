@@ -100,13 +100,15 @@ describe('content-language gating (T-2.3 server constraint)', () => {
     expect(pickerCodes('Language')).toEqual([...AUTHORED_LANGUAGES]);
   });
 
-  it('omits a registered-but-unauthored language from the create picker', () => {
+  it('now offers every registry language on the create picker (T-6.3)', () => {
     renderHome();
-    // `de` is a real registry entry with a flag and a UI catalogue slot, and is
-    // exactly what SRC's picker would have offered. It must not be creatable
-    // until T-6.3 authors its pools.
+    // `de` is a real registry entry with a flag and a UI catalogue slot.
+    // Before T-6.3 authored its pool texts it was excluded from this picker
+    // (SRC's picker would have offered it); now that AUTHORED_LANGUAGES
+    // covers the full registry, content and interface language pickers
+    // offer the same set.
     expect(LANGUAGES.some((l) => l.code === 'de')).toBe(true);
-    expect(pickerCodes('Language')).not.toContain('de');
+    expect(pickerCodes('Language')).toContain('de');
   });
 
   it('still offers all 15 registry languages as the joiner UI language', () => {

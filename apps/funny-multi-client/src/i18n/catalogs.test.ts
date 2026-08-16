@@ -16,20 +16,56 @@
 // are about their shape.
 
 import { describe, expect, it } from 'vitest';
-import { AUTHORED_LANGUAGES, type ErrorCode } from '@funny/shared';
+import { LANGUAGES, type ErrorCode } from '@funny/shared';
 import en from './en.json';
 import ru from './ru.json';
+import de from './de.json';
+import fr from './fr.json';
+import id from './id.json';
+import itCatalog from './it.json';
+import zh from './zh.json';
+import ja from './ja.json';
+import ko from './ko.json';
+import ptBr from './pt-br.json';
+import es419 from './es-419.json';
+import esEs from './es-es.json';
+import uk from './uk.json';
+import he from './he.json';
+import ta from './ta.json';
 
 type Catalog = Record<string, unknown>;
-const CATALOGS: Record<string, Catalog> = { en, ru };
+const CATALOGS: Record<string, Catalog> = {
+  en,
+  ru,
+  de,
+  fr,
+  id,
+  it: itCatalog,
+  zh,
+  ja,
+  ko,
+  'pt-br': ptBr,
+  'es-419': es419,
+  'es-es': esEs,
+  uk,
+  he,
+  ta,
+};
 
-/** Every leaf path in a nested catalogue, e.g. `home.title`, `questions.0`. */
+/**
+ * Every leaf path in a nested catalogue, e.g. `home.title`, `questions.0`.
+ * `_note` is metadata (the `needs-<code>-review` flag on machine-drafted
+ * catalogues, languages.ts §top), not translated content — excluded so it
+ * doesn't register as a key `en.json` is missing.
+ */
 function leafPaths(value: unknown, prefix = ''): string[] {
   if (Array.isArray(value)) {
     return value.flatMap((v, i) => leafPaths(v, `${prefix}${i}.`));
   }
   if (value !== null && typeof value === 'object') {
-    return Object.entries(value).flatMap(([k, v]) => leafPaths(v, `${prefix}${k}.`));
+    return Object.entries(value)
+      .filter(([k]) => prefix !== '' || k !== '_note')
+      .flatMap(([k, v]) => leafPaths(v, `${prefix}${k}.`));
   }
   return [prefix.slice(0, -1)];
 }
@@ -49,12 +85,15 @@ function leaf(catalog: Catalog, path: string): unknown {
 }
 
 describe('catalogue coverage', () => {
-  it('ships a catalogue for every authored language', () => {
-    // Keyed to AUTHORED_LANGUAGES, the same en+ru→15 switch the server's i18n
-    // loader and POOL_TEXTS use — T-6.2 widens it in one place and this
-    // follows. `i18n/index.ts` makes the same check at boot; this makes it
-    // before the boot.
-    expect(Object.keys(CATALOGS).sort()).toEqual([...AUTHORED_LANGUAGES].sort());
+  it('ships a catalogue for every UI language', () => {
+    // Keyed to the full `LANGUAGES` registry, not `AUTHORED_LANGUAGES` (T-6.1):
+    // UI language and room content language are different axes. The room's
+    // content language is still gated to `AUTHORED_LANGUAGES` until T-6.3
+    // finishes the pool texts (rooms.ts, POOL_TEXTS) — but the interface
+    // itself can be read in any of the 15 the moment a catalogue exists for
+    // it, same as SRC shipped it. `i18n/index.ts` makes the same check at
+    // boot; this makes it before the boot.
+    expect(Object.keys(CATALOGS).sort()).toEqual(LANGUAGES.map((l) => l.code).sort());
   });
 
   it('translates exactly the same keys in every language', () => {

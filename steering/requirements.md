@@ -10,7 +10,7 @@
 **Binding order** (highest wins):
 1. Product-owner decisions of 2026-08-12 (recorded in §2)
 2. This document
-3. `docs/Additional_requirements_strong.md` and `docs/Initial_Requirements.md`
+3. `docs/archive/Additional_requirements_strong.md` and `docs/archive/Initial_Requirements.md`
 4. Source project spec: `docs/source_project/monkeybus/docs/FUNNY_STORIES_SPEC_v4.md` (v4.34.1)
 5. `docs/source_project/monkeybus/docs/DESIGN_SYSTEM.md`
 6. `docs/source_project/monkeybus/docs/MODERATION.md`

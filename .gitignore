@@ -14,7 +14,7 @@ coverage/
 .env.local
 
 # Tooling / OS
-.claude/
+.claude/settings.local.json
 .vite/
 .wrangler/
 *.log

@@ -1163,3 +1163,20 @@ unless they carry advisories:
       *Full suite: typecheck, lint, `prettier --check` clean; 616/616 tests (client 188 [+2],
       server 307, shared 82, cloudflare 39). `npm audit` 0 vulnerabilities. No regressions.*
 
+## Phase 8 — Deploy + acceptance + docs
+
+*In progress — T-8.1 and T-8.2 and Gate 8 are still open in `steering/tasks.md`. Only fully
+closed tasks are moved here as they land.*
+
+- [x] **T-8.3 (M)** Docs for this repo: README (what it is, deploy-your-own buttons pattern,
+      AGPL/no-DRM honesty note per MON-5, GitHub Sponsors link only), DEPLOYMENT, DEVELOPMENT,
+      LANGUAGES (pools workflow), MODERATION rewritten to FM-CPL-3 posture. → FM-TIER-4/6, FM-CPL-2/3
+      *Landed 2026-08-20, ahead of T-8.1's remainder (owner-decided order swap) so the actual
+      deploy session can follow DEPLOYMENT.md as a runbook. Also closed the T-8.1 carry-over
+      write-up of the `x-forwarded-for` trust model / `TRUSTED_PROXY_HOPS` in DEPLOYMENT.md.
+      Owed: the README's GitHub Sponsors link and Render deploy button are unverified against
+      a live repo/Sponsors page.*
+      *Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests (client 188,
+      server 310, shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
+      vulnerabilities. No regressions — docs-only step.*
+

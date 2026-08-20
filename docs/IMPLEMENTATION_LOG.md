@@ -194,12 +194,43 @@ vulnerabilities. No regressions.*
 
 ---
 
+## Step 5 — T-8.3: docs pass (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) (2026-08-20)
+
+**Shipped:** All five T-8.3 docs, written before the actual Render/Worker deploy rather than
+after (owner decision this session) so the deploy session can follow DEPLOYMENT.md as a
+runbook instead of writing it up after the fact. `DEPLOYMENT.md` covers the Worker
+(`wrangler r2 bucket create`, optional KV, `wrangler secret put WORKER_SECRET`, `wrangler
+deploy`) then Render (blueprint via `render.yaml`, the five `sync: false` env vars) then
+Docker as the self-host alternative (still unverified — no Docker in the dev sandbox); it
+also carries the T-8.1 carry-over write-up of the `x-forwarded-for` trust model and
+`TRUSTED_PROXY_HOPS`. `README.md` (new — didn't exist before): what the game is, the
+Render deploy-your-own button, AGPL + explicit not-DRM note (FM-TIER-6), GitHub Sponsors as
+the only support link (FM-TIER-4/MON-7). `DEVELOPMENT.md`: layout, commands, the six gates,
+and conventions (in-memory rooms, no free text, transform/opacity-only motion, one prompt
+language for all 15 room languages). `LANGUAGES.md`: the UI-catalog vs. pool-text
+distinction, the add-a-language checklist, what "needs-review" means for the 13
+machine-drafted languages, and why es-419/es-es stay separate files. `MODERATION.md`:
+rewritten to the FM-CPL-3 "safety by construction" posture (curated pools + server-side
+validation + locked style suffix, not an input filter), operator responsibilities (the
+Flux Schnell signature-squiggle artefact, per-language pool review), and the FM-CPL-4
+standing guard if free text is ever reintroduced.
+**Owed:** the README's GitHub Sponsors link (`github.com/sponsors/oursharedcode`) and the
+Render deploy button URL are unverified against a live Sponsors page / working deploy
+flow — confirm both once the repo is actually public and the Sponsors page exists.
+Everything else T-8.1 still owes (Render + Worker deploy, `docker compose up` sanity check,
+the Phase-7 device-session bundle) is unchanged by this step.
+*Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests (client 188, server
+310, shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
+vulnerabilities. No regressions — docs-only step.*
+
+---
+
 **RESUME HERE (2026-08-20).** Next: **T-8.1 remainder** — deploy server to Render (blueprint
-already committed as `render.yaml`) + Worker/R2/KV via `wrangler`, set secrets (FM-NFR-3).
-This is an owner-driven session: needs Render and Cloudflare accounts/credentials that
-this agent doesn't have. Once the production URL exists, the same session should also
-close the parked Phase-7 device-session bundle — T-7.1's real iPhone/Android install test,
-T-7.3's 60 fps animation-jank check, and Gate 7 itself — plus a sanity `docker compose up`
-against `Dockerfile`/`docker-compose.yml`, unverified so far since no Docker is available
-in the dev sandbox. No other blockers; CI is green through the Phase 7 push (`c89dd9d`) —
-Step 4 (this session) has not been pushed yet.
+committed as `render.yaml`, runbook now in `DEPLOYMENT.md`) + Worker/R2/KV via `wrangler`,
+set secrets (FM-NFR-3). This is an owner-driven session: needs Render and Cloudflare
+accounts/credentials that this agent doesn't have. Once the production URL exists, the same
+session should also close the parked Phase-7 device-session bundle — T-7.1's real
+iPhone/Android install test, T-7.3's 60 fps animation-jank check, and Gate 7 itself — plus a
+sanity `docker compose up` against `Dockerfile`/`docker-compose.yml`, unverified so far since
+no Docker is available in the dev sandbox. No other blockers; CI is green through Step 4
+(`33a52a3`, pushed) — Step 5 (this session) has not been pushed yet.

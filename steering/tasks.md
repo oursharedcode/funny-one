@@ -77,7 +77,7 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       `trustedProxyHops` param (default 1) and reads `x-forwarded-for` from the right-hand
       (proxy-appended) end instead of the client-settable first hop; wired to a new
       `TRUSTED_PROXY_HOPS` env var in `index.ts`, documented in `.env.example`. The
-      DEPLOYMENT.md write-up of this assumption is still owed — folds into T-8.3's docs pass.*
+      DEPLOYMENT.md write-up of this assumption landed with T-8.3 (`steering/tasks-done.md`).*
       **Remaining for T-8.1:** deploy server to Render + Worker/R2/KV via wrangler, set secrets
       — needs the owner's accounts/credentials, a separate owner-driven session.
       *Carry-over from Phase 7 (owner decision 2026-08-20): once deployed, this session's device
@@ -88,10 +88,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
       run with 3 real phones on the production URL; include disconnect-mid-game → bot,
       cap flow, cache-hit flow. → design §13
-- [ ] **T-8.3 (M)** Docs for this repo: README (what it is, deploy-your-own buttons pattern,
-      AGPL/no-DRM honesty note per MON-5, GitHub Sponsors link only), DEPLOYMENT, DEVELOPMENT,
-      LANGUAGES (pools workflow), MODERATION rewritten to FM-CPL-3 posture. → FM-TIER-4/6, FM-CPL-2/3
 - **Gate 8**: acceptance checklist signed off; a stranger can self-deploy from README alone.
+  *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 —
+  `steering/tasks-done.md`. Gate itself still open: needs T-8.1's deploy and T-8.2's
+  acceptance pass before "a stranger can self-deploy" can actually be verified.*
 
 ## Phase 9 — Premium (final phase, D-4)
 

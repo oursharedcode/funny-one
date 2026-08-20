@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+apps/*/dist
+packages/*/dist
+cloudflare/node_modules
+.git
+.gitignore
+.env
+.env.local
+*.log
+docs/source_project
+coverage
+.wrangler
+.vite

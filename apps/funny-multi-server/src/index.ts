@@ -71,6 +71,12 @@ const PORT = Number(process.env.PORT ?? 3000);
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
 const DEV_CLIENT_ORIGIN = 'http://localhost:5173';
 
+// Number of trusted reverse-proxy hops in front of this process, for
+// `clientIp`'s x-forwarded-for parsing (rateLimit.ts). Default 1 matches
+// Render's single TLS-terminating proxy; raise it if a CDN or load balancer
+// sits in front of Render.
+const TRUSTED_PROXY_HOPS = Number(process.env.TRUSTED_PROXY_HOPS ?? 1);
+
 // Built client bundle, relative to dist/index.js (spec §14: one process serves
 // both). SRC pointed at '../../client/dist/'; the workspace layout renames the
 // app and adds an apps/ level, and this file's depth below the app root is
@@ -240,7 +246,7 @@ export async function buildServer({
       fastify.log.info({ socketId: socket.id }, 'socket connected');
     }
 
-    const ip = clientIp(socket.handshake);
+    const ip = clientIp(socket.handshake, TRUSTED_PROXY_HOPS);
 
     socket.on('room:create', (payload, ack) => {
       // Rate check first: a limited caller must not consume a room slot or a

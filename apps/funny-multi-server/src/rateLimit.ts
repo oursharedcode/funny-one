@@ -114,26 +114,38 @@ export const ROOM_JOIN_PER_MINUTE = 30;
 export const RATE_WINDOW_MS = 60_000;
 
 /**
- * Client IP for bucketing, read from `x-forwarded-for`'s first hop per spec
- * §17 (Render terminates TLS and proxies, so the socket's own address is the
- * proxy's).
+ * Client IP for bucketing, read from `x-forwarded-for` counting from the
+ * right-hand (proxy-appended) end per `trustedProxyHops` (default 1, Render's
+ * single hop: TLS-terminating proxy directly in front of this process).
  *
- * Caveat worth stating plainly: `x-forwarded-for` is a client-settable header.
- * A trusted proxy appends the real peer, but taking the *first* hop means a
- * caller who sends their own `X-Forwarded-For` picks their own bucket key and
- * can rotate it to evade the limit. Spec §17 nevertheless specifies the first
- * hop, and SRC's DEPLOYMENT.md documents that assumption to operators, so the
- * spec'd behavior is what ships here rather than a silent divergence. Making
- * the trusted-hop count configurable is the real fix and is noted as an open
- * item in steering/tasks.md against T-8.1, where deploy config is settled.
+ * `x-forwarded-for` is a client-settable header: each proxy in the chain
+ * *appends* the peer it saw, so the rightmost `trustedProxyHops` entries are
+ * the ones our own trusted proxies actually observed, while anything to their
+ * left (including a whole forged chain) came from the client and cannot be
+ * trusted. Deployments behind more than one proxy (a CDN in front of Render,
+ * for example) must set `trustedProxyHops` to match the chain depth, or every
+ * caller collapses onto the same bucket key.
+ *
+ * SRC's DEPLOYMENT.md documented reading the *first* hop as the spec §17
+ * behavior, which let a caller pick and rotate its own bucket key — this
+ * deployment's actual chain (Render, one hop) is now what's trusted instead.
  */
-export function clientIp(handshake: {
-  headers: Record<string, string | string[] | undefined>;
-  address?: string;
-}): string {
+export function clientIp(
+  handshake: {
+    headers: Record<string, string | string[] | undefined>;
+    address?: string;
+  },
+  trustedProxyHops = 1,
+): string {
   const forwarded = handshake.headers['x-forwarded-for'];
   const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  const first = raw?.split(',')[0]?.trim();
-  if (first) return first;
+  const hops = raw
+    ?.split(',')
+    .map((hop) => hop.trim())
+    .filter(Boolean);
+  if (hops && hops.length > 0 && trustedProxyHops > 0) {
+    const index = Math.max(0, hops.length - trustedProxyHops);
+    return hops[index];
+  }
   return handshake.address ?? 'unknown';
 }

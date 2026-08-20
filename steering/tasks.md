@@ -66,16 +66,20 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - [ ] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
       `.dockerignore`, `.env.example`; deploy server to Render + Worker/R2/KV via wrangler;
       set secrets. → FM-NFR-3
-      *Carry-over from T-2.3: bump `actions/checkout` and `actions/setup-node` from `@v4` to
-      `@v5` in `.github/workflows/ci.yml`. GitHub now warns that both target the deprecated
-      Node 20 runner and is force-running them on Node 24; nothing is broken today, but the
-      warning is on every run. Unrelated to the repo's own Node 20 target, which is what the
-      `node-version: 20` step pins and which the nanoid `^5` decision depends on.*
-      *Carry-over from T-2.2: make the rate limiter's trusted-proxy-hop count configurable.
-      `clientIp()` currently takes `x-forwarded-for`'s first hop per spec §17, which a client can
-      set itself to pick — and rotate — its own bucket key. Once the real proxy chain is known,
-      count hops from the right-hand (proxy-appended) end instead, and document the assumption
-      in DEPLOYMENT.md rather than inheriting SRC's claim that it already works this way.*
+      *Artifacts landed 2026-08-20: `Dockerfile`, `.dockerignore`, `docker-compose.yml`,
+      `render.yaml` adapted from `docs/source_project/monkeybus` for the `apps/*`/`packages/*`
+      workspace layout; `render.yaml` on the free plan (owner decision 2026-08-20).
+      `docker compose up` itself is unverified — no Docker available in the dev sandbox; run it
+      once before the real deploy on a machine that has Docker.*
+      *T-2.3 carry-over landed 2026-08-20: `actions/checkout` and `actions/setup-node` bumped
+      `@v4` → `@v5` in `.github/workflows/ci.yml`.*
+      *T-2.2 carry-over landed 2026-08-20: `clientIp()` (`rateLimit.ts`) now takes a
+      `trustedProxyHops` param (default 1) and reads `x-forwarded-for` from the right-hand
+      (proxy-appended) end instead of the client-settable first hop; wired to a new
+      `TRUSTED_PROXY_HOPS` env var in `index.ts`, documented in `.env.example`. The
+      DEPLOYMENT.md write-up of this assumption is still owed — folds into T-8.3's docs pass.*
+      **Remaining for T-8.1:** deploy server to Render + Worker/R2/KV via wrangler, set secrets
+      — needs the owner's accounts/credentials, a separate owner-driven session.
       *Carry-over from Phase 7 (owner decision 2026-08-20): once deployed, this session's device
       pass must also close T-7.1's real-device install test (DevTools Installability panel +
       real iPhone/Android install against the production URL), T-7.3's 60 fps animation-jank

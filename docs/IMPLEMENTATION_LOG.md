@@ -150,7 +150,7 @@ vulnerabilities. No regressions.*
 
 ---
 
-**RESUME HERE (2026-08-20).** Next: **T-8.1 (M)** — deploy artifacts: `render.yaml`,
+~~**RESUME HERE (2026-08-20).** Next: **T-8.1 (M)** — deploy artifacts: `render.yaml`,
 `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.env.example`; deploy server to
 Render + Worker/R2/KV via wrangler; set secrets (FM-NFR-3). Carries two Phase-2 carry-overs
 (bump `actions/checkout`/`actions/setup-node` to `@v5`; make the rate-limiter's trusted-proxy
@@ -158,4 +158,48 @@ hop count configurable) plus the Phase-7 device-session bundle: T-7.1's real iPh
 install test, T-7.3's 60 fps animation-jank check, and Gate 7's own jank check — all three
 parked here by owner decision 2026-08-20 rather than a throwaway HTTPS tunnel. No other
 blockers; CI is green through the Phase 7 push (Steps 1–2, `d45181b`) — Step 3 (this
-session) has not been pushed yet.
+session) has not been pushed yet.~~ *(carried — see Step 4 below.)*
+
+## Step 4 — T-8.1 code legs: deploy artifacts, CI bump, rate-limiter hop fix (2026-08-20)
+
+**Shipped:** Landed the three legs of T-8.1 that don't need the owner's Render/Cloudflare
+accounts. Deploy artifacts: `Dockerfile`, `.dockerignore`, `docker-compose.yml`, `render.yaml`
+adapted from `docs/source_project/monkeybus` (owner-confirmed SRC read) for this repo's
+`apps/*`/`packages/*` workspace layout rather than SRC's flat `client`/`server`/`shared`
+— `Dockerfile` copies each workspace's `package.json` (including `cloudflare/`, which
+`npm ci` needs present even though nothing dockerises it) before the full-context `npm
+run build`, and `render.yaml` uses Render's native Node build/start rather than the
+Dockerfile, matching SRC's approach and the free plan's cost profile (owner decision this
+session). T-2.3 carry-over: bumped `actions/checkout`/`actions/setup-node` from `@v4` to
+`@v5` in `.github/workflows/ci.yml`. T-2.2 carry-over: `clientIp()` (`rateLimit.ts`) now
+takes a `trustedProxyHops` param (default 1) and reads `x-forwarded-for` from the
+right-hand (proxy-appended) end instead of the client-settable first hop, closing the gap
+where a caller could set its own header to pick — and rotate — its rate-limit bucket;
+wired to a new `TRUSTED_PROXY_HOPS` env var in `index.ts` and documented in
+`.env.example`. Updated `rateLimit.test.ts` for the new semantics and added coverage for
+multi-hop chains.
+Owner decisions this session: SRC read for the deploy artifacts confirmed in scope;
+`render.yaml` targets the free plan; the artifact work (this step) and the actual
+Render/Worker deploy + device session (T-8.1's remainder) are two separate sessions, the
+second needing the owner's own accounts and credentials.
+**Owed:** T-8.1 stays open — remaining: deploy server to Render + Worker/R2/KV via
+wrangler, set secrets; `docker compose up` itself is unverified (no Docker in the dev
+sandbox, run it once before the real deploy); plus the Phase-7 device-session bundle
+already parked here (T-7.1 install test, T-7.3 jank check, Gate 7 itself). The
+`x-forwarded-for` trust assumption still needs writing up in DEPLOYMENT.md, folded into
+T-8.3's docs pass.
+*Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests (client 188, server
+310 [+1], shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
+vulnerabilities. No regressions.*
+
+---
+
+**RESUME HERE (2026-08-20).** Next: **T-8.1 remainder** — deploy server to Render (blueprint
+already committed as `render.yaml`) + Worker/R2/KV via `wrangler`, set secrets (FM-NFR-3).
+This is an owner-driven session: needs Render and Cloudflare accounts/credentials that
+this agent doesn't have. Once the production URL exists, the same session should also
+close the parked Phase-7 device-session bundle — T-7.1's real iPhone/Android install test,
+T-7.3's 60 fps animation-jank check, and Gate 7 itself — plus a sanity `docker compose up`
+against `Dockerfile`/`docker-compose.yml`, unverified so far since no Docker is available
+in the dev sandbox. No other blockers; CI is green through the Phase 7 push (`c89dd9d`) —
+Step 4 (this session) has not been pushed yet.

@@ -129,10 +129,18 @@ describe('validation', () => {
 });
 
 describe('clientIp', () => {
-  it('takes the first hop of x-forwarded-for', () => {
+  it('takes the last hop of x-forwarded-for by default (one trusted proxy)', () => {
+    // '203.0.113.7' is what a caller could set on its own request; '70.41.3.18'
+    // is the peer our one trusted proxy (Render) actually observed and appended.
     expect(clientIp({ headers: { 'x-forwarded-for': '203.0.113.7, 70.41.3.18' } })).toBe(
-      '203.0.113.7',
+      '70.41.3.18',
     );
+  });
+
+  it('counts trustedProxyHops from the right for deeper proxy chains', () => {
+    const handshake = { headers: { 'x-forwarded-for': 'a, b, c, d' } };
+    expect(clientIp(handshake, 1)).toBe('d');
+    expect(clientIp(handshake, 2)).toBe('c');
   });
 
   it('handles a header repeated as an array', () => {

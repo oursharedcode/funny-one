@@ -1,0 +1,27 @@
+# Funny Family «Чепуха 37» — Render blueprint (T-8.1, FM-NFR-3).
+# Canonical hosted-deploy config. Uses Render's Node runtime directly rather
+# than the Dockerfile — no reason to pay the extra build/cold-start cost of a
+# container on the free plan when Render's native Node build does the same
+# `npm run build` + `npm run start` this repo already defines.
+services:
+  - type: web
+    name: funny-multi
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: '20'
+      - key: NODE_ENV
+        value: production
+      - key: CLOUDFLARE_WORKER_URL
+        sync: false # set in Render dashboard after deploying the Worker
+      - key: CLOUDFLARE_WORKER_SECRET
+        sync: false # set in both Render dashboard and Cloudflare Worker env
+      - key: DEPLOYER_DONATE_URL
+        sync: false # optional; set to show a "Support this server" button
+      - key: MAX_ROOMS
+        sync: false # optional; default 500 if unset
+      - key: MAX_IMAGES_PER_DAY
+        sync: false # optional; default 25 if unset — daily AI image ceiling

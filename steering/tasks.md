@@ -26,16 +26,28 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       *Partly landed at T-3.1, which had to: a PWA will not install without a manifest and an
       icon, so `vite.config.ts` already carries the manifest, the NetworkFirst navigation
       strategy and the un-precached `index.html`, and `swReload.ts` is copied.
-      **Remaining for T-7.1:** replace the placeholder `public/icon.svg` with real artwork
-      (SRC's icons are its own branding and were not carried), decide whether to ship raster
-      192/512 alongside it for stores that dislike SVG, and run the real-device install test —
-      which is the part of this task that was never automatable.*
+      **Icon work landed 2026-08-20:** `public/icon.svg` rewritten as a paths-only vector (no
+      `<text>`/webfont dependency, which silently falls back to a system font when rasterized
+      outside a page context); 180/192/512 PNGs pre-rendered once via a temporary local `sharp`
+      install (never added to `package.json`) and committed as static files, since iOS ignores
+      SVG for `apple-touch-icon` — `index.html` now points it at `icon-180.png`; manifest
+      `icons[]` carries the SVG plus 192/512 PNG fallbacks. Real commissioned artwork deferred
+      to Phase 8 polish (owner decision 2026-08-20); this hand-authored "37"-on-brand-cream mark
+      is the placeholder until then.
+      **Remaining for T-7.1:** the real-device install test on iPhone + Android — the part of
+      this task that was never automatable, and separately blocked on a secure context: PWA
+      install and service-worker registration both require HTTPS, which the LAN setup used for
+      Gates 3–5 doesn't have. Owner decision 2026-08-20: defer this check to T-8.1's Render
+      deploy rather than stand up a throwaway tunnel — run the DevTools Installability panel and
+      both real-device installs against the production URL once it exists, then close Gate 7.*
 - [ ] **T-7.2 (M)** Design-system pass: motion presets on all transitions (forward-only),
       mascot triggers (waiting/timer/submit/reveal flourish/end/error), reduced-motion,
       wordmark, SourceFooter + LogoStamp. → FM-ARC-4, FM-CPL-3
 - [ ] **T-7.3 (S)** Perf check on mid-range Android: 60 fps animations, reveal payload sizes
       (URL-only) verified in devtools. → FM-NFR-2/4
-- **Gate 7**: Lighthouse PWA installable; animation jank check passed on a real device.
+- **Gate 7**: Chrome DevTools Application → Manifest → Installability panel passes (Lighthouse
+  dropped its dedicated PWA audit category in v12, so this is its successor check); install
+  confirmed on a real iPhone and Android; animation jank check passed on a real device.
 
 ## Phase 8 — Deploy + acceptance + docs
 

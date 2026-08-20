@@ -39,9 +39,43 @@ Step numbering starts at Step 1 with the first entry after this backfill.
 
 ---
 
-**RESUME HERE (2026-08-20).** Next: **T-7.1 (S)** — PWA install. Manifest, service worker
+~~**RESUME HERE (2026-08-20).** Next: **T-7.1 (S)** — PWA install. Manifest, service worker
 and `swReload.ts` already landed at T-3.1; remaining per the task block: replace the
 placeholder `public/icon.svg` with real artwork, decide whether to ship raster 192/512
 icons alongside it, and run the real-device install test on iPhone + Android (the part
 that was never automatable). Gate 7 = Lighthouse PWA installable + animation jank check
-on a real device. No blockers; CI is green through the Phase 6 push.
+on a real device. No blockers; CI is green through the Phase 6 push.~~ *(carried — see
+Step 1 below.)*
+
+## Step 1 — T-7.1 PWA icons: paths-only SVG + pre-rendered rasters (2026-08-20)
+
+**Shipped:** Hand-authored `public/icon.svg` as a paths-only vector — the previous
+placeholder relied on `<text font-family="Fredoka">`, which silently falls back to a
+system font when rasterized outside a page context, so anything derived from it would
+have carried that bug forward. Pre-rendered 180/192/512 PNGs from the new SVG via a
+temporary local `sharp` install (never added to `package.json`/lock; removed after use)
+and committed them as static files under `public/`. Wired `index.html`'s
+`apple-touch-icon` to `icon-180.png` (iOS ignores SVG there) and the PWA manifest's
+`icons[]` to the SVG plus 192/512 PNG fallbacks, all `any maskable`. Updated Gate 7's
+wording in `steering/tasks.md`: Lighthouse dropped its dedicated PWA audit category in
+v12, so Gate 7 now names the Chrome DevTools Application → Manifest → Installability
+panel as the successor automated check. Verified with a production build that
+`manifest.webmanifest` and all icon files land correctly in `dist/`.
+Owner decisions this session: hand-authored placeholder art now, real commissioned
+artwork deferred to a Phase 8 polish item; PNGs pre-rendered once and committed rather
+than adding a rasterizer to the client build; Gate 7's automated leg is the DevTools
+Installability panel; the real-device install test is deferred to T-8.1's Render deploy
+rather than standing up a throwaway HTTPS tunnel, since both service-worker registration
+and PWA install require a secure context that the LAN setup used for Gates 3–5 doesn't
+have.
+**Owed:** T-7.1 stays open — the real-device install test on iPhone + Android (DevTools
+Installability panel + both real installs) against the production URL once T-8.1 deploys.
+
+---
+
+**RESUME HERE (2026-08-20).** Next: **T-7.2 (M)** — design-system pass: motion presets on
+all transitions (forward-only), mascot triggers (waiting/timer/submit/reveal
+flourish/end/error), reduced-motion, wordmark, SourceFooter + LogoStamp
+(FM-ARC-4, FM-CPL-3). T-7.1's remaining piece (real-device install test) is parked on
+T-8.1's deploy per Step 1 above and doesn't block T-7.2. No other blockers; CI is green
+through the Phase 6 push (`676fd45`) — this session's Step 1 has not been pushed yet.

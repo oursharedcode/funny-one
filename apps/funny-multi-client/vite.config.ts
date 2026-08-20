@@ -9,8 +9,9 @@
 //  2. `includeAssets` lists this project's assets. SRC precached its own
 //     branding (`monkeys-on-bus.png`); ours is `icon.svg` plus the language
 //     picker's flags, which a player needs on the very first screen.
-//  3. Manifest identity is Funny Multi (FM-ID-1), and the icon is a single
-//     SVG rather than SRC's 192/512 PNG pair — see `public/icon.svg`.
+//  3. Manifest identity is Funny Multi (FM-ID-1). The manifest icons are the
+//     192/512 PNG pair, as in SRC; `icon.svg` is the favicon only — see the
+//     icons[] comment below for why Chrome will not take it as a manifest icon.
 //
 // Everything else — the NetworkFirst navigation strategy, the deliberately
 // un-precached index.html, the Google Fonts rules — is carried verbatim,
@@ -48,24 +49,39 @@ export default defineConfig({
         background_color: '#fef3c7',
         start_url: '/',
         scope: '/',
+        // PNG only, and each `purpose` declared on its own entry.
+        //
+        // `/icon.svg` is deliberately NOT listed. Chrome's manifest icon
+        // loader rejects it — "Icon .../icon.svg failed to load" — even though
+        // the file is well-formed, carries explicit width/height, and renders
+        // when opened directly. Verified against the Render deploy 2026-08-20:
+        // the error survived a hard reload, a Clear-site-data, and adding the
+        // width/height attributes. The SVG serves as the favicon from
+        // index.html instead, where browsers do honour it; installability rests
+        // on the PNGs, which is also what iOS uses (apple-touch-icon → 180).
+        //
+        // Splitting `any` and `maskable` into separate entries clears Chrome's
+        // "declaring an icon with 'purpose' of 'any maskable' is discouraged"
+        // warning. The mark is maskable-safe by construction — see the safe-area
+        // note in `public/icon.svg`.
         icons: [
-          {
-            src: '/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
           {
             src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

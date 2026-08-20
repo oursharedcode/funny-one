@@ -8,10 +8,12 @@
     of «Чепуха 37» (FM-ID-1, the 3-7 player range) on the brand-cream ground.
     Maskable-safe: all foreground content sits inside the middle 80% (the
     circle, r=180, and the digits within it).
-    The explicit width/height are load-bearing, not decoration: a manifest icon
-    declared `sizes: "any"` is rasterized outside any layout context, and Chrome
-    reports "failed to load" for an SVG carrying only a viewBox (verified against
-    the Render deploy 2026-08-20). Keep both attributes in sync with the viewBox.
+    Used as the favicon (index.html, rel="icon"), NOT as a manifest icon:
+    Chrome's manifest loader reports "failed to load" for this file no matter
+    what — width/height added, cache cleared, hard reloaded — while rendering it
+    fine everywhere else. See the icons[] comment in vite.config.ts. The
+    explicit width/height stay because an SVG rasterized outside a layout
+    context needs an intrinsic size; keep them in sync with the viewBox.
   -->
   <rect width="512" height="512" fill="#fef3c7" />
   <circle cx="256" cy="256" r="180" fill="#ec4899" />

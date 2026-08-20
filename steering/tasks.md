@@ -30,8 +30,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       `<text>`/webfont dependency, which silently falls back to a system font when rasterized
       outside a page context); 180/192/512 PNGs pre-rendered once via a temporary local `sharp`
       install (never added to `package.json`) and committed as static files, since iOS ignores
-      SVG for `apple-touch-icon` — `index.html` now points it at `icon-180.png`; manifest
-      `icons[]` carries the SVG plus 192/512 PNG fallbacks. Real commissioned artwork deferred
+      SVG for `apple-touch-icon` — `index.html` now points it at `icon-180.png`.
+      *(Superseded 2026-08-20, Step 7: manifest `icons[]` briefly carried the SVG plus the PNG
+      fallbacks; Chrome will not load an SVG manifest icon, so `icons[]` is now the 192/512 PNGs
+      only, with `any` and `maskable` split onto separate entries, and `icon.svg` serves as the
+      favicon via a new `rel="icon"` link.)* Real commissioned artwork deferred
       to Phase 8 polish (owner decision 2026-08-20); this hand-authored "37"-on-brand-cream mark
       is the placeholder until then.
       **Remaining for T-7.1:** the real-device install test on iPhone + Android — the part of
@@ -60,6 +63,13 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   *Stays open across the Phase 7→8 boundary by owner decision 2026-08-20 — its three
   device-dependent legs (T-7.1 install test, T-7.3 jank check, this gate's own jank check) are
   folded into T-8.1's device session rather than blocking Phase 8's start.*
+  **Installability leg passed 2026-08-20 (Step 7)** against
+  https://funny-multi.onrender.com/: the Manifest panel is clean apart from the two optional
+  "richer PWA install UI" screenshot notices, and Chrome offers the install affordance. Getting
+  there needed a real fix — Chrome's manifest loader rejects `/icon.svg` outright (error
+  survived a redeploy adding `width`/`height`, a warm hard reload, and Clear-site-data with the
+  SW unregistered), so the manifest is PNG-only now and the SVG is the favicon.
+  **Still open:** real iPhone install, real Android install, and the jank check.
 
 ## Phase 8 — Deploy + acceptance + docs
 
@@ -78,13 +88,23 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       (proxy-appended) end instead of the client-settable first hop; wired to a new
       `TRUSTED_PROXY_HOPS` env var in `index.ts`, documented in `.env.example`. The
       DEPLOYMENT.md write-up of this assumption landed with T-8.3 (`steering/tasks-done.md`).*
-      **Remaining for T-8.1:** deploy server to Render + Worker/R2/KV via wrangler, set secrets
-      — needs the owner's accounts/credentials, a separate owner-driven session.
-      *Carry-over from Phase 7 (owner decision 2026-08-20): once deployed, this session's device
-      pass must also close T-7.1's real-device install test (DevTools Installability panel +
-      real iPhone/Android install against the production URL), T-7.3's 60 fps animation-jank
-      check, and Gate 7 itself — all three were parked here rather than blocked on a throwaway
-      HTTPS tunnel.*
+      **Deploy landed 2026-08-20 (Steps 6–7).** Production: **https://funny-multi.onrender.com/**
+      (Render blueprint `funny-one-111` → service `funny-multi`, free plan). The Worker was
+      already live from T-4.1 with its R2 bucket, so only `WORKER_SECRET` needed attention —
+      rotated, because the value the owner had saved returned 403 (it was SRC's secret, not
+      ours) and a Worker secret cannot be read back. Verified: `/` and `/index.html` 200,
+      `/health` `{"ok":true}`, Socket.IO handshake 5/5 with a websocket upgrade offered.
+      **Remaining for T-8.1:** `docker compose up` is still unrun — no Docker on the dev machine
+      or the owner's — so `DEPLOYMENT.md` Option B keeps its "unverified" note.
+      **Owner decision pending (2026-08-20):** the free plan hibernates — ~30% of requests to the
+      warm service return Render's own 404 with `x-render-routing: no-server`, and the pod
+      hostname carries a `-hibernate-` segment. Not an application fault (server logs show every
+      request that reaches the app returning 200 from one unrestarted pid), but it will drop idle
+      Socket.IO connections, so decide on a paid Starter instance **before** T-8.2 — otherwise
+      disconnects during acceptance are ambiguous between the plan and the code.
+      *Carry-over from Phase 7 (owner decision 2026-08-20): the device pass must still close
+      T-7.1's real iPhone/Android install, T-7.3's 60 fps jank check, and Gate 7 itself. The
+      Installability leg of that bundle is done — see Gate 7 below.*
 - [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
       run with 3 real phones on the production URL; include disconnect-mid-game → bot,
       cap flow, cache-hit flow. → design §13

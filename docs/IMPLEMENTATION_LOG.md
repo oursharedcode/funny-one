@@ -225,12 +225,74 @@ vulnerabilities. No regressions — docs-only step.*
 
 ---
 
-**RESUME HERE (2026-08-20).** Next: **T-8.1 remainder** — deploy server to Render (blueprint
-committed as `render.yaml`, runbook now in `DEPLOYMENT.md`) + Worker/R2/KV via `wrangler`,
-set secrets (FM-NFR-3). This is an owner-driven session: needs Render and Cloudflare
-accounts/credentials that this agent doesn't have. Once the production URL exists, the same
-session should also close the parked Phase-7 device-session bundle — T-7.1's real
-iPhone/Android install test, T-7.3's 60 fps animation-jank check, and Gate 7 itself — plus a
-sanity `docker compose up` against `Dockerfile`/`docker-compose.yml`, unverified so far since
-no Docker is available in the dev sandbox. No other blockers; CI is green through Step 4
-(`33a52a3`, pushed) — Step 5 (this session) has not been pushed yet.
+## Step 6 — T-8.1: production deploy; manifest icon.svg width/height (2026-08-20)
+
+**Shipped:** Both pieces are live (FM-NFR-3). The Cloudflare Worker turned out to be already
+deployed from T-4.1 with its R2 bucket (`funny-multi-images`) in place and unchanged since,
+so no redeploy was needed. `WORKER_SECRET` was rotated: the value the owner had saved
+returned 403 against `/stats` — it was SRC's secret, not this project's — and the Worker's
+own value is not readable back. The owner generated and set a fresh one locally (never
+through the agent), and `/stats` then returned 200. Render deployed from `render.yaml` as
+blueprint `funny-one-111` → service `funny-multi`,
+**https://funny-multi.onrender.com/**. Verified: `/` and `/index.html` 200, `/health`
+`{"ok":true}`, and the Socket.IO polling handshake 5/5 with `upgrades:["websocket"]`.
+Also fixed what looked like the one real defect the deploy surfaced — Chrome DevTools
+reporting `icon.svg failed to load` — by adding `width`/`height` to the paths-only SVG.
+*(Step 7 disproves that diagnosis; see below.)*
+**Owed:** the device legs of Gate 7, and `docker compose up` — still unrun, no Docker on the
+owner's machine either, so `DEPLOYMENT.md`'s "unverified" note on Option B stands.
+*Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests (client 188, server
+310, shared 82, cloudflare 39); `npm audit` 0 vulnerabilities. One server-suite failure on
+the first full run did not reproduce in isolation or on re-run — a port clash between
+concurrently running workspaces, not a regression.*
+
+---
+
+## Step 7 — T-8.1: manifest icons PNG-only, icon.svg becomes the favicon (2026-08-20)
+
+**Shipped:** Step 6's diagnosis was wrong and this step corrects it. The
+`icon.svg failed to load` error survived the redeploy that added `width`/`height`, a warm
+hard reload, and a Clear-site-data with the service worker unregistered — while the same
+file renders fine opened directly and is served correctly (200, `image/svg+xml`, `xmlns`
+and both attributes present). Chrome's manifest icon loader simply will not take this SVG.
+So `/icon.svg` came out of `icons[]`. It had no other consumer — there was no `rel="icon"`
+link — so it is now the favicon from `index.html`, where browsers do honour SVG;
+installability rests on the 192/512 PNGs, which is what iOS already used via
+`apple-touch-icon`. `any` and `maskable` were also split onto separate entries, clearing
+Chrome's "'purpose' of 'any maskable' is discouraged" warning (the mark is maskable-safe by
+construction). Comments in `icon.svg` and the `vite.config.ts` header were corrected — both
+still described the old single-SVG arrangement, and `icon.svg` carried Step 6's wrong cause.
+Confirmed against the live deploy: DevTools Manifest now lists only the two optional
+"richer PWA install UI" screenshot notices, and Chrome offers the install affordance —
+**Gate 7's DevTools Installability leg passes.**
+**Owed:** the screenshot notices are install-dialog polish, not installability; folded into
+the Phase-8 commissioned-artwork item rather than fixed here.
+*Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests; `npm audit` 0
+vulnerabilities. No regressions.*
+
+---
+
+**RESUME HERE (2026-08-20).** Production is live at **https://funny-multi.onrender.com/**
+(Render service `funny-multi`) with the Worker at
+`https://funny-multi-image.oursharedcode.workers.dev`. Pushed through Step 7 (`85b8592`).
+
+Next: **finish Gate 7's device legs**, all of which need hardware in hand and none of which
+this agent can run — a real iPhone install (Safari → Share → Add to Home Screen, then
+confirm it launches standalone), a real Android install, and T-7.3's 60 fps animation-jank
+check on a mid-range Android. The DevTools Installability leg is already signed off (Step
+7). After that, **T-8.2**: the SRC §19 acceptance checklist on the production URL with 3
+real phones, including disconnect-mid-game → bot, the daily cap flow, and a cache-hit
+replay.
+
+**Owner decision pending before T-8.2.** Render's free plan hibernates: roughly 30% of
+requests to the warm service returned Render's own 404 with `x-render-routing: no-server`,
+and the pod hostname carries a `-hibernate-` segment. This is not an application fault —
+the server logs show every request that reaches the app returning 200 from a single
+unrestarted pid. But it will break idle Socket.IO connections mid-game, so decide whether
+to move to a paid Starter instance before running acceptance; otherwise disconnects during
+T-8.2 will be ambiguous between the plan and the code.
+
+Still unverified: `docker compose up` (no Docker on the dev machine or the owner's), so
+`DEPLOYMENT.md` Option B keeps its "unverified" note. Also still owed from Step 5: the
+README's GitHub Sponsors link and Render deploy-button URL, confirmable only once the repo
+is public — it is currently private.

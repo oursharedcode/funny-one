@@ -79,6 +79,15 @@ spin-down is slow (cold start) but otherwise this is a normal Node web service �
 database, no persistent volume (FM-CORE-2: room state is in-memory only and is meant to be
 disposable).
 
+**Free-plan hibernation, measured 2026-08-20.** Expect more than slow cold starts: against a
+service that had just served traffic, roughly 30% of requests came back as Render's own 404
+with an `x-render-routing: no-server` header, and the pod hostname carried a `-hibernate-`
+segment. The application is not involved — its logs show every request that reaches it
+returning 200 from a single, never-restarted pid. For a game built on long-lived Socket.IO
+connections this matters: an idle room can lose its socket to the routing layer rather than
+to any bug in the server. Use a paid instance for anything you expect real players on; the
+free plan is fine for a smoke test or a self-hosted family deploy that tolerates a reconnect.
+
 ### Option B — self-host with Docker
 
 ```bash

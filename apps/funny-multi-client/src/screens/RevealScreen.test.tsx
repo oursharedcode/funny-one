@@ -91,17 +91,20 @@ describe('reveal:pictureReady', () => {
     expect(img.height).toBe(PICTURE.height);
   });
 
-  it('starts faded out and reveals the flourish only once the image itself has loaded', () => {
+  it('starts faded out and reveals the flourish and logo stamp only once the image itself has loaded', () => {
     renderReveal();
     socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'a prompt' });
 
     const img = screen.getByAltText('AI-generated cartoon of your story');
     expect(img.className).toContain('opacity-0');
+    expect(screen.queryByAltText('')).toBeNull();
 
     act(() => {
       fireEvent.load(img);
     });
     expect(img.className).toContain('opacity-100');
+    const stamp = screen.getByAltText('') as HTMLImageElement;
+    expect(stamp.src).toContain('/deployer-logo.png');
   });
 
   it('clears any prior waiting/error state once a picture lands', () => {

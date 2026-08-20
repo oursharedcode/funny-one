@@ -19,13 +19,10 @@
 // then MP4 (Safari) are tried in order. If none is supported the function
 // rejects; the caller surfaces this as a button-disabled state.
 //
-// The deployer-logo stamp below is best-effort against a `/deployer-logo.png`
-// asset this repo doesn't ship yet — same branding gap T-5.1/T-4.4 already
-// noted for `<LogoStamp />`, arriving at T-7.2. Left in as-is (unlike
-// `<LogoStamp />`, there's no React component to omit here, just a fetch that
-// 404s and is caught): a missing file already degrades to "no stamp" without
-// any change needed, so T-7.2 gets a working stamp for free once the asset
-// lands, same as `<LogoStamp />`'s in-app path will.
+// The deployer-logo stamp below is best-effort against `/deployer-logo.png`,
+// which now ships (T-7.2, same placeholder asset as `<LogoStamp />`'s in-app
+// overlay). Still wrapped in a try/catch: a deployer who removes the file
+// without replacing it degrades to "no stamp" rather than a broken export.
 
 import { SOURCE_URL } from './sourceUrl';
 import { downloadFile } from './share';

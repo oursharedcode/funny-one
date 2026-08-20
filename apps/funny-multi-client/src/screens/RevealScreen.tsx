@@ -16,16 +16,11 @@
 //     either, only on the dev-only Test* screens this repo doesn't carry
 //     (design §3) — so it's received and otherwise unused here, same as SRC.
 //
-// Not carried: `<LogoStamp />`. SRC stamped it over every landed picture;
-// this repo's LogoStamp doesn't exist yet — it arrives at T-7.2 with the rest
-// of the design-system polish pass (wordmark, SourceFooter). The picture
-// renders correctly without it; only the branding overlay is missing until
-// then.
-
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import ProseText from '../components/ProseText';
+import LogoStamp from '../components/LogoStamp';
 import PictureFlourish from '../components/art/PictureFlourish';
 import WaitingMascot from '../components/art/WaitingMascot';
 import ErrorMascot from '../components/art/ErrorMascot';
@@ -124,7 +119,10 @@ export default function RevealScreen({ reveal, onContinue }: Props) {
             }`}
           />
           {imgLoaded && (
-            <PictureFlourish className="pointer-events-none absolute inset-0 h-full w-full" />
+            <>
+              <PictureFlourish className="pointer-events-none absolute inset-0 h-full w-full" />
+              <LogoStamp />
+            </>
           )}
         </div>
       ) : status === 'error' ? (

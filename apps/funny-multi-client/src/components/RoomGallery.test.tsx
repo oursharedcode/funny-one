@@ -62,6 +62,19 @@ describe('empty gallery', () => {
   });
 });
 
+describe('logo stamp', () => {
+  it('overlays the deployer logo on a picture entry', () => {
+    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    const stamp = screen.getByAltText('') as HTMLImageElement;
+    expect(stamp.src).toContain('/deployer-logo.png');
+  });
+
+  it('is absent when the entry has no picture', () => {
+    render(<RoomGallery entries={[NO_PICTURE]} />);
+    expect(screen.queryByAltText('')).toBeNull();
+  });
+});
+
 describe('download button', () => {
   it('offers the picture download label when a picture exists', () => {
     render(<RoomGallery entries={[WITH_PICTURE]} />);

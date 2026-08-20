@@ -1140,3 +1140,26 @@ unless they carry advisories:
       tests do not touch `ScrollBox`'s pixel layout) and passed clean in isolation on retry.*
 - **Gate 6**: pool + i18n coverage tests green for all 15; the three spot-check games pass.
 
+## Phase 7 — PWA + polish
+
+*In progress — Gate 7 and the rest of Phase 7's tasks (T-7.1, T-7.3) are still open in
+`steering/tasks.md`. Only fully closed tasks are moved here as they land.*
+
+- [x] **T-7.2 (M)** Design-system pass: motion presets on all transitions (forward-only),
+      mascot triggers (waiting/timer/submit/reveal flourish/end/error), reduced-motion,
+      wordmark, SourceFooter + LogoStamp. → FM-ARC-4, FM-CPL-3
+      *Closed 2026-08-20. Audit found motion presets, the six mascot triggers, wordmark and
+      SourceFooter already landed correctly during Phases 3–6 — nothing to fix there, and
+      `PictureFlourish`'s one non-preset tween got a comment explaining it's an intentional
+      exception (a spring would make a one-shot particle burst oscillate). The one real gap was
+      `LogoStamp`, ported from SRC and wired into RevealScreen and RoomGallery; its bundled
+      `/deployer-logo.png` (25×25, none shipped before) is the same placeholder-now/real-art-
+      deferred-to-Phase-8 owner decision as the T-7.1 PWA icons, rasterized from `public/icon.svg`
+      via the same temporary local `sharp` install. Decision: the stamp is an in-app overlay only
+      — `downloadStory.ts`'s exported PNG keeps its existing QR-only branding unchanged;
+      `recordWobble.ts`'s video export already had its own best-effort stamp fetch from T-5.1 and
+      now has a live asset to find. New RTL coverage in `RevealScreen.test.tsx` and
+      `RoomGallery.test.tsx` asserts the stamp's presence/absence.*
+      *Full suite: typecheck, lint, `prettier --check` clean; 616/616 tests (client 188 [+2],
+      server 307, shared 82, cloudflare 39). `npm audit` 0 vulnerabilities. No regressions.*
+

@@ -73,9 +73,52 @@ Installability panel + both real installs) against the production URL once T-8.1
 
 ---
 
-**RESUME HERE (2026-08-20).** Next: **T-7.2 (M)** — design-system pass: motion presets on
+~~**RESUME HERE (2026-08-20).** Next: **T-7.2 (M)** — design-system pass: motion presets on
 all transitions (forward-only), mascot triggers (waiting/timer/submit/reveal
 flourish/end/error), reduced-motion, wordmark, SourceFooter + LogoStamp
 (FM-ARC-4, FM-CPL-3). T-7.1's remaining piece (real-device install test) is parked on
 T-8.1's deploy per Step 1 above and doesn't block T-7.2. No other blockers; CI is green
-through the Phase 6 push (`676fd45`) — this session's Step 1 has not been pushed yet.
+through the Phase 6 push (`676fd45`) — this session's Step 1 has not been pushed yet.~~
+*(carried — see Step 2 below.)*
+
+## Step 2 — T-7.2 design-system pass: LogoStamp, motion/mascot audit (2026-08-20)
+
+**Shipped:** Audited the four T-7.2 legs against the actual client. Three were already
+correctly landed during Phases 3–6 and needed no code change: motion presets (`snappy`/
+`goofy`/`panic`/`screenSlide`) are applied everywhere framer-motion is used except one
+deliberate exception; all six mascot triggers (waiting, timer, submit, reveal flourish,
+end, error) render at their correct screens; `Wordmark` and `SourceFooter` both exist and
+are wired. Documented `PictureFlourish`'s one non-preset tween (a fixed duration/ease,
+copied verbatim from SRC) as the intentional exception the "do not invent a fourth
+[preset]" note in `motion.ts` allows for — a spring's overshoot is wrong for a one-shot
+outward particle burst.
+The one real gap was `LogoStamp`: didn't exist yet. Ported from
+`SRC/client/src/components/LogoStamp.tsx` (a 25×25 absolutely-positioned branding overlay,
+display-only, not baked into picture pixels) and wired into `RevealScreen` and
+`RoomGallery`, both of which already had the `position: relative` picture wrapper it
+needs. Its bundled `/deployer-logo.png` didn't exist in this repo either — rasterized a
+placeholder from `public/icon.svg` at 25×25 via the same temporary local `sharp` install
+pattern as the T-7.1 icons (never added to `package.json`; removed after use). Updated
+`recordWobble.ts`'s stale comment: its T-5.1 best-effort stamp-fetch logic now has a real
+asset to find instead of always 404ing. Added RTL coverage in `RevealScreen.test.tsx` and
+`RoomGallery.test.tsx` asserting the stamp's presence when a picture exists and absence
+when it doesn't.
+Owner decisions this session: SRC read for `LogoStamp.tsx` confirmed in scope (design.md
+classes it "copy"); the stamp is an in-app overlay only — `downloadStory.ts`'s exported
+PNG keeps its existing QR-only branding unchanged, no stamp added to the download/share
+path.
+**Owed:** none — T-7.2 closed in full; its task block moved to `steering/tasks-done.md`.
+*Full suite: typecheck, lint, `prettier --check` clean; 616/616 tests (client 188 [+2],
+server 307, shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
+vulnerabilities. No regressions.*
+
+---
+
+**RESUME HERE (2026-08-20).** Next: **T-7.3 (S)** — perf check on mid-range Android: 60 fps
+animations and reveal payload sizes (URL-only) verified in DevTools (FM-NFR-2/4). The
+payload-size leg can run from DevTools alone; the 60 fps animation leg needs a real
+mid-range Android device, same real-device constraint as T-7.1's install test and Gate 7's
+jank check — worth deciding together whether to fold it into the T-8.1 deploy's
+device-session pass rather than a separate one. T-7.1 still has its real-device install
+test open, parked on T-8.1 per Step 1. No other blockers; CI is green through the Phase 6
+push (`676fd45`) — Steps 1–2 (this session and last) have not been pushed yet.

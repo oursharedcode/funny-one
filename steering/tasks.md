@@ -40,9 +40,6 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       Gates 3–5 doesn't have. Owner decision 2026-08-20: defer this check to T-8.1's Render
       deploy rather than stand up a throwaway tunnel — run the DevTools Installability panel and
       both real-device installs against the production URL once it exists, then close Gate 7.*
-- [ ] **T-7.2 (M)** Design-system pass: motion presets on all transitions (forward-only),
-      mascot triggers (waiting/timer/submit/reveal flourish/end/error), reduced-motion,
-      wordmark, SourceFooter + LogoStamp. → FM-ARC-4, FM-CPL-3
 - [ ] **T-7.3 (S)** Perf check on mid-range Android: 60 fps animations, reveal payload sizes
       (URL-only) verified in devtools. → FM-NFR-2/4
 - **Gate 7**: Chrome DevTools Application → Manifest → Installability panel passes (Lighthouse

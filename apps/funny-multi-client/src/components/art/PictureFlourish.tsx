@@ -4,6 +4,12 @@ import { motion } from 'framer-motion';
 
 // A one-shot confetti + sparkle burst (DESIGN_SYSTEM §5). Plays once when the
 // cartoon arrives (reveal:pictureReady). Render as a centered overlay.
+//
+// The particle transition below is a fixed duration/ease tween, not one of
+// the three named springs (styles/motion.ts) — copied as-is from SRC. A
+// spring's overshoot/oscillation is wrong for a one-shot outward
+// radiate-and-fade; this is the documented exception the "do not invent a
+// fourth [preset]" note in motion.ts allows for.
 
 interface Props {
   className?: string;

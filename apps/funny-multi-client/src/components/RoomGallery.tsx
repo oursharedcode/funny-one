@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Adapted from SRC/client/src/components/RoomGallery.tsx (spec §24). Two
-// things SRC's version had are deliberately not here, each arriving with the
-// task that owns it:
+// Adapted from SRC/client/src/components/RoomGallery.tsx (spec §24). One
+// thing SRC's version had is deliberately not here:
 //
-//   - `<LogoStamp />` over the picture — T-7.2's, same as RevealScreen (T-4.4)
-//     already noted. The picture renders correctly without the branding
-//     overlay.
 //   - The `wobbleEngine` prop — the type it read (`WobbleEngine`) doesn't
 //     exist in this repo's wire contract at all (ARC-3/DD-9, T-1.6): there is
 //     only the CSS engine now, so there is nothing to choose between.
@@ -16,11 +12,14 @@
 // wired to `downloadStory.ts`, `share.ts` and `recordWobble.ts`. What's
 // carried unchanged from the earlier pass: the picture-wobble CSS classes
 // (styles/index.css, present since T-3.1) and the prev/next browsing UI.
+// `<LogoStamp />` (T-7.2) sits on the outer relative wrapper, outside the
+// wobble stack, so the branding overlay stays fixed while the picture wobbles.
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ProseText from './ProseText';
 import ShareButton from './ShareButton';
+import LogoStamp from './LogoStamp';
 import { buildStoryImageFile, downloadStoryImage } from '../downloadStory';
 import { buildWobbleVideoFile, isVideoRecordingSupported } from '../recordWobble';
 import { canShareFiles, downloadFile, shareFiles } from '../share';
@@ -110,6 +109,7 @@ export default function RoomGallery({ entries }: Props) {
               </div>
             </div>
           </div>
+          <LogoStamp />
         </div>
       ) : (
         <div className="flex h-40 w-full items-center justify-center rounded-lg border-2 border-dashed border-amber-300 bg-amber-50">

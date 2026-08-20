@@ -114,11 +114,48 @@ vulnerabilities. No regressions.*
 
 ---
 
-**RESUME HERE (2026-08-20).** Next: **T-7.3 (S)** — perf check on mid-range Android: 60 fps
+~~**RESUME HERE (2026-08-20).** Next: **T-7.3 (S)** — perf check on mid-range Android: 60 fps
 animations and reveal payload sizes (URL-only) verified in DevTools (FM-NFR-2/4). The
 payload-size leg can run from DevTools alone; the 60 fps animation leg needs a real
 mid-range Android device, same real-device constraint as T-7.1's install test and Gate 7's
 jank check — worth deciding together whether to fold it into the T-8.1 deploy's
 device-session pass rather than a separate one. T-7.1 still has its real-device install
 test open, parked on T-8.1 per Step 1. No other blockers; CI is green through the Phase 6
-push (`676fd45`) — Steps 1–2 (this session and last) have not been pushed yet.
+push (`676fd45`) — Steps 1–2 (this session and last) have not been pushed yet.~~
+*(carried — see Step 3 below.)*
+
+## Step 3 — T-7.3 automatable legs: payload-size test, motion audit (2026-08-20)
+
+**Shipped:** Landed both legs of T-7.3 that don't need a physical device. FM-NFR-2: added
+`apps/funny-multi-server/src/game.payloadSize.socket.test.ts`, a real-socket test that pins
+the byte budget FM-IMG-3 targets rather than leaving it as a one-off DevTools observation —
+a single `reveal:pictureReady` picture reference stays under 400 B against a realistic
+R2-shaped URL (not the short `fake.png` placeholder other suites use), and a full 7-player
+game's picture traffic (every player's own `reveal:requestPicture` plus the shared
+gallery's 7-way fan-out) stays under the ~30 KB budget. FM-NFR-4: statically audited every
+`motion`/`AnimatePresence` prop across the client — `ErrorMascot`, `PictureFlourish`,
+`SubmitConfirm`, `Wordmark`, `PlayerList`, `RoundScreen`, `WaitingScreen`, and the
+`screenSlide` preset in `motion.ts` — confirming every animated property is
+`scale`/`x`/`y`/`opacity`/`rotate`, i.e. transform/opacity only; no layout- or
+paint-triggering property is animated anywhere, so no code change was needed for this leg.
+Owner decision this session: T-7.3's remaining leg (60 fps jank measurement on a real
+mid-range Android device) folds into T-8.1's device session, alongside T-7.1's install test
+and Gate 7's own jank check, rather than a separate device session — Gate 7 stays open
+across the Phase 7→8 boundary as a deliberate, logged exception.
+**Owed:** T-7.3 stays open — only the real-device 60 fps check remains, parked on T-8.1 per
+the note above.
+*Full suite: typecheck, lint, `prettier --check` clean; 618/618 tests (client 188, server
+309 [+2], shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
+vulnerabilities. No regressions.*
+
+---
+
+**RESUME HERE (2026-08-20).** Next: **T-8.1 (M)** — deploy artifacts: `render.yaml`,
+`Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.env.example`; deploy server to
+Render + Worker/R2/KV via wrangler; set secrets (FM-NFR-3). Carries two Phase-2 carry-overs
+(bump `actions/checkout`/`actions/setup-node` to `@v5`; make the rate-limiter's trusted-proxy
+hop count configurable) plus the Phase-7 device-session bundle: T-7.1's real iPhone/Android
+install test, T-7.3's 60 fps animation-jank check, and Gate 7's own jank check — all three
+parked here by owner decision 2026-08-20 rather than a throwaway HTTPS tunnel. No other
+blockers; CI is green through the Phase 7 push (Steps 1–2, `d45181b`) — Step 3 (this
+session) has not been pushed yet.

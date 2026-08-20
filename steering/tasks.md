@@ -42,9 +42,24 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       both real-device installs against the production URL once it exists, then close Gate 7.*
 - [ ] **T-7.3 (S)** Perf check on mid-range Android: 60 fps animations, reveal payload sizes
       (URL-only) verified in devtools. → FM-NFR-2/4
+      *Both automatable legs landed 2026-08-20: a committed server test
+      (`game.payloadSize.socket.test.ts`) pins FM-NFR-2's byte budget — a single `PictureRef`
+      under 400 B, a full 7-player game's picture traffic (every player's own request plus the
+      shared gallery's fan-out) under 30 KB — against a realistic R2-shaped URL rather than the
+      short placeholder other suites use. A static audit of every `motion`/`AnimatePresence`
+      prop in the client (`ErrorMascot`, `PictureFlourish`, `SubmitConfirm`, `Wordmark`,
+      `PlayerList`, `RoundScreen`, `WaitingScreen`, `screenSlide` in `motion.ts`) confirmed
+      FM-NFR-4: every animated property is `scale`/`x`/`y`/`opacity`/`rotate` — transform/opacity
+      only, no layout- or paint-triggering property anywhere — so no code change was needed.
+      **Remaining for T-7.3:** the 60 fps jank measurement itself needs a real mid-range Android
+      device; owner decision 2026-08-20 folds it into T-8.1's device-session pass alongside
+      T-7.1's install test and Gate 7's jank check, rather than a separate session.*
 - **Gate 7**: Chrome DevTools Application → Manifest → Installability panel passes (Lighthouse
   dropped its dedicated PWA audit category in v12, so this is its successor check); install
   confirmed on a real iPhone and Android; animation jank check passed on a real device.
+  *Stays open across the Phase 7→8 boundary by owner decision 2026-08-20 — its three
+  device-dependent legs (T-7.1 install test, T-7.3 jank check, this gate's own jank check) are
+  folded into T-8.1's device session rather than blocking Phase 8's start.*
 
 ## Phase 8 — Deploy + acceptance + docs
 
@@ -61,6 +76,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       set itself to pick — and rotate — its own bucket key. Once the real proxy chain is known,
       count hops from the right-hand (proxy-appended) end instead, and document the assumption
       in DEPLOYMENT.md rather than inheriting SRC's claim that it already works this way.*
+      *Carry-over from Phase 7 (owner decision 2026-08-20): once deployed, this session's device
+      pass must also close T-7.1's real-device install test (DevTools Installability panel +
+      real iPhone/Android install against the production URL), T-7.3's 60 fps animation-jank
+      check, and Gate 7 itself — all three were parked here rather than blocked on a throwaway
+      HTTPS tunnel.*
 - [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
       run with 3 real phones on the production URL; include disconnect-mid-game → bot,
       cap flow, cache-hit flow. → design §13

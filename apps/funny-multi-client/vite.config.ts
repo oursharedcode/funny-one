@@ -62,8 +62,15 @@ export default defineConfig({
         //
         // Splitting `any` and `maskable` into separate entries clears Chrome's
         // "declaring an icon with 'purpose' of 'any maskable' is discouraged"
-        // warning. The mark is maskable-safe by construction — see the safe-area
-        // note in `public/icon.svg`.
+        // warning.
+        //
+        // Artwork (2026-08-20, owner decision): icon-180/192/512.png are SRC's
+        // commissioned mascot art (SRC/client/public/icon-192.png, icon-512.png;
+        // 180 resized from the 512 master), replacing the hand-authored "37"
+        // placeholder. NOT verified maskable-safe — the art's ears/hair sit close
+        // to the frame edge, outside the usual middle-80% safe zone, so a circular
+        // mask (Android adaptive icons) may clip them. Re-check on a real Android
+        // install (T-7.1) rather than assuming this is fine.
         icons: [
           {
             src: '/icon-192.png',

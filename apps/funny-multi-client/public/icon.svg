@@ -8,12 +8,18 @@
     of «Чепуха 37» (FM-ID-1, the 3-7 player range) on the brand-cream ground.
     Maskable-safe: all foreground content sits inside the middle 80% (the
     circle, r=180, and the digits within it).
-    Used as the favicon (index.html, rel="icon"), NOT as a manifest icon:
-    Chrome's manifest loader reports "failed to load" for this file no matter
-    what — width/height added, cache cleared, hard reloaded — while rendering it
-    fine everywhere else. See the icons[] comment in vite.config.ts. The
-    explicit width/height stay because an SVG rasterized outside a layout
-    context needs an intrinsic size; keep them in sync with the viewBox.
+    Not used as a manifest icon: Chrome's manifest loader reports "failed to
+    load" for this file no matter what — width/height added, cache cleared,
+    hard reloaded — while rendering it fine everywhere else. See the icons[]
+    comment in vite.config.ts.
+    Not the favicon either as of 2026-08-20 — index.html's rel="icon" now
+    points at icon-192.png to match the app icon, which was swapped to SRC's
+    commissioned mascot art the same day. This file has no runtime consumer
+    left; it survives as the source LogoStamp.tsx documents for regenerating
+    deployer-logo.png (a separate asset, the small watermark on generated
+    pictures — untouched by the app-icon swap). The explicit width/height stay
+    because an SVG rasterized outside a layout context needs an intrinsic size;
+    keep them in sync with the viewBox if this is ever rasterized again.
   -->
   <rect width="512" height="512" fill="#fef3c7" />
   <circle cx="256" cy="256" r="180" fill="#ec4899" />

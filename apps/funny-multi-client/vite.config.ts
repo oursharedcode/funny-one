@@ -7,8 +7,11 @@
 //     carried (no task creates it), so the version moves when someone edits
 //     package.json rather than on every build.
 //  2. `includeAssets` lists this project's assets. SRC precached its own
-//     branding (`monkeys-on-bus.png`); ours is `icon.svg` plus the language
-//     picker's flags, which a player needs on the very first screen.
+//     branding (`monkeys-on-bus.png`); ours is the icon PNGs plus the language
+//     picker's flags, which a player needs on the very first screen. `icon.svg`
+//     is deliberately not precached here — index.html no longer references it
+//     (2026-08-20: the favicon moved to icon-192.png to match the swapped app
+//     icon below), so nothing loads it at runtime.
 //  3. Manifest identity is Funny Multi (FM-ID-1). The manifest icons are the
 //     192/512 PNG pair, as in SRC; `icon.svg` is the favicon only — see the
 //     icons[] comment below for why Chrome will not take it as a manifest icon.
@@ -38,7 +41,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'flags/*.png'],
+      includeAssets: ['icon-180.png', 'icon-192.png', 'icon-512.png', 'flags/*.png'],
       manifest: {
         name: 'Funny Multi «Чепуха 37»',
         short_name: 'Funny Multi',

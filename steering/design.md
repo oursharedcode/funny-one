@@ -41,6 +41,10 @@ into this repo and adapted here. SRC spec section references (`spec §N`) point 
 
 Unchanged from SRC: no database, in-memory `Map<roomCode, Room>`, bounded-reconnect
 grace window then disconnect = bot (spec §7), no client-side AI calls, one Render service.
+*(D-5, 2026-09-14: the one service is now the Docker image on an Oracle Always-Free VM behind
+Caddy, at `https://www.staging-oursharedcode.com/funny37-game` — served under a sub-path, so the
+client's Vite `base`, manifest `start_url`/`scope`, Socket.IO path and the server's static
+prefix all take one configurable `BASE_PATH`, default `/`, which keeps Render working unchanged.)*
 
 Changed vs SRC (each detailed below): combobox answers with server-side validation (§4–§6),
 deterministic prompts from pool fragments (§7.1), R2-cached images delivered by URL (§7.2),

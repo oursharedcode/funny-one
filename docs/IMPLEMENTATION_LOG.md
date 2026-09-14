@@ -272,27 +272,137 @@ vulnerabilities. No regressions.*
 
 ---
 
-**RESUME HERE (2026-08-20).** Production is live at **https://funny-multi.onrender.com/**
+~~**RESUME HERE (2026-08-20).** Production is live at **https://funny-multi.onrender.com/**
 (Render service `funny-multi`) with the Worker at
-`https://funny-multi-image.oursharedcode.workers.dev`. Pushed through Step 7 (`85b8592`).
+`https://funny-multi-image.oursharedcode.workers.dev`. Pushed through Step 7 (`85b8592`).~~
 
-Next: **finish Gate 7's device legs**, all of which need hardware in hand and none of which
+~~Next: **finish Gate 7's device legs**, all of which need hardware in hand and none of which
 this agent can run — a real iPhone install (Safari → Share → Add to Home Screen, then
 confirm it launches standalone), a real Android install, and T-7.3's 60 fps animation-jank
 check on a mid-range Android. The DevTools Installability leg is already signed off (Step
 7). After that, **T-8.2**: the SRC §19 acceptance checklist on the production URL with 3
 real phones, including disconnect-mid-game → bot, the daily cap flow, and a cache-hit
-replay.
+replay.~~
 
-**Owner decision pending before T-8.2.** Render's free plan hibernates: roughly 30% of
+~~**Owner decision pending before T-8.2.** Render's free plan hibernates: roughly 30% of
 requests to the warm service returned Render's own 404 with `x-render-routing: no-server`,
 and the pod hostname carries a `-hibernate-` segment. This is not an application fault —
 the server logs show every request that reaches the app returning 200 from a single
 unrestarted pid. But it will break idle Socket.IO connections mid-game, so decide whether
 to move to a paid Starter instance before running acceptance; otherwise disconnects during
-T-8.2 will be ambiguous between the plan and the code.
+T-8.2 will be ambiguous between the plan and the code.~~
 
-Still unverified: `docker compose up` (no Docker on the dev machine or the owner's), so
+~~Still unverified: `docker compose up` (no Docker on the dev machine or the owner's), so
 `DEPLOYMENT.md` Option B keeps its "unverified" note. Also still owed from Step 5: the
 README's GitHub Sponsors link and Render deploy-button URL, confirmable only once the repo
-is public — it is currently private.
+is public — it is currently private.~~ *(carried — see Step 11 below.)*
+
+## Step 9 — T-7.1: app icon replaced with SRC's commissioned artwork (2026-08-21)
+
+*Logged retroactively on 2026-09-15 from the commit (`b89b214`); the session that shipped it
+ended without a log entry.*
+**Shipped:** Owner decision 2026-08-20: the hand-authored "37" placeholder mark
+(`icon-192.png`, `icon-512.png`) gave way to SRC's real commissioned mascot art;
+`icon-180.png` regenerated from the 512 master via a temporary local `sharp`, same technique
+as Step 1's pre-render. `icon.svg` (favicon at the time) and `deployer-logo.png` (LogoStamp
+watermark) untouched — still the "37" mark. The `vite.config.ts` `icons[]` comment was
+corrected: it claimed the manifest art was "maskable-safe by construction", true of the
+hand-drawn mark, unverified for this artwork.
+**Owed:** the mascot's ears and hair sit close to the frame edge, outside the usual
+middle-80 % safe zone, so Android's adaptive-icon mask may clip them — flagged for the real
+Android install rather than assumed fine.
+
+---
+
+## Step 10 — T-7.1: favicon matches the swapped app icon (2026-08-21)
+
+*Logged retroactively on 2026-09-15 from the commit (`397c616`).*
+**Shipped:** Owner decision: the tab favicon follows Step 9's swap instead of staying on the
+retired "37" mark — `index.html`'s `rel="icon"` now points at `icon-192.png` (SRC has no SVG
+of the mascot, so a PNG favicon rather than like-for-like). `icon.svg` left `includeAssets`
+(nothing loads it any more — Step 7 took it out of manifest `icons[]`, and it was only ever a
+precache target for the favicon link this step removed) and its header comment now says so:
+no runtime consumer, kept only as the source `LogoStamp.tsx` documents for regenerating
+`deployer-logo.png`.
+**Owed:** nothing new.
+
+---
+
+## Step 11 — T-8.1: `docker compose up` verified; production moves to an own VM (D-5) (2026-09-15)
+
+**Shipped:** Docker turned out to be installed on the dev machine since the last session
+(29.7.2, linux engine), so the `docker compose up` leg owed since Step 4 finally ran: the
+image builds from the Dockerfile unchanged (~1.5 min, `npm ci` 46 s + build 37 s) and the
+container passes the same checks Step 6 ran on Render — `/`, `/index.html`, `/health`
+`{"ok":true}`, `manifest.webmanifest`, `sw.js` all 200 and the Socket.IO polling handshake
+5/5 with `upgrades:["websocket"]` — at ~53 MB RSS idle. Host port 3000 was busy with another
+project, so the check ran through a scratch compose override mapping `3010:3000`; the
+committed compose file is unchanged. `DEPLOYMENT.md` Option B loses its "unverified" note.
+Found while at it: the image is **785 MB** — a single-stage build keeps the
+`npm ci --include=dev` layer (451 MB) and `npm prune` cannot shrink a layer already written,
+so the Dockerfile's "prune to slim the image" comment describes an intent, not an effect.
+**Owner decisions taken (2026-09-14, recorded as D-5 in `requirements.md` §2, with notes on
+FM-NFR-3 and design §1):** no paid Render plan; production becomes the Docker image on an
+**Oracle Cloud Always-Free VM behind Caddy**, at
+`https://www.staging-oursharedcode.com/funny37-game` — a **sub-path**, chosen over
+subdomains with the trade-off stated (needs a base-path leg; same-origin storage shared with
+the future `/funny1-game` sibling). Also: the maskable-icon clip risk is judged on the real
+Android install, not padded pre-emptively; the stale local `.env` stays until generation is
+tested locally; the three Gate 7 device legs plus T-8.2 run as **one scripted phone session**
+after the checklist doc exists. The four "before Step 13" prerequisites were then done
+operation by operation with the owner confirming each: Oracle Free Tier account (tenancy
+`markvmindlin`, home region Sydney) → API key on this PC (the OCI *CLI* would not install —
+Windows long-path limit — so the `oci` Python SDK drives everything) → network (`funny-vcn`,
+public subnet, IGW, security list: 22 from the operator IP only, 80/443 open) → VM `funny-vm`.
+**Sydney had no free Arm capacity** (six "Out of host capacity" in a row), so the fallback
+free AMD shape `VM.Standard.E2.1.Micro` (1 GB) is what runs, with a 2 GB swap file, Ubuntu
+24.04, Docker 29.8 + Compose 5.5 from cloud-init, iptables opened for 80/443 (Oracle's image
+rejects all but 22), and a **reserved** public IP **152.69.166.212** so the address survives a
+later swap to Arm. Measured idle: 495 MB free; the game container needs ~53 MB, so images are
+built here and streamed over SSH rather than built on the VM. The two provisioning scripts
+are committed as `deploy/oci/network.py` and `deploy/oci/vm.py` (idempotent; ids live in
+`~/.oci/funny-infra.json`, outside the repo); `deploy/` is excluded from the image context.
+The owner registered **`staging-oursharedcode.com`**; its nameservers are already Cloudflare's.
+**Owed:** the D-5 legs of T-8.1 — configurable `BASE_PATH` (client + server + Dockerfile
+build-arg), Caddy as a container in the compose file, Cloudflare DNS records (via API once
+the owner drops a DNS-edit token on this PC), the deploy itself, multi-stage Dockerfile,
+DEPLOYMENT.md/README rewrite, and a re-run of Gate 7's Installability leg on the new origin.
+An Arm retry (`deploy/oci/vm.py` after terminating the Micro) is worth a try at each session
+start. README's Sponsors link and deploy-button URL are still unconfirmable (repo private).
+*Full suite: typecheck, lint, `prettier --check` clean; 619/619 tests (client 188, server 310,
+shared 82, cloudflare 39), run outside the sandbox. `npm audit` first reported 5 advisories
+published since the last session (fastify ×2 incl. an X-Forwarded-* hop-count spoof we are
+not exposed to — `clientIp()` reads the header itself, `trustProxy` is unused — fast-uri,
+js-yaml, @vitest/mocker); all fixed inside the declared ranges, lockfile only: fastify
+5.11.3 → 5.12.4, fast-uri 3.1.7/4.1.4, js-yaml 4.3.2, vitest 4.1.11. `npm audit fix` and
+`npm update vitest` both crash npm 10.9.3's arborist (`edgesOut` of null in `#loadPeerSet`),
+so vitest moved via `npx npm@11 update`. Gates re-run green on the bumped tree; 0
+vulnerabilities. The compose image above was built before the bump — Dockerfile unchanged,
+and the deploy step rebuilds anyway. No TypeScript touched.*
+
+---
+
+**RESUME HERE (2026-09-15).** Production target is now the owner's own VM (D-5), not Render:
+Oracle Always-Free `funny-vm` in Sydney at **152.69.166.212** (1 GB AMD; Arm was out of
+capacity), Docker + Compose installed, ports 22/80/443 open, domain
+`staging-oursharedcode.com` registered with DNS on Cloudflare. Render
+(`https://funny-multi.onrender.com/`) still serves as the interim URL and stays the free
+one-click alternative. Worker unchanged at `https://funny-multi-image.oursharedcode.workers.dev`.
+
+Next: **Step 12 — T-8.1 base path.** One `BASE_PATH` (default `/`, Render unchanged): client
+Vite `base`, manifest `start_url`/`scope`, Socket.IO client `path`, workbox denylist regexes;
+server static prefix, `/health`, Socket.IO server path; Dockerfile build-arg + compose. Before
+writing it, one grep for `base:` in SRC's `client/vite.config.ts` (T-8.1 cites SRC) in case
+SRC already solved it. Verify by building with `/funny37-game/`, running the container, curl +
+handshake under the prefix, and DevTools Installability on `localhost` (secure-context
+exception). Fold the multi-stage Dockerfile in here or in Step 13.
+Then **Step 13 — T-8.1 deploy**: Caddy container in the compose file (auto-HTTPS, websocket
+upgrade, `TRUSTED_PROXY_HOPS=1` stays right for one proxy), DNS `A`/`www` records via the
+Cloudflare API (owner supplies a DNS-edit token as a file on this PC, never in chat), build
+here → `docker save | ssh … docker load` → `compose up` on the VM, DEPLOYMENT.md/README
+rewrite, Installability leg re-run on the new origin. Then **Step 14**: `docs/ACCEPTANCE.md`
+(SRC §19 + Gate 7 legs) for the owner's single scripted phone session (T-8.2 + Gate 7).
+
+Owner-side, still open: nothing before Step 13 except the Cloudflare DNS token when asked.
+`README`'s Sponsors link and Render deploy-button URL remain unconfirmable while the repo is
+private.

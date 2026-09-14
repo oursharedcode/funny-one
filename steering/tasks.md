@@ -37,6 +37,13 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       favicon via a new `rel="icon"` link.)* Real commissioned artwork deferred
       to Phase 8 polish (owner decision 2026-08-20); this hand-authored "37"-on-brand-cream mark
       is the placeholder until then.
+      **Artwork landed early (2026-08-21, Steps 9–10):** the 180/192/512 PNGs are now SRC's
+      commissioned mascot (owner decision 2026-08-20), and `index.html`'s favicon follows them
+      (`icon-192.png`; SRC has no SVG of the mascot). `icon.svg` has no runtime consumer left —
+      it survives only as the source for `deployer-logo.png` (the LogoStamp watermark, still the
+      "37" mark). **Open flag:** the mascot's ears and hair sit outside the maskable safe zone,
+      so Android's circular mask may clip them — owner decision 2026-09-14: judge on the real
+      Android install rather than pad a `maskable`-only variant pre-emptively.
       **Remaining for T-7.1:** the real-device install test on iPhone + Android — the part of
       this task that was never automatable, and separately blocked on a secure context: PWA
       install and service-worker registration both require HTTPS, which the LAN setup used for
@@ -69,7 +76,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   there needed a real fix — Chrome's manifest loader rejects `/icon.svg` outright (error
   survived a redeploy adding `width`/`height`, a warm hard reload, and Clear-site-data with the
   SW unregistered), so the manifest is PNG-only now and the SVG is the favicon.
-  **Still open:** real iPhone install, real Android install, and the jank check.
+  **Still open:** real iPhone install, real Android install, and the jank check — all three in
+  one scripted device session (owner decision 2026-09-14) once T-8.1's new deploy target is up.
+  *The Installability sign-off above was against the Render origin; D-5 moves production to a
+  different origin **and** a sub-path scope, so that leg is re-run there before the session.*
 
 ## Phase 8 — Deploy + acceptance + docs
 
@@ -94,20 +104,34 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       rotated, because the value the owner had saved returned 403 (it was SRC's secret, not
       ours) and a Worker secret cannot be read back. Verified: `/` and `/index.html` 200,
       `/health` `{"ok":true}`, Socket.IO handshake 5/5 with a websocket upgrade offered.
-      **Remaining for T-8.1:** `docker compose up` is still unrun — no Docker on the dev machine
-      or the owner's — so `DEPLOYMENT.md` Option B keeps its "unverified" note.
-      **Owner decision pending (2026-08-20):** the free plan hibernates — ~30% of requests to the
-      warm service return Render's own 404 with `x-render-routing: no-server`, and the pod
-      hostname carries a `-hibernate-` segment. Not an application fault (server logs show every
-      request that reaches the app returning 200 from one unrestarted pid), but it will drop idle
-      Socket.IO connections, so decide on a paid Starter instance **before** T-8.2 — otherwise
-      disconnects during acceptance are ambiguous between the plan and the code.
+      **`docker compose up` verified 2026-09-15 (Step 11)** on the dev machine (Docker 29.7,
+      linux/amd64): image builds from the Dockerfile unchanged and passes the same four checks as
+      the Render deploy. `DEPLOYMENT.md` Option B's "unverified" note is gone.
+      **Owner decision taken 2026-09-14 (D-5):** no paid Render plan — production moves to the
+      Docker image on an Oracle Cloud *Always Free* VM behind Caddy at
+      `https://www.staging-oursharedcode.com/funny37-game`. Provisioned 2026-09-15 via the
+      committed `deploy/oci/network.py` + `vm.py` (Sydney; VCN `funny-vcn`, VM `funny-vm` on the
+      free AMD 1 GB shape because Arm was out of capacity, 2 GB swap, Docker 29.8 + Compose 5.5
+      via cloud-init, reserved IP `152.69.166.212`); domain `staging-oursharedcode.com`
+      registered, DNS on Cloudflare. Images are built on the dev machine and streamed to the VM
+      over SSH (no build on 1 GB, no registry). Render stays as the free one-click alternative.
+      **Remaining for T-8.1 (new legs, D-5):** (1) configurable `BASE_PATH` — client `base`,
+      manifest `start_url`/`scope`, Socket.IO path, workbox denylist; server static prefix,
+      `/health`, Socket.IO path; Dockerfile build-arg + compose — default `/` so Render is
+      unchanged; (2) Caddy as a container in the same compose, DNS A records via the Cloudflare
+      API, deploy to the VM, `TRUSTED_PROXY_HOPS` for Caddy, DEPLOYMENT.md/README rewrite;
+      re-run Gate 7's Installability leg on the new origin; (3) multi-stage Dockerfile — the
+      single-stage image is 785 MB because `npm prune` cannot shrink the already-written
+      `npm ci --include=dev` layer (451 MB), and it has to be streamed to a 1 GB VM.
       *Carry-over from Phase 7 (owner decision 2026-08-20): the device pass must still close
       T-7.1's real iPhone/Android install, T-7.3's 60 fps jank check, and Gate 7 itself. The
       Installability leg of that bundle is done — see Gate 7 below.*
 - [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
       run with 3 real phones on the production URL; include disconnect-mid-game → bot,
       cap flow, cache-hit flow. → design §13
+      *Owner decision 2026-09-14: the checklist is authored first as `docs/ACCEPTANCE.md`, with
+      Gate 7's three device legs prepended, so the phone session — on the D-5 URL, not Render —
+      runs as one scripted pass.*
 - **Gate 8**: acceptance checklist signed off; a stranger can self-deploy from README alone.
   *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 —
   `steering/tasks-done.md`. Gate itself still open: needs T-8.1's deploy and T-8.2's

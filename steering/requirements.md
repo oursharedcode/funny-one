@@ -38,7 +38,7 @@ wherever they fit (see `design.md` for the reuse map).
 
 ## 2. Scope decisions (product owner, 2026-08-12)
 
-These four decisions were taken explicitly and govern the rest of this document:
+These decisions (D-1–D-4 of 2026-08-12, D-5 of 2026-09-14) were taken explicitly and govern the rest of this document:
 
 | # | Decision |
 |---|---|
@@ -46,6 +46,7 @@ These four decisions were taken explicitly and govern the rest of this document:
 | D-2 | **Languages**: **all 15 source-project languages** ship in v1 (en, fr, de, ru, id, it, zh, ja, ko, pt-br, es-419, es-es, uk, he, ta). Answer pools are authored for every one of them (en + ru are the hand-authored references; the other 13 are machine-drafted and flagged for native review, mirroring the source project's `needs-<code>-review` convention). Note: the source registry contains 15 languages, not 16. |
 | D-3 | **Store apps AND37/IOS37**: specified now (§10), **built post-v1**. Resolves the conflict between `Additional_requirements_strong.md` (must-have, packaging "??") and Initial_Requirements AND-1/OD-2 (web-first) in favor of web-first for v1. |
 | D-4 | **Premium tier**: **in scope for v1, as the final build phase** — started only after the core game is playable end-to-end on real phones. |
+| D-5 | **Production hosting (2026-09-14)**: **self-hosted, $0** — the Docker image on an Oracle Cloud *Always Free* VM (Sydney) behind Caddy, at **`https://www.staging-oursharedcode.com/funny37-game`**; the sibling one-device game will share the domain at `/funny1-game` (sub-paths, not subdomains — owner's call, taken knowing it needs a base-path leg in the client and server). Replaces the Render Starter plan FM-NFR-3 assumed: Render's free plan hibernates and drops idle sockets (log Step 8), and no paid plan is wanted. Render stays as the one-click free alternative for self-deployers. |
 
 ## 3. The defining change: no free text in answers
 
@@ -228,7 +229,9 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-NFR-2 (MUST)** Socket payloads for reveals carry URLs, not image bytes (FM-IMG-3 target:
   ~250 B per reveal, ~30 KB per game on the socket).
 - **FM-NFR-3 (MUST)** Server: single Render web service (starter plan) serving both the Socket.IO
-  API and the built client statics; single Cloudflare Worker + R2 bucket + KV namespace.
+  API and the built client statics *(amended by D-5, 2026-09-14: production is the Docker image
+  on an Oracle Always-Free VM behind Caddy, served under a URL sub-path; Render remains the
+  self-deploy alternative)*; single Cloudflare Worker + R2 bucket + KV namespace.
   Docker (single-stage node:20-alpine) as the self-hosting alternative. Free-tier self-hosting
   stays possible (README deploy buttons pattern from the source).
 - **FM-NFR-4 (MUST)** Animations use transform/opacity only, 60 fps on mid-range Android Chrome

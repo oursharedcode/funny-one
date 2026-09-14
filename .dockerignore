@@ -12,3 +12,6 @@ docs/source_project
 coverage
 .wrangler
 .vite
+
+# Cloud provisioning scripts are not part of the image
+deploy

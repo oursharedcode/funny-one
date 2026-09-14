@@ -101,9 +101,15 @@ repo root. Put your own TLS-terminating reverse proxy (nginx, Caddy, Cloudflare 
 front of it — the container itself serves plain HTTP on port 3000, and PWA install +
 service-worker registration both require HTTPS.
 
-Unverified: `docker compose up` has not been run against this Dockerfile yet (no Docker
-available in the dev sandbox that built it). Run it once before relying on it for a real
-deploy, and update this note once confirmed.
+Verified 2026-09-15 with Docker 29.7 / Compose (linux/amd64): the image builds from this
+Dockerfile unchanged and the container passes the same checks as the Render deploy — `/`,
+`/index.html`, `/health`, `manifest.webmanifest`, `sw.js` all 200, Socket.IO polling
+handshake offering a websocket upgrade 5/5 — at ~53 MB RSS idle. Known wart: the image is
+785 MB because the single-stage build keeps the `npm ci --include=dev` layer (451 MB) —
+`npm prune` cannot shrink a layer already written. A multi-stage build is on the T-8.1 list.
+This is also the production path now (steering decision D-5: the image on an Oracle Cloud
+Always-Free VM behind Caddy, under a URL sub-path); that write-up lands with the deploy step,
+and the container still needs a TLS proxy in front of it.
 
 ## Trusted proxy hops (`TRUSTED_PROXY_HOPS`)
 

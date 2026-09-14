@@ -14,6 +14,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
+import { homeUrl } from '../basePath';
 import PlayerList from '../components/PlayerList';
 import QRCode from '../components/QRCode';
 import { hoursUntilUtcMidnight, isCapReached } from '../capReset';
@@ -46,7 +47,7 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
 
   // Carry the room language so the invitee's join screen renders in it from the
   // first paint (HomeScreen reads `?lang=`). The QR code encodes the same URL.
-  const joinUrl = `${window.location.origin}/?room=${lobby.roomCode}&lang=${lobby.language}`;
+  const joinUrl = `${homeUrl()}?room=${lobby.roomCode}&lang=${lobby.language}`;
   const isHost = lobby.socketId === lobby.hostId;
   const canStart = lobby.players.length >= 3;
   const capReached = isCapReached(stats);

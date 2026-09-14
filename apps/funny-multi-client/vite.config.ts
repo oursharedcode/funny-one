@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Adapted from SRC/client/vite.config.ts. Three changes:
+// Adapted from SRC/client/vite.config.ts. Four changes:
 //
 //  1. The version is read from this package.json directly. SRC ran
 //     `scripts/bump-version.mjs` in a `prebuild` hook; that script is not
@@ -15,6 +15,14 @@
 //  3. Manifest identity is Funny Multi (FM-ID-1). The manifest icons are the
 //     192/512 PNG pair, as in SRC; `icon.svg` is the favicon only — see the
 //     icons[] comment below for why Chrome will not take it as a manifest icon.
+//  4. BASE_PATH (T-8.1, requirements D-5). SRC was only ever served at `/`;
+//     production here is `https://…/funny37-game/` behind Caddy, one sub-path
+//     per game. The build reads BASE_PATH (a Docker build-arg; unset = `/`)
+//     and threads it into Vite's `base`, the manifest's `start_url`/`scope`
+//     and the workbox denylist; `src/basePath.ts` reads the result back via
+//     `import.meta.env.BASE_URL` for the socket path and asset URLs. The
+//     server takes the same variable at runtime (static prefix, /health,
+//     Socket.IO path) — docker-compose.yml feeds both from one value.
 //
 // Everything else — the NetworkFirst navigation strategy, the deliberately
 // un-precached index.html, the Google Fonts rules — is carried verbatim,
@@ -26,13 +34,18 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { normalizeBasePath } from '@funny/shared';
 
 const pkg = JSON.parse(
   readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'),
 ) as { version: string };
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
+// For the workbox regexes below: the base as a literal, not a pattern.
+const BASE_RE = BASE_PATH.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 
 export default defineConfig({
+  base: BASE_PATH,
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __BUILD_DATE__: JSON.stringify(BUILD_DATE),
@@ -50,9 +63,12 @@ export default defineConfig({
         orientation: 'portrait',
         theme_color: '#fef3c7',
         background_color: '#fef3c7',
-        start_url: '/',
-        scope: '/',
-        // PNG only, and each `purpose` declared on its own entry.
+        start_url: BASE_PATH,
+        scope: BASE_PATH,
+        // PNG only, and each `purpose` declared on its own entry. Paths are
+        // relative: the manifest is served from under the base path, so
+        // `icon-192.png` resolves to `${base}icon-192.png` on every deploy,
+        // where a root-absolute `/icon-192.png` would miss a sub-path one.
         //
         // `/icon.svg` is deliberately NOT listed. Chrome's manifest icon
         // loader rejects it — "Icon .../icon.svg failed to load" — even though
@@ -76,19 +92,19 @@ export default defineConfig({
         // install (T-7.1) rather than assuming this is fine.
         icons: [
           {
-            src: '/icon-192.png',
+            src: 'icon-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icon-512.png',
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icon-512.png',
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -105,7 +121,7 @@ export default defineConfig({
         // Disable the default precached-index.html fallback for SPA
         // navigations — the NetworkFirst rule below handles them.
         navigateFallback: null,
-        navigateFallbackDenylist: [/^\/socket\.io/, /^\/health/],
+        navigateFallbackDenylist: [new RegExp(`^${BASE_RE}(socket\\.io|health)`)],
         runtimeCaching: [
           {
             // Navigation requests (`/`, `/anything`) — NetworkFirst so a

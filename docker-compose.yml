@@ -1,9 +1,17 @@
 # Funny Family «Чепуха 37» — self-hosted Docker Compose (T-8.1, FM-NFR-3).
 # Reads the same env vars as the Render service from a .env file at the repo
 # root. Copy .env.example to .env and fill it in before `docker compose up`.
+#
+# BASE_PATH (requirements D-5) is the one value that has to reach two places:
+# the image build (the client bakes it in) and the running server. Compose
+# reads it from .env for the `${…}` substitutions below, so setting it once
+# there keeps both in step. Unset means "/" — served at the root.
 services:
   funny-multi:
-    build: .
+    build:
+      context: .
+      args:
+        BASE_PATH: ${BASE_PATH:-/}
     image: funny-multi:latest
     ports:
       - '3000:3000'
@@ -11,4 +19,5 @@ services:
       - .env
     environment:
       NODE_ENV: production
+      BASE_PATH: ${BASE_PATH:-/}
     restart: unless-stopped

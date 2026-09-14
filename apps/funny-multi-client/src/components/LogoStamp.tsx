@@ -2,7 +2,7 @@
 
 // Adapted from SRC/client/src/components/LogoStamp.tsx (spec §25). Optional
 // deployer branding overlaid on generated pictures. The image is a bundled
-// asset at /deployer-logo.png, shipped at 25×25 pixels; an operator brands
+// asset at `deployer-logo.png` under the app's base path, shipped at 25×25 pixels; an operator brands
 // their instance by replacing `client/public/deployer-logo.png` with their
 // own 25×25 PNG and rebuilding. Our bundled default is the placeholder «37»
 // mark rasterized from `public/icon.svg` (same source and same "real
@@ -12,10 +12,12 @@
 //
 // Display-only overlay; not baked into the picture's pixels. Render as a
 // child of a `position: relative` container holding the picture.
+import { withBase } from '../basePath';
+
 export default function LogoStamp() {
   return (
     <img
-      src="/deployer-logo.png"
+      src={withBase('deployer-logo.png')}
       alt=""
       aria-hidden="true"
       width={25}

@@ -95,18 +95,21 @@ cp .env.example .env   # fill in CLOUDFLARE_WORKER_URL / CLOUDFLARE_WORKER_SECRE
 docker compose up
 ```
 
-`docker-compose.yml` builds `Dockerfile` (single-stage `node:20-alpine`: `npm ci`, `npm run
-build`, `npm prune --omit=dev`, then `npm run start`) and reads env vars from `.env` at the
-repo root. Put your own TLS-terminating reverse proxy (nginx, Caddy, Cloudflare Tunnel, …) in
-front of it — the container itself serves plain HTTP on port 3000, and PWA install +
-service-worker registration both require HTTPS.
+`docker-compose.yml` builds `Dockerfile` (two-stage `node:20-alpine`: build everything, then a
+runtime image with only the server's production dependencies and the built `dist/` trees)
+and reads env vars from `.env` at the repo root. Put your own TLS-terminating reverse proxy
+(nginx, Caddy, Cloudflare Tunnel, …) in front of it — the container itself serves plain HTTP
+on port 3000, and PWA install + service-worker registration both require HTTPS. To serve
+under a sub-path (`https://host/funny37-game/`), set `BASE_PATH=/funny37-game` in `.env`
+before building: Compose passes it to the image build (the client bakes it in) and to the
+running server, which must agree — see `.env.example`.
 
 Verified 2026-09-15 with Docker 29.7 / Compose (linux/amd64): the image builds from this
 Dockerfile unchanged and the container passes the same checks as the Render deploy — `/`,
 `/index.html`, `/health`, `manifest.webmanifest`, `sw.js` all 200, Socket.IO polling
-handshake offering a websocket upgrade 5/5 — at ~53 MB RSS idle. Known wart: the image is
-785 MB because the single-stage build keeps the `npm ci --include=dev` layer (451 MB) —
-`npm prune` cannot shrink a layer already written. A multi-stage build is on the T-8.1 list.
+handshake offering a websocket upgrade 5/5 — at ~53 MB RSS idle. The first Dockerfile was
+single-stage and came out at 785 MB (the `npm ci --include=dev` layer, 451 MB, survives a
+later `npm prune`); the two-stage build replaced it the same week.
 This is also the production path now (steering decision D-5: the image on an Oracle Cloud
 Always-Free VM behind Caddy, under a URL sub-path); that write-up lands with the deploy step,
 and the container still needs a TLS proxy in front of it.

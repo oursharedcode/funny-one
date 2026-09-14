@@ -14,6 +14,8 @@ export type { Language, LanguageOption } from './languages.js';
 // T-1.2 — story rotation (FM-CORE-6)
 export { storyIndex } from './rotation.js';
 
+export { normalizeBasePath } from './basePath.js';
+
 // T-1.3 — answer-pool schema (FM-POOL-1/3/4)
 export {
   AUTHORED_LANGUAGES,

@@ -7,6 +7,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import { Server as SocketIOServer } from 'socket.io';
+import { normalizeBasePath } from '@funny/shared';
 import type {
   ClientToServerEvents,
   LobbyUpdatePayload,
@@ -77,6 +78,14 @@ const DEV_CLIENT_ORIGIN = 'http://localhost:5173';
 // sits in front of Render.
 const TRUSTED_PROXY_HOPS = Number(process.env.TRUSTED_PROXY_HOPS ?? 1);
 
+// URL sub-path this process is mounted under (requirements D-5): `/` on Render
+// and in dev, `/funny37-game/` behind the owner's Caddy, which routes one
+// sub-path per game to its own container. Everything path-shaped below hangs
+// off it — the static prefix, /health, the Socket.IO path — and the client
+// build bakes the same value in (vite.config.ts), so the two must be fed the
+// same BASE_PATH; docker-compose.yml does exactly that.
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
+
 // Built client bundle, relative to dist/index.js (spec §14: one process serves
 // both). SRC pointed at '../../client/dist/'; the workspace layout renames the
 // app and adds an apps/ level, and this file's depth below the app root is
@@ -111,12 +120,16 @@ export interface BuildServerOptions {
    * a few milliseconds so a grace window can actually elapse inside a case.
    */
   disconnectGraceMs?: number;
+  /** Overrides the BASE_PATH env var; tests use it to mount under a sub-path. */
+  basePath?: string;
 }
 
 export async function buildServer({
   logger = true,
   disconnectGraceMs = DISCONNECT_GRACE_MS,
+  basePath = BASE_PATH,
 }: BuildServerOptions = {}): Promise<BuiltServer> {
+  const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
 
   await fastify.register(fastifyCors, {
@@ -124,14 +137,17 @@ export async function buildServer({
     credentials: true,
   });
 
-  fastify.get('/health', async () => ({ ok: true }));
+  fastify.get(`${base}health`, async () => ({ ok: true }));
 
   // Production: this same Fastify process serves the built client bundle —
   // one process, no nginx sidecar (spec §14). Unmatched routes fall back to
   // index.html so the SPA can handle deep links like /?room=ABCDEF. In dev
   // the client runs on Vite's own server, so static serving is skipped.
+  // The bundle is mounted under the base path because the client was built
+  // with the same value as Vite's `base`, so every asset URL in it already
+  // carries the prefix.
   if (NODE_ENV === 'production') {
-    await fastify.register(fastifyStatic, { root: CLIENT_DIST });
+    await fastify.register(fastifyStatic, { root: CLIENT_DIST, prefix: base });
     fastify.setNotFoundHandler((_request, reply) => reply.sendFile('index.html'));
   }
 
@@ -140,6 +156,10 @@ export async function buildServer({
   const io: GameIO = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(
     fastify.server,
     {
+      // Socket.IO's default is `/socket.io`; under a sub-path the client
+      // (socket.ts) asks for `${base}socket.io`, so the server must listen
+      // there — and nowhere else, which is what the base-path test pins.
+      path: `${base}socket.io`,
       cors: {
         origin: NODE_ENV === 'production' ? false : DEV_CLIENT_ORIGIN,
         credentials: true,
@@ -445,6 +465,7 @@ export async function buildServer({
 async function main(): Promise<void> {
   const { fastify } = await buildServer();
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
+  fastify.log.info(`mounted under ${BASE_PATH}`);
 
   // Eager initial sync of the Worker-side daily counter. Fire-and-forget: a
   // Worker that's unreachable at startup must not block the server from

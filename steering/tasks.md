@@ -115,14 +115,22 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       via cloud-init, reserved IP `152.69.166.212`); domain `staging-oursharedcode.com`
       registered, DNS on Cloudflare. Images are built on the dev machine and streamed to the VM
       over SSH (no build on 1 GB, no registry). Render stays as the free one-click alternative.
-      **Remaining for T-8.1 (new legs, D-5):** (1) configurable `BASE_PATH` — client `base`,
-      manifest `start_url`/`scope`, Socket.IO path, workbox denylist; server static prefix,
-      `/health`, Socket.IO path; Dockerfile build-arg + compose — default `/` so Render is
-      unchanged; (2) Caddy as a container in the same compose, DNS A records via the Cloudflare
-      API, deploy to the VM, `TRUSTED_PROXY_HOPS` for Caddy, DEPLOYMENT.md/README rewrite;
-      re-run Gate 7's Installability leg on the new origin; (3) multi-stage Dockerfile — the
-      single-stage image is 785 MB because `npm prune` cannot shrink the already-written
-      `npm ci --include=dev` layer (451 MB), and it has to be streamed to a 1 GB VM.
+      **`BASE_PATH` landed 2026-09-15 (Step 12):** one normaliser in `@funny/shared`
+      (`normalizeBasePath`, tested) feeds Vite `base`, manifest `start_url`/`scope`, relative
+      manifest icons, the workbox denylist and — via `src/basePath.ts` reading
+      `import.meta.env.BASE_URL` — the Socket.IO client path, flag/logo asset URLs and the
+      `?room=` join link; the server mounts static, `/health` and Socket.IO under the same
+      value (`basePath` option for tests, which pin that the root paths no longer answer).
+      Dockerfile is two-stage (251 MB, was 785 MB) with `BASE_PATH` as a build-arg that
+      `docker-compose.yml` feeds from `.env` to both the build and the runtime. Verified
+      end-to-end in the container at `/funny37-game/`: routes, manifest scope, SW registered
+      at `/funny37-game/sw.js`, socket handshake 5/5, root `/health` gone. Default `/` keeps
+      Render (native Node build, no Dockerfile) unchanged. DNS `A` records for the apex and
+      `www` were created the same day via the Cloudflare API (DNS-only, not proxied).
+      **Remaining for T-8.1:** Caddy as a container in the same compose (auto-HTTPS, websocket
+      upgrade), deploy to the VM (`docker save | ssh … docker load`), `TRUSTED_PROXY_HOPS`
+      check behind Caddy, DEPLOYMENT.md/README rewrite, re-run Gate 7's Installability leg on
+      the new origin.
       *Carry-over from Phase 7 (owner decision 2026-08-20): the device pass must still close
       T-7.1's real iPhone/Android install, T-7.3's 60 fps jank check, and Gate 7 itself. The
       Installability leg of that bundle is done — see Gate 7 below.*

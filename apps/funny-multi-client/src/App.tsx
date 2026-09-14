@@ -21,6 +21,7 @@ import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
+import { baseUrl } from './basePath';
 import { APP_VERSION } from './version';
 import type {
   AuthoredLanguage,
@@ -151,7 +152,7 @@ export default function App() {
   // Create-mode Home screen.
   function createNewRoom(): void {
     socket.emit('game:end');
-    window.location.assign('/');
+    window.location.assign(baseUrl());
   }
 
   let body: JSX.Element;

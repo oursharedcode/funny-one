@@ -27,6 +27,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
+import { homeUrl, withBase } from '../basePath';
 import Wordmark from '../components/art/Wordmark';
 import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
@@ -248,7 +249,7 @@ export default function HomeScreen({ onJoined }: Props) {
                   onClick={() => switchLanguage(opt.code as AuthoredLanguage)}
                 >
                   <img
-                    src={`/flags/${opt.code}.png`}
+                    src={withBase(`flags/${opt.code}.png`)}
                     alt=""
                     aria-hidden="true"
                     className="h-6 w-6 flex-shrink-0 object-contain"
@@ -336,7 +337,7 @@ export default function HomeScreen({ onJoined }: Props) {
                   onClick={() => selectUiLanguage(opt.code)}
                 >
                   <img
-                    src={`/flags/${opt.code}.png`}
+                    src={withBase(`flags/${opt.code}.png`)}
                     alt=""
                     aria-hidden="true"
                     className="h-6 w-6 flex-shrink-0 object-contain"
@@ -360,9 +361,7 @@ export default function HomeScreen({ onJoined }: Props) {
               URL preserves `?lang=` when present, matching LobbyScreen. */}
           <div className="flex flex-col items-center gap-2 rounded bg-white p-4">
             <QRCode
-              value={`${window.location.origin}/?room=${urlRoom}${
-                urlLang ? `&lang=${urlLang}` : ''
-              }`}
+              value={`${homeUrl()}?room=${urlRoom}${urlLang ? `&lang=${urlLang}` : ''}`}
               size={160}
             />
             <p className="text-xs text-gray-600">{t('lobby.qrCaption')}</p>

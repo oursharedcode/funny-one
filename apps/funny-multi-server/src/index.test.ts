@@ -12,8 +12,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
-import type { Socket } from 'socket.io-client';
-import { buildServer, type BuiltServer } from './index.js';
+import { io as ioClient, type Socket } from 'socket.io-client';
+import { buildServer, type BuildServerOptions, type BuiltServer } from './index.js';
 import { ENV_PATH } from './env.js';
 import { __resetRoomsForTest } from './rooms.js';
 import { emitWithAck, once, startTestServer, type TestServer } from './testutils/socket.js';
@@ -42,8 +42,8 @@ async function boot(): Promise<BuiltServer> {
   return server;
 }
 
-async function listen(): Promise<TestServer> {
-  const h = await startTestServer();
+async function listen(options: BuildServerOptions = {}): Promise<TestServer> {
+  const h = await startTestServer(options);
   harness = h;
   return h;
 }
@@ -112,6 +112,63 @@ describe('socket.io', () => {
     const h = await listen();
     const socket = await connect(h);
     expect(socket.id).toBeTruthy();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-8.1 — BASE_PATH mount (requirements D-5)
+// ---------------------------------------------------------------------------
+//
+// Production sits behind Caddy at /funny37-game/, so every path the process
+// answers on must move with the base — and only there. The negative cases
+// matter as much as the positive ones: a server that still answered at the
+// root would mask a client built with the wrong base until the first real
+// deploy, where the shell would load and the socket never connect.
+
+describe('base path', () => {
+  const BASE = '/funny37-game/';
+
+  it('serves /health under the base and nowhere else', async () => {
+    const server = await buildServer({ logger: false, basePath: BASE });
+    built = server;
+    const under = await server.fastify.inject({ method: 'GET', url: `${BASE}health` });
+    expect(under.statusCode).toBe(200);
+    expect(under.json()).toEqual({ ok: true });
+    const root = await server.fastify.inject({ method: 'GET', url: '/health' });
+    expect(root.statusCode).toBe(404);
+  });
+
+  it('accepts every spelling of the base the deploy config might pass', async () => {
+    // The env var is typed by hand in .env / a build arg; the normaliser is
+    // what keeps "funny37-game" and "/funny37-game/" from being two deploys.
+    const server = await buildServer({ logger: false, basePath: 'funny37-game' });
+    built = server;
+    const res = await server.fastify.inject({ method: 'GET', url: `${BASE}health` });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('answers Socket.IO under the base path and refuses the default path', async () => {
+    const h = await listen({ basePath: BASE });
+    const open = (path: string): Promise<Socket> =>
+      new Promise((resolve, reject) => {
+        const socket = ioClient(h.url, {
+          path,
+          transports: ['websocket'],
+          forceNew: true,
+          reconnection: false,
+        });
+        socket.on('connect', () => resolve(socket));
+        socket.on('connect_error', (err) => {
+          socket.disconnect();
+          reject(err);
+        });
+      });
+
+    const socket = await open(`${BASE}socket.io`);
+    expect(socket.id).toBeTruthy();
+    socket.disconnect();
+
+    await expect(open('/socket.io')).rejects.toBeInstanceOf(Error);
   });
 });
 

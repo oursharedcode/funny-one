@@ -25,6 +25,7 @@
 // without replacing it degrades to "no stamp" rather than a broken export.
 
 import { SOURCE_URL } from './sourceUrl';
+import { withBase } from './basePath';
 import { downloadFile } from './share';
 import {
   drawAttribution,
@@ -122,7 +123,7 @@ export async function buildWobbleVideoFile(opts: {
   // still records, just without the stamp.
   let logo: HTMLImageElement | null = null;
   try {
-    logo = await loadImage('/deployer-logo.png');
+    logo = await loadImage(withBase('deployer-logo.png'));
   } catch {
     logo = null;
   }

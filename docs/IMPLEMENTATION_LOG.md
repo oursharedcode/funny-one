@@ -382,14 +382,14 @@ and the deploy step rebuilds anyway. No TypeScript touched.*
 
 ---
 
-**RESUME HERE (2026-09-15).** Production target is now the owner's own VM (D-5), not Render:
+~~**RESUME HERE (2026-09-15).** Production target is now the owner's own VM (D-5), not Render:
 Oracle Always-Free `funny-vm` in Sydney at **152.69.166.212** (1 GB AMD; Arm was out of
 capacity), Docker + Compose installed, ports 22/80/443 open, domain
 `staging-oursharedcode.com` registered with DNS on Cloudflare. Render
 (`https://funny-multi.onrender.com/`) still serves as the interim URL and stays the free
-one-click alternative. Worker unchanged at `https://funny-multi-image.oursharedcode.workers.dev`.
+one-click alternative. Worker unchanged at `https://funny-multi-image.oursharedcode.workers.dev`.~~
 
-Next: **Step 12 — T-8.1 base path.** One `BASE_PATH` (default `/`, Render unchanged): client
+~~Next: **Step 12 — T-8.1 base path.** One `BASE_PATH` (default `/`, Render unchanged): client
 Vite `base`, manifest `start_url`/`scope`, Socket.IO client `path`, workbox denylist regexes;
 server static prefix, `/health`, Socket.IO server path; Dockerfile build-arg + compose. Before
 writing it, one grep for `base:` in SRC's `client/vite.config.ts` (T-8.1 cites SRC) in case
@@ -401,8 +401,79 @@ upgrade, `TRUSTED_PROXY_HOPS=1` stays right for one proxy), DNS `A`/`www` record
 Cloudflare API (owner supplies a DNS-edit token as a file on this PC, never in chat), build
 here → `docker save | ssh … docker load` → `compose up` on the VM, DEPLOYMENT.md/README
 rewrite, Installability leg re-run on the new origin. Then **Step 14**: `docs/ACCEPTANCE.md`
-(SRC §19 + Gate 7 legs) for the owner's single scripted phone session (T-8.2 + Gate 7).
+(SRC §19 + Gate 7 legs) for the owner's single scripted phone session (T-8.2 + Gate 7).~~
 
-Owner-side, still open: nothing before Step 13 except the Cloudflare DNS token when asked.
+~~Owner-side, still open: nothing before Step 13 except the Cloudflare DNS token when asked.
 `README`'s Sponsors link and Render deploy-button URL remain unconfirmable while the repo is
-private.
+private.~~ *(carried — see Step 12 below.)*
+
+## Step 12 — T-8.1: BASE_PATH — the app under a URL sub-path; two-stage Dockerfile (2026-09-15)
+
+**Shipped:** The D-5 sub-path leg. One normaliser, `normalizeBasePath` in `@funny/shared`
+(any of `funny37-game`, `/funny37-game`, `/funny37-game/` → `/funny37-game/`; unset → `/`;
+4 tests), is the single source for every path-shaped value on both sides. Client:
+`vite.config.ts` reads `BASE_PATH` from the build environment into Vite `base`, the manifest's
+`start_url`/`scope` and the workbox denylist (the base escaped as a literal); manifest icons
+became relative (`icon-192.png`) so they resolve under whatever base the manifest is served
+from. A new `src/basePath.ts` (`baseUrl()`, `withBase()`, `homeUrl()`, read from
+`import.meta.env.BASE_URL` at call time so `vi.stubEnv` can test the sub-path shape) replaces
+every hand-written root-absolute URL: the Socket.IO client `path`, the flag images, the
+LogoStamp and recordWobble `deployer-logo.png`, the `?room=` join link in LobbyScreen and the
+Home QR code, and the "new room" reload in App. Server: `buildServer` takes a `basePath`
+option (default from the env) and mounts the static bundle (`prefix`), `${base}health` and
+Socket.IO (`path: ${base}socket.io`) under it; three tests pin the positive and negative
+cases — under a sub-path the root `/health` and `/socket.io` no longer answer, because a
+server that still did would mask a client built with the wrong base until the first real
+deploy. SRC never served under a sub-path (one grep of its `vite.config.ts` for `base`, as
+T-8.1 allows), so nothing was copied. Dockerfile rewritten as two stages — the Step 11 finding
+— with `BASE_PATH` as an `ARG` in both (the client bakes it in at build, the server reads it
+at run); the runtime stage installs only the server workspace's production dependencies
+(`npm ci --omit=dev --workspace apps/funny-multi-server`) and copies the three `dist/` trees:
+**251 MB, from 785 MB**. `docker-compose.yml` feeds one `${BASE_PATH:-/}` from `.env` to both
+the build arg and the container environment; `.env.example` and DEPLOYMENT.md Option B
+explain it. Verified in the container built with `/funny37-game`: `/funny37-game/` +
+`index.html` + `health` (JSON) + `manifest.webmanifest` + `sw.js` + icons + flags + logo all
+200; manifest `start_url`/`scope` `/funny37-game/`; `index.html` asset hrefs rewritten by
+Vite; `registerSW.js` registers `/funny37-game/sw.js` with scope `/funny37-game/`; the bundle
+carries the base in its Socket.IO `path` and the socket handshake is 5/5 under the prefix; root
+`/health` and `/socket.io` fall through to the SPA shell — ~49 MB RSS. The default build is
+unchanged, and Render (native Node build, no Dockerfile, no `BASE_PATH`) stays at `/`.
+Also this session, before the code: **Cloudflare DNS** — the owner created a zone-scoped
+DNS-edit token as a file on this PC (never in chat); the token verified active, and `A`
+records for `staging-oursharedcode.com` and `www` now point at 152.69.166.212, DNS-only (grey
+cloud) so Caddy can hold the certificate and WebSockets go straight to the VM. Resolving
+worldwide within a minute.
+**Owed:** the Installability re-check on `localhost:3010/funny37-game/` was not run — no
+browser automation here; it happens on the real origin in Step 13 as planned. Two flakes
+seen, neither from this step: Git Bash rewrote `BASE_PATH=/funny37-game` into
+`C:/Program Files/Git/funny37-game` when passed as a shell env var to `docker compose` (MSYS
+path conversion — use `.env` or `MSYS_NO_PATHCONV=1`), and the client's `RoundScreen` "sizes
+visual slots" test twice exceeded its 5 s budget under load (1.9–6.0 s across five samples,
+identical on the committed tree) — passes on re-run, left as is. The workbox precache still
+lists `icon.svg` via the `**/*.svg` glob although nothing references it (2 KB, harmless).
+*Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests (client 190, server 313,
+shared 86, cloudflare 39), run outside the sandbox; `npm audit` 0 vulnerabilities.*
+
+---
+
+**RESUME HERE (2026-09-15).** The app now runs under `/funny37-game/` (Step 12) and the VM,
+DNS and reserved IP are ready (Steps 11–12): Oracle Always-Free `funny-vm`, Sydney,
+**152.69.166.212** (1 GB AMD, Docker + Compose, 22/80/443 open), `staging-oursharedcode.com`
+and `www` → that IP, DNS-only on Cloudflare. Render (`https://funny-multi.onrender.com/`) is
+still the interim URL. Worker unchanged.
+
+Next: **Step 13 — T-8.1 deploy.** (1) Caddy as a second service in `docker-compose.yml`
+(`caddy:2`, ports 80/443, a `Caddyfile` routing `www.staging-oursharedcode.com/funny37-game*`
+→ `funny-multi:3000` with the apex redirecting to `www`; websockets pass through by default;
+volumes for `/data` so the certificate survives restarts). (2) Ship: build here with
+`BASE_PATH=/funny37-game` in the VM's `.env` (Compose interpolates it — do not pass it as a
+Git Bash env var), `docker save funny-multi | ssh ubuntu@152.69.166.212 docker load`, copy
+`docker-compose.yml`, `Caddyfile` and a `.env` (Worker URL + the rotated secret, `BASE_PATH`,
+`TRUSTED_PROXY_HOPS=1` — Caddy is the one proxy), `docker compose up -d`. (3) Verify on the
+real origin: `/funny37-game/health`, handshake, DevTools Installability, a two-tab game.
+(4) DEPLOYMENT.md/README rewrite (Option B becomes primary; Render stays the one-click
+alternative). Then **Step 14**: `docs/ACCEPTANCE.md` (SRC §19 + Gate 7 legs) for the owner's
+single scripted phone session.
+
+Owner-side: nothing until the phone session. Consider terminating the Micro and re-running
+`deploy/oci/vm.py` at a session start to retry Arm — the reserved IP moves with it.

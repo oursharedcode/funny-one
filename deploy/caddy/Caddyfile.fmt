@@ -1,0 +1,44 @@
+# Funny Family «Чепуха 37» — Caddy in front of the game container (T-8.1,
+# requirements D-5). Used by the `caddy` profile in docker-compose.yml:
+#
+#   docker compose --profile caddy up -d
+#
+# Caddy terminates TLS (certificates from Let's Encrypt, renewed by itself,
+# kept in the `caddy_data` volume), forwards WebSockets without any extra
+# directive, and appends the client address to X-Forwarded-For — which is
+# why TRUSTED_PROXY_HOPS=1 is right behind it. The three {$…} values come
+# from .env via the compose file: SITE_HOST (the name players use),
+# SITE_APEX (the bare domain, redirected to it) and BASE_PATH (the sub-path
+# the game lives under — write it WITHOUT a trailing slash here, e.g.
+# /funny37-game; the app itself accepts any spelling).
+{
+	# HTTP/3 needs UDP 443, which the VM's cloud firewall does not open;
+	# advertising it would only make browsers probe and fall back.
+	servers {
+		protocols h1 h2
+	}
+}
+
+{$SITE_HOST} {
+	encode zstd gzip
+
+	# `/funny37-game` → `/funny37-game/`: the service worker's scope and the
+	# join link both carry the trailing slash, so land there.
+	redir {$BASE_PATH} {$BASE_PATH}/ permanent
+
+	# The path is forwarded untouched — the container mounts itself under
+	# BASE_PATH (static bundle, /health, Socket.IO), so nothing to rewrite.
+	handle {$BASE_PATH}/* {
+		reverse_proxy funny-multi:3000
+	}
+
+	# A second game on the same host gets its own handle block here; anything
+	# else on this name is not a game.
+	handle {
+		respond "Not found" 404
+	}
+}
+
+{$SITE_APEX} {
+	redir https://{$SITE_HOST}{uri} permanent
+}

@@ -456,13 +456,13 @@ shared 86, cloudflare 39), run outside the sandbox; `npm audit` 0 vulnerabilitie
 
 ---
 
-**RESUME HERE (2026-09-15).** The app now runs under `/funny37-game/` (Step 12) and the VM,
+~~**RESUME HERE (2026-09-15).** The app now runs under `/funny37-game/` (Step 12) and the VM,
 DNS and reserved IP are ready (Steps 11–12): Oracle Always-Free `funny-vm`, Sydney,
 **152.69.166.212** (1 GB AMD, Docker + Compose, 22/80/443 open), `staging-oursharedcode.com`
 and `www` → that IP, DNS-only on Cloudflare. Render (`https://funny-multi.onrender.com/`) is
-still the interim URL. Worker unchanged.
+still the interim URL. Worker unchanged.~~
 
-Next: **Step 13 — T-8.1 deploy.** (1) Caddy as a second service in `docker-compose.yml`
+~~Next: **Step 13 — T-8.1 deploy.** (1) Caddy as a second service in `docker-compose.yml`
 (`caddy:2`, ports 80/443, a `Caddyfile` routing `www.staging-oursharedcode.com/funny37-game*`
 → `funny-multi:3000` with the apex redirecting to `www`; websockets pass through by default;
 volumes for `/data` so the certificate survives restarts). (2) Ship: build here with
@@ -473,7 +473,83 @@ Git Bash env var), `docker save funny-multi | ssh ubuntu@152.69.166.212 docker l
 real origin: `/funny37-game/health`, handshake, DevTools Installability, a two-tab game.
 (4) DEPLOYMENT.md/README rewrite (Option B becomes primary; Render stays the one-click
 alternative). Then **Step 14**: `docs/ACCEPTANCE.md` (SRC §19 + Gate 7 legs) for the owner's
-single scripted phone session.
+single scripted phone session.~~
 
-Owner-side: nothing until the phone session. Consider terminating the Micro and re-running
-`deploy/oci/vm.py` at a session start to retry Arm — the reserved IP moves with it.
+~~Owner-side: nothing until the phone session. Consider terminating the Micro and re-running
+`deploy/oci/vm.py` at a session start to retry Arm — the reserved IP moves with it.~~ *(carried — see Step 13 below.)*
+
+## Step 13 — T-8.1: production deployed — Caddy profile, ship script, VM live (2026-09-15)
+
+**Shipped:** **https://www.staging-oursharedcode.com/funny37-game/** is live on the Oracle VM.
+`docker-compose.yml` gained a `caddy` profile — `caddy:2` on 80/443 with `deploy/caddy/Caddyfile`
+(env-driven `SITE_HOST`/`SITE_APEX`/`BASE_PATH`; apex → `www` redirect; `/funny37-game` →
+`/funny37-game/` so the SW scope and the join link agree; `BASE_PATH/*` reverse-proxied to
+`funny-multi:3000` with the path untouched; 404 for anything else on the name; HTTP/3
+disabled because the VM's cloud firewall leaves UDP 443 closed and advertising it would only
+make browsers probe and fall back) validated with `caddy validate`/`fmt`. The profile is
+opt-in and its variables are plain `${…:-}` — Compose interpolates the whole file before it
+applies profiles, so the `:?` required form would have broken the profile-less
+`docker compose up`. `deploy/ship.sh` is the deploy: reads `BASE_PATH` from the host's `.env`
+(so the client is built with the value the server runs under), builds the image tagged with
+the commit, `docker save | gzip | ssh … docker load` (~80 MB — no build on the 1 GB VM, no
+registry), copies the compose file and Caddyfile next to `.env`, `compose --profile caddy up
+-d --no-build`, and polls `https://SITE_HOST/BASE_PATH/health`; `MSYS_NO_PATHCONV=1` inside
+it because Git Bash rewrites `/funny37-game` into a Windows path. The VM's `.env` was written
+in a remote shell from a secret file copied by `scp` (Worker URL, rotated secret,
+`BASE_PATH=/funny37-game`, `SITE_HOST`, `SITE_APEX`, `TRUSTED_PROXY_HOPS=1`), mode 600.
+**Verified on the real origin:** Let's Encrypt certificates for both names obtained on first
+boot (Caddy log), `/funny37-game/` + `health` + `manifest.webmanifest` + `sw.js` + icons +
+flags all 200 over HTTPS, `http://` → 308 → `https://`, apex → 301 → `www`, no-slash → 301 →
+slash, `/` → 404, manifest `start_url`/`scope` `/funny37-game/`, Socket.IO polling handshake
+5/5 through Caddy, and a **scripted 3-player game** from this PC (socket.io-client, websocket
+transport, TLS): connect 146 ms, `room:create` → two `room:join`s → `game:start` →
+`round:start` in 893 ms; `stats:get` answers. The VM's own `.env` secret gets 200 from the
+Worker's `/stats`. Footprint: app ~50 MB, Caddy ~19 MB, 456 MB host free. DEPLOYMENT.md
+rewritten — self-host with Docker + Caddy is Option A (what production runs, with the `.env`
+recipe and `ship.sh`), Render is Option B with its hibernation caveat and D-5 pointer, the
+`TRUSTED_PROXY_HOPS` section covers Caddy; README opens with the URL and puts self-hosting
+before the Render button; `.env.example` documents `SITE_HOST`/`SITE_APEX`.
+**A mistake, owned:** `CLOUDFLARE_WORKER_SECRET` was rotated a second time on a false
+diagnosis. The agent's check of the owner's pasted values used Python `urllib`, whose default
+`Python-urllib/3.10` user agent Cloudflare answers with 403 regardless of the secret — so two
+correct pastes (the current value, then Render's copy) read as wrong, and the rotation was
+done before curl showed the check itself was broken (curl 200, same secret with the
+Python UA 403). The rotation is harmless — the Worker, its `/stats` and the VM all agree on
+the new value — but Render's dashboard still holds the previous one, so the interim Render
+site cannot generate until the owner pastes the new value there (a one-line owner operation,
+queued). Lesson recorded in memory: verify Cloudflare-fronted endpoints with curl, never a
+bare `urllib`.
+**Owed:** Gate 7's Installability leg on the new origin — needs Chrome DevTools, owner's
+browser (queued as the next owner operation); the Render secret paste (above). Both close
+T-8.1; the device legs (iPhone/Android install, jank) stay with Gate 7 for the phone session.
+The smoke game left two rooms from the two failed attempts (a 2-letter nickname the server
+rightly rejected) to expire by grace window — harmless, in-memory. `caddy fmt --diff` still
+reports one blank line it would drop; cosmetic.
+*Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the
+sandbox; `npm audit` 0 vulnerabilities. One test-only TypeScript change: the client's
+`RoundScreen` "sizes visual slots" case, which renders all ten rounds through jsdom and
+measured 1.9–6.0 s across the day's runs, failed its default 5 s budget in three of six
+full-suite runs (Step 12 saw it first); its budget is now 20 s with the measurement in a
+comment. Otherwise compose, Caddyfile, ship script, docs, steering.*
+
+---
+
+**RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
+(Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
+redeploy). Render (`https://funny-multi.onrender.com/`) is now only the one-click alternative
+and its `CLOUDFLARE_WORKER_SECRET` is stale until the owner pastes the rotated value.
+
+Two owner operations close T-8.1: (1) paste the rotated secret (file
+`C:\Users\Misha\.cloudflare\worker-secret`) into Render's dashboard env; (2) open the
+production URL in Chrome → DevTools → Application → Manifest → confirm "installable" —
+Gate 7's Installability leg on the new origin (the Render sign-off does not transfer).
+
+Next agent step: **Step 14 — `docs/ACCEPTANCE.md`**: SRC spec §19 (`FUNNY_STORIES_SPEC_v4.md`
+line 1315; T-8.2 cites SRC) adapted to combobox answers + URL images, prefixed with Gate 7's
+three device legs (iPhone install, Android install incl. the maskable-icon clip check, jank),
+with a results template — the script for the owner's single phone session (T-8.2 + Gate 7),
+run on the production URL. Then Gate 8 ("a stranger can self-deploy from README alone") can be
+judged against the rewritten DEPLOYMENT.md.
+
+Still open elsewhere: README's Sponsors link and Render deploy-button URL (repo private); an
+Arm retry for the VM (`deploy/oci/vm.py` after terminating the Micro) at any session start.

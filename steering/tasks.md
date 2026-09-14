@@ -127,10 +127,22 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       at `/funny37-game/sw.js`, socket handshake 5/5, root `/health` gone. Default `/` keeps
       Render (native Node build, no Dockerfile) unchanged. DNS `A` records for the apex and
       `www` were created the same day via the Cloudflare API (DNS-only, not proxied).
-      **Remaining for T-8.1:** Caddy as a container in the same compose (auto-HTTPS, websocket
-      upgrade), deploy to the VM (`docker save | ssh … docker load`), `TRUSTED_PROXY_HOPS`
-      check behind Caddy, DEPLOYMENT.md/README rewrite, re-run Gate 7's Installability leg on
-      the new origin.
+      **Production deployed 2026-09-15 (Step 13):** **https://www.staging-oursharedcode.com/funny37-game/**
+      — `docker-compose.yml` gained a `caddy` profile (`deploy/caddy/Caddyfile`: auto-HTTPS,
+      apex→`www`, `/funny37-game`→`/funny37-game/`, `BASE_PATH/*` → container, 404 elsewhere;
+      HTTP/3 off because UDP 443 is closed) and `deploy/ship.sh` builds here with the host's
+      `BASE_PATH`, streams the image over SSH and runs `compose --profile caddy up`. Verified on
+      the real origin: Let's Encrypt certs for both names on first boot, all routes, both
+      redirects, socket handshake 5/5, and a scripted 3-player create/join/start over TLS
+      WebSockets in 0.9 s; the VM's `.env` secret returns 200 from the Worker. `WORKER_SECRET`
+      was rotated once more (the agent's Python check was a false negative — Cloudflare 403s
+      the `Python-urllib` user agent — and the rotation was done before that was understood;
+      Render's copy is owed a paste). DEPLOYMENT.md rewritten (self-host + Caddy = Option A,
+      Render = Option B) and README points at the URL. `TRUSTED_PROXY_HOPS=1` is right for
+      Caddy, the one proxy.
+      **Remaining for T-8.1:** Gate 7's Installability leg re-run on the new origin (owner, Chrome
+      DevTools — the agent has no browser); the Render dashboard's `CLOUDFLARE_WORKER_SECRET`
+      updated to the rotated value (owner). Then T-8.1 closes; the device legs stay with Gate 7.
       *Carry-over from Phase 7 (owner decision 2026-08-20): the device pass must still close
       T-7.1's real iPhone/Android install, T-7.3's 60 fps jank check, and Gate 7 itself. The
       Installability leg of that bundle is done — see Gate 7 below.*

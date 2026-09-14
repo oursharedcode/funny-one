@@ -105,7 +105,12 @@ describe('options come from the shared pools (DD-2)', () => {
     },
   );
 
-  it('sizes visual slots at 9–12 and prose slots at 20–30', () => {
+  // Renders all ten rounds — up to 30 combobox options each, through jsdom —
+  // and takes anywhere from 2 s to 6 s depending on what else the machine is
+  // doing (measured 2026-09-15 across five full-suite runs, identical before
+  // and after unrelated changes). The default 5 s budget made it the one
+  // flaky test in the six-gate run; the work is real, so the budget moves.
+  it('sizes visual slots at 9–12 and prose slots at 20–30', { timeout: 20_000 }, () => {
     for (let roundNumber = 0; roundNumber < SLOT_COUNT; roundNumber++) {
       const { unmount } = renderRound({ roundNumber });
       const count = screen.getAllByRole('radio').length;

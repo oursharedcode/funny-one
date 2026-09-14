@@ -4,7 +4,7 @@ This repo has two independently deployed pieces (design §7):
 
 1. **The Cloudflare Worker** (`cloudflare/`) — generates and caches the AI cartoons.
 2. **The game server** (`apps/funny-multi-server/`, which also serves the built client) —
-   deploy to Render (blueprint included) or self-host with Docker.
+   self-host with Docker behind Caddy (what production runs), or one-click to Render.
 
 Deploy the Worker first: the game server needs its URL and shared secret before it can start.
 
@@ -31,8 +31,9 @@ Keep that and the `WORKER_SECRET` value — the game server needs both.
 
 ### Optional: persistent stats counter
 
-Without this, the Worker's "images generated today" counter resets whenever Render's free
-tier spins the server down. To make it durable:
+Without this, the Worker's "images generated today" counter resets whenever the Worker's
+isolate is recycled (and, on Render's free tier, whenever the server spins down). To make it
+durable:
 
 ```bash
 npx wrangler kv namespace create STATS_KV
@@ -51,7 +52,70 @@ game server means no premium rooms are created.
 
 ## 2. Deploy the game server
 
-### Option A — Render (recommended, free plan)
+Two options. **A** is what `https://www.staging-oursharedcode.com/funny37-game` runs on; **B**
+is the fastest way to get a copy up, at the price of Render's free-plan hibernation.
+
+### Option A — self-host with Docker + Caddy (what production runs)
+
+Any Linux host with Docker will do; production is an Oracle Cloud _Always Free_ VM (1 GB,
+Sydney) provisioned by the two scripts in `deploy/oci/` (`network.py`, then `vm.py` — each
+file's header says what it creates; both need `pip install oci` and an API key in
+`~/.oci/config`). Whatever the host, it needs ports 80 and 443 reachable and DNS `A` records
+for your site name (and its bare domain) pointing at it before the first start, because Caddy
+fetches its certificates on boot.
+
+Two files make it production rather than "a container on :3000":
+
+- `docker-compose.yml`'s **`caddy` profile** adds Caddy on 80/443 with automatic HTTPS
+  (`deploy/caddy/Caddyfile`): it redirects the bare domain to `SITE_HOST`, forwards
+  `BASE_PATH/*` to the game container untouched, forwards WebSockets without any extra
+  configuration, and 404s everything else on the host — a second game on the same name gets
+  its own `handle` block. Certificates live in the `caddy_data` volume.
+- **`BASE_PATH`** (`.env`), the URL sub-path the game is served under — `/funny37-game` in
+  production, so a sibling game can share the domain (design §1). It must reach two places:
+  the image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO
+  path) and the running server (static prefix, `/health`, Socket.IO path). Compose feeds one
+  value to both; the server and client accept any spelling, the Caddyfile pastes it verbatim,
+  so write it **without** a trailing slash. Unset means `/`.
+
+On the host, once, as the user that will run it:
+
+```bash
+mkdir -p ~/funny && cd ~/funny
+# .env — see .env.example. Production's, minus the secret:
+#   CLOUDFLARE_WORKER_URL=https://funny-multi-image.<subdomain>.workers.dev
+#   CLOUDFLARE_WORKER_SECRET=<the WORKER_SECRET from step 1>
+#   BASE_PATH=/funny37-game
+#   SITE_HOST=www.example.com
+#   SITE_APEX=example.com
+#   TRUSTED_PROXY_HOPS=1        # Caddy is the one proxy (see below)
+chmod 600 .env
+```
+
+Then, from a checkout on any machine with Docker (a 1 GB host is too small to build on, so
+the image is built here and streamed across; no registry involved):
+
+```bash
+deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
+```
+
+`ship.sh` reads `BASE_PATH` from the host's `.env`, builds the image with it (tagged with the
+git commit), `docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml`
+and the Caddyfile next to `.env`, runs `docker compose --profile caddy up -d`, and waits for
+`https://SITE_HOST/BASE_PATH/health` to answer through Caddy. Re-run it to deploy a new
+commit; Caddy keeps its certificates across restarts.
+
+Without the profile — `docker compose up -d` — you get the game alone on plain HTTP `:3000`,
+for a TLS proxy of your own (nginx, Cloudflare Tunnel, …); PWA install and service-worker
+registration both require HTTPS, so something must terminate TLS.
+
+Verified 2026-09-15 on the production VM: `docker compose up` builds from this Dockerfile
+(two-stage `node:20-alpine`, 251 MB), the container idles at ~50 MB with Caddy at ~20 MB,
+Let's Encrypt certificates for both names on first boot, HTTP→HTTPS and apex→`www`
+redirects, and a scripted 3-player room over TLS WebSockets through Caddy in under a
+second.
+
+### Option B — Render (one click, free plan; hibernates)
 
 The repo includes `render.yaml`, a Render Blueprint. From the Render dashboard: **New →
 Blueprint**, point it at this repo, and Render reads `render.yaml` for the build/start
@@ -86,33 +150,8 @@ segment. The application is not involved — its logs show every request that re
 returning 200 from a single, never-restarted pid. For a game built on long-lived Socket.IO
 connections this matters: an idle room can lose its socket to the routing layer rather than
 to any bug in the server. Use a paid instance for anything you expect real players on; the
-free plan is fine for a smoke test or a self-hosted family deploy that tolerates a reconnect.
-
-### Option B — self-host with Docker
-
-```bash
-cp .env.example .env   # fill in CLOUDFLARE_WORKER_URL / CLOUDFLARE_WORKER_SECRET at minimum
-docker compose up
-```
-
-`docker-compose.yml` builds `Dockerfile` (two-stage `node:20-alpine`: build everything, then a
-runtime image with only the server's production dependencies and the built `dist/` trees)
-and reads env vars from `.env` at the repo root. Put your own TLS-terminating reverse proxy
-(nginx, Caddy, Cloudflare Tunnel, …) in front of it — the container itself serves plain HTTP
-on port 3000, and PWA install + service-worker registration both require HTTPS. To serve
-under a sub-path (`https://host/funny37-game/`), set `BASE_PATH=/funny37-game` in `.env`
-before building: Compose passes it to the image build (the client bakes it in) and to the
-running server, which must agree — see `.env.example`.
-
-Verified 2026-09-15 with Docker 29.7 / Compose (linux/amd64): the image builds from this
-Dockerfile unchanged and the container passes the same checks as the Render deploy — `/`,
-`/index.html`, `/health`, `manifest.webmanifest`, `sw.js` all 200, Socket.IO polling
-handshake offering a websocket upgrade 5/5 — at ~53 MB RSS idle. The first Dockerfile was
-single-stage and came out at 785 MB (the `npm ci --include=dev` layer, 451 MB, survives a
-later `npm prune`); the two-stage build replaced it the same week.
-This is also the production path now (steering decision D-5: the image on an Oracle Cloud
-Always-Free VM behind Caddy, under a URL sub-path); that write-up lands with the deploy step,
-and the container still needs a TLS proxy in front of it.
+free plan is fine for a smoke test or a family deploy that tolerates a reconnect. This is why
+production moved to Option A (steering decision D-5, 2026-09-14) — a $0 VM that never sleeps.
 
 ## Trusted proxy hops (`TRUSTED_PROXY_HOPS`)
 
@@ -121,16 +160,19 @@ The per-IP rate limiter (FM-CORE-4) buckets by client IP, read from the right-ha
 can set to any value it likes and use to pick, or rotate, its own rate-limit bucket.
 
 "Right-hand end, N hops in" is only correct if the request actually crosses exactly N
-trusted proxies before reaching the server. Render puts one TLS-terminating proxy in front
-of every web service, so the default `TRUSTED_PROXY_HOPS=1` is correct for Option A
-unchanged. Only raise it if you put something else in front of Render (a CDN, a load
-balancer) or in front of your own Docker host — one hop per proxy that appends to
-`x-forwarded-for` before the server sees it. Setting it too high re-opens the same
-spoofing gap this exists to close (a client's own value shifts into the trusted window).
+trusted proxies before reaching the server. Caddy (Option A) appends the client address to
+`x-forwarded-for` and is the only proxy in front of the container, and Render (Option B)
+puts exactly one TLS-terminating proxy in front of every web service — so the default
+`TRUSTED_PROXY_HOPS=1` is right for both. Only raise it if you add something in front (a
+CDN, a load balancer, Cloudflare's proxy switched on for the DNS record) — one hop per proxy
+that appends to `x-forwarded-for` before the server sees it. Setting it too high re-opens
+the same spoofing gap this exists to close (a client's own value shifts into the trusted
+window).
 
 ## After both are deployed
 
-Run the acceptance checklist (T-8.2) against the production URL with real phones, including
+Run the acceptance checklist (T-8.2) against the production URL
+(`https://www.staging-oursharedcode.com/funny37-game/`) with real phones, including
 disconnect-mid-game → bot, the daily image cap, and a cache-hit replay of the same story.
 Then close the Phase-7 device-session items that were parked pending an HTTPS URL: the
 DevTools Application → Manifest → Installability panel, a real iPhone + Android PWA install,

@@ -8,17 +8,30 @@ story reveals instantly for everyone after the first time.
 «Чепуха 37» is this game's product name; it ships under the «Семейная Чепуха» (Funny Family)
 umbrella, which is planned to hold future games sharing this repo's rotation/pool engine.
 
+## Play it
+
+**https://www.staging-oursharedcode.com/funny37-game/** — the reference deployment: a $0
+Oracle Cloud _Always Free_ VM running this repo's Docker image behind Caddy. Open it on a
+phone, create a room, and share the QR code.
+
 ## Deploy your own
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/oursharedcode/funny-one)
+Two pieces: a Cloudflare Worker (cartoon generation + cache) and the game server (which also
+serves the client). The full walkthrough is [DEPLOYMENT.md](DEPLOYMENT.md); in short:
 
-The button above deploys the game server from `render.yaml` (Render's free plan). It still
-needs a Cloudflare Worker deployed separately for image generation — the Render service won't
-generate cartoons until you point it at one. Full walkthrough, including the Worker: see
-[DEPLOYMENT.md](DEPLOYMENT.md).
+- **Self-host** (what the reference deployment runs): any Linux host with Docker, `.env` from
+  `.env.example`, then `deploy/ship.sh user@host` builds the image here, streams it over SSH
+  and starts it with Caddy in front for automatic HTTPS. `docker compose up` alone gives you
+  the container on `:3000` for a proxy of your own.
+- **Render**, one click:
 
-Prefer to self-host instead of Render? `docker compose up` works from a `.env` file — also
-covered in DEPLOYMENT.md.
+  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/oursharedcode/funny-one)
+
+  deploys the server from `render.yaml` on Render's free plan, which hibernates between
+  visits and drops idle game sockets — fine for a try-out, not for a party.
+
+Either way the Worker is deployed separately first; the server won't generate cartoons until
+you point it at one.
 
 ## Local development
 

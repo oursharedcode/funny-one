@@ -522,6 +522,18 @@ bare `urllib`.
 **Owed:** Gate 7's Installability leg on the new origin — needs Chrome DevTools, owner's
 browser (queued as the next owner operation); the Render secret paste (above). Both close
 T-8.1; the device legs (iPhone/Android install, jank) stay with Gate 7 for the phone session.
+**Same-day follow-up — Render service deleted (owner decision 2026-09-15).** Handed the
+paste operation, the owner asked why Render was still needed. It wasn't: since D-5 the
+service was a second, stale copy of the game at a URL nobody is sent, rebuilding on every
+push to `main` and unable to generate cartoons. Options weighed — delete, keep-and-paste,
+suspend; deleted (owner, dashboard; the Render API would first have needed a key). The paste
+is void. `render.yaml` and README's deploy button stay: they are Option B, the one-click path
+a stranger can take, and Gate 8 still judges that path. One production now.
+**Installability re-run, same day:** the owner opened the production URL in desktop Chrome —
+DevTools Application → Manifest shows only the two optional "richer PWA install UI"
+screenshot notices, and the omnibox offers install; the sub-path scope is accepted. Gate 7's
+Installability leg is signed off on the D-5 origin and **T-8.1 is closed**. Left for the
+phone session: iPhone install, Android install (maskable clip check), jank.
 The smoke game left two rooms from the two failed attempts (a 2-letter nickname the server
 rightly rejected) to expire by grace window — harmless, in-memory. `caddy fmt --diff` still
 reports one blank line it would drop; cosmetic.
@@ -536,13 +548,12 @@ comment. Otherwise compose, Caddyfile, ship script, docs, steering.*
 
 **RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
 (Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
-redeploy). Render (`https://funny-multi.onrender.com/`) is now only the one-click alternative
-and its `CLOUDFLARE_WORKER_SECRET` is stale until the owner pastes the rotated value.
+redeploy). The Render service is deleted (owner decision 2026-09-15) — `render.yaml` stays
+only as the one-click Option B for strangers; the rotated `WORKER_SECRET` lives in
+`C:\Users\Misha\.cloudflare\worker-secret`, the Worker and the VM's `.env`.
 
-Two owner operations close T-8.1: (1) paste the rotated secret (file
-`C:\Users\Misha\.cloudflare\worker-secret`) into Render's dashboard env; (2) open the
-production URL in Chrome → DevTools → Application → Manifest → confirm "installable" —
-Gate 7's Installability leg on the new origin (the Render sign-off does not transfer).
+T-8.1 is closed (Installability re-run passed on the new origin, 2026-09-15). No owner
+operation is pending.
 
 Next agent step: **Step 14 — `docs/ACCEPTANCE.md`**: SRC spec §19 (`FUNNY_STORIES_SPEC_v4.md`
 line 1315; T-8.2 cites SRC) adapted to combobox answers + URL images, prefixed with Gate 7's

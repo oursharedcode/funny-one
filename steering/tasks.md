@@ -78,12 +78,14 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   SW unregistered), so the manifest is PNG-only now and the SVG is the favicon.
   **Still open:** real iPhone install, real Android install, and the jank check — all three in
   one scripted device session (owner decision 2026-09-14) once T-8.1's new deploy target is up.
-  *The Installability sign-off above was against the Render origin; D-5 moves production to a
-  different origin **and** a sub-path scope, so that leg is re-run there before the session.*
+  **Installability leg re-run 2026-09-15 (Step 13)** against
+  https://www.staging-oursharedcode.com/funny37-game/ — D-5's new origin **and** sub-path
+  scope: same clean result (only the two optional screenshot notices) and Chrome shows the
+  install icon in the omnibox. The Render sign-off is superseded; the Render service is gone.
 
 ## Phase 8 — Deploy + acceptance + docs
 
-- [ ] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
+- [x] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
       `.dockerignore`, `.env.example`; deploy server to Render + Worker/R2/KV via wrangler;
       set secrets. → FM-NFR-3
       *Artifacts landed 2026-08-20: `Dockerfile`, `.dockerignore`, `docker-compose.yml`,
@@ -98,7 +100,7 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       (proxy-appended) end instead of the client-settable first hop; wired to a new
       `TRUSTED_PROXY_HOPS` env var in `index.ts`, documented in `.env.example`. The
       DEPLOYMENT.md write-up of this assumption landed with T-8.3 (`steering/tasks-done.md`).*
-      **Deploy landed 2026-08-20 (Steps 6–7).** Production: **https://funny-multi.onrender.com/**
+      **Deploy landed 2026-08-20 (Steps 6–7).** Production until D-5: **https://funny-multi.onrender.com/**
       (Render blueprint `funny-one-111` → service `funny-multi`, free plan). The Worker was
       already live from T-4.1 with its R2 bucket, so only `WORKER_SECRET` needed attention —
       rotated, because the value the owner had saved returned 403 (it was SRC's secret, not
@@ -137,12 +139,15 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       WebSockets in 0.9 s; the VM's `.env` secret returns 200 from the Worker. `WORKER_SECRET`
       was rotated once more (the agent's Python check was a false negative — Cloudflare 403s
       the `Python-urllib` user agent — and the rotation was done before that was understood;
-      Render's copy is owed a paste). DEPLOYMENT.md rewritten (self-host + Caddy = Option A,
+      Render's copy was never updated — see the deletion below). DEPLOYMENT.md rewritten (self-host + Caddy = Option A,
       Render = Option B) and README points at the URL. `TRUSTED_PROXY_HOPS=1` is right for
       Caddy, the one proxy.
-      **Remaining for T-8.1:** Gate 7's Installability leg re-run on the new origin (owner, Chrome
-      DevTools — the agent has no browser); the Render dashboard's `CLOUDFLARE_WORKER_SECRET`
-      updated to the rotated value (owner). Then T-8.1 closes; the device legs stay with Gate 7.
+      **Owner decision 2026-09-15: the Render service `funny-multi` is deleted.** Asked why it was
+      still needed, the answer was: it isn't — since D-5 it was a second, stale copy that rebuilt
+      on every push and could not generate (old secret). One production now. `render.yaml` and
+      README's button stay as Option B, the one-click path for strangers (Gate 8).
+      **Closed 2026-09-15:** Gate 7's Installability leg re-run on the new origin passed (owner,
+      Chrome DevTools — see Gate 7). The device legs stay with Gate 7 for T-8.2's phone session.
       *Carry-over from Phase 7 (owner decision 2026-08-20): the device pass must still close
       T-7.1's real iPhone/Android install, T-7.3's 60 fps jank check, and Gate 7 itself. The
       Installability leg of that bundle is done — see Gate 7 below.*

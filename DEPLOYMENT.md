@@ -4,36 +4,54 @@ This repo has two independently deployed pieces (design §7):
 
 1. **The Cloudflare Worker** (`cloudflare/`) — generates and caches the AI cartoons.
 2. **The game server** (`apps/funny-multi-server/`, which also serves the built client) —
-   self-host with Docker behind Caddy (what production runs), or one-click to Render.
+   a Docker image, run behind Caddy for automatic HTTPS (what production runs) or behind a TLS
+   proxy of your own.
 
 Deploy the Worker first: the game server needs its URL and shared secret before it can start.
 
+## What you need
+
+- A **Cloudflare account**. Workers, Workers AI and R2 all have free tiers that cover this
+  game's usage; note that Cloudflare asks for a payment method on file before it lets you
+  enable R2, even though the free tier itself costs nothing.
+- A **Linux host with Docker** (Compose v2 included) that can be reached on ports 80 and 443,
+  and SSH access to it. Production is an Oracle Cloud _Always Free_ VM — any VPS works.
+- A **domain name** you control, with DNS `A` records for the site name (e.g. `www.example.com`)
+  and its bare domain (`example.com`) pointing at the host. Caddy fetches its certificates on
+  first boot, so the records must resolve before the first start.
+- On the machine you deploy _from_ (your PC is fine): Node 20, git, Docker, `ssh`/`scp` and
+  `curl`. On Windows use Git Bash — `deploy/ship.sh` is a bash script and already handles
+  Git Bash's path rewriting.
+
 ## 1. Deploy the Cloudflare Worker
 
-Requires a Cloudflare account (Workers AI and R2 are both available on the free plan).
-
 ```bash
-cd cloudflare
-npx wrangler login
+git clone https://github.com/oursharedcode/funny-one.git
+cd funny-one/cloudflare
+npx wrangler login              # npx fetches wrangler on first use — answer "y"
 
 # The image cache (design §7.2) — one bucket, your account. Required.
 npx wrangler r2 bucket create funny-multi-images
 
 # Shared secret between the Worker and the game server. Generate any random
-# string (e.g. `openssl rand -hex 32`) and set it here.
+# string (e.g. `openssl rand -hex 32`) and paste it when prompted.
 npx wrangler secret put WORKER_SECRET
 
 npx wrangler deploy
 ```
 
 The deploy prints your Worker's URL (`https://funny-multi-image.<your-subdomain>.workers.dev`).
-Keep that and the `WORKER_SECRET` value — the game server needs both.
+Keep that and the `WORKER_SECRET` value — the game server needs both. A quick check:
+
+```bash
+curl -H "X-Secret: <your WORKER_SECRET>" https://funny-multi-image.<your-subdomain>.workers.dev/stats
+# → {"date":"2026-09-16","count":0}   (a 403 means the secret doesn't match)
+```
 
 ### Optional: persistent stats counter
 
 Without this, the Worker's "images generated today" counter resets whenever the Worker's
-isolate is recycled (and, on Render's free tier, whenever the server spins down). To make it
-durable:
+isolate is recycled. To make it durable:
 
 ```bash
 npx wrangler kv namespace create STATS_KV
@@ -52,17 +70,10 @@ game server means no premium rooms are created.
 
 ## 2. Deploy the game server
 
-Two options. **A** is what `https://www.staging-oursharedcode.com/funny37-game` runs on; **B**
-is the fastest way to get a copy up, at the price of Render's free-plan hibernation.
-
-### Option A — self-host with Docker + Caddy (what production runs)
-
-Any Linux host with Docker will do; production is an Oracle Cloud _Always Free_ VM (1 GB,
-Sydney) provisioned by the two scripts in `deploy/oci/` (`network.py`, then `vm.py` — each
-file's header says what it creates; both need `pip install oci` and an API key in
-`~/.oci/config`). Whatever the host, it needs ports 80 and 443 reachable and DNS `A` records
-for your site name (and its bare domain) pointing at it before the first start, because Caddy
-fetches its certificates on boot.
+Production (`https://www.staging-oursharedcode.com/funny37-game`) is an Oracle Cloud _Always
+Free_ VM (1 GB, Sydney) provisioned by the two scripts in `deploy/oci/` (`network.py`, then
+`vm.py` — each file's header says what it creates; both need `pip install oci` and an API key
+in `~/.oci/config`). Those scripts are optional: any host from the list above will do.
 
 Two files make it production rather than "a container on :3000":
 
@@ -76,82 +87,63 @@ Two files make it production rather than "a container on :3000":
   the image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO
   path) and the running server (static prefix, `/health`, Socket.IO path). Compose feeds one
   value to both; the server and client accept any spelling, the Caddyfile pastes it verbatim,
-  so write it **without** a trailing slash. Unset means `/`.
+  so write it **without** a trailing slash. Unset means `/` — the game at the root of the
+  site name.
 
-On the host, once, as the user that will run it:
+### 2a. Once, on the host: the `.env` file
+
+Nothing from this repo needs to be on the host in advance — `ship.sh` copies what it needs.
+The one thing you create by hand is the environment file, as the user that will run Docker:
 
 ```bash
+ssh ubuntu@<host-ip>
 mkdir -p ~/funny && cd ~/funny
-# .env — see .env.example. Production's, minus the secret:
-#   CLOUDFLARE_WORKER_URL=https://funny-multi-image.<subdomain>.workers.dev
-#   CLOUDFLARE_WORKER_SECRET=<the WORKER_SECRET from step 1>
-#   BASE_PATH=/funny37-game
-#   SITE_HOST=www.example.com
-#   SITE_APEX=example.com
-#   TRUSTED_PROXY_HOPS=1        # Caddy is the one proxy (see below)
+cat > .env <<'ENV'
+CLOUDFLARE_WORKER_URL=https://funny-multi-image.<your-subdomain>.workers.dev
+CLOUDFLARE_WORKER_SECRET=<the WORKER_SECRET from step 1>
+BASE_PATH=/funny37-game
+SITE_HOST=www.example.com
+SITE_APEX=example.com
+TRUSTED_PROXY_HOPS=1
+ENV
 chmod 600 .env
+exit
 ```
 
-Then, from a checkout on any machine with Docker (a 1 GB host is too small to build on, so
-the image is built here and streamed across; no registry involved):
+`.env.example` in the repo documents every variable, including the optional ones
+(`DEPLOYER_DONATE_URL` for a "Support this server" button, `MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
+`ROUND_DURATION_MS`, `PORT`). The defaults are right for a family-sized deployment.
+
+### 2b. From your PC: ship it
+
+From your clone, on any machine with Docker (a 1 GB host is too small to build on, so the
+image is built here and streamed across; no registry involved):
 
 ```bash
 deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
 ```
 
-`ship.sh` reads `BASE_PATH` from the host's `.env`, builds the image with it (tagged with the
-git commit), `docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml`
-and the Caddyfile next to `.env`, runs `docker compose --profile caddy up -d`, and waits for
-`https://SITE_HOST/BASE_PATH/health` to answer through Caddy. Re-run it to deploy a new
-commit; Caddy keeps its certificates across restarts.
+`ship.sh` reads `BASE_PATH` and `SITE_HOST` from the host's `.env`, builds the image with it
+(tagged with the git commit), `docker save | gzip | ssh … docker load`s it (~80 MB), copies
+`docker-compose.yml` and the Caddyfile next to `.env`, runs
+`docker compose --profile caddy up -d`, and waits for `https://SITE_HOST/BASE_PATH/health`
+to answer through Caddy. The first run takes a minute longer while Caddy obtains its
+certificates. Re-run it to deploy a new commit; Caddy keeps its certificates across restarts.
 
-Without the profile — `docker compose up -d` — you get the game alone on plain HTTP `:3000`,
-for a TLS proxy of your own (nginx, Cloudflare Tunnel, …); PWA install and service-worker
-registration both require HTTPS, so something must terminate TLS.
+Verified 2026-09-15 on the production VM: the two-stage `node:20-alpine` image (251 MB), the
+container idles at ~50 MB with Caddy at ~20 MB, Let's Encrypt certificates for both names on
+first boot, HTTP→HTTPS and apex→`www` redirects, and a scripted 3-player room over TLS
+WebSockets through Caddy in under a second.
 
-Verified 2026-09-15 on the production VM: `docker compose up` builds from this Dockerfile
-(two-stage `node:20-alpine`, 251 MB), the container idles at ~50 MB with Caddy at ~20 MB,
-Let's Encrypt certificates for both names on first boot, HTTP→HTTPS and apex→`www`
-redirects, and a scripted 3-player room over TLS WebSockets through Caddy in under a
-second.
+### Variant: your own TLS proxy instead of Caddy
 
-### Option B — Render (one click, free plan; hibernates)
-
-The repo includes `render.yaml`, a Render Blueprint. From the Render dashboard: **New →
-Blueprint**, point it at this repo, and Render reads `render.yaml` for the build/start
-commands and env var list. It uses Render's native Node runtime — `npm install --include=dev
-&& npm run build`, then `npm run start` — not the Dockerfile; there's no reason to pay the
-extra build/cold-start cost of a container on the free plan when Render's own Node build does
-the same thing.
-
-After the blueprint creates the service, set these in the Render dashboard (marked
-`sync: false` in `render.yaml`, so Render won't ask for them until you fill them in):
-
-| Env var                    | Value                                                             |
-| -------------------------- | ----------------------------------------------------------------- |
-| `CLOUDFLARE_WORKER_URL`    | the Worker URL from step 1                                        |
-| `CLOUDFLARE_WORKER_SECRET` | the `WORKER_SECRET` value from step 1                             |
-| `DEPLOYER_DONATE_URL`      | optional — shows a "Support this server" button on the end screen |
-| `MAX_ROOMS`                | optional — default 500                                            |
-| `MAX_IMAGES_PER_DAY`       | optional — default 25; R2 cache hits don't count against this     |
-
-See `.env.example` for the full list, including `TRUSTED_PROXY_HOPS` (below) and
-`ROUND_DURATION_MS`/`PORT`, which Render doesn't need to override.
-
-Render's free plan spins the service down after inactivity; the first request after a
-spin-down is slow (cold start) but otherwise this is a normal Node web service — no
-database, no persistent volume (FM-CORE-2: room state is in-memory only and is meant to be
-disposable).
-
-**Free-plan hibernation, measured 2026-08-20.** Expect more than slow cold starts: against a
-service that had just served traffic, roughly 30% of requests came back as Render's own 404
-with an `x-render-routing: no-server` header, and the pod hostname carried a `-hibernate-`
-segment. The application is not involved — its logs show every request that reaches it
-returning 200 from a single, never-restarted pid. For a game built on long-lived Socket.IO
-connections this matters: an idle room can lose its socket to the routing layer rather than
-to any bug in the server. Use a paid instance for anything you expect real players on; the
-free plan is fine for a smoke test or a family deploy that tolerates a reconnect. This is why
-production moved to Option A (steering decision D-5, 2026-09-14) — a $0 VM that never sleeps.
+`ship.sh` always uses the Caddy profile. If you already terminate TLS elsewhere (nginx,
+Cloudflare Tunnel, …), clone the repo on a host big enough to build (2 GB is plenty), put the
+same `.env` at the repo root (`SITE_HOST`/`SITE_APEX` not needed) and run
+`docker compose up -d`: you get the game alone on plain HTTP `:3000`, mounted under
+`BASE_PATH`, for your proxy to forward to. PWA install and service-worker registration both
+require HTTPS, so something must terminate TLS. See the next section before choosing
+`TRUSTED_PROXY_HOPS`.
 
 ## Trusted proxy hops (`TRUSTED_PROXY_HOPS`)
 
@@ -160,20 +152,25 @@ The per-IP rate limiter (FM-CORE-4) buckets by client IP, read from the right-ha
 can set to any value it likes and use to pick, or rotate, its own rate-limit bucket.
 
 "Right-hand end, N hops in" is only correct if the request actually crosses exactly N
-trusted proxies before reaching the server. Caddy (Option A) appends the client address to
-`x-forwarded-for` and is the only proxy in front of the container, and Render (Option B)
-puts exactly one TLS-terminating proxy in front of every web service — so the default
-`TRUSTED_PROXY_HOPS=1` is right for both. Only raise it if you add something in front (a
-CDN, a load balancer, Cloudflare's proxy switched on for the DNS record) — one hop per proxy
-that appends to `x-forwarded-for` before the server sees it. Setting it too high re-opens
-the same spoofing gap this exists to close (a client's own value shifts into the trusted
-window).
+trusted proxies before reaching the server. Caddy appends the client address to
+`x-forwarded-for` and is the only proxy in front of the container, so the default
+`TRUSTED_PROXY_HOPS=1` is right for the setup above. Only raise it if you add something in
+front (a CDN, a load balancer, Cloudflare's proxy switched on for the DNS record) — one hop
+per proxy that appends to `x-forwarded-for` before the server sees it. Setting it too high
+re-opens the same spoofing gap this exists to close (a client's own value shifts into the
+trusted window).
 
-## After both are deployed
+## After both are deployed — a five-minute check
 
-Run the acceptance checklist (T-8.2) against the production URL
-(`https://www.staging-oursharedcode.com/funny37-game/`) with real phones, including
-disconnect-mid-game → bot, the daily image cap, and a cache-hit replay of the same story.
-Then close the Phase-7 device-session items that were parked pending an HTTPS URL: the
-DevTools Application → Manifest → Installability panel, a real iPhone + Android PWA install,
-and the 60 fps animation-jank check (Gate 7).
+1. `https://<SITE_HOST><BASE_PATH>/health` answers `{"ok":true}` (this is what `ship.sh`
+   waits for).
+2. Open `https://<SITE_HOST><BASE_PATH>/` on a phone: Chrome offers "Install app" (Android) or
+   Safari's Share → Add to Home Screen (iPhone). No offer means the origin is not HTTPS or the
+   service worker failed — check `BASE_PATH` matches what the client was built with.
+3. Create a room, join from two more devices (or browser tabs) via the QR code, play a round.
+   The reveal should show a cartoon within ~10 s. "Generation failed" on every reveal means
+   `CLOUDFLARE_WORKER_URL`/`CLOUDFLARE_WORKER_SECRET` don't match the Worker — compare with
+   `wrangler secret list` in `cloudflare/`.
+4. Play the same story again: the second reveal is instant (R2 cache hit), and the Worker's
+   `/stats` count (the `curl` from step 1) did not move.
+5. Logs, when something is off: `ssh ubuntu@<host-ip> 'cd ~/funny && docker compose logs --tail 50'`.

@@ -655,7 +655,7 @@ filled in), `steering/tasks.md` (T-7.1/T-7.3/T-8.2/Gate 7/Gate 8 updated, B-8 ad
 
 ---
 
-**RESUME HERE (2026-09-16).** Production is **https://www.staging-oursharedcode.com/funny37-game/**,
+~~**RESUME HERE (2026-09-16).** Production is **https://www.staging-oursharedcode.com/funny37-game/**,
 now running the icon fix from this session (redeployed mid-session, commit pending). T-8.1 and
 T-8.2 are closed; T-7.3 is closed. Gate 7 has only A1 (iPhone) left; Gate 8 has only the README
 self-deploy judgement left.
@@ -668,4 +668,81 @@ Still open elsewhere: T-7.1's iPhone install leg (A1) needs a borrowed phone —
 short session, not blocking Gate 8; **B-8** (Google Play Protect "Unsafe app" warning on Android
 install) needs investigation, not urgent; README's Sponsors link and Render deploy-button URL
 (repo private, check as part of the Gate 8 judgement); an Arm retry for the VM
-(`deploy/oci/vm.py` after terminating the Micro) at any session start, still not attempted.
+(`deploy/oci/vm.py` after terminating the Micro) at any session start, still not attempted.~~ *Carried — superseded by the Step 16 note below.*
+
+---
+
+## Step 16 — Gate 8 self-deploy judgement; Render dropped; FUNDING.yml (2026-09-16)
+
+**Task:** Gate 8's last leg — read `DEPLOYMENT.md` and README's deploy section as a stranger
+with a Cloudflare account, a Linux box with Docker and a domain, and judge whether they could
+self-host without asking the owner anything. Agent-only; no device or secret access.
+
+**Verdict: pass with fixes — three gaps would have stopped a stranger; all fixed here.**
+
+1. *Host-side `.env` had no creation step.* The old text said `mkdir -p ~/funny` then listed
+   the variables in a comment, never saying how the file gets onto a host that has no
+   checkout — and `deploy/ship.sh` exits immediately if `SITE_HOST` isn't already in the
+   remote `.env`. Now §2a is an explicit `ssh … cat > .env <<'ENV' … ENV; chmod 600` block with
+   the six production variables, and §2b runs `ship.sh` after it.
+2. *No prerequisites list.* Added "What you need": Cloudflare account (with the note that R2
+   needs a payment method on file even at $0), a Docker host on 80/443, DNS `A` records for
+   both names before first boot, and what the deploying PC needs (Node 20, git, Docker,
+   ssh/scp, curl; Git Bash on Windows). The Worker section now starts with `git clone` and
+   notes that `npx wrangler` fetches wrangler on first use (`cloudflare/package.json` doesn't
+   depend on it).
+3. *Render "Option B" pointed at a service that no longer exists* (deleted in T-8.1) with a
+   deploy button to a private repo. Owner decision this session: **drop Render entirely** —
+   no free platform keeps a party's sockets alive, and no paid hosting is on offer.
+   `render.yaml` deleted; README's button and bullet gone (replaced by a three-line summary of
+   the self-host path and a sentence on *why* there is no one-click option); the Render
+   mentions in `.env.example`, `docker-compose.yml`, `cloudflare/wrangler.toml` and the
+   trusted-proxy section rewritten around Caddy. D-5 and FM-NFR-3 carry a dated amendment.
+
+Smaller fixes on the same pass: `.env.example` still said "see docs/DEPLOYMENT.md … until that
+doc is written at T-8.3"; the `/stats` smoke check needed the `X-Secret` header (the Worker
+403s without it — the first draft of the doc got this wrong and was corrected against
+`worker.js`); the closing "After both are deployed" section was an internal T-8.2/Gate 7
+to-do list and is now a five-step stranger's smoke test (`/health` → install offer → play a
+round → replay is instant and `/stats` unchanged → where the logs are). A "your own TLS
+proxy" variant is spelled out, since `ship.sh` always uses the Caddy profile.
+
+**Owner decisions (2026-09-16):** repo stays private for now, docs judged as if public —
+**making the repo public is a launch prerequisite** (the `git clone` line and the AGPL
+source-availability paragraph both assume it). Render dropped (above). GitHub Sponsors:
+the source project's `.github/FUNDING.yml` pattern copied — `github: oursharedcode` — so the
+README's Sponsors link is backed by the repo's Sponsor button.
+
+**Not touched:** code comments that still cite Render as the example single-proxy platform
+(`apps/funny-multi-server/src/{env,index,rateLimit,stats}.ts`, `packages/shared/src/basePath.ts`,
+`apps/funny-multi-client/vite.config.ts`, `steering/design.md` §1/§7). They are historical
+and invisible to a self-hoster; a cosmetic sweep can ride along with the next code change to
+those files. **Gate 8 is marked PASSED** in `steering/tasks.md`; Phase 8 is complete apart from
+Gate 7's iPhone leg, which is not a Phase 8 item.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the sandbox;
+`npm audit` 0 vulnerabilities. Changed: `DEPLOYMENT.md` (rewritten), `README.md`,
+`.env.example`, `docker-compose.yml`, `cloudflare/wrangler.toml`, `render.yaml` (deleted),
+`.github/FUNDING.yml` (new), `steering/requirements.md` (D-5, FM-NFR-3 amended),
+`steering/tasks.md` (Gate 8 passed).*
+
+---
+
+**RESUME HERE (2026-09-16, after Step 16).** Production is
+**https://www.staging-oursharedcode.com/funny37-game/**. Phases 0–8 are done: Gate 8 passed
+this session (self-deploy judgement; Render dropped; FUNDING.yml added). Nothing in this step
+needs deploying — docs and steering only.
+
+**Next agent step: open Phase 9 (Premium, D-4) with T-9.1.** T-9.1 is business setup on Polar
+(product + two SKUs, license keys on), not code — it needs the owner at the Polar dashboard,
+so the /morning proposal should be: confirm T-9.1 is the owner's to do, and in the same session
+start **T-9.2** (Worker `POST /entitlement`: Polar license validation → 24 h HMAC JWT), which
+is agent code with negative-case tests and only needs a Polar sandbox token at the very end.
+Grep `steering/requirements.md` for FM-TIER-2/3 and read `steering/design.md` §10 (premium
+entitlement) before planning.
+
+Still open elsewhere, none blocking Phase 9: **making the repo public** before any launch
+announcement (owner action, Gate 8 residual); T-7.1's iPhone install leg (A1, needs a borrowed
+phone — closes Gate 7); **B-8** (Play Protect "Unsafe app" warning on Android install); the Arm
+retry for the VM (`deploy/oci/vm.py` after terminating the Micro), still not attempted; a
+cosmetic sweep of "Render" in code comments (list in Step 16).

@@ -46,7 +46,7 @@ These decisions (D-1–D-4 of 2026-08-12, D-5 of 2026-09-14) were taken explicit
 | D-2 | **Languages**: **all 15 source-project languages** ship in v1 (en, fr, de, ru, id, it, zh, ja, ko, pt-br, es-419, es-es, uk, he, ta). Answer pools are authored for every one of them (en + ru are the hand-authored references; the other 13 are machine-drafted and flagged for native review, mirroring the source project's `needs-<code>-review` convention). Note: the source registry contains 15 languages, not 16. |
 | D-3 | **Store apps AND37/IOS37**: specified now (§10), **built post-v1**. Resolves the conflict between `Additional_requirements_strong.md` (must-have, packaging "??") and Initial_Requirements AND-1/OD-2 (web-first) in favor of web-first for v1. |
 | D-4 | **Premium tier**: **in scope for v1, as the final build phase** — started only after the core game is playable end-to-end on real phones. |
-| D-5 | **Production hosting (2026-09-14)**: **self-hosted, $0** — the Docker image on an Oracle Cloud *Always Free* VM (Sydney) behind Caddy, at **`https://www.staging-oursharedcode.com/funny37-game`**; the sibling one-device game will share the domain at `/funny1-game` (sub-paths, not subdomains — owner's call, taken knowing it needs a base-path leg in the client and server). Replaces the Render Starter plan FM-NFR-3 assumed: Render's free plan hibernates and drops idle sockets (log Step 8), and no paid plan is wanted. Render stays as the one-click free alternative for self-deployers. |
+| D-5 | **Production hosting (2026-09-14)**: **self-hosted, $0** — the Docker image on an Oracle Cloud *Always Free* VM (Sydney) behind Caddy, at **`https://www.staging-oursharedcode.com/funny37-game`**; the sibling one-device game will share the domain at `/funny1-game` (sub-paths, not subdomains — owner's call, taken knowing it needs a base-path leg in the client and server). Replaces the Render Starter plan FM-NFR-3 assumed: Render's free plan hibernates and drops idle sockets (log Step 8), and no paid plan is wanted. Render stays as the one-click free alternative for self-deployers. **Amended 2026-09-16 (Gate 8 judgement):** the Render path is dropped altogether — `render.yaml` and the README button removed; self-hosting (Docker + Caddy, or an own TLS proxy) is the only documented deploy. Reason: a hibernating free platform drops the long-lived sockets a party game needs, and no paid hosting is on offer. |
 
 ## 3. The defining change: no free text in answers
 
@@ -231,9 +231,9 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-NFR-3 (MUST)** Server: single Render web service (starter plan) serving both the Socket.IO
   API and the built client statics *(amended by D-5, 2026-09-14: production is the Docker image
   on an Oracle Always-Free VM behind Caddy, served under a URL sub-path; Render remains the
-  self-deploy alternative)*; single Cloudflare Worker + R2 bucket + KV namespace.
-  Docker (single-stage node:20-alpine) as the self-hosting alternative. Free-tier self-hosting
-  stays possible (README deploy buttons pattern from the source).
+  self-deploy alternative — and 2026-09-16: Render dropped entirely, see D-5)*; single
+  Cloudflare Worker + R2 bucket + KV namespace. Docker (two-stage node:20-alpine) is the only
+  deploy; free-tier self-hosting stays possible (Oracle Always-Free or any small VPS).
 - **FM-NFR-4 (MUST)** Animations use transform/opacity only, 60 fps on mid-range Android Chrome
   (design-system constraint); reduced-motion preference honored.
 - **FM-NFR-5 (SHOULD)** Image generation p50 within ~10 s on a warm Worker; R2 cache hit

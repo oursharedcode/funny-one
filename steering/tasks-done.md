@@ -1181,8 +1181,15 @@ unless they carry advisories:
 
 ## Phase 8 — Deploy + acceptance + docs
 
-*In progress — Gate 8 is still open in `steering/tasks.md`. Only fully
-closed tasks are moved here as they land.*
+- **Gate 8 — PASSED 2026-09-16.** Self-deploy judgement (log Step 16): read `DEPLOYMENT.md` and
+  README's deploy section as a stranger with a Cloudflare account, a Linux Docker host and a
+  domain. Found and fixed three blocking gaps — the host `.env` step never said how to create
+  the file (`ship.sh` needs it in place first), no prerequisites list, and a Render path whose
+  service no longer existed (deleted T-8.1). Owner decisions the same day: Render dropped
+  entirely (`render.yaml` deleted, README button removed, D-5/FM-NFR-3 amended);
+  `.github/FUNDING.yml` added (`github: oursharedcode`) so the README's Sponsors link is backed
+  by the repo's own Sponsor button; repo stays private for now, docs judged as if public — making
+  the repo public before any launch announcement is a recorded prerequisite. Phase 8 is complete.
 
 - [x] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
       `.dockerignore`, `.env.example`; deploy server to Render + Worker/R2/KV via wrangler;

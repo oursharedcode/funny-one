@@ -38,16 +38,17 @@ binding = "AI"
 binding = "IMAGES"
 bucket_name = "funny-multi-images"
 
-# Workers KV — OPTIONAL. Persists the daily image counter across Render
-# free-tier spin-downs. The server's in-memory counter resets on each cold
-# start; this KV namespace is the cross-process source of truth.
+# Workers KV — OPTIONAL. Persists the daily image counter across Worker
+# isolate recycles and game-server restarts. The server's in-memory counter
+# resets on each cold start; this KV namespace is the cross-process source
+# of truth.
 #
-# Left commented out by default so a one-click deploy works for ANY account: a
+# Left commented out by default so a fresh `wrangler deploy` works for ANY account: a
 # KV `id` belongs to the account that created it, so a hard-coded id from
 # another account makes `wrangler deploy` fail with "namespace not valid". The
 # Worker treats STATS_KV as optional (see worker.js: `if (!env.STATS_KV)`) and
 # runs fine without it — only the cross-cold-start "Images today" counter is
-# lost, which the Render free tier already resets.
+# lost.
 #
 # To enable persistent stats in YOUR account (one-time):
 #   wrangler kv namespace create STATS_KV            # prints your id
@@ -61,4 +62,4 @@ bucket_name = "funny-multi-images"
 # preview_id = "<your-preview-namespace-id>"
 
 # Set WORKER_SECRET via: wrangler secret put WORKER_SECRET
-# Then set the same value as CLOUDFLARE_WORKER_SECRET in the Render dashboard.
+# Then set the same value as CLOUDFLARE_WORKER_SECRET in the game server's .env.

@@ -75,14 +75,6 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   **Still open:** the iPhone install leg (A1), deferred for lack of a phone this session; Gate 7
   closes once that runs.
 
-## Phase 8 — Deploy + acceptance + docs
-
-- **Gate 8**: acceptance checklist signed off; a stranger can self-deploy from README alone.
-  *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 and T-8.2
-  (acceptance pass) closed 2026-09-16 — both in `steering/tasks-done.md`. Gate itself still
-  open: only the "a stranger can self-deploy from README alone" judgement against
-  `DEPLOYMENT.md` remains.*
-
 ## Phase 9 — Premium (final phase, D-4)
 
 - [ ] **T-9.1 (S)** Polar: product + subscription SKUs ($2.99/mo, $19.99/yr Family Pass),

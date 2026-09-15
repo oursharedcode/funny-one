@@ -17,21 +17,19 @@ phone, create a room, and share the QR code.
 ## Deploy your own
 
 Two pieces: a Cloudflare Worker (cartoon generation + cache) and the game server (which also
-serves the client). The full walkthrough is [DEPLOYMENT.md](DEPLOYMENT.md); in short:
+serves the client). The full walkthrough is [DEPLOYMENT.md](DEPLOYMENT.md) — it assumes
+nothing beyond a Cloudflare account, a Linux host with Docker and a domain name. In short:
 
-- **Self-host** (what the reference deployment runs): any Linux host with Docker, `.env` from
-  `.env.example`, then `deploy/ship.sh user@host` builds the image here, streams it over SSH
-  and starts it with Caddy in front for automatic HTTPS. `docker compose up` alone gives you
-  the container on `:3000` for a proxy of your own.
-- **Render**, one click:
+1. `cd cloudflare && npx wrangler deploy` (after creating the R2 bucket and the shared
+   secret) gives you the Worker URL.
+2. On the host, a six-line `.env` from `.env.example` (Worker URL + secret, `BASE_PATH`, site
+   name).
+3. From your PC, `deploy/ship.sh user@host` builds the image, streams it over SSH and starts
+   it with Caddy in front for automatic HTTPS.
 
-  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/oursharedcode/funny-one)
-
-  deploys the server from `render.yaml` on Render's free plan, which hibernates between
-  visits and drops idle game sockets — fine for a try-out, not for a party.
-
-Either way the Worker is deployed separately first; the server won't generate cartoons until
-you point it at one.
+`docker compose up` alone gives you the container on `:3000` for a TLS proxy of your own.
+There is no hosted or one-click option: the game keeps long-lived sockets open for the length
+of a party, which free app platforms hibernate away.
 
 ## Local development
 
@@ -54,8 +52,9 @@ Purchases (Phase 9, once shipped) buy convenience and support — a hosted insta
 have to run yourself, or unlimited cartoons on someone else's server — **not DRM**. A
 self-hosted deployment gets every feature this repo has, license key or not. If you'd like to
 support development, the only supported way is
-[GitHub Sponsors](https://github.com/sponsors/oursharedcode) — the game client itself never
-hardcodes a donation, payment, or sponsor URL. A deployer can optionally show their own
+[GitHub Sponsors](https://github.com/sponsors/oursharedcode) (the **Sponsor** button on this
+repo, wired by `.github/FUNDING.yml`) — the game client itself never hardcodes a donation,
+payment, or sponsor URL. A deployer can optionally show their own
 "Support this server" button via the `DEPLOYER_DONATE_URL` env var (see `.env.example`); that
 donation goes to whoever runs that specific deployment, not to this project.
 

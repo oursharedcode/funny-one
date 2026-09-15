@@ -44,26 +44,16 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       "37" mark). **Open flag:** the mascot's ears and hair sit outside the maskable safe zone,
       so Android's circular mask may clip them — owner decision 2026-09-14: judge on the real
       Android install rather than pad a `maskable`-only variant pre-emptively.
-      **Remaining for T-7.1:** the real-device install test on iPhone + Android — the part of
-      this task that was never automatable, and separately blocked on a secure context: PWA
-      install and service-worker registration both require HTTPS, which the LAN setup used for
-      Gates 3–5 doesn't have. Owner decision 2026-08-20: defer this check to T-8.1's Render
-      deploy rather than stand up a throwaway tunnel — run the DevTools Installability panel and
-      both real-device installs against the production URL once it exists, then close Gate 7.*
-- [ ] **T-7.3 (S)** Perf check on mid-range Android: 60 fps animations, reveal payload sizes
-      (URL-only) verified in devtools. → FM-NFR-2/4
-      *Both automatable legs landed 2026-08-20: a committed server test
-      (`game.payloadSize.socket.test.ts`) pins FM-NFR-2's byte budget — a single `PictureRef`
-      under 400 B, a full 7-player game's picture traffic (every player's own request plus the
-      shared gallery's fan-out) under 30 KB — against a realistic R2-shaped URL rather than the
-      short placeholder other suites use. A static audit of every `motion`/`AnimatePresence`
-      prop in the client (`ErrorMascot`, `PictureFlourish`, `SubmitConfirm`, `Wordmark`,
-      `PlayerList`, `RoundScreen`, `WaitingScreen`, `screenSlide` in `motion.ts`) confirmed
-      FM-NFR-4: every animated property is `scale`/`x`/`y`/`opacity`/`rotate` — transform/opacity
-      only, no layout- or paint-triggering property anywhere — so no code change was needed.
-      **Remaining for T-7.3:** the 60 fps jank measurement itself needs a real mid-range Android
-      device; owner decision 2026-08-20 folds it into T-8.1's device-session pass alongside
-      T-7.1's install test and Gate 7's jank check, rather than a separate session.*
+      **Android install run 2026-09-16 (device session, A2–A3):** installed and opened standalone
+      at `/funny37-game/` on a real Android phone; the mascot's ears/hair clear the squircle mask
+      cleanly. Getting there needed a real fix — the full-bleed art sat too close to the frame
+      edge for the owner's comfort, so a dedicated `icon-512-maskable.png` (art shrunk to 80%,
+      padded with its own background pink so the shrink reads as headroom, not a mismatched box)
+      now backs the manifest's `maskable` entry; `icon-512.png` stays full-bleed for `any`. Also
+      surfaced: Google Play Protect blocks the install as "Unsafe app" until "Install anyway" —
+      logged as **B-8**, not fixed here.
+      **Remaining for T-7.1:** the iPhone install leg — still needs a borrowed phone; stays open
+      until then.*
 - **Gate 7**: Chrome DevTools Application → Manifest → Installability panel passes (Lighthouse
   dropped its dedicated PWA audit category in v12, so this is its successor check); install
   confirmed on a real iPhone and Android; animation jank check passed on a real device.
@@ -76,29 +66,22 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   there needed a real fix — Chrome's manifest loader rejects `/icon.svg` outright (error
   survived a redeploy adding `width`/`height`, a warm hard reload, and Clear-site-data with the
   SW unregistered), so the manifest is PNG-only now and the SVG is the favicon.
-  **Still open:** real iPhone install, real Android install, and the jank check — all three in
-  one scripted device session (owner decision 2026-09-14) once T-8.1's new deploy target is up.
   **Installability leg re-run 2026-09-15 (Step 13)** against
   https://www.staging-oursharedcode.com/funny37-game/ — D-5's new origin **and** sub-path
   scope: same clean result (only the two optional screenshot notices) and Chrome shows the
   install icon in the omnibox. The Render sign-off is superseded; the Render service is gone.
+  **Android install + maskable-icon + jank legs passed 2026-09-16** (device session, A2–A4;
+  `docs/ACCEPTANCE.md`) — see T-7.1/T-7.3 notes above for detail.
+  **Still open:** the iPhone install leg (A1), deferred for lack of a phone this session; Gate 7
+  closes once that runs.
 
 ## Phase 8 — Deploy + acceptance + docs
 
-- [ ] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
-      run with 3 real phones on the production URL; include disconnect-mid-game → bot,
-      cap flow, cache-hit flow. → design §13
-      *Owner decision 2026-09-14: the checklist is authored first as `docs/ACCEPTANCE.md`, with
-      Gate 7's three device legs prepended, so the phone session — on the D-5 URL, not Render —
-      runs as one scripted pass.*
-      *Step 14 (2026-09-15): `docs/ACCEPTANCE.md` written — Part A (Gate 7 legs), Part B (§19
-      adapted, 17 items), Part C (cap / dead-Worker flips the agent performs live), results
-      template. Owner decision 2026-09-15: devices are two desktops + one Android; the iPhone
-      leg is deferred, so Gate 7 keeps that one leg open after the session.*
 - **Gate 8**: acceptance checklist signed off; a stranger can self-deploy from README alone.
-  *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 —
-  `steering/tasks-done.md`. Gate itself still open: needs T-8.1's deploy and T-8.2's
-  acceptance pass before "a stranger can self-deploy" can actually be verified.*
+  *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 and T-8.2
+  (acceptance pass) closed 2026-09-16 — both in `steering/tasks-done.md`. Gate itself still
+  open: only the "a stranger can self-deploy from README alone" judgement against
+  `DEPLOYMENT.md` remains.*
 
 ## Phase 9 — Premium (final phase, D-4)
 
@@ -128,6 +111,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 - **B-6** RuStore investigation (CMP-4); OD-F3 cap-granularity revisit; OD-F4 12+ revisit.
 - **B-7** Optional AI Gateway / output classifier if the audience broadens (MODERATION.md
   operator guidance).
+- **B-8** Google Play Protect shows "Unsafe app blocked — built for an older version of
+  Android" on install, requiring "Install anyway" (seen 2026-09-16, A2). Likely the WebAPK's
+  minified/unsigned nature reading as unrecognized rather than a real manifest defect —
+  investigate `targetSdkVersion`-equivalent metadata and whether a TWA (B-1) sidesteps it.
 
 ## Dependency notes
 

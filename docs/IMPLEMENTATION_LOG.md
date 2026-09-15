@@ -597,20 +597,75 @@ docs-only session); `npm audit` 0 vulnerabilities. Only `docs/ACCEPTANCE.md` (ne
 
 ---
 
-**RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
-(Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
-redeploy). T-8.1 is closed. `docs/ACCEPTANCE.md` is written (Step 14) but not yet run.
+Next agent step: **the device session** (T-8.2 + Gate 7's device legs) per `docs/ACCEPTANCE.md`,
+run live with the owner. *Carried — superseded by the Step 15 note below.*
 
-**Owner operation pending:** the device session itself — two desktop Chrome tabs + one Android
-phone, per `docs/ACCEPTANCE.md`. The agent joins live for Part C (the two `.env` flips on the
-VM); Part A/B are the owner's play-through. No agent code step is blocked on this — the next
-agent-only step is Gate 8's README judgement, which needs T-8.2 to have passed first, so in
-practice **the device session is next** regardless of who starts it.
+---
 
-Still open elsewhere: the iPhone install leg (A1) needs a separate pass whenever a phone is
-borrowed — it stays open after this session's run either way; README's Sponsors link and Render
-deploy-button URL (repo private); an Arm retry for the VM (`deploy/oci/vm.py` after terminating
-the Micro) at any session start.
+## Step 15 — T-8.2 device session run; T-7.1/T-7.3 device legs; icon fix (2026-09-16)
 
-Still open elsewhere: README's Sponsors link and Render deploy-button URL (repo private); an
-Arm retry for the VM (`deploy/oci/vm.py` after terminating the Micro) at any session start.
+**Shipped:** the acceptance device session ran end to end — two desktop Chrome tabs (A, B) and
+one Android phone (C), the owner playing all three seats, the agent driving Part C's server-side
+flips over SSH. Full results in `docs/ACCEPTANCE.md`.
+
+**Part A (Gate 7 legs):** A2 (Android install) pass — real Play Store friction surfaced though:
+Google Play Protect blocks the install as "Unsafe app blocked — built for an older version of
+Android" until the user taps "Install anyway"; logged as **B-8**, not investigated further this
+session. A3 (maskable-icon clip check) failed on first look — the mascot's ears/hair sat right at
+the safe-zone edge, and the owner asked for more headroom mid-session. Fixed live: a dedicated
+`icon-512-maskable.png` (the art shrunk to 80%, padded with its own background pink sampled from
+the source corner rather than the manifest's cream, so the shrink reads as headroom instead of a
+mismatched box) now backs the manifest's `maskable` icon entry; `icon-512.png` stays full-bleed
+for the `any` entry. Built and deployed mid-session (`deploy/ship.sh`), re-verified on the phone
+— pass. A4 (jank check, folded into the Part B playthrough): no stutter noticed on the timer bar,
+submit-confirm mascot, or reveal flourish — eye check only, not instrumented. T-7.1's Android leg
+and T-7.3 both close on this; T-7.1's iPhone leg (A1) stays open, still needing a borrowed phone.
+
+**Part B (17-item playthrough):** 14 of 17 pass (B1–B11, B13, B14, B17). Three skipped by owner
+decision (session time): B12 (cache-hit replay + live `/stats` check — the "cache hit costs no
+slot" path is unit-tested server-side already), B15 (reconnect-within-window), B16 (Russian
+room). B4's type-to-filter sub-check was waived, tap-pick and the disabled-Submit state both
+confirmed. Owner decision: sign off T-8.2 on this basis rather than hold it open for the three
+skips — see `steering/tasks.md`.
+
+**Part C (server-side flips):** all three pass. C1 (daily cap =1): exactly one cartoon generated,
+the other two saw the cap message with no Try again and a blank-free gallery state; the lobby
+showed the unavailable notice for new rooms. C2 (dead Worker, wrong secret): every player saw
+"Generation failed. Try again." with the error mascot, Try again failed gracefully a second time,
+Continue still reached the gallery. C3 (restore): production is back to its shipped
+configuration; a fresh room generated normally.
+
+**Harness limits hit and worked around:** the auto-mode classifier refuses any Bash write to a
+`*_SECRET=` line (even to a deliberately-wrong test value) and any read of `.env` content — both
+by design. C2's and C3's secret edits were done by the owner directly on the VM instead (one
+command per message). Separately, `~/.cloudflare/worker-secret` (needed to restore C3) had never
+been copied to the VM — only this PC held it — so the owner `scp`'d it across first. Both lessons
+are now in memory (`mark-operation-style`, `funnyone-hosting-oracle`) for next time.
+
+**Owed:** Gate 7 — only A1 (iPhone install) remains, needs a borrowed phone. Gate 8 — needs the
+README self-deploy judgement, next up now that T-8.2 has passed. **B-8** (Play Protect warning)
+is a new backlog item, not investigated. B12/B15/B16 stay unrun; re-run only if the owner decides
+the skip wasn't acceptable in hindsight.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the sandbox;
+`npm audit` 0 vulnerabilities. Changed: `apps/funny-multi-client/vite.config.ts`,
+`apps/funny-multi-client/public/icon-512-maskable.png` (new), `docs/ACCEPTANCE.md` (results
+filled in), `steering/tasks.md` (T-7.1/T-7.3/T-8.2/Gate 7/Gate 8 updated, B-8 added),
+`steering/tasks-done.md` (T-7.3, T-8.2 moved in).*
+
+---
+
+**RESUME HERE (2026-09-16).** Production is **https://www.staging-oursharedcode.com/funny37-game/**,
+now running the icon fix from this session (redeployed mid-session, commit pending). T-8.1 and
+T-8.2 are closed; T-7.3 is closed. Gate 7 has only A1 (iPhone) left; Gate 8 has only the README
+self-deploy judgement left.
+
+**Next agent step: Gate 8's README self-deploy judgement** — read `DEPLOYMENT.md` as a stranger
+would and judge whether it's enough to self-host without asking the owner anything. No device or
+owner-secret access needed; this is an agent-only read-and-judge step.
+
+Still open elsewhere: T-7.1's iPhone install leg (A1) needs a borrowed phone — folds into a future
+short session, not blocking Gate 8; **B-8** (Google Play Protect "Unsafe app" warning on Android
+install) needs investigation, not urgent; README's Sponsors link and Render deploy-button URL
+(repo private, check as part of the Gate 8 judgement); an Arm retry for the VM
+(`deploy/oci/vm.py` after terminating the Micro) at any session start, still not attempted.

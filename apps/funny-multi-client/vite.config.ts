@@ -54,7 +54,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-180.png', 'icon-192.png', 'icon-512.png', 'flags/*.png'],
+      includeAssets: [
+        'icon-180.png',
+        'icon-192.png',
+        'icon-512.png',
+        'icon-512-maskable.png',
+        'flags/*.png',
+      ],
       manifest: {
         name: 'Funny Multi «Чепуха 37»',
         short_name: 'Funny Multi',
@@ -86,10 +92,17 @@ export default defineConfig({
         // Artwork (2026-08-20, owner decision): icon-180/192/512.png are SRC's
         // commissioned mascot art (SRC/client/public/icon-192.png, icon-512.png;
         // 180 resized from the 512 master), replacing the hand-authored "37"
-        // placeholder. NOT verified maskable-safe — the art's ears/hair sit close
-        // to the frame edge, outside the usual middle-80% safe zone, so a circular
-        // mask (Android adaptive icons) may clip them. Re-check on a real Android
-        // install (T-7.1) rather than assuming this is fine.
+        // placeholder.
+        //
+        // Real Android install (2026-09-15, A3) showed the full-bleed art
+        // survives the squircle mask, but with the ears/hair right at the
+        // edge — the owner asked for more headroom. `icon-512-maskable.png`
+        // is a dedicated maskable variant: the same art shrunk to 80% and
+        // padded with its own background pink (sampled from the source
+        // corner, not the manifest's cream, so the shrink reads as headroom
+        // rather than a mismatched box) — see `steering/tasks.md` T-7.1 /
+        // Gate 7. `icon-512.png` (full bleed) stays the `any` icon; only the
+        // maskable entry points at the padded file.
         icons: [
           {
             src: 'icon-192.png',
@@ -104,7 +117,7 @@ export default defineConfig({
             purpose: 'any',
           },
           {
-            src: 'icon-512.png',
+            src: 'icon-512-maskable.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',

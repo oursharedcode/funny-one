@@ -75,40 +75,40 @@ rooms reset with the restart, so **start a fresh room after each flip**.
 
 | Field            | Value                                            |
 | ---------------- | ------------------------------------------------ |
-| Date             |                                                  |
-| App commit       |                                                  |
+| Date             | 2026-09-15 → 2026-09-16 (one session, crossed UTC midnight) |
+| App commit       | 3548b56, plus the `icon-512-maskable.png` change made and deployed mid-session (Step 15) |
 | URL              | https://www.staging-oursharedcode.com/funny37-game/ |
-| A (host)         | desktop Chrome — OS / Chrome version:            |
-| B                | desktop Chrome — OS / Chrome version:            |
-| C                | Android phone — model / Android / Chrome version: |
-| Tester(s)        |                                                  |
+| A (host)         | desktop Chrome — Windows 10 (owner's PC)         |
+| B                | desktop Chrome — second tab/window on the same PC |
+| C                | Android phone — owner's (model not recorded)     |
+| Tester(s)        | owner (all three seats); agent drove Part C's VM flips |
 
 | #   | Result (pass / fail / deferred) | Note                     |
 | --- | ------------------------------- | ------------------------ |
 | A1  | deferred                        | no iPhone this session   |
-| A2  |                                 |                          |
-| A3  |                                 |                          |
-| A4  |                                 |                          |
-| B1  |                                 |                          |
-| B2  |                                 |                          |
-| B3  |                                 |                          |
-| B4  |                                 |                          |
-| B5  |                                 |                          |
-| B6  |                                 |                          |
-| B7  |                                 |                          |
-| B8  |                                 |                          |
-| B9  |                                 |                          |
-| B10 |                                 |                          |
-| B11 |                                 |                          |
-| B12 |                                 |                          |
-| B13 |                                 |                          |
-| B14 |                                 |                          |
-| B15 |                                 |                          |
-| B16 |                                 |                          |
-| B17 |                                 |                          |
-| C1  |                                 |                          |
-| C2  |                                 |                          |
-| C3  |                                 |                          |
+| A2  | pass                            | Installed, opens standalone. **Flag:** Google Play Protect showed "Unsafe app blocked — built for an older version of Android" on both install attempts; "Install anyway" was needed. Every real installer will see this — investigate separately (post-session). |
+| A3  | pass                            | Full-bleed art survived the squircle mask, but the ears/hair sat at the edge; owner asked for headroom. Fixed mid-session: dedicated `icon-512-maskable.png` (art at 80 %, padded in its own background pink), redeployed, re-installed, confirmed. |
+| A4  | pass                            | No stutter noticed during the full playthrough on C (timer bar, submit mascot, reveal flourish). Not instrumented — eye check only. |
+| B1  | pass                            |                          |
+| B2  | pass                            |                          |
+| B3  | pass                            |                          |
+| B4  | pass                            | Tap-pick and Submit-disabled confirmed. Type-to-filter **waived** (owner decision 2026-09-16, "not needed"). |
+| B5  | pass                            |                          |
+| B6  | pass                            |                          |
+| B7  | pass                            |                          |
+| B8  | pass                            |                          |
+| B9  | pass                            | Story and picture downloads worked. |
+| B10 | pass                            |                          |
+| B11 | pass                            |                          |
+| B12 | skipped                         | Owner decision 2026-09-16. The "cache hit costs no slot" path is unit-tested on the server (`image.test.ts`); the live end-to-end `/stats` counter check was not run. |
+| B13 | pass                            |                          |
+| B14 | pass                            |                          |
+| B15 | skipped                         | Owner decision 2026-09-16. |
+| B16 | skipped                         | Owner decision 2026-09-16. |
+| B17 | pass                            |                          |
+| C1  | pass                            | Agent set `MAX_IMAGES_PER_DAY=1` over SSH. |
+| C2  | pass                            | Owner swapped the secret by hand — the agent harness refuses writes to `*_SECRET=` lines. Try again failed gracefully; Continue → gallery "No picture for this story". |
+| C3  | pass                            | Secret restored from `~/.cloudflare/worker-secret` (scp'd from the owner's PC to the VM first — it had never been on the VM). `/health` OK; a fresh room generated normally. |
 
 **Sign-off:** T-8.2 passes when every B and C row is _pass_. Gate 7 closes when A2–A4 pass and
 A1 is later run on a borrowed iPhone. Gate 8 additionally needs the "stranger self-deploys from

@@ -1142,7 +1142,7 @@ unless they carry advisories:
 
 ## Phase 7 — PWA + polish
 
-*In progress — Gate 7 and the rest of Phase 7's tasks (T-7.1, T-7.3) are still open in
+*In progress — Gate 7 and T-7.1 (the iPhone install leg) are still open in
 `steering/tasks.md`. Only fully closed tasks are moved here as they land.*
 
 - [x] **T-7.2 (M)** Design-system pass: motion presets on all transitions (forward-only),
@@ -1163,9 +1163,25 @@ unless they carry advisories:
       *Full suite: typecheck, lint, `prettier --check` clean; 616/616 tests (client 188 [+2],
       server 307, shared 82, cloudflare 39). `npm audit` 0 vulnerabilities. No regressions.*
 
+- [x] **T-7.3 (S)** Perf check on mid-range Android: 60 fps animations, reveal payload sizes
+      (URL-only) verified in devtools. → FM-NFR-2/4
+      *Both automatable legs landed 2026-08-20: a committed server test
+      (`game.payloadSize.socket.test.ts`) pins FM-NFR-2's byte budget — a single `PictureRef`
+      under 400 B, a full 7-player game's picture traffic (every player's own request plus the
+      shared gallery's fan-out) under 30 KB — against a realistic R2-shaped URL rather than the
+      short placeholder other suites use. A static audit of every `motion`/`AnimatePresence`
+      prop in the client (`ErrorMascot`, `PictureFlourish`, `SubmitConfirm`, `Wordmark`,
+      `PlayerList`, `RoundScreen`, `WaitingScreen`, `screenSlide` in `motion.ts`) confirmed
+      FM-NFR-4: every animated property is `scale`/`x`/`y`/`opacity`/`rotate` — transform/opacity
+      only, no layout- or paint-triggering property anywhere — so no code change was needed.
+      **Jank check run 2026-09-16 (device session, A4):** a full game played on a real Android
+      phone — timer bar's final 10 s, submit-confirm mascot, picture reveal flourish — showed no
+      noticeable stutter or dropped frames. Eye check only, not instrumented; T-7.3 closes on
+      that basis.*
+
 ## Phase 8 — Deploy + acceptance + docs
 
-*In progress — T-8.2 and Gate 8 are still open in `steering/tasks.md`. Only fully
+*In progress — Gate 8 is still open in `steering/tasks.md`. Only fully
 closed tasks are moved here as they land.*
 
 - [x] **T-8.1 (M)** Deploy artifacts adapted: `render.yaml`, `Dockerfile`, `docker-compose.yml`,
@@ -1247,3 +1263,23 @@ closed tasks are moved here as they land.*
       server 310, shared 82, cloudflare 39), run directly outside the sandbox; `npm audit` 0
       vulnerabilities. No regressions — docs-only step.*
 
+
+- [x] **T-8.2 (M)** Acceptance test: SRC spec §19 checklist adapted to combobox + URL images,
+      run with 3 real phones on the production URL; include disconnect-mid-game → bot,
+      cap flow, cache-hit flow. → design §13
+      *Owner decision 2026-09-14: the checklist is authored first as `docs/ACCEPTANCE.md`, with
+      Gate 7's three device legs prepended, so the phone session — on the D-5 URL, not Render —
+      runs as one scripted pass.*
+      *Step 14 (2026-09-15): `docs/ACCEPTANCE.md` written — Part A (Gate 7 legs), Part B (§19
+      adapted, 17 items), Part C (cap / dead-Worker flips the agent performs live), results
+      template. Owner decision 2026-09-15: devices are two desktops + one Android; the iPhone
+      leg is deferred, so Gate 7 keeps that one leg open after the session.*
+      **Step 15 (2026-09-16): session run.** Part A (A2–A4) and Part C (C1–C3) all pass; Part B
+      passed 14 of 17 items (B1–B11, B13, B14, B17) — B12 (cache-hit `/stats` replay), B15
+      (reconnect-within-window) and B16 (Russian room) were skipped by owner decision (time),
+      and B4's type-to-filter sub-check was waived. Full results in `docs/ACCEPTANCE.md`. Owner
+      decision 2026-09-16: sign off T-8.2 on this basis rather than hold it open for the three
+      skipped items — the named extras (disconnect→bot, cap flow, cache-hit *unit* coverage)
+      are otherwise covered. A2–A3 also drove a real fix: `icon-512-maskable.png` (T-7.1 note).*
+      *Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the
+      sandbox; `npm audit` 0 vulnerabilities.*

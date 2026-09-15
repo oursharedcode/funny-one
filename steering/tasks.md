@@ -91,6 +91,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       *Owner decision 2026-09-14: the checklist is authored first as `docs/ACCEPTANCE.md`, with
       Gate 7's three device legs prepended, so the phone session — on the D-5 URL, not Render —
       runs as one scripted pass.*
+      *Step 14 (2026-09-15): `docs/ACCEPTANCE.md` written — Part A (Gate 7 legs), Part B (§19
+      adapted, 17 items), Part C (cap / dead-Worker flips the agent performs live), results
+      template. Owner decision 2026-09-15: devices are two desktops + one Android; the iPhone
+      leg is deferred, so Gate 7 keeps that one leg open after the session.*
 - **Gate 8**: acceptance checklist signed off; a stranger can self-deploy from README alone.
   *T-8.3 (README, DEPLOYMENT, DEVELOPMENT, LANGUAGES, MODERATION) closed 2026-08-20 —
   `steering/tasks-done.md`. Gate itself still open: needs T-8.1's deploy and T-8.2's

@@ -546,7 +546,7 @@ comment. Otherwise compose, Caddyfile, ship script, docs, steering.*
 
 ---
 
-**RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
+~~**RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
 (Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
 redeploy). The Render service is deleted (owner decision 2026-09-15) — `render.yaml` stays
 only as the one-click Option B for strangers; the rotated `WORKER_SECRET` lives in
@@ -560,7 +560,57 @@ line 1315; T-8.2 cites SRC) adapted to combobox answers + URL images, prefixed w
 three device legs (iPhone install, Android install incl. the maskable-icon clip check, jank),
 with a results template — the script for the owner's single phone session (T-8.2 + Gate 7),
 run on the production URL. Then Gate 8 ("a stranger can self-deploy from README alone") can be
-judged against the rewritten DEPLOYMENT.md.
+judged against the rewritten DEPLOYMENT.md.~~ *Carried — superseded by the Step 14 note below.*
+
+---
+
+## Step 14 — T-8.2: `docs/ACCEPTANCE.md` written (2026-09-15)
+
+**Shipped:** the acceptance script for the owner's device session, adapted from SRC spec §19
+(`FUNNY_STORIES_SPEC_v4.md` line 1315) per the 2026-09-14 owner decision to author the checklist
+first. Part A: Gate 7's three device legs (iPhone install, Android install, maskable-icon clip
+check, jank), A1 pre-marked *deferred* since this session's device roster (owner decision
+2026-09-15: two desktop Chrome tabs + one Android phone, no iPhone) has nothing to run it on.
+Part B: SRC's 13 items reworked to 17 for this game's shape — combobox tap-pick and
+type-to-filter replace free-text, `/i/<hash>` URL images replace base64, the automatic-reveal
+flow replaces the "Generate Picture" button, the profanity item is dropped (no free-text
+answers, nothing to filter) — plus T-8.2's three named extras: disconnect-mid-game → bot,
+reconnect-within-window, and a same-picks cache-hit replay that checks the Worker `/stats`
+counter is unchanged. RU room and an added Hebrew RTL sanity item close out Part B. Part C: the
+two server-side flips (daily cap, dead Worker) the agent runs live on the VM's `.env` during the
+session — each a restart, so each starts its flow in a fresh room — plus a restore-and-verify
+step. A results table with device/tester fields and a per-item pass/fail/deferred column, and
+sign-off rules distinguishing T-8.2 (every B/C row passes) from Gate 7 (A2–A4 pass, A1 deferred
+until an iPhone is available) from Gate 8 (needs this plus the README self-deploy judgement).
+`steering/tasks.md` T-8.2 carries a note pointing at this file and the device-roster decision.
+
+**Owed:** T-8.2 itself — the doc is the script, not the run. The owner's device session (Part A,
+B, C) is still to happen; T-8.2 stays unticked and Gate 7/Gate 8 stay open until it does. The
+iPhone leg (A1) will need a separate pass whenever a phone is available — it will not close in
+the desktops+Android session. Gate 8's README self-deploy judgement follows once T-8.2 passes.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the sandbox
+(one transient client-suite failure on the first run — `AUTHORED_LANGUAGES` picker assertion —
+reproduced clean, 190/190, on an isolated rerun; flake, not a regression, and unrelated to this
+docs-only session); `npm audit` 0 vulnerabilities. Only `docs/ACCEPTANCE.md` (new) and
+`steering/tasks.md` (a note under T-8.2) changed.*
+
+---
+
+**RESUME HERE (2026-09-15).** Production is **https://www.staging-oursharedcode.com/funny37-game/**
+(Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
+redeploy). T-8.1 is closed. `docs/ACCEPTANCE.md` is written (Step 14) but not yet run.
+
+**Owner operation pending:** the device session itself — two desktop Chrome tabs + one Android
+phone, per `docs/ACCEPTANCE.md`. The agent joins live for Part C (the two `.env` flips on the
+VM); Part A/B are the owner's play-through. No agent code step is blocked on this — the next
+agent-only step is Gate 8's README judgement, which needs T-8.2 to have passed first, so in
+practice **the device session is next** regardless of who starts it.
+
+Still open elsewhere: the iPhone install leg (A1) needs a separate pass whenever a phone is
+borrowed — it stays open after this session's run either way; README's Sponsors link and Render
+deploy-button URL (repo private); an Arm retry for the VM (`deploy/oci/vm.py` after terminating
+the Micro) at any session start.
 
 Still open elsewhere: README's Sponsors link and Render deploy-button URL (repo private); an
 Arm retry for the VM (`deploy/oci/vm.py` after terminating the Micro) at any session start.

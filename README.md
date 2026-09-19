@@ -48,15 +48,19 @@ secrets baked into any deployment, no server-side-only feature, nothing withheld
 self-hoster. If you deploy your own copy — modified or not — the AGPL requires you to make
 your source available to your users, same as everyone else deploying this game.
 
-Purchases (Phase 9, once shipped) buy convenience and support — a hosted instance you don't
-have to run yourself, or unlimited cartoons on someone else's server — **not DRM**. A
-self-hosted deployment gets every feature this repo has, license key or not. If you'd like to
-support development, the only supported way is
-[GitHub Sponsors](https://github.com/sponsors/oursharedcode) (the **Sponsor** button on this
-repo, wired by `.github/FUNDING.yml`) — the game client itself never hardcodes a donation,
-payment, or sponsor URL. A deployer can optionally show their own
-"Support this server" button via the `DEPLOYER_DONATE_URL` env var (see `.env.example`); that
-donation goes to whoever runs that specific deployment, not to this project.
+There is nothing to buy: no premium tier, no license keys, no paywall. A self-hosted
+deployment gets every feature this repo has. The game is free to play; if you'd like to say
+thanks, the official deployment has a **Support** screen (♥ on the Home screen) with
+voluntary gifts — nothing is owed, nothing is unlocked.
+
+Only chargeback-free rails are offered: **PayID/Osko** (Australian banks), **GitHub
+Sponsors** (choose _one-time_; GitHub is the merchant of record; the **Sponsor** button on
+this repo is the same account, wired by `.github/FUNDING.yml`) and **Bitcoin Lightning**.
+No card checkout, Stripe, PayPal, Ko-fi or Buy Me a Coffee: on those a single disputed $1
+gift costs the recipient $15–30 in dispute fees, which is a bet a small project cannot take.
+The addresses are not in the code — a deployer sets their own via `DEPLOYER_PAYID`,
+`DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` (and the older
+`DEPLOYER_DONATE_URL`; see `.env.example`), so gifts on any deployment go to whoever runs it.
 
 ## Adding a language
 

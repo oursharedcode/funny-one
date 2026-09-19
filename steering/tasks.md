@@ -75,22 +75,31 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   **Still open:** the iPhone install leg (A1), deferred for lack of a phone this session; Gate 7
   closes once that runs.
 
-## Phase 9 — Premium (final phase, D-4)
+## Phase 9 — Commercial: pre-generated library + support rails (final phase, D-6/D-7)
 
-- [ ] **T-9.1 (S)** Polar: product + subscription SKUs ($2.99/mo, $19.99/yr Family Pass),
-      license keys enabled. (Business setup, not code.) → FM-TIER-2
-- [ ] **T-9.2 (M)** Worker `POST /entitlement`: Polar license validation → 24 h HMAC JWT
-      (`ENTITLEMENT_SECRET`); negative cases (invalid/expired/refunded). → FM-TIER-3
-- [ ] **T-9.3 (M)** Server: `entitlementToken` on `room:create`, JWT verify, `room.premium`,
-      cap bypass debiting monthly KV fair-use counter `fu:<yyyy-mm>:<keyHash>` (generations
-      only, 300/mo ceiling, distinct at-ceiling message). Tests: bypass, ceiling, cache hits
-      free. → FM-TIER-2/3
-- [ ] **T-9.4 (S)** Client: "I have a key" redemption field (Home, ⭐ affordance), JWT in
-      localStorage, premium badge in lobby. **No prices, no buy buttons, no purchase copy.** → FM-TIER-4
-- [ ] **T-9.5 (S)** Docs: premium section in README (web checkout link lives outside the app),
-      fair-use policy stated plainly. → FM-TIER-2/6
-- **Gate 9**: end-to-end: buy test key on Polar sandbox → redeem → premium room generates past
-  the free daily cap → fair-use ceiling triggers correctly.
+*Rewritten 2026-09-16; the Polar premium tasks that stood here were never started.*
+
+- [ ] **T-9.1 (S)** Owner, not code: register a PayID and note the **exact registered account
+      name** the payer's bank displays; pick a Lightning wallet and get its address; on GitHub
+      Sponsors (`oursharedcode`) add **one-time** tiers $1/$3/$5; enable the paid Workers AI plan
+      for the batch. → D-6, D-7
+- [ ] **T-9.2 (M)** `cloudflare/pregenerate.mjs`: enumerate all `VISUAL_SLOTS` combinations via
+      `buildPrompt`, `/exists` → `/generate`, resumable, concurrency ≤ 4, backoff on 429/5xx,
+      progress + cost summary. Tests: enumeration is exactly 10⁴ distinct prompts, skip-existing,
+      stop-on-fatal. Then run it to completion against production. → FM-TIER-2, design §10.1
+- [ ] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
+      `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
+      set → passed through, never in any socket event. → FM-TIER-3
+- [ ] **T-9.4 (M)** Client: `SupportScreen` (Home ♥ + end screen), tap-to-copy with "Copied!",
+      PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
+      QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
+      off in store-shell builds. Tests: rows follow config, copy button, no rail → no ♥. → FM-TIER-4
+- [ ] **T-9.5 (S)** Docs: README "Support" and "Why no card payments" paragraphs; `.env.example`
+      + DEPLOYMENT.md variables; ACCEPTANCE.md gets a support-screen row. → FM-TIER-3/6
+- **Gate 9**: library complete (object count in R2 = 10⁴; a full game on production leaves
+  `/stats` unchanged); Support screen on desktop + Android: a real $1 PayID transfer arrives
+  under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
+  from a second wallet arrives.
 
 ## Post-v1 backlog (not scheduled)
 
@@ -107,11 +116,22 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   Android" on install, requiring "Install anyway" (seen 2026-09-16, A2). Likely the WebAPK's
   minified/unsigned nature reading as unrecognized rather than a real manifest defect —
   investigate `targetSdkVersion`-equivalent metadata and whether a TWA (B-1) sidesteps it.
+- **B-9** Version 2 animated cartoon: animate the still client-side and export WebM via
+  `MediaRecorder` (SRC's `VIDEO_GENERATION_ANALYSIS.md` option 2). Zero AI cost. Note DD-9
+  dropped SRC's Lottie engine — reinstating it is a v2 decision, not a revert.
+- **B-10** Further income options under D-6(e), each chargeback-free or platform-as-MoR:
+  seasonal word packs (Christmas, Halloween, birthday) as free pre-generated content; Sponsors
+  monthly tier → "Family Pass" badge (the only safe recurring rail); print-on-demand of a room's
+  cartoon (POD platform is MoR); theme packs (B-5) unlocked by a one-time Sponsors tier; private
+  branded instances for schools/venues by bank-transfer invoice; paid self-host setup/support;
+  affiliate links in README/HUB only; the v2 animation export as the gift thank-you;
+  grants/credits (Screen Australia games fund, Cloudflare/Oracle startup credits, Open
+  Collective for language packs); ad network on «Чепуха 37» only — separate decision.
 
 ## Dependency notes
 
-- Phases are strictly ordered 0→8; Phase 9 requires only Gate 4 technically but is scheduled
-  last by decision D-4.
+- Phases are strictly ordered 0→8; Phase 9 (commercial, D-6/D-7) requires only Gate 4
+  technically and keeps the last slot that D-4 gave it, although D-4 itself is superseded.
 - T-1.5 (en/ru pools) blocks Gate 1 but T-1.6 and Phase 2 tasks T-2.1/T-2.2 can proceed in
   parallel with it.
 - T-6.3 (13 pool languages) is the largest content task; it can start any time after T-1.4

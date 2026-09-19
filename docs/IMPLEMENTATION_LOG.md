@@ -728,7 +728,7 @@ Gate 7's iPhone leg, which is not a Phase 8 item.
 
 ---
 
-**RESUME HERE (2026-09-16, after Step 16).** Production is
+~~**RESUME HERE (2026-09-16, after Step 16).** Production is
 **https://www.staging-oursharedcode.com/funny37-game/**. Phases 0–8 are done: Gate 8 passed
 this session (self-deploy judgement; Render dropped; FUNDING.yml added). Nothing in this step
 needs deploying — docs and steering only.
@@ -745,4 +745,65 @@ Still open elsewhere, none blocking Phase 9: **making the repo public** before a
 announcement (owner action, Gate 8 residual); T-7.1's iPhone install leg (A1, needs a borrowed
 phone — closes Gate 7); **B-8** (Play Protect "Unsafe app" warning on Android install); the Arm
 retry for the VM (`deploy/oci/vm.py` after terminating the Micro), still not attempted; a
-cosmetic sweep of "Render" in code comments (list in Step 16).
+cosmetic sweep of "Render" in code comments (list in Step 16).~~ **Superseded same day, before
+any of it was started** — see Step 17.
+
+## Step 17 (task: commit D-6/D-7 steering rewrite) — 2026-09-20
+
+**Owed:** Step 16 ended with the Premium plan (D-4, Polar) intact and a RESUME note pointing at
+it. Later the same day the owner made two new scope decisions — **D-6** (no premium tier, no
+card merchant of record; support becomes voluntary gifts over PayID/Osko, GitHub Sponsors
+one-time tiers and Bitcoin Lightning, each deployer-configured) and **D-7** (pre-generate all
+10⁴ visual-slot combinations into R2 once, ≈ $10, so per-player generation is never gated by
+the Workers AI daily budget) — reasoned in `local_docs/gift-payments-no-chargeback-research.md`.
+`steering/requirements.md`, `steering/design.md` §10 (renamed "Commercial: pre-generated
+library and support rails"), and `steering/tasks.md` Phase 9 were rewritten to match (DD-10
+retired, DD-11/DD-12 added; T-9.1–T-9.5 replaced; Gate 9 redefined; B-9/B-10 backlog added).
+`.env.example`, `.github/FUNDING.yml`, `DEPLOYMENT.md` and `README.md` were updated for the new
+env vars and dropped Polar mentions. **None of this was committed** — the session that wrote it
+ended without a commit, leaving the RESUME note above stale and pointing at a plan the owner had
+already replaced.
+
+**Shipped this step:** committed the pending rewrite as-is (docs/steering only, no code changed,
+so typecheck/lint/tests are unaffected by this step and were not re-run). `local_docs/` added to
+version control — the fee-structure research is the cited justification for a binding decision
+(D-6) and has nothing sensitive in it.
+
+**Verified before committing (Sonnet 5, this session):** the image-prompt `SKELETON` that D-7's
+pre-generation batch depends on was tuned against real Flux output and **locked 2026-08-14**
+(T-4.2) — a later wording edit cannot orphan the batch. Two inaccuracies in the still-uncommitted
+plan text, left as-is pending owner/agent follow-up: (1) design §10.1 places the new
+`pregenerate.mjs` under `cloudflare/`, but `buildPrompt` and the existing mixed-radix pool
+enumeration (`apps/funny-multi-server/scripts/samplePrompts.mjs`, `--curl` mode) both live in
+the server workspace — the pre-generator should be a sibling of that script, not new code in
+`cloudflare/`. (2) design §10.2 / T-9.3 describe the four new `DEPLOYER_*` support vars landing
+on "the same config endpoint that already carries `donateUrl`" — no such endpoint exists yet;
+`donateUrl` today ships inside the `lobby:update` **socket** broadcast
+(`apps/funny-multi-server/src/index.ts:192`), re-sent on every join/leave. T-9.3 will need to
+either add a `GET config` REST route (recommended — five static strings do not belong on a
+per-join broadcast) or extend the existing payload; owner has not yet chosen.
+
+**RESUME HERE (2026-09-20, after Step 17).** Production is unchanged:
+**https://www.staging-oursharedcode.com/funny37-game/**. Phases 0–8 done. Phase 9 is now
+"Commercial: pre-generated library + support rails" (D-6/D-7), not Premium — Polar/JWT/
+entitlement code was never started and the design section for it no longer exists.
+
+**Next agent step: T-9.3** (server support-rail env vars → a config surface the client can read;
+resolve the endpoint-vs-broadcast question above first) is the largest piece of Phase 9 that
+needs no owner action and no spend. **T-9.1** (owner: register PayID + note the bank's exact
+display name, pick a Lightning wallet, add one-time Sponsors tiers, enable the paid Workers AI
+plan) and **T-9.2** (pregenerate script + the real batch run, needs T-9.1's Workers AI plan)
+are the owner-gated and spend-gated pieces — sequence them whenever the owner is free, one small
+step at a time per their usual cadence.
+
+Also mid-session 2026-09-20, the owner opened two large new fronts beyond Phase 9: a
+single-device "Funny One" party game (anticipated by D-5's `/funny1-game` sub-path but not yet
+scoped anywhere in `steering/`) and Android/iPhone store apps published under an Australian ABN
+(AND37/IOS37, `steering/design.md` §"store apps", specified but explicitly deferred to
+post-v1 by D-3). Both need their own planning pass before code — see whichever session picks
+this up next for how far that planning got.
+
+Still open, none blocking Phase 9: making the repo public before any launch announcement; T-7.1's
+iPhone install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM
+retry; a cosmetic "Render" sweep in code comments; a stray comment in
+`apps/funny-multi-server/src/prompt.ts:72` still calling T-4.2 outstanding when it is done.

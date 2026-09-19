@@ -38,15 +38,17 @@ wherever they fit (see `design.md` for the reuse map).
 
 ## 2. Scope decisions (product owner, 2026-08-12)
 
-These decisions (D-1–D-4 of 2026-08-12, D-5 of 2026-09-14) were taken explicitly and govern the rest of this document:
+These decisions (D-1–D-4 of 2026-08-12, D-5 of 2026-09-14, D-6–D-7 of 2026-09-16) were taken explicitly and govern the rest of this document:
 
 | # | Decision |
 |---|---|
 | D-1 | **Scope**: steering docs plan **Funny Multi only**, but inside the family monorepo layout (ARC-1) — `apps/funny-multi-client`, `apps/funny-multi-server`, `packages/shared` — so Funny One and the HUB site can be added later without rework. |
 | D-2 | **Languages**: **all 15 source-project languages** ship in v1 (en, fr, de, ru, id, it, zh, ja, ko, pt-br, es-419, es-es, uk, he, ta). Answer pools are authored for every one of them (en + ru are the hand-authored references; the other 13 are machine-drafted and flagged for native review, mirroring the source project's `needs-<code>-review` convention). Note: the source registry contains 15 languages, not 16. |
 | D-3 | **Store apps AND37/IOS37**: specified now (§10), **built post-v1**. Resolves the conflict between `Additional_requirements_strong.md` (must-have, packaging "??") and Initial_Requirements AND-1/OD-2 (web-first) in favor of web-first for v1. |
-| D-4 | **Premium tier**: **in scope for v1, as the final build phase** — started only after the core game is playable end-to-end on real phones. |
+| D-4 | **Premium tier**: **in scope for v1, as the final build phase** — started only after the core game is playable end-to-end on real phones. **Superseded 2026-09-16 by D-6:** no premium tier, no subscription, no Polar; Phase 9 keeps its slot (last) but now holds the commercial work of D-6/D-7. |
 | D-5 | **Production hosting (2026-09-14)**: **self-hosted, $0** — the Docker image on an Oracle Cloud *Always Free* VM (Sydney) behind Caddy, at **`https://www.staging-oursharedcode.com/funny37-game`**; the sibling one-device game will share the domain at `/funny1-game` (sub-paths, not subdomains — owner's call, taken knowing it needs a base-path leg in the client and server). Replaces the Render Starter plan FM-NFR-3 assumed: Render's free plan hibernates and drops idle sockets (log Step 8), and no paid plan is wanted. Render stays as the one-click free alternative for self-deployers. **Amended 2026-09-16 (Gate 8 judgement):** the Render path is dropped altogether — `render.yaml` and the README button removed; self-hosting (Docker + Caddy, or an own TLS proxy) is the only documented deploy. Reason: a hibernating free platform drops the long-lived sockets a party game needs, and no paid hosting is on offer. |
+| D-6 | **Commercial posture and support rails (2026-09-16)**: this project is a **fully commercial product with an official deployment** (desktop and mobile browsers now; AND37/IOS37 native shells post-v1). The source project's monetisation stances **MON-1** ("no ads ever") and **MON-7** ("no payment/sponsor URLs in the client") were written for a free GitHub repo with no official deployment and **do not bind this project**. What replaces them: (a) **no card-based merchant of record** — Polar, Stripe, Ko-fi, Buy Me a Coffee, PayPal, Patreon are out, because a $1 gift disputed on a card costs $15–30 in fees (`local_docs/gift-payments-no-chargeback-research.md`); support arrives only over **chargeback-free rails: PayID/Osko (AU bank push), GitHub Sponsors (GitHub is the merchant of record), Bitcoin Lightning**; (b) the rails are **deployer-configured env vars**, so the official deployment shows the owner's and a self-hoster shows their own; (c) payments are framed as **voluntary gifts, nothing owed**; (d) **advertising is permitted in principle** on «Чепуха 37» (12+ audience) but **never on the children's product** and **not in the v1 build** — network choice is a separate decision; (e) further income options (seasonal packs, print-on-demand, branded instances, paid self-host support, grants) are backlog B-10 in `tasks.md`. |
+| D-7 | **Pre-generated image library (2026-09-16)**: all **10⁴ visual-slot combinations** are generated once into R2 (paid Workers AI, ≈ $10 one-off, ≈ 3 GB; R2 egress is free), so every in-game request is a cache hit and player count is no longer bound by the Workers AI daily budget. `MAX_IMAGES_PER_DAY` stays as a backstop for pool changes and for self-hosters who skip the batch. Reverses the v1 non-goal "no pre-generated flat image library" (docs OD-9). **Version 2 target:** an animated cartoon rendered client-side from the still (the source project's Lottie/`MediaRecorder` approach, its `VIDEO_GENERATION_ANALYSIS.md`), zero AI cost — backlog B-9. |
 
 ## 3. The defining change: no free text in answers
 
@@ -203,23 +205,29 @@ Everything in this section is inherited from the source spec v4 unless marked **
   operator-tunable daily cap (`MAX_IMAGES_PER_DAY`, default 25, UTC reset, reserve-before-await,
   KV-backed recovery after server restarts). Cap-reached UX (`CAP_REACHED` "cartoon oven is
   full" flow) is kept as-is. R2 **cache hits bypass the cap** — a capped room can still receive
-  already-cached cartoons.
-- **FM-TIER-2 (MUST)** **Premium tier** (v1, final phase — D-4): marketed "unlimited cartoons",
-  enforced as a fair-use ceiling of **300 generated cartoons / month** per license
-  (cache hits don't count). Default pricing $2.99/mo or $19.99/yr "Family Pass" (OD-3 default).
-- **FM-TIER-3 (MUST)** Entitlement per MON-6: one Worker endpoint `/entitlement` accepting a
-  **Polar license key** and returning a **24 h signed JWT**; the game server honors the JWT by
-  lifting the daily cap for that room. Entitlement state lives at the merchant of record (Polar);
-  only the monthly fair-use counter touches Cloudflare KV (OD-4 exception, scoped to the Worker).
-- **FM-TIER-4 (MUST)** In-app purchase UI is **key-redemption only** ("I have a key" field) —
-  no prices, no buy buttons, no purchase language in the client (CMP-5 posture for all markets).
-  No hardcoded donation/payment/sponsor URLs in any built client (MON-7); author support =
-  GitHub Sponsors in README only. The deployer-controlled `DEPLOYER_DONATE_URL` end-screen
-  button (a source-project *operator* feature, not an author link) is kept.
-- **FM-TIER-5 (MUST)** No advertising anywhere, ever (MON-1). Russia: web product free in v1
-  (OD-8, CMP-4).
-- **FM-TIER-6 (MUST)** Purchases are convenience and support, **not DRM** (MON-5): the repo is
-  AGPL and self-hosters get everything; documented plainly in README.
+  already-cached cartoons. Under D-7 the cap is a backstop only: the library makes every
+  in-game request a cache hit.
+- **FM-TIER-2 (MUST)** **Pre-generated library** (D-7): a resumable batch script generates every
+  prompt `buildPrompt` can produce (all visual-slot combinations) into R2 before launch and
+  again after any pool change; a full game on the official deployment leaves `/stats` unchanged.
+  *(Rewritten 2026-09-16; the premium tier this id used to carry is superseded by D-6.)*
+- **FM-TIER-3 (MUST)** **Support rails** (D-6): the server exposes, from env, `DEPLOYER_PAYID` +
+  `DEPLOYER_PAYID_NAME` (the exact registered account name the payer's bank will display),
+  `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS`, alongside the existing
+  `DEPLOYER_DONATE_URL`; the client shows only what is set. No card checkout, no
+  merchant-of-record account, no secrets in the client. *(Rewritten 2026-09-16; replaces the
+  Polar `/entitlement` design.)*
+- **FM-TIER-4 (MUST)** **Support screen**: reachable from Home (small ♥ affordance) and from the
+  end screen; every address has tap-to-copy with visible "Copied!" feedback; PayID shows the
+  registered name; the Sponsors line says "choose one-time"; Lightning is a `lightning:` link
+  plus a client-rendered QR; the copy states plainly that gifts are voluntary and nothing is
+  owed — in all 15 languages. Inside the store shells (FM-APP-3) the screen is hidden until
+  platform rules are reviewed. *(Rewritten 2026-09-16; MON-7 retired by D-6.)*
+- **FM-TIER-5 (MUST)** Advertising per D-6(d): none in the v1 build; permitted later on
+  «Чепуха 37» only, never on the children's product. Russia: web product free in v1
+  (OD-8, CMP-4). *(Rewritten 2026-09-16; MON-1 retired by D-6.)*
+- **FM-TIER-6 (MUST)** Gifts are support, **not DRM** (MON-5): the repo is AGPL and
+  self-hosters get everything; documented plainly in README.
 
 ## 8. Non-functional requirements
 
@@ -265,19 +273,21 @@ Everything in this section is inherited from the source spec v4 unless marked **
   with the client bundle inside the app. The game is **online-only** (server-held rooms) — the
   shell must present as a genuine game to pass App Review Guideline 4.2 ("minimum functionality");
   this risk is accepted and revisited at build time.
-- **FM-APP-3 (MUST, post-v1)** Store-app purchases, if any, follow MON-2 rails (Play Billing /
-  StoreKit) with the same key-only web fallback rules (CMP-5). Not designed further in v1.
+- **FM-APP-3 (MUST, post-v1)** No in-app purchases (D-6). The Support screen (FM-TIER-4) is
+  hidden inside the store shells until Play and App Store rules on developer gifts outside
+  platform billing are reviewed at B-1/B-2 time. Not designed further in v1.
 - **FM-APP-4 (MUST)** v1 web client must not depend on anything that would block wrapping later
   (no popup-only flows; share/download features degrade gracefully inside webviews).
 
 ## 11. Non-goals for v1
 
 No free-text answers (defining change). No accounts, auth, database, ORM, Redis, or job queue.
-No reconnect (disconnect = bot). No sound. No Lottie/Rive/video/WebGL. No ads. No analytics.
+No reconnect (disconnect = bot). No sound. No Lottie/Rive/video/WebGL. No ad network in the v1
+build (D-6). No analytics.
 No translation at runtime (neither answers nor prompts). No deploy automation. No Turnstile /
 fingerprinting / quota layers beyond the caps in §7. No RuStore (post-launch investigation).
-No Funny One, no HUB site, no store apps in the v1 build (D-1, D-3). No pre-generated flat
-image library (the R2 cache fills organically; OD-9 stays closed).
+No Funny One, no HUB site, no store apps in the v1 build (D-1, D-3). *(The former non-goal
+"no pre-generated flat image library" was reversed by D-7 on 2026-09-16.)*
 
 ## 12. Open decisions
 
@@ -288,7 +298,7 @@ image library (the R2 cache fills organically; OD-9 stays closed).
 | OD-F3 | Daily-cap granularity: docs MUL-3 says "per-room daily cap", source implements process-global | Keep process-global (matches the account-wide Neuron budget); revisit with premium telemetry |
 | OD-F4 | Revisit 12+ positioning now that all content is curated (affects AND37/IOS37 rating) | Stay 12+ (MUL-5) |
 | OD-F5 | Native-speaker review completion for 13 machine-drafted pool languages | Ship flagged `needs-<code>-review`; review post-launch |
-| OD-F6 | Premium one-time purchase alternative (docs OD-3) | Subscription $2.99/mo / $19.99/yr |
+| OD-F6 | ~~Premium one-time purchase alternative (docs OD-3)~~ | Closed 2026-09-16 by D-6: no premium tier; voluntary gifts only |
 | OD-F7 | Umbrella RU brand «Семейная Чепуха» approval (docs OD-10) | Not needed for MUL v1; HUB concern |
 | OD-F8 | ESLint 8.57.1 is end-of-life; ESLint 9 requires a flat-config migration that discards the `.eslintrc.json` copied from SRC (T-0.2) | Stay on ESLint 8 (no advisories against it); revisit before v1 ships |
 | OD-F9 | FM-CORE-4's per-IP buckets key on `x-forwarded-for`'s **first** hop (spec §17). That header is client-settable, so a caller can choose — and rotate — its own bucket key and evade the limit. Correct trust depends on the deployed proxy chain, which is not fixed until T-8.1 (T-2.2) | Ship spec §17 behavior rather than diverge silently; make the trusted-hop count configurable and count from the proxy-appended end at T-8.1, and correct DEPLOYMENT.md, which inherits SRC's claim that this already works |
@@ -304,7 +314,7 @@ image library (the R2 cache fills organically; OD-9 stays closed).
 | FM-BOT-* | spec §7, §17; ONE-4 |
 | FM-IMG-* | MUL-2; spec §10, §11, §15, §22 |
 | FM-POOL-* | ONE-10..12 adapted to MUL; ARC-2, ARC-5 |
-| FM-TIER-* | MUL-3; MON-1..7; OD-3, OD-4, OD-8; spec §11, §17 |
+| FM-TIER-* | MUL-3; MON-5; OD-8; D-6, D-7 (MON-1, MON-7, OD-3, OD-4 retired 2026-09-16); spec §11, §17 |
 | FM-NFR-* | spec §8, §13, §14; MUL-2; DESIGN_SYSTEM |
 | FM-CPL-* | CMP-1, CMP-5, CMP-6; MODERATION.md; spec §27 |
 | FM-APP-* | Additional_requirements_strong (AND37/IOS37); AND-2/AND-3, IOS-1/IOS-2 as packaging precedent |

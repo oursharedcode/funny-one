@@ -34,8 +34,8 @@ into this repo and adapted here. SRC spec section references (`spec §N`) point 
 │          Workers AI Flux Schnell (4 steps) → PNG → R2 put → KV count++          │
 │  /i/<hash>     → serve PNG from R2 (immutable cache headers, CORS)              │
 │  /stats        → { date, count } from KV                                        │
-│  /entitlement  → Polar key → 24h JWT          (premium phase)                   │
-│  KV: daily counter + premium monthly fair-use counters                          │
+│  library: all 10⁴ prompts pre-generated into R2 before launch (D-7, §10)        │
+│  KV: daily counter (a backstop only under D-7)                                  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -48,7 +48,7 @@ prefix all take one configurable `BASE_PATH`, default `/`, which keeps Render wo
 
 Changed vs SRC (each detailed below): combobox answers with server-side validation (§4–§6),
 deterministic prompts from pool fragments (§7.1), R2-cached images delivered by URL (§7.2),
-no filter/translation stack, premium entitlement (§10).
+no filter/translation stack, pre-generated library and support rails (§10).
 
 ## 2. Repository layout (FM-ARC-1)
 
@@ -366,8 +366,8 @@ Bindings: `AI`, `STATS_KV` (existing), **new** `IMAGES` (R2 bucket). All routes 
   request we make for these URLs is a plain `GET` with no custom headers, which is never
   preflighted.
 - `GET /stats` → unchanged from SRC.
-- `POST /entitlement` → premium phase, §10. Routing dispatches on pathname first, leaving method
-  checks to the routes, so this lands without restructuring.
+- No `/entitlement` route: the Polar premium design was retired by D-6 (§10). Routing still
+  dispatches on pathname first, leaving method checks to the routes.
 
 Not carried from SRC: the raw-byte-stream fallback for pre-Flux image models. SRC streamed bytes
 straight through; this Worker has to **store** them, and a stream cannot be sniffed for type or
@@ -446,25 +446,43 @@ engine-selection UI and Lottie path are removed.
   its clause commas via the copied `polishRussianProse`.
 - es-419 / es-es are distinct pool text files (may start identical; regional review flagged).
 
-## 10. Premium / entitlement (final phase — D-4, FM-TIER-2..4)
+## 10. Commercial: pre-generated library and support rails (final phase — D-6, D-7, FM-TIER-2..4)
 
-- **Polar** (merchant of record) sells the subscription and issues license keys; no card data
-  or checkout in our code. Checkout link lives on the marketing surface (HUB later, README) —
-  never in the client (FM-TIER-4).
-- **Worker `POST /entitlement`** `{licenseKey}` → validate against Polar's license API →
-  `200 {token}` where token = JWT `{sub: keyHash, tier:'premium', exp: now+24h}` signed
-  HMAC-SHA256 with new secret `ENTITLEMENT_SECRET` (shared Worker↔server env var, distinct
-  from `WORKER_SECRET`). Invalid/expired/refunded key → 403.
-- **Client**: "I have a key" field on the Home screen (behind a small ⭐ affordance), stores
-  the JWT in localStorage, sends it in `room:create` payload (new optional field
-  `entitlementToken`). Key-redemption UI only — no prices, no buy language (CMP-5).
-- **Server**: verifies JWT signature/expiry at room creation; a premium room sets
-  `room.premium = true` → picture generation for that room bypasses the daily free cap and
-  instead debits the **monthly fair-use counter**: Worker KV key `fu:<yyyy-mm>:<keyHash>`,
-  incremented on actual generations only (cache hits free), ceiling 300/month (FM-TIER-2);
-  at ceiling the room falls back to the free-tier cap behavior with a distinct message.
-- Free-tier flow (daily cap + CAP_REACHED UX) is completely independent and ships phases
-  earlier; premium only adds a bypass.
+*Rewritten 2026-09-16. The Polar license → JWT → cap-bypass design this section held was
+retired by D-6; nothing of it was built.*
+
+### 10.1 Pre-generated library (D-7, FM-TIER-2)
+
+- `cloudflare/pregenerate.mjs` (Node, run from the deploying PC): enumerates every combination
+  of the four `VISUAL_SLOTS` from `POOLS`, builds the prompt with the server's `buildPrompt`
+  (the same bytes the game sends, so the R2 keys match), and for each calls `GET /exists` then
+  `GET /generate` on the Worker with `X-Secret`. Resumable (skips what exists), concurrency ≤ 4,
+  retries 429/5xx with backoff, prints a running count and stops on the first non-retryable
+  error. 10⁴ prompts ≈ $10 on the paid Workers AI plan, ≈ 3 GB of R2; both within one evening.
+- Nothing in the game path changes: `/generate` on a full library is always a cache hit,
+  `/stats` does not move, and the reservation/refund logic of §7.3 keeps working as the
+  backstop for a pool change or a self-hoster who skipped the batch.
+- Re-run after any pool edit; a new option in one slot costs 10³ images.
+- Version 2 (backlog B-9): animate the still client-side (SRC's Lottie/`MediaRecorder` idea);
+  no server or Worker change.
+
+### 10.2 Support rails (D-6, FM-TIER-3/4)
+
+- **Server**: four optional env vars next to `DEPLOYER_DONATE_URL` — `DEPLOYER_PAYID`,
+  `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` — read once at
+  boot and returned by the same config endpoint that already carries `donateUrl`
+  (`support: { payId, payIdName, sponsorsUrl, lightningAddress, donateUrl }`, each `string|null`).
+  Nothing else server-side: no accounts, no webhooks, no payment state.
+- **Client**: `SupportScreen` opened from Home (♥ affordance) and from the end screen (replacing
+  the single donate button when any rail is set). Order: PayID → Sponsors → Lightning → donate
+  URL. Each row: label, the address in a `<code>`, a copy button using `navigator.clipboard`
+  with a 2 s "Copied!" state; PayID row shows "your bank will display: <name>"; Sponsors row
+  is a plain link with the "choose one-time" hint; Lightning row is an `<a href="lightning:…">`
+  plus a QR drawn on a `<canvas>` by a small vendored encoder (no CDN). Header copy: voluntary
+  gift, nothing owed. All strings in the 15 locale files.
+- Store shells (FM-APP-3): the screen is compiled in but gated off by the shell build flag until
+  the platform review at B-1/B-2.
+- Not built: any card checkout, key redemption, entitlement token, premium room flag.
 
 ## 11. Environment variables
 
@@ -474,8 +492,9 @@ engine-selection UI and Lottie path are removed.
 | `WORKER_SECRET` | Worker | as SRC |
 | `MAX_IMAGES_PER_DAY` (25) / `MAX_ROOMS` (500) / `ROUND_DURATION_MS` (60000) | server | as SRC |
 | `DEPLOYER_DONATE_URL` | server | operator donate button, as SRC |
-| `ENTITLEMENT_SECRET` | server + Worker | premium phase (§10) |
-| `POLAR_ACCESS_TOKEN` | Worker | premium phase; license validation |
+| `DEPLOYER_PAYID` / `DEPLOYER_PAYID_NAME` | server | support rails (§10.2, D-6): PayID and the exact registered account name |
+| `DEPLOYER_SPONSORS_URL` | server | support rails (§10.2): GitHub Sponsors profile |
+| `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 
 R2 bucket (`IMAGES`) and KV (`STATS_KV`) are wrangler.toml bindings, not env vars.
 
@@ -553,4 +572,6 @@ post-v1 phase; nothing in v1 may preclude it.
 | DD-7 | Combobox = tap-card radio list, no dropdown, no search | Phone-first tap targets; typing anywhere would reintroduce a free-text affordance |
 | DD-8 | Filter/translate stack deleted rather than disabled | Dead code invites re-enabling half of it; FM-CPL-4 guards the future instead |
 | DD-9 | Lottie recording engine dropped, `wobbleEngine` field removed from protocol | ARC-3 locks the stack (no Lottie); removing the field is the honest protocol |
-| DD-10 | Premium as cap-bypass on the existing free path, not a parallel pipeline | Free tier ships and is testable phases earlier; premium risk isolated to the last phase (D-4) |
+| DD-10 | ~~Premium as cap-bypass on the existing free path~~ Retired 2026-09-16 by D-6/D-7 — no premium tier; nothing was built | — |
+| DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $10 once; keys match because the same function makes them; free egress means no per-view cost |
+| DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |

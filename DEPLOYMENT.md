@@ -62,11 +62,12 @@ Uncomment the `[[kv_namespaces]]` block in `cloudflare/wrangler.toml` and paste 
 ids the commands above print, then `wrangler deploy` again. The Worker runs fine without
 this — `worker.js` treats `STATS_KV` as optional.
 
-### Optional: premium phase (Phase 9 only)
+### Optional: pre-generate the whole picture library (Phase 9, D-7)
 
-`POLAR_ACCESS_TOKEN` and `ENTITLEMENT_SECRET` are only needed once Phase 9 (license
-redemption) is in use. Leave them unset until then — an unset `ENTITLEMENT_SECRET` on the
-game server means no premium rooms are created.
+The game only ever asks for one of 10,000 possible pictures. Generating them all once
+(`node cloudflare/pregenerate.mjs`, resumable) costs about $10 on the paid Workers AI plan and
+about 3 GB of R2, after which every request is a cache hit, the daily cap never fires and R2
+egress is free. Without it the cache fills organically and `MAX_IMAGES_PER_DAY` applies.
 
 ## 2. Deploy the game server
 
@@ -111,7 +112,8 @@ exit
 ```
 
 `.env.example` in the repo documents every variable, including the optional ones
-(`DEPLOYER_DONATE_URL` for a "Support this server" button, `MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
+(the `DEPLOYER_*` support rails — PayID + registered name, GitHub Sponsors URL, Lightning
+address, legacy donate URL — for the Support screen, `MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
 `ROUND_DURATION_MS`, `PORT`). The defaults are right for a family-sized deployment.
 
 ### 2b. From your PC: ship it

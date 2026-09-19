@@ -796,7 +796,7 @@ plan) and **T-9.2** (pregenerate script + the real batch run, needs T-9.1's Work
 are the owner-gated and spend-gated pieces — sequence them whenever the owner is free, one small
 step at a time per their usual cadence.
 
-Also mid-session 2026-09-20, the owner opened two large new fronts beyond Phase 9: a
+~~Also mid-session 2026-09-20, the owner opened two large new fronts beyond Phase 9: a
 single-device "Funny One" party game (anticipated by D-5's `/funny1-game` sub-path but not yet
 scoped anywhere in `steering/`) and Android/iPhone store apps published under an Australian ABN
 (AND37/IOS37, `steering/design.md` §"store apps", specified but explicitly deferred to
@@ -806,4 +806,63 @@ this up next for how far that planning got.
 Still open, none blocking Phase 9: making the repo public before any launch announcement; T-7.1's
 iPhone install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM
 retry; a cosmetic "Render" sweep in code comments; a stray comment in
-`apps/funny-multi-server/src/prompt.ts:72` still calling T-4.2 outstanding when it is done.
+`apps/funny-multi-server/src/prompt.ts:72` still calling T-4.2 outstanding when it is done.~~
+**Superseded same day — see Step 18.**
+
+## Step 18 (task: plan Funny One + store apps) — 2026-09-20
+
+**Owed:** Step 17's RESUME note said Funny One and the store apps "need their own planning pass
+before code" without saying what that pass would find. This step is that pass — docs only, no
+application code. Owner explicitly directed **Phase 9 paused** for now to make room for it.
+
+**Critical finding, before any of the rest of this step matters:** the task brief this session
+started from assumed Funny One would reuse Funny Multi's AI-cartoon pipeline. It doesn't match
+the only spec that ever existed for this product — `docs/archive/Initial_Requirements.md`
+(**ONE-13/14/17/19**): Funny One was invented specifically to be the fully **offline**, zero-
+network, zero-server sibling (the multi-device game can never be offline because its room state
+is server-held; Funny One exists to close that gap), assembling scenes on-device from a small
+layered art rig rather than calling out to Workers AI. Nothing in `steering/requirements.md`
+overrides that — D-1 only reserves the `apps/funny-one` workspace name. **Owner decided
+(D-8, recorded in the new `steering/funny-one-requirements.md`): the offline on-device rig,
+matching the original archived intent, not the AI pipeline — plus per-question round-robin
+turn-passing** (closer to Funny Multi's rhythm than the archive's per-player-block default).
+
+**Shipped:** three new sibling steering documents, kept out of `steering/requirements.md`/
+`design.md`/`tasks.md` because D-1 scopes those to Funny Multi only: `steering/
+funny-one-requirements.md` (FO-\* ids, D-8, open questions OQ-3/OQ-4 flagged for later phases),
+`steering/funny-one-design.md` (no-server architecture, the reuse map against
+`funny-multi-client`, the one genuinely new system — the rig compositor), `steering/
+funny-one-tasks.md` (Phase FO-0–FO-7 + a Phase S for store apps, sized S/M/L, FO-0 marked closed
+today). `steering/tasks.md` B-1/B-2 (AND37/IOS37) annotated "pulled forward 2026-09-20" per the
+owner's direction to plan store apps for both products now rather than post-v1; its header notes
+Phase 9's pause and points at the new documents.
+
+**Also determined (store apps, both products):** Apple Developer Program enrollment as an
+Organization needs a **D-U-N-S number** first, which can take 1–2 weeks to register if the ABN
+entity doesn't already have one — this is the long-pole step and was started as the very next
+owner action regardless of anything else in this step. Google Play Console (Organization,
+$25 one-time, ABN business verification) runs in parallel and is usually faster. Funny One's
+store shells, once it exists, are in a *stronger* App Store 4.2 position than Funny Multi's
+(a self-contained offline game, not a wrapped website) and can realistically target Google Play
+Families/"Everyone" — the opposite of Funny Multi's 12+, never-Families positioning (FM-ID-2) —
+*because* D-8 chose the offline path; that positioning would not hold if a future change added
+any network call.
+
+**Not done this step:** no code, no `apps/funny-one-client` scaffold yet (T-FO-1.1, next once the
+owner is ready), no developer-account signup completed (owner action, in progress outside this
+session). Full six-gate suite not re-run — no application code changed, only new/edited
+Markdown, prettier-checked.
+
+**RESUME HERE (2026-09-20, after Step 18).** Phase 9 (commercial rails, D-6/D-7) is paused, not
+abandoned — T-9.3 (server support-rail config, no owner/spend dependency) is still the easiest
+re-entry point whenever the owner wants Phase 9 moving again. The two new fronts each have a
+concrete next step: **T-FO-1.1** (Funny One: scaffold `apps/funny-one-client`, no art needed yet
+— can start any time) and the Apple/Google developer-account enrollment sequence in
+`steering/funny-one-tasks.md` Phase S (owner action, D-U-N-S lookup first). Rig art (T-FO-4.1) is
+the single largest unknown in the Funny One plan — content authoring, not engineering, and
+genuinely unscoped until real art exists.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`.

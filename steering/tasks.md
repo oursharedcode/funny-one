@@ -6,7 +6,7 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–6 complete (Gates 0–6 passed); closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
+| **Progress** | Phases 0–8 complete; Phase 9 (commercial rails) **paused 2026-09-20** by owner direction while two new fronts get planned — see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` (new product) and this file's B-1/B-2 (store apps, pulled forward). Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
 | **Build state** | Tracked per step in `docs/IMPLEMENTATION_LOG.md`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
@@ -104,7 +104,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 ## Post-v1 backlog (not scheduled)
 
 - **B-1** AND37: TWA (Bubblewrap) wrapper + Play listing (12+, not Families) — FM-APP-1.
+  **Pulled forward 2026-09-20** — owner wants store apps for both products now rather than
+  post-v1; see `steering/funny-one-tasks.md` Phase S for the sequencing (developer-account
+  enrollment under the existing ABN, then Funny Multi's shells, then Funny One's once it exists).
 - **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
+  **Pulled forward 2026-09-20**, same note as B-1.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared

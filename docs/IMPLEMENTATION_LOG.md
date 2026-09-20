@@ -996,13 +996,50 @@ T-FO-3.3 (the virtual-seat "thinking" delay this step deferred); the Apple/Googl
 developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
 running in parallel.
 
-**RESUME HERE (2026-09-20, after Step 21).** `apps/funny-one-client` now has a tested local game
-engine (`src/game/roundRobin.ts`) but still no screens beyond the T-FO-1.1 placeholder. Next
+~~**RESUME HERE (2026-09-20, after Step 21).** `apps/funny-one-client` now has a tested local
+game engine (`src/game/roundRobin.ts`) but still no screens beyond the T-FO-1.1 placeholder. Next
 agent step: **Phase FO-3** — likely **T-FO-3.1** (home/setup screen: seat count, human/virtual
 mix, language picker gated to `AUTHORED_LANGUAGES`) first, since T-FO-3.2's handoff/round screens
 need seats to exist. Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google
 developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
+running in parallel.~~
+
+## Step 22 — Funny One home/setup screen (2026-09-20)
+
+**Shipped:** `apps/funny-one-client/src/screens/HomeScreen.tsx` (T-FO-3.1) — the local setup
+screen, adapted from Funny Multi's create-mode `HomeScreen`: an editable seat list (human or
+virtual, add/remove bounded by `MIN_SEATS`/`MAX_SEATS`, default 1 human + 1 virtual per OQ-3's
+solo floor) and a single content-language picker gated to `AUTHORED_LANGUAGES` (currently all 15
+of `LANGUAGES`), reusing the same two-column rules+language `ScrollBox` layout. Flag artwork
+copied unmodified into `public/flags/`; `ScrollBox.tsx` copied unmodified. `GameState`
+(`src/game/roundRobin.ts`) gained a `language: AuthoredLanguage` field and `createGame` a second
+`language` parameter, so the setup screen's pick survives into the game state for future
+reveal/prose rendering (mirrors Funny Multi's `Room.language`) — propagated through the 15
+existing `createGame` call sites in `roundRobin.test.ts` and the one in `App.tsx`. `App.tsx` now
+renders `HomeScreen` and a minimal placeholder "playing" view (current seat/question number) via
+the reducer's `currentSeat`/`currentSlot`/`isDone` selectors; the real `HandoffScreen`/
+`RoundScreen` UI is explicitly out of scope here (T-FO-3.2).
+
+**Verified:** `HomeScreen.test.tsx` (8 new tests) — OQ-3 default seat mix, add/remove seat bounds
+at the floor and ceiling, empty-name disables Start, language picking highlights the pressed
+button, and Start calls back with trimmed seat names plus the selected language. Full suite:
+typecheck, lint, `prettier --check` clean; 653/653 tests across 38 files (client 190, server 209,
+funny-one-client 25 [+8], shared 190, cloudflare 39), run outside the sandbox; `npm audit` 0
+vulnerabilities. No in-browser verification yet — the placeholder playing view is not meant to be
+the real experience (T-FO-3.2 replaces it).
+
+**Owed:** T-FO-3.1 closes with this step. Next up per `steering/funny-one-tasks.md`: **T-FO-3.2**
+(`HandoffScreen` + adapted `RoundScreen` combobox — App.tsx's placeholder playing view gets
+replaced here) then **T-FO-3.3** (virtual-seat "thinking" delay, 0.8–1.5 s); the Apple/Google
+developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
 running in parallel.
+
+**RESUME HERE (2026-09-20, after Step 22).** `apps/funny-one-client` now has a working setup
+screen wired to the round-robin engine, but `App.tsx`'s "playing" view is still a one-line
+placeholder — no `HandoffScreen`, no real `RoundScreen`. Next agent step: **T-FO-3.2**
+(`HandoffScreen` + adapted `RoundScreen` combobox, replacing the placeholder). Phase 9 stays
+paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account enrollment sequence
+(Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a

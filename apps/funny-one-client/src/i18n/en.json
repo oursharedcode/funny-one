@@ -1,10 +1,20 @@
 {
   "home": {
     "title": "Funny One",
-    "subtitle": "Pass the device and build absurd stories together, 3 to 7 players, no internet needed.",
+    "subtitle": "Pass the device and build absurd stories together, 2 to 7 players, no internet needed.",
     "start": "Start game",
     "gameRules": "Game rules",
-    "rules": "Pass the device around. Each round, everyone answers the same playful question in turn. Your answers get mixed into absurd stories, then a silly picture is built for each one."
+    "rules": "Pass the device around. Each round, everyone answers the same playful question in turn. Your answers get mixed into absurd stories, then a silly picture is built for each one.",
+    "language": "Language",
+    "seatCountHint": "2–7 players total",
+    "playerNamePlaceholder": "Name",
+    "humanSeatLabel": "Player name",
+    "virtualSeatLabel": "Virtual player name",
+    "humanBadge": "You",
+    "virtualBadge": "Bot",
+    "removeSeat": "Remove player",
+    "addPlayer": "+ Add player",
+    "addVirtual": "+ Add virtual"
   },
   "footer": {
     "source": "Source on GitHub",

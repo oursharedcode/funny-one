@@ -50,8 +50,13 @@ external wait time, elapsed time rather than effort).
 
 ## Phase FO-3 — core screens
 
-- [ ] **T-FO-3.1 (M)** Home/setup screen (seat count, human/virtual mix, language picker gated
+- [x] **T-FO-3.1 (M)** Home/setup screen (seat count, human/virtual mix, language picker gated
       to `AUTHORED_LANGUAGES`).
+      *Step 22 (2026-09-20): `apps/funny-one-client/src/screens/HomeScreen.tsx`, adapted from
+      Funny Multi's create-mode `HomeScreen` (two-column rules+language layout, `ScrollBox`,
+      flag artwork copied under `public/flags/`). `GameState` gained a `language` field so the
+      picked content language survives into `App.tsx`'s (still-placeholder) playing view. See
+      `docs/IMPLEMENTATION_LOG.md` Step 22.*
 - [ ] **T-FO-3.2 (M)** `HandoffScreen` + adapted `RoundScreen` combobox.
 - [ ] **T-FO-3.3 (S)** Virtual-seat "thinking" mascot delay (archive ONE-4, 0.8–1.5 s).
 

@@ -33,26 +33,29 @@ function sequentialRng(): () => number {
 
 describe('createGame', () => {
   it('rejects seat counts below MIN_SEATS or above MAX_SEATS', () => {
-    expect(() => createGame(seats(MIN_SEATS - 1))).toThrow(RangeError);
-    expect(() => createGame(seats(MAX_SEATS + 1))).toThrow(RangeError);
+    expect(() => createGame(seats(MIN_SEATS - 1), 'en')).toThrow(RangeError);
+    expect(() => createGame(seats(MAX_SEATS + 1), 'en')).toThrow(RangeError);
   });
 
   it('accepts the OQ-3 solo floor: 1 human + 1 virtual seat', () => {
-    const state = createGame([
-      { id: 's0', name: 'You', kind: 'human' },
-      { id: 's1', name: 'Bot', kind: 'virtual' },
-    ]);
+    const state = createGame(
+      [
+        { id: 's0', name: 'You', kind: 'human' },
+        { id: 's1', name: 'Bot', kind: 'virtual' },
+      ],
+      'en',
+    );
     expect(state.seats).toHaveLength(2);
     expect(state.stories).toHaveLength(2);
   });
 
   it('accepts the full 7-seat ceiling', () => {
-    const state = createGame(seats(MAX_SEATS));
+    const state = createGame(seats(MAX_SEATS), 'en');
     expect(state.stories).toHaveLength(MAX_SEATS);
   });
 
   it('starts at question 0, seat turn 0, every answer null', () => {
-    const state = createGame(seats(3));
+    const state = createGame(seats(3), 'en');
     expect(state.question).toBe(0);
     expect(state.seatTurn).toBe(0);
     expect(isDone(state)).toBe(false);
@@ -66,7 +69,7 @@ describe('createGame', () => {
 
 describe('turn order (FO-CORE-2 — question-major round robin)', () => {
   it.each([2, 3, 7])('N=%i — visits every seat before advancing the question', (n) => {
-    let state = createGame(seats(n));
+    let state = createGame(seats(n), 'en');
     for (let seat = 0; seat < n; seat++) {
       expect(currentSeat(state)?.id).toBe(`s${seat}`);
       expect(currentSlot(state)).toBe(0);
@@ -78,7 +81,7 @@ describe('turn order (FO-CORE-2 — question-major round robin)', () => {
 
   it('a full 7-question game ends after seatCount * 7 submissions and marks done', () => {
     const n = 4;
-    let state = createGame(seats(n));
+    let state = createGame(seats(n), 'en');
     let submissions = 0;
     while (!isDone(state)) {
       state = submitAnswer(state, `pick-${submissions}`);
@@ -92,7 +95,7 @@ describe('turn order (FO-CORE-2 — question-major round robin)', () => {
   it('routes each turn to the story storyIndex(seatTurn, question, N) points to', () => {
     // N=3: at question 1, seat 0 -> story 2, seat 1 -> story 0, seat 2 -> story 1
     // (same worked example rotation.test.ts uses for storyIndex directly).
-    let state = createGame(seats(3));
+    let state = createGame(seats(3), 'en');
     for (let seat = 0; seat < 3; seat++) state = submitAnswer(state, `q0-${seat}`);
     expect(state.question).toBe(1);
 
@@ -107,7 +110,7 @@ describe('turn order (FO-CORE-2 — question-major round robin)', () => {
 
   it('rejects submitting or picking once the game is done', () => {
     const n = 2;
-    let state = createGame(seats(n));
+    let state = createGame(seats(n), 'en');
     for (let i = 0; i < n * SLOT_COUNT; i++) state = submitAnswer(state, `pick-${i}`);
     expect(isDone(state)).toBe(true);
     expect(() => submitAnswer(state, 'late')).toThrow();
@@ -118,7 +121,7 @@ describe('turn order (FO-CORE-2 — question-major round robin)', () => {
 describe('an all-human game', () => {
   it('every story ends with 7 non-null answers, one full game', () => {
     const n = 5;
-    let state = createGame(seats(n, 'human'));
+    let state = createGame(seats(n, 'human'), 'en');
     let i = 0;
     while (!isDone(state)) {
       expect(currentSeat(state)?.kind).toBe('human');
@@ -134,7 +137,7 @@ describe('an all-human game', () => {
 describe('an all-virtual game (FO-BOT-1)', () => {
   it('plays itself to completion using pickVirtualAnswer at every turn', () => {
     const n = 6;
-    let state = createGame(seats(n, 'virtual'));
+    let state = createGame(seats(n, 'virtual'), 'en');
     const rng = sequentialRng();
     while (!isDone(state)) {
       expect(currentSeat(state)?.kind).toBe('virtual');
@@ -151,7 +154,7 @@ describe('an all-virtual game (FO-BOT-1)', () => {
     // a full room of virtual seats should not repeat an option within one
     // question when the pool is larger than the seat count.
     const n = 7; // smallest pool (visual slots) is 10 ids, so 7 distinct picks always fit.
-    let state = createGame(seats(n, 'virtual'));
+    let state = createGame(seats(n, 'virtual'), 'en');
     const rng = sequentialRng();
     for (let question = 0; question < SLOT_COUNT; question++) {
       for (let seat = 0; seat < n; seat++) {
@@ -172,7 +175,7 @@ describe('a mixed human/virtual game', () => {
       { id: 's1', name: 'Bot', kind: 'virtual' },
       { id: 's2', name: 'Bob', kind: 'human' },
     ];
-    let state = createGame(mixed);
+    let state = createGame(mixed, 'en');
     const rng = sequentialRng();
     let i = 0;
     while (!isDone(state)) {
@@ -188,7 +191,7 @@ describe('a mixed human/virtual game', () => {
 
 describe('usedOptionsThisQuestion / pickVirtualAnswer exclusion (FO-BOT-1)', () => {
   it('excludes options already placed at the current question by other stories', () => {
-    let state = createGame(seats(3, 'virtual'));
+    let state = createGame(seats(3, 'virtual'), 'en');
     const firstPick = pickVirtualAnswer(state, () => 0);
     state = submitAnswer(state, firstPick);
 
@@ -209,7 +212,7 @@ describe('usedOptionsThisQuestion / pickVirtualAnswer exclusion (FO-BOT-1)', () 
     // question 0 already placed on some story. Candidates is then empty and
     // pickVirtualAnswer must fall back to the whole pool rather than
     // throwing or picking from an empty array.
-    const base = createGame(seats(2, 'virtual'));
+    const base = createGame(seats(2, 'virtual'), 'en');
     const pool = POOLS[0];
     expect(pool.length).toBeGreaterThan(0);
     // One story per pool option, each already holding that option's id at

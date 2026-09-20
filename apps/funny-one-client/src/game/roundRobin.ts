@@ -12,7 +12,7 @@
 // caller, respectively — so this stays synchronously testable).
 
 import { POOLS, SLOT_COUNT, storyIndex } from '@funny/shared';
-import type { OptionId, SlotIndex, Story } from '@funny/shared';
+import type { AuthoredLanguage, OptionId, SlotIndex, Story } from '@funny/shared';
 
 export interface Seat {
   readonly id: string;
@@ -22,6 +22,8 @@ export interface Seat {
 
 export interface GameState {
   readonly seats: readonly Seat[];
+  /** Content language, fixed for the whole game (T-FO-3.1's setup screen picks it). */
+  readonly language: AuthoredLanguage;
   /** 0..SLOT_COUNT-1 while playing; SLOT_COUNT once every question is answered. */
   readonly question: number;
   /** Index into `seats` for whichever seat answers next. */
@@ -36,12 +38,13 @@ export interface GameState {
 export const MIN_SEATS = 2;
 export const MAX_SEATS = 7;
 
-export function createGame(seats: readonly Seat[]): GameState {
+export function createGame(seats: readonly Seat[], language: AuthoredLanguage): GameState {
   if (seats.length < MIN_SEATS || seats.length > MAX_SEATS) {
     throw new RangeError(`seats.length must be ${MIN_SEATS}..${MAX_SEATS}, got ${seats.length}`);
   }
   return {
     seats,
+    language,
     question: 0,
     seatTurn: 0,
     stories: seats.map(() => ({

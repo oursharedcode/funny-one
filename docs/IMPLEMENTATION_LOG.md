@@ -1034,14 +1034,64 @@ replaced here) then **T-FO-3.3** (virtual-seat "thinking" delay, 0.8–1.5 s); t
 developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
 running in parallel.
 
-**RESUME HERE (2026-09-20, after Step 22).** `apps/funny-one-client` now has a working setup
-screen wired to the round-robin engine, but `App.tsx`'s "playing" view is still a one-line
-placeholder — no `HandoffScreen`, no real `RoundScreen`. Next agent step: **T-FO-3.2**
-(`HandoffScreen` + adapted `RoundScreen` combobox, replacing the placeholder). Phase 9 stays
-paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account enrollment sequence
-(Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
+## Step 23 — Funny One `HandoffScreen` + `RoundScreen` (2026-09-20)
+
+**Shipped:** `apps/funny-one-client/src/screens/HandoffScreen.tsx` (T-FO-3.2, new — FO-CORE-3):
+a full-screen "Pass to {name}" interstitial with an explicit "I'm {name} — go" tap; it never
+receives the previous answer, so there is nothing for it to leak by construction.
+`RoundScreen.tsx` adapted from Funny Multi's (`apps/funny-multi-client/src/screens/RoundScreen.tsx`):
+same radiogroup combobox, per-render shuffle, same FM-ANS-1 "no free-text affordance" constraint
+— but no `socket`, no `round:start` payload, no `isHost`, no joiner dual-language gloss or
+story-language badge (none of those concepts exist on one device with one chosen language), and
+no `TimerBar` (owner call, 2026-09-20: pass-and-play has no network latency to bound, and rushing
+whoever holds the phone works against the game). Question text now comes from `QUESTIONS[language][slot]`
+(`@funny/shared`, promoted at T-FO-2.1) instead of a server payload.
+
+`App.tsx` rewritten as a local phase machine: setup → (handoff → round)× SLOT_COUNT → done, driven
+by `roundRobin.ts`'s reducer plus one local flag (`awaitingHandoff`) that gates the interstitial
+per turn. A virtual seat's turn never renders anything of its own (owner call, 2026-09-20, per
+FO-CORE-3's "every handoff" read literally for humans only) — an effect resolves it immediately
+via `pickVirtualAnswer`/`submitAnswer` as soon as it becomes the current turn, chaining through any
+run of consecutive virtual seats with no visible screen; deliberately rendering `null` for that
+turn rather than the combobox, so a human cannot answer on a bot's behalf. The 0.8–1.5 s
+"thinking" pause that will eventually stand in for that instant resolution is still T-FO-3.3's, not
+this step's.
+
+**Verified:** `RoundScreen.test.tsx` (13 new tests, ported from Funny Multi's) — no text-entry
+element on any of the 7 slots, no search/filter/combobox role, options match the shared pool
+exactly (including in a non-English game language), two renders shuffle differently while holding
+still during a single selection, Submit stays disabled with nothing selected and fires `onSubmit`
+exactly once. `HandoffScreen.test.tsx` (2 new tests) — the seat name appears in both the title and
+the go button, tapping go calls back. `App.test.tsx` gained a full end-to-end playthrough (1 human
++ 1 virtual, the OQ-3 default): every question shows the handoff, tapping go reveals the combobox,
+submitting an answer advances straight to the next handoff with the virtual seat's turn resolved
+silently in between, and the 7th submit reaches "game complete". Full suite: typecheck, lint,
+`prettier --check` clean; 677/677 tests across 39 files (client 190, server 209, funny-one-client
+49 [+24], shared 190, cloudflare 39), run outside the sandbox; `npm audit` 0 vulnerabilities.
+**In-browser verification:** `npm run dev` at 375px width via a Playwright driver script (no
+project run-skill existed yet, `chromium-cli` wasn't installed) — HomeScreen → Start → "Pass to
+Player 1" → the "Who?" combobox with 9 visible options, no input/textarea/contenteditable anywhere
+→ looped through all 7 questions, the virtual seat's turns never producing a screen → "Funny One —
+game complete". Only console output was the pre-existing "missing i18n catalog" warning for the 14
+languages T-FO-5.1 hasn't wired yet — unrelated to this step.
+
+**Owed:** T-FO-3.2 closes with this step. Next up per `steering/funny-one-tasks.md`: **T-FO-3.3**
+(virtual-seat "thinking" mascot delay, 0.8–1.5 s, archive ONE-4) — the natural next step now that
+a screen exists for the delay to gate; then **Phase FO-4** (rig art + reveal, T-FO-4.1 first,
+confirm OQ-4 before the gallery/end screen depends on it). The Apple/Google developer-account
+enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
+
+**RESUME HERE (2026-09-20, after Step 23).** `apps/funny-one-client` now plays a full local game
+end to end — setup, handoff, combobox, completion — with virtual seats resolving invisibly. Next
+agent step: **T-FO-3.3**, the virtual-seat "thinking" mascot delay (0.8–1.5 s): give that instant
+`null`-render turn a comedic pause and (per archive ONE-4) a mascot, without turning it into
+something a human could act on. Phase 9 stays paused (T-9.3 is its easiest re-entry); the
+Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an
+owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
-`apps/funny-multi-server/src/prompt.ts:72`.
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern this step
+used, since `chromium-cli` is not installed in this environment).

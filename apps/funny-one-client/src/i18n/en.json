@@ -16,6 +16,20 @@
     "addPlayer": "+ Add player",
     "addVirtual": "+ Add virtual"
   },
+  "handoff": {
+    "title": "Pass to {{name}}",
+    "subtitle": "Don't peek at anyone else's answers.",
+    "ready": "I'm {{name}} — go"
+  },
+  "round": {
+    "progress": "Question {{current}} of {{total}}",
+    "pick": "Pick your answer",
+    "optionsLabel": "Answers to choose from",
+    "scrollHint": "Scroll for more",
+    "submit": "Submit",
+    "submitDisabled": "Pick an answer first",
+    "submitted": "Submitted"
+  },
   "footer": {
     "source": "Source on GitHub",
     "contentNotice": "This game runs entirely on your device. Nothing you type ever leaves it."

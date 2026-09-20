@@ -57,7 +57,12 @@ external wait time, elapsed time rather than effort).
       flag artwork copied under `public/flags/`). `GameState` gained a `language` field so the
       picked content language survives into `App.tsx`'s (still-placeholder) playing view. See
       `docs/IMPLEMENTATION_LOG.md` Step 22.*
-- [ ] **T-FO-3.2 (M)** `HandoffScreen` + adapted `RoundScreen` combobox.
+- [x] **T-FO-3.2 (M)** `HandoffScreen` + adapted `RoundScreen` combobox.
+      *Step 23 (2026-09-20): `apps/funny-one-client/src/screens/HandoffScreen.tsx` (new,
+      FO-CORE-3) and `RoundScreen.tsx` (adapted from Funny Multi's, no `TimerBar`, owner call).
+      `App.tsx` rewritten as a local phase machine: setup → (handoff → round)× → done. A virtual
+      seat's turn resolves immediately with no screen (owner call) — the "thinking" pause lands at
+      T-FO-3.3. See `docs/IMPLEMENTATION_LOG.md` Step 23.*
 - [ ] **T-FO-3.3 (S)** Virtual-seat "thinking" mascot delay (archive ONE-4, 0.8–1.5 s).
 
 ## Phase FO-4 — rig art + reveal

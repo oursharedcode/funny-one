@@ -52,7 +52,11 @@ import type { Server as SocketIOServer } from 'socket.io';
 import {
   POOLS,
   POOL_TEXTS,
+  QUESTIONS,
   SLOT_COUNT,
+  polishProse,
+  renderProse,
+  requireAuthoredLanguage,
   storyIndex,
   type OptionId,
   type SlotIndex,
@@ -66,8 +70,6 @@ import type {
   ServerToClientEvents,
   Story,
 } from './types.js';
-import { QUESTIONS, renderProse, requireAuthoredLanguage } from './i18n/index.js';
-import { polishProse } from './grammar.js';
 import { buildPrompt } from './prompt.js';
 import { ImageCapReachedError, generateImage } from './image.js';
 
@@ -264,8 +266,9 @@ export function resolveAnswers(room: Room, story: Story | undefined): string[] {
 
 // Renders a story's prose and runs the offline polish pass: Russian gets its
 // clause commas, and every language gets the opening capital and terminal
-// period (see grammar.ts — the T-1.5 carry-over). Synchronous and instant, so
-// it never delays the reveal.
+// period (see `@funny/shared`'s `i18n/grammar.ts` — the T-1.5 carry-over,
+// promoted to shared by T-FO-2.1). Synchronous and instant, so it never
+// delays the reveal.
 export function revealProse(room: Room, answers: readonly string[]): string {
   const prose = renderProse(requireAuthoredLanguage(room.language), answers);
   return polishProse(room.language, prose);

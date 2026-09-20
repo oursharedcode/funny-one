@@ -1,40 +1,42 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// T-2.5 — i18n coverage (design §9, FM-POOL-4).
+// T-FO-2.1 — i18n coverage (design §9, FM-POOL-4), promoted from
+// `apps/funny-multi-server/src/i18n/index.test.ts` unchanged in substance;
+// only the import paths moved, since everything under test now lives in this
+// package rather than split across the server and `@funny/shared`.
 //
 // SRC's `i18n/index.test.ts` is not adapted: every one of its cases exercises
-// one of the three render-time repair transforms, and `i18n/index.ts` documents
-// why all three are gone (they repaired free-typed input; answers are now
-// authored pool texts). `game.test.ts` already re-derives SRC's own predicates
-// and proves no shipped text would trigger a repair — that is the *pool* side of
-// the claim. This file is the *module* side: what the loader and `renderProse`
-// guarantee on their own, for any answers at all.
+// one of the three render-time repair transforms, and `index.ts` documents why
+// all three are gone (they repaired free-typed input; answers are now
+// authored pool texts). Funny Multi's `game.test.ts` already re-derives SRC's
+// own predicates and proves no shipped text would trigger a repair — that is
+// the *pool* side of the claim. This file is the *module* side: what the
+// catalogs and `renderProse` guarantee on their own, for any answers at all.
 //
-// The theme throughout is coverage. A language the server offers must be a
-// language it can fully render — questions, prose template and pool texts —
+// The theme throughout is coverage. A language either product offers must be
+// a language it can fully render — questions, prose template and pool texts —
 // and every one of the 7 answers a player worked for must reach the screen.
 
 import { describe, expect, it } from 'vitest';
-import { AUTHORED_LANGUAGES, LANGUAGES, POOL_TEXTS, type AuthoredLanguage } from '@funny/shared';
+import { LANGUAGES } from '../languages.js';
+import { AUTHORED_LANGUAGES, type AuthoredLanguage } from '../pools/schema.js';
+import { POOL_TEXTS } from '../pools/text/index.js';
 import { PROSE_TEMPLATES, QUESTIONS, renderProse, requireAuthoredLanguage } from './index.js';
 
 /** Seven identifiable answers, so a lost or duplicated slot is obvious. */
 const ANSWERS = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6'];
 
 describe('language coverage', () => {
-  it('loads questions and a prose template for exactly the authored languages', () => {
-    // Not `toContain` per language: extra keys matter too. The loader skips
-    // `<code>.json` files whose code is not authored, and this is what proves
-    // it — a stray half-translated file must not quietly become renderable.
+  it('has questions and a prose template for exactly the authored languages', () => {
+    // Not `toContain` per language: extra keys matter too. `CATALOGS`'s
+    // `Record<AuthoredLanguage, ...>` annotation already makes a missing
+    // language a compile error, so this is the runtime half of that claim.
     const expected = [...AUTHORED_LANGUAGES].sort();
     expect(Object.keys(QUESTIONS).sort()).toEqual(expected);
     expect(Object.keys(PROSE_TEMPLATES).sort()).toEqual(expected);
   });
 
   it('has pool texts for every language it has questions for', () => {
-    // The three sources are loaded independently — server JSON, server JSON,
-    // shared TS module — so nothing but a test ties them together. A language
-    // with questions but no pool texts renders a story of "undefined".
     expect(Object.keys(POOL_TEXTS).sort()).toEqual(Object.keys(QUESTIONS).sort());
   });
 
@@ -96,9 +98,10 @@ describe('renderProse', () => {
   });
 
   it('inserts answers verbatim, applying none of SRC’s repairs', () => {
-    // The module-level half of the claim in `game.test.ts`: even an answer that
-    // *would* have tripped every SRC transform passes through untouched. If a
-    // repair were ever reintroduced, this fails whatever the pools contain.
+    // The module-level half of the claim in Funny Multi's `game.test.ts`: even
+    // an answer that *would* have tripped every SRC transform passes through
+    // untouched. If a repair were ever reintroduced, this fails whatever the
+    // pools contain.
     const prose = renderProse('en', ['mouse', 'kangaroo', 'here', 'now', 'skiing', 'money', 'joy']);
     expect(prose).toContain('They skiing money.');
     expect(prose, 'SRC prepended "for " to a bare-noun slot 5').not.toContain('for money');
@@ -120,9 +123,9 @@ describe('renderProse', () => {
   });
 
   it('renders a blank for a missing answer rather than throwing', () => {
-    // Defence in depth. `assembleStories` always passes 7, but a story cut
-    // short by a mid-game drop must still reveal — a half-empty sentence is
-    // recoverable, a throw inside the reveal broadcast is not.
+    // Defence in depth. Funny Multi's `assembleStories` always passes 7, but a
+    // story cut short by a mid-game drop must still reveal — a half-empty
+    // sentence is recoverable, a throw inside the reveal broadcast is not.
     const prose = renderProse('en', ['A0', 'A1']);
     expect(prose).toBe('A0 and A1 were  . They  . In the end, .');
     expect(prose).not.toMatch(/\{\d\}|undefined/);

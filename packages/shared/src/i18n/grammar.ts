@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Offline, dependency-free Russian punctuation pass for assembled story prose.
-// The story is a run of player-typed answers dropped into a fixed template
-// (server/src/i18n/ru.json), so it frequently arrives without the commas
-// Russian clause structure needs, without a capitalised opening, and without a
-// final period. This module adds them deterministically — no network, no
-// external engine. It runs synchronously and instantly, so it never blocks or
-// delays the reveal or the image (Worker AI) request: the image generation is
-// kicked off from the same tick, and this pass only shapes the *text* that the
-// reveal screen shows and that the downloadable image/video embed.
+// Promoted from `apps/funny-multi-server/src/grammar.ts` into `@funny/shared`
+// (T-FO-2.1, FO-ARC-2) so Funny One can polish prose too — the pass itself is
+// unchanged. The story is a run of player-typed answers dropped into a fixed
+// template (`i18n/ru.ts`'s `prose`), so it frequently arrives without the
+// commas Russian clause structure needs, without a capitalised opening, and
+// without a final period. This module adds them deterministically — no
+// network, no external engine. In Funny Multi it runs synchronously and
+// instantly, so it never blocks or delays the reveal or the image (Worker AI)
+// request: the image generation is kicked off from the same tick, and this
+// pass only shapes the *text* that the reveal screen shows and that the
+// downloadable image/video embed.
 //
 // Scope is deliberately conservative. We insert a comma *before* a small set of
 // high-confidence clause-boundary words (adversative/subordinating conjunctions

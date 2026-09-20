@@ -99,8 +99,10 @@ cost, and no network dependency at any point in a play session.
 
 ## 7. Open questions (confirm before the phase that needs them — see `funny-one-tasks.md`)
 
-- **OQ-3** Minimum local-player floor: does a genuinely solo (1 human + 1 virtual) quick-start
-  matter for v1, or keep the 3-total floor Funny Multi's math assumes? — confirm before T-FO-2.2.
+- **OQ-3** *(resolved 2026-09-20, owner)* Solo quick-start is allowed: 1 human + 1 virtual seat
+  is a valid v1 game, no 3-total floor. Funny Multi's floor exists for room-fairness reasons that
+  don't apply to a single-device app — the person holding the phone doesn't need company to
+  start. T-FO-2.2's reducer must accept a 2-seat minimum (not 3).
 - **OQ-4** Any cross-device sharing at all (e.g. "send this gallery to another phone," export/
   print) — most likely nothing, since there is no room to link to, but confirm before T-FO-4.2.
 - **OQ-6** *(resolved by D-8's audience choice, FO-ID-1 — kept here only as a reminder not to

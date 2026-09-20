@@ -42,6 +42,12 @@ export type {
 export { ALL_OPTION_IDS, POOLS } from './pools/options.js';
 export { POOL_TEXTS } from './pools/text/index.js';
 
+// T-FO-2.1 — prose rendering (FO-ARC-2), promoted from
+// `apps/funny-multi-server/src/i18n/` and `.../grammar.ts` so both products
+// can render and polish story prose.
+export { QUESTIONS, PROSE_TEMPLATES, renderProse, requireAuthoredLanguage } from './i18n/index.js';
+export { polishProse, polishRussianProse } from './i18n/grammar.js';
+
 // T-1.6 — socket contract (design §5). Types only: the protocol carries no
 // runtime values, so this whole module erases at build time.
 export type {

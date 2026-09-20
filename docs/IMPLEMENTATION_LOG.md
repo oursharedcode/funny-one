@@ -904,12 +904,58 @@ monorepo-wide).
 to hold that logic) and T-FO-2.2 (local round-robin state machine — OQ-3, the minimum-player
 floor, needs confirming before that one starts).
 
-**RESUME HERE (2026-09-20, after Step 19).** `apps/funny-one-client` exists, builds, and passes
+~~**RESUME HERE (2026-09-20, after Step 19).** `apps/funny-one-client` exists, builds, and passes
 all applicable gates; it renders a placeholder screen only — no game logic yet. Phase 9 stays
 paused (T-9.3 is its easiest re-entry). Next agent step: **T-FO-2.1** (prose-rendering
 promotion into `packages/shared`) or **T-FO-2.2** (round-robin engine, pending OQ-3), owner's
 call on order; the Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup
 first) remains an owner action running in parallel.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`.~~ *Carried — see Step 20 below.*
+
+## Step 20 (task T-FO-2.1): promote prose rendering into `packages/shared` (2026-09-20)
+
+**Shipped:** `renderProse`, `QUESTIONS`, `PROSE_TEMPLATES`, `requireAuthoredLanguage` (from
+`apps/funny-multi-server/src/i18n/index.ts`) and `polishProse`/`polishRussianProse` (from
+`apps/funny-multi-server/src/grammar.ts`) promoted into `packages/shared/src/i18n/` — owner
+confirmed the wider scope (the whole i18n module, not just the three named functions), since
+`renderProse` alone is meaningless without the prose templates it fills. The 15 language
+catalogs moved from JSON (`<code>.json`) to TS modules (`<code>.ts`), owner's second call,
+mirroring the pattern `pools/text/index.ts` already used for `POOL_TEXTS`: static imports and a
+`Record<AuthoredLanguage, ServerI18n>` type annotation replace the old loader's
+`readdirSync`/`createRequire` (Node-only — incompatible with two browser clients importing this
+package) and its boot-time "missing language" throw, which is now a compile error instead.
+`apps/funny-multi-server/src/game.ts` re-points at `@funny/shared`; the server's own `i18n/`
+directory, `grammar.ts`, `grammar.test.ts`, and `scripts/copy-i18n.mjs` are deleted, and the
+server's `build` script no longer runs the copy step. Both test files moved into
+`packages/shared/src/i18n/` (`index.test.ts`, `grammar.test.ts`), updated only to import sibling
+shared modules directly instead of `@funny/shared` + local server files — same assertions,
+same coverage. OQ-3 also resolved this step (owner, 2026-09-20): solo play (1 human + 1 virtual
+seat) is a valid v1 start, no 3-player floor — recorded in `funny-one-requirements.md` §7,
+unblocking T-FO-2.2.
+
+**Verified:** full suite — typecheck, lint, `prettier --check` clean; 629/629 tests across 37
+files (client 190, server 209, funny-one-client 1, shared 190, cloudflare 39), run outside the
+sandbox; `npm audit` 0 vulnerabilities, monorepo-wide. One `disconnect.socket.test.ts` flake
+surfaced mid-session under parallel load (host-drop promotion, unrelated to this change) —
+confirmed passing 13/13 in isolation and again clean on the final full-suite rerun. No in-browser
+verification: pure refactor, no UI surface touched.
+
+**Owed:** T-FO-2.1 closes with this step. Next up per `steering/funny-one-tasks.md`: **T-FO-2.2**
+(local round-robin state machine, now unblocked by OQ-3 — 2-seat minimum, not 3) → FO-CORE-1/2,
+FO-BOT-1; the Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup first)
+remains an owner action running in parallel.
+
+**RESUME HERE (2026-09-20, after Step 20).** `@funny/shared` now carries all prose-rendering
+logic (rendering, polish, questions, templates) for both products; Funny Multi's server consumes
+it with no behavior change (629/629 tests). OQ-3 is resolved. Next agent step: **T-FO-2.2**
+(round-robin engine — seat list, per-question rotation via `storyIndex`, virtual-seat auto-fill
+with the "thinking" delay; pure reducer, unit-tested before any screen exists; 2-seat minimum).
+Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account
+enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a

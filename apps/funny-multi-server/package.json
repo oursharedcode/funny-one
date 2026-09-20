@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json && node scripts/copy-i18n.mjs",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "prompts": "npm run build && node scripts/samplePrompts.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",

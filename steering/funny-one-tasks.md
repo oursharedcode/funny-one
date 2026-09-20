@@ -33,9 +33,13 @@ external wait time, elapsed time rather than effort).
 
 ## Phase FO-2 — local game engine
 
-- [ ] **T-FO-2.1 (M)** Promote `renderProse`/`polishProse`/`polishRussianProse` from
+- [x] **T-FO-2.1 (M)** Promote `renderProse`/`polishProse`/`polishRussianProse` from
       `apps/funny-multi-server` into `packages/shared`; re-point Funny Multi's server at the
       shared version; unit tests before either client consumes it. → FO-ARC-2
+      *Step 20 (2026-09-20): scope widened to the whole i18n module (owner call), not just the
+      three named functions — `renderProse` needs the prose templates it fills. JSON catalogs
+      converted to TS modules (owner call), mirroring `pools/text/index.ts`. See
+      `docs/IMPLEMENTATION_LOG.md` Step 20 for the full record.*
 - [ ] **T-FO-2.2 (M)** Local round-robin state machine: seat list (human/virtual), per-question
       rotation via the unmodified `storyIndex`, virtual-seat auto-fill with the "thinking" delay.
       Pure reducer logic, unit-tested before any screen exists. **Confirm OQ-3 (min player

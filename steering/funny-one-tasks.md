@@ -40,10 +40,13 @@ external wait time, elapsed time rather than effort).
       three named functions — `renderProse` needs the prose templates it fills. JSON catalogs
       converted to TS modules (owner call), mirroring `pools/text/index.ts`. See
       `docs/IMPLEMENTATION_LOG.md` Step 20 for the full record.*
-- [ ] **T-FO-2.2 (M)** Local round-robin state machine: seat list (human/virtual), per-question
+- [x] **T-FO-2.2 (M)** Local round-robin state machine: seat list (human/virtual), per-question
       rotation via the unmodified `storyIndex`, virtual-seat auto-fill with the "thinking" delay.
       Pure reducer logic, unit-tested before any screen exists. **Confirm OQ-3 (min player
       floor) before starting.** → FO-CORE-1/2, FO-BOT-1
+      *Step 21 (2026-09-20): `apps/funny-one-client/src/game/roundRobin.ts` — the "thinking"
+      delay itself is deferred to T-FO-3.3 (no screen exists yet); this step only exposes which
+      seat is up and its kind. See `docs/IMPLEMENTATION_LOG.md` Step 21.*
 
 ## Phase FO-3 — core screens
 

@@ -949,13 +949,60 @@ verification: pure refactor, no UI surface touched.
 FO-BOT-1; the Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup first)
 remains an owner action running in parallel.
 
-**RESUME HERE (2026-09-20, after Step 20).** `@funny/shared` now carries all prose-rendering
+~~**RESUME HERE (2026-09-20, after Step 20).** `@funny/shared` now carries all prose-rendering
 logic (rendering, polish, questions, templates) for both products; Funny Multi's server consumes
 it with no behavior change (629/629 tests). OQ-3 is resolved. Next agent step: **T-FO-2.2**
 (round-robin engine — seat list, per-question rotation via `storyIndex`, virtual-seat auto-fill
 with the "thinking" delay; pure reducer, unit-tested before any screen exists; 2-seat minimum).
 Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account
 enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`.~~ *Carried — see Step 21 below.*
+
+## Step 21 (task T-FO-2.2): local round-robin state machine (2026-09-20)
+
+**Shipped:** `apps/funny-one-client/src/game/roundRobin.ts` — the pure reducer FO-CORE-1/2 and
+FO-BOT-1 need, with no screen consuming it yet (Phase FO-3). `createGame(seats)` builds initial
+state for 2–7 seats (`MIN_SEATS`/`MAX_SEATS`; OQ-3's 2-seat solo floor, not FM's 3-player room
+minimum). Turn order is question-major per FO-CORE-2: question 0 for every seat in order, then
+question 1, and so on for `SLOT_COUNT` (7) questions — `seatTurn`/`question` track whose turn it
+is; `submitAnswer` writes the given option id onto `storyIndex(seatTurn, question, seatCount)`
+(the unmodified shared rotation, FO-ARC-1) and advances the turn, then the question once every
+seat has answered it. `pickVirtualAnswer` reimplements FM-BOT-2's same-slot exclusion locally
+(uniform pick from the question's pool, excluding ids already placed at that slot this question,
+falling back to the whole pool if exhausted) — reimplemented rather than imported because the
+server's version is entangled with `Room`/socket state; RNG is an injected parameter (defaults to
+`Math.random`) so both this module's tests and any future caller stay deterministic. The
+0.8–1.5 s "thinking" delay itself is deliberately *not* in the reducer — `currentSeat(state).kind`
+exposes whether the active turn is virtual, and the delay/timing lives in a hook at T-FO-3.3, so
+this step stays synchronously testable with no fake timers.
+
+**Verified:** `roundRobin.test.ts` — turn order at N=2/3/7, a full 7×N playthrough to completion
+(`isDone`), an all-human game, an all-virtual game played to completion via `pickVirtualAnswer`,
+a mixed human/virtual game, the storyIndex routing worked example from `rotation.test.ts`
+reproduced through the reducer, the same-slot exclusion never repeating an id within one
+question, and the pool-wide fallback once a question's exclusion set is constructed to cover the
+whole pool (17 new tests). Full suite: typecheck, lint, `prettier --check` clean; 645/645 tests
+across 38 files (client 190, server 209, funny-one-client 17 [+16], shared 190, cloudflare 39),
+run outside the sandbox; `npm audit` 0 vulnerabilities. No in-browser verification: no screen
+exists yet for this reducer to drive (Phase FO-3).
+
+**Owed:** T-FO-2.2 closes with this step. Next up per `steering/funny-one-tasks.md`: **Phase
+FO-3** — T-FO-3.1 (home/setup screen), T-FO-3.2 (`HandoffScreen` + adapted `RoundScreen`),
+T-FO-3.3 (the virtual-seat "thinking" delay this step deferred); the Apple/Google
+developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
+running in parallel.
+
+**RESUME HERE (2026-09-20, after Step 21).** `apps/funny-one-client` now has a tested local game
+engine (`src/game/roundRobin.ts`) but still no screens beyond the T-FO-1.1 placeholder. Next
+agent step: **Phase FO-3** — likely **T-FO-3.1** (home/setup screen: seat count, human/virtual
+mix, language picker gated to `AUTHORED_LANGUAGES`) first, since T-FO-3.2's handoff/round screens
+need seats to exist. Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google
+developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action
+running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a

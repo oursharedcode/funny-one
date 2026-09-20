@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// T-FO-3.2 replaces the T-FO-3.1 placeholder with the real local phase
-// machine: setup -> (handoff -> round)* -> done. Funny Multi's phases are
-// driven by socket events; this one is driven entirely by the `roundRobin`
-// reducer plus one piece of local UI state (`awaitingHandoff`).
+// T-FO-3.2 built the local phase machine: setup -> (handoff -> round)* ->
+// done, driven by the `roundRobin` reducer plus one piece of local UI state
+// (`awaitingHandoff`). T-FO-3.3 fills in a virtual seat's turn, which was a
+// no-op `null` render until now: it now shows a ThinkingScreen for FO-BOT-1's
+// 0.8–1.5 s comedic delay (archive ONE-4) before auto-picking an answer.
 //
 // Every human seat's turn is preceded by a HandoffScreen (FO-CORE-3, "Pass to
 // {name}" + an explicit "I'm {name} — go" tap). A virtual seat's turn has no
-// one to hand the phone to, so it resolves immediately here with no screen of
-// its own — the 0.8–1.5 s "thinking" pause that will stand in for it lands at
-// T-FO-3.3 (owner call, 2026-09-20).
+// one to hand the phone to, so it never shows a HandoffScreen (owner call,
+// 2026-09-20) — only the ThinkingScreen, then an automatic submit.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HomeScreen from './screens/HomeScreen';
 import HandoffScreen from './screens/HandoffScreen';
 import RoundScreen from './screens/RoundScreen';
+import ThinkingScreen from './screens/ThinkingScreen';
+import { pickThinkingDelayMs } from './game/thinkingDelay';
 import {
   createGame,
   currentSeat,
@@ -36,18 +38,24 @@ export default function App() {
   // it false so RoundScreen takes over for that same turn.
   const [awaitingHandoff, setAwaitingHandoff] = useState(true);
 
-  // Virtual seats never render anything of their own: as soon as one becomes
-  // the current turn, resolve it and move straight to the next. This re-runs
-  // every time `game` changes, so a run of consecutive virtual seats resolves
-  // one turn per render with no extra wiring.
+  // Drives a virtual seat's turn: as soon as one becomes current, run out
+  // FO-BOT-1's thinking delay, then auto-submit and move to the next turn.
+  // The functional `setGame` update reads the *latest* state when the timer
+  // fires rather than closing over the `game` this effect was scheduled
+  // with, and the cleanup clears a stale timer — both matter under
+  // StrictMode's dev-only double-invoke, which would otherwise risk two
+  // picks racing for the same turn.
   useEffect(() => {
     if (!game || isDone(game)) return;
     const seat = currentSeat(game)!;
-    if (seat.kind === 'virtual') {
-      setGame(submitAnswer(game, pickVirtualAnswer(game)));
-    } else {
+    if (seat.kind !== 'virtual') {
       setAwaitingHandoff(true);
+      return;
     }
+    const timer = setTimeout(() => {
+      setGame((prev) => (prev ? submitAnswer(prev, pickVirtualAnswer(prev)) : prev));
+    }, pickThinkingDelayMs());
+    return () => clearTimeout(timer);
   }, [game]);
 
   function handleStart(seats: readonly Seat[], language: AuthoredLanguage): void {
@@ -72,11 +80,11 @@ export default function App() {
 
   const seat = currentSeat(game)!;
 
-  // Nothing to show while a virtual seat's turn auto-resolves above — in
-  // particular, never the combobox, or a human could answer on the bot's
-  // behalf.
+  // Never the combobox for a virtual seat's turn — a human could otherwise
+  // answer on the bot's behalf. The ThinkingScreen has nothing for anyone to
+  // act on; the effect above is what actually resolves this turn.
   if (seat.kind === 'virtual') {
-    return null;
+    return <ThinkingScreen seat={seat} />;
   }
 
   if (awaitingHandoff) {

@@ -22,6 +22,29 @@ body {
   color: #1f2937; /* brand-ink */
 }
 
+/* WaitingMascot's finger-tap loop (DESIGN_SYSTEM §5), copied from
+   funny-multi-client/src/styles/index.css — only the one animation this
+   product currently uses (T-FO-3.3), not the whole mascot set. */
+@keyframes mascot-tap {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.mascot-tap {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-tap 0.55s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-tap {
+    animation: none;
+  }
+}
+
 /* Hide native scrollbar (used by ScrollBox, copied from funny-multi-client). */
 .hide-native-scrollbar {
   scrollbar-width: none; /* Firefox */

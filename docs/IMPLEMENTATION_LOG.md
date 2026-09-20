@@ -1081,17 +1081,62 @@ a screen exists for the delay to gate; then **Phase FO-4** (rig art + reveal, T-
 confirm OQ-4 before the gallery/end screen depends on it). The Apple/Google developer-account
 enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
 
-**RESUME HERE (2026-09-20, after Step 23).** `apps/funny-one-client` now plays a full local game
+~~**RESUME HERE (2026-09-20, after Step 23).** `apps/funny-one-client` now plays a full local game
 end to end — setup, handoff, combobox, completion — with virtual seats resolving invisibly. Next
 agent step: **T-FO-3.3**, the virtual-seat "thinking" mascot delay (0.8–1.5 s): give that instant
 `null`-render turn a comedic pause and (per archive ONE-4) a mascot, without turning it into
 something a human could act on. Phase 9 stays paused (T-9.3 is its easiest re-entry); the
 Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup first) remains an
-owner action running in parallel.
+owner action running in parallel.~~ *(carried — see Step 24 below.)*
+
+## Step 24 — Funny One virtual-seat "thinking" mascot delay (2026-09-20)
+
+**Shipped:** `apps/funny-one-client/src/game/thinkingDelay.ts` (T-FO-3.3, FO-BOT-1, archive ONE-4)
+— `pickThinkingDelayMs`, RNG-injected the same way as `roundRobin.ts`'s `pickVirtualAnswer`
+(defaults to `Math.random`), uniform in `[THINKING_DELAY_MIN_MS, THINKING_DELAY_MAX_MS)` =
+`[800, 1500)`. `ThinkingScreen.tsx` (new) reuses Funny Multi's `WaitingMascot` copied unmodified
+into `src/components/art/`, with only the one CSS animation it actually uses (`mascot-tap`) ported
+into `src/styles/index.css` — deliberately not the whole FM mascot set. The screen is purely
+decorative: no button, no interactive element of any kind, so a human cannot act on a bot's behalf.
+
+`App.tsx`'s virtual-seat effect changed from resolving the turn instantly (Step 23) to scheduling
+`submitAnswer` after `pickThinkingDelayMs()` via `setTimeout`, with a `clearTimeout` cleanup and a
+functional `setGame(prev => …)` update — closing over `prev` rather than the possibly-stale `game`
+from the effect's closure, which also makes the effect correct under React 18 StrictMode's dev-only
+mount→cleanup→mount double-invoke. While a virtual seat's timer is pending, `App.tsx` renders
+`ThinkingScreen` for that seat instead of the earlier `null`.
+
+**Verified:** `thinkingDelay.test.ts` (3 new tests) — floor at `rng()=0`, approaches but never
+reaches the ceiling as `rng()→1`, 200-iteration real-`Math.random` bounds check.
+`ThinkingScreen.test.tsx` (2 new tests) — seat name renders, zero interactive elements (`button`,
+`input`, `textarea`, `[contenteditable]`). `App.test.tsx`'s full-playthrough test updated to fake
+timers (`vi.useFakeTimers`/`advanceTimersByTimeAsync`, same pattern as Funny Multi's own
+`App.test.tsx`): after each human submit it now asserts the `ThinkingScreen` text and zero buttons
+before advancing past `THINKING_DELAY_MAX_MS` and continuing. Full suite: typecheck, lint,
+`prettier --check` clean; 682/682 tests across 41 files (client 190, server 209, funny-one-client
+54 [+5], shared 190, cloudflare 39), run outside the sandbox; `npm audit` 0 vulnerabilities.
+**In-browser verification:** same Playwright-driver pattern as Step 23, phone-width (375px) —
+after a human's Submit, `ThinkingScreen` appeared with zero `<button>` elements and the "Bot 1 is
+thinking…" mascot; elapsed time to the next handoff measured 858 ms, inside the 800–1500 ms FO-BOT-1
+bound; the only console output was the same pre-existing "missing i18n catalog" warning as Step 23,
+unrelated to this step. Both screenshots inspected visually.
+
+**Owed:** T-FO-3.3 closes with this step. Next up per `steering/funny-one-tasks.md`: **Phase FO-4**
+(rig art + reveal), starting with **T-FO-4.1** (rig art — content authoring, not code) — but
+**confirm OQ-4 (any cross-device sharing) with the owner first**, since the gallery/end screen
+(T-FO-4.3) depends on that answer. The Apple/Google developer-account enrollment sequence (Phase S,
+D-U-N-S lookup first) remains an owner action running in parallel.
+
+**RESUME HERE (2026-09-20, after Step 24).** `apps/funny-one-client` now plays a full local game
+end to end with virtual seats pausing on a comedic "thinking" mascot screen before their turn
+resolves — Phase FO-3 is closed. Next agent step: propose **T-FO-4.1** (rig art) to the owner, but
+first get an explicit answer on **OQ-4** (any cross-device sharing) since it gates T-FO-4.3's
+design. Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account
+enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
-client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern this step
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–24
 used, since `chromium-cli` is not installed in this environment).

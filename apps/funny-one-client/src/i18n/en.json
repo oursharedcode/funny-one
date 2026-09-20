@@ -16,6 +16,9 @@
     "addPlayer": "+ Add player",
     "addVirtual": "+ Add virtual"
   },
+  "thinking": {
+    "title": "{{name}} is thinking…"
+  },
   "handoff": {
     "title": "Pass to {{name}}",
     "subtitle": "Don't peek at anyone else's answers.",

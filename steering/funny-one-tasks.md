@@ -63,7 +63,13 @@ external wait time, elapsed time rather than effort).
       `App.tsx` rewritten as a local phase machine: setup → (handoff → round)× → done. A virtual
       seat's turn resolves immediately with no screen (owner call) — the "thinking" pause lands at
       T-FO-3.3. See `docs/IMPLEMENTATION_LOG.md` Step 23.*
-- [ ] **T-FO-3.3 (S)** Virtual-seat "thinking" mascot delay (archive ONE-4, 0.8–1.5 s).
+- [x] **T-FO-3.3 (S)** Virtual-seat "thinking" mascot delay (archive ONE-4, 0.8–1.5 s).
+      *Step 24 (2026-09-20): `apps/funny-one-client/src/game/thinkingDelay.ts` (FO-BOT-1,
+      RNG-injected like `pickVirtualAnswer`) + `ThinkingScreen.tsx` (reuses Funny Multi's
+      `WaitingMascot` unmodified, no button/affordance). `App.tsx`'s virtual-seat effect now
+      schedules `submitAnswer` via `setTimeout` with a `clearTimeout` cleanup (functional
+      `setGame` update, avoids stale closures under StrictMode's dev double-invoke) instead of
+      resolving instantly. See `docs/IMPLEMENTATION_LOG.md` Step 24.*
 
 ## Phase FO-4 — rig art + reveal
 

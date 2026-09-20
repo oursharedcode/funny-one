@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  background-color: #fef3c7; /* brand-cream, shared design system */
+  color: #1f2937; /* brand-ink */
+}
+
+/* Hide native scrollbar (used by ScrollBox, copied from funny-multi-client). */
+.hide-native-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+.hide-native-scrollbar::-webkit-scrollbar {
+  display: none; /* WebKit / Blink */
+}

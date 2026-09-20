@@ -853,7 +853,7 @@ owner is ready), no developer-account signup completed (owner action, in progres
 session). Full six-gate suite not re-run — no application code changed, only new/edited
 Markdown, prettier-checked.
 
-**RESUME HERE (2026-09-20, after Step 18).** Phase 9 (commercial rails, D-6/D-7) is paused, not
+~~**RESUME HERE (2026-09-20, after Step 18).** Phase 9 (commercial rails, D-6/D-7) is paused, not
 abandoned — T-9.3 (server support-rail config, no owner/spend dependency) is still the easiest
 re-entry point whenever the owner wants Phase 9 moving again. The two new fronts each have a
 concrete next step: **T-FO-1.1** (Funny One: scaffold `apps/funny-one-client`, no art needed yet
@@ -861,6 +861,55 @@ concrete next step: **T-FO-1.1** (Funny One: scaffold `apps/funny-one-client`, n
 `steering/funny-one-tasks.md` Phase S (owner action, D-U-N-S lookup first). Rig art (T-FO-4.1) is
 the single largest unknown in the Funny One plan — content authoring, not engineering, and
 genuinely unscoped until real art exists.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`.~~ *Carried — see Step 19 below.*
+
+## Step 19 (task T-FO-1.1): `apps/funny-one-client` workspace scaffold (2026-09-20)
+
+**Shipped:** the new workspace, adapted from `apps/funny-multi-client` per
+`steering/funny-one-design.md` §2's reuse map. Kept unmodified: `styles/motion.ts` (spring
+presets, `screenSlide`), `testSetup.ts`, `swReload.ts`, `components/art/Wordmark.tsx`, the
+`i18n/index.ts` auto-discovery/RTL/completeness-check pattern. Adapted: `basePath.ts` drops
+`homeUrl()` (no `?room=` link to build — FO-ARC-3, no server, no rooms); `SourceFooter.tsx`
+drops the `sourceQr` prop and its `QRCode` import for the same reason, and its content-notice
+copy drops the "AI pictures" clause since Funny One's rig art ships with the app rather than
+being generated per-story (D-8); `package.json` deliberately omits `qrcode`, `qrcode.react`
+and `socket.io-client`; `vite.config.ts`'s PWA plugin precaches everything
+(`globPatterns: ['**/*.{js,css,png,svg,webmanifest}']`) rather than the NetworkFirst
+shell-only strategy Funny Multi uses, since full offline precache is the headline feature
+(FO-IMG-2) — a comment flags that `globPatterns` will need to widen once rig art lands
+(T-FO-4.1). `App.tsx` is a deliberate placeholder (wordmark + subtitle + footer, no game
+logic) — the local round-robin state machine is T-FO-2.2, not this task. i18n ships only
+`en.json` for now; `home.title`/`home.subtitle`/`home.start`/`home.gameRules`/`home.rules`
+and `footer.*` keys are Funny-One-specific copy, not copied from Funny Multi's catalog.
+Placeholder icons (`icon-180/192/512/512-maskable.png`) copied byte-for-byte from
+`apps/funny-multi-client/public/` as temporary branding — swap alongside real rig art before
+this product is announced anywhere.
+
+**Verified:** `npm install` links the new workspace cleanly; `npx prettier --check
+apps/funny-one-client`, `npm run typecheck --workspace=funny-one-client`, `npx eslint
+apps/funny-one-client`, `npm run test --workspace=funny-one-client` (1/1) and `npm run build
+--workspace=funny-one-client` (PWA precache generated, 13 entries) all pass. One fix during
+verification: `App.test.tsx` first asserted with `toBeInTheDocument()` (jest-dom, never a
+dependency of this monorepo) — changed to `toBeTruthy()` to match the convention already used
+throughout `funny-multi-client`'s own test suite. `npm audit` clean (0 vulnerabilities,
+monorepo-wide).
+
+**Owed:** T-FO-1.1 closes with this step. Next up per `steering/funny-one-tasks.md`: T-FO-2.1
+(promote `renderProse`/`polishProse`/`polishRussianProse` out of
+`apps/funny-multi-server/src/grammar.ts` into `packages/shared`, since Funny One has no server
+to hold that logic) and T-FO-2.2 (local round-robin state machine — OQ-3, the minimum-player
+floor, needs confirming before that one starts).
+
+**RESUME HERE (2026-09-20, after Step 19).** `apps/funny-one-client` exists, builds, and passes
+all applicable gates; it renders a placeholder screen only — no game logic yet. Phase 9 stays
+paused (T-9.3 is its easiest re-entry). Next agent step: **T-FO-2.1** (prose-rendering
+promotion into `packages/shared`) or **T-FO-2.2** (round-robin engine, pending OQ-3), owner's
+call on order; the Apple/Google developer-account enrollment sequence (Phase S, D-U-N-S lookup
+first) remains an owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a

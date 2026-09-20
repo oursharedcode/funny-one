@@ -1,0 +1,13 @@
+{
+  "home": {
+    "title": "Funny One",
+    "subtitle": "Pass the device and build absurd stories together, 3 to 7 players, no internet needed.",
+    "start": "Start game",
+    "gameRules": "Game rules",
+    "rules": "Pass the device around. Each round, everyone answers the same playful question in turn. Your answers get mixed into absurd stories, then a silly picture is built for each one."
+  },
+  "footer": {
+    "source": "Source on GitHub",
+    "contentNotice": "This game runs entirely on your device. Nothing you type ever leaves it."
+  }
+}

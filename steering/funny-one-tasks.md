@@ -20,11 +20,16 @@ external wait time, elapsed time rather than effort).
 - [x] **T-FO-0.1 (S)** Resolved: on-device rig (not the AI pipeline), round-robin turn-passing.
       Recorded as D-8 in `funny-one-requirements.md` §2.
 
-## Phase FO-1 — repo scaffold
+## Phase FO-1 — repo scaffold (CLOSED 2026-09-20)
 
-- [ ] **T-FO-1.1 (S)** `apps/funny-one-client` workspace: package.json, tsconfig, Vite/Tailwind/
-      PWA config copied from `funny-multi-client` and adapted (`BASE_PATH` default
-      `/funny1-game` per D-5); CI wiring (existing `apps/*` workspace glob already covers it).
+- [x] **T-FO-1.1 (S)** `apps/funny-one-client` workspace: package.json, tsconfig, Vite/Tailwind/
+      PWA config copied from `funny-multi-client` and adapted (`BASE_PATH` read via
+      `normalizeBasePath`, same as Funny Multi — `/funny1-game` is the intended deploy value per
+      D-5, set at build time, not hardcoded); full-precache PWA strategy (FO-IMG-2) instead of
+      Funny Multi's NetworkFirst shell; `qrcode`/`socket.io-client` deliberately omitted
+      (FO-ARC-3). Placeholder `App.tsx` (wordmark + subtitle, no game logic) and one smoke test.
+      CI wiring needs no change (existing `apps/*` workspace glob already covers it). All six
+      gates verified for the new workspace (typecheck, lint, format, test, build, audit).
 
 ## Phase FO-2 — local game engine
 

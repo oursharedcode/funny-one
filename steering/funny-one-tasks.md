@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document** | `steering/funny-one-tasks.md` |
-| **Status** | Phase FO-0 (decide the fork) closed 2026-09-20 (D-8). Nothing built yet. |
+| **Status** | Phases FO-0–FO-3 closed. Full local game playable end to end (setup, handoff, combobox, thinking-delay virtual seats, completion). Next: Phase FO-4 (rig art + reveal). |
 
 Execution plan for `steering/funny-one-requirements.md` (FO-\*) per
 `steering/funny-one-design.md`. Same discipline as Funny Multi: phases in order, verify each
@@ -48,7 +48,7 @@ external wait time, elapsed time rather than effort).
       delay itself is deferred to T-FO-3.3 (no screen exists yet); this step only exposes which
       seat is up and its kind. See `docs/IMPLEMENTATION_LOG.md` Step 21.*
 
-## Phase FO-3 — core screens
+## Phase FO-3 — core screens (CLOSED 2026-09-20)
 
 - [x] **T-FO-3.1 (M)** Home/setup screen (seat count, human/virtual mix, language picker gated
       to `AUTHORED_LANGUAGES`).
@@ -75,7 +75,8 @@ external wait time, elapsed time rather than effort).
 
 - [ ] **T-FO-4.1 (L)** Rig art: backgrounds, characters, co-characters, props — new content,
       matched to the existing mascot art style. Sizing is content-authoring time, not code.
-      **Confirm OQ-4 (any cross-device sharing) before the gallery/end screen depends on it.**
+      *OQ-4 resolved 2026-09-20 (owner): cross-device sharing wanted, via the OS native share
+      sheet only — no upload/link, no network call. See `funny-one-requirements.md` §7.*
 - [ ] **T-FO-4.2 (M)** Rig compositor: layered assembly, spring reveal, in-round dedup. →
       FO-IMG-1/3/4
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.

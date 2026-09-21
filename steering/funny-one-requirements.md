@@ -103,7 +103,12 @@ cost, and no network dependency at any point in a play session.
   is a valid v1 game, no 3-total floor. Funny Multi's floor exists for room-fairness reasons that
   don't apply to a single-device app — the person holding the phone doesn't need company to
   start. T-FO-2.2's reducer must accept a 2-seat minimum (not 3).
-- **OQ-4** Any cross-device sharing at all (e.g. "send this gallery to another phone," export/
-  print) — most likely nothing, since there is no room to link to, but confirm before T-FO-4.2.
+- **OQ-4** *(resolved 2026-09-20, owner)* Yes, cross-device sharing is wanted — but via the OS
+  native share sheet only (export the finished image/story to AirDrop, Bluetooth, Messages,
+  email, save-to-photos, etc.), not an upload/link or any other network path. The app itself
+  makes no network call to do this; the OS does any transfer, so FO-IMG-2 (offline PWA) and
+  FO-ID-1 (Play Families eligibility) both stay intact as written. T-FO-4.2/4.3 should reuse
+  Funny Multi's existing local `downloadStory.ts`-style export (canvas → file/share, no server)
+  rather than its `/i/<hash>` upload+link pattern.
 - **OQ-6** *(resolved by D-8's audience choice, FO-ID-1 — kept here only as a reminder not to
   relitigate it casually: any future feature that adds a network call reopens this.)*

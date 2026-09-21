@@ -1127,11 +1127,28 @@ unrelated to this step. Both screenshots inspected visually.
 (T-FO-4.3) depends on that answer. The Apple/Google developer-account enrollment sequence (Phase S,
 D-U-N-S lookup first) remains an owner action running in parallel.
 
-**RESUME HERE (2026-09-20, after Step 24).** `apps/funny-one-client` now plays a full local game
+~~**RESUME HERE (2026-09-20, after Step 24).** `apps/funny-one-client` now plays a full local game
 end to end with virtual seats pausing on a comedic "thinking" mascot screen before their turn
 resolves — Phase FO-3 is closed. Next agent step: propose **T-FO-4.1** (rig art) to the owner, but
 first get an explicit answer on **OQ-4** (any cross-device sharing) since it gates T-FO-4.3's
 design. Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account
+enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.~~
+
+**OQ-4 resolved (2026-09-20/21, owner).** Cross-device sharing is wanted for Funny One's finished
+story/cartoon, via the OS native share sheet only (AirDrop, Bluetooth, Messages, email,
+save-to-photos) — no upload, no link, no network call from the app itself, so FO-IMG-2 (offline
+PWA) and FO-ID-1 (Play Families eligibility) both stay intact as written. Recorded in
+`funny-one-requirements.md` §7 and `funny-one-tasks.md`'s T-FO-4.1 note. This settles T-FO-4.2/4.3
+scope (reuse Funny Multi's local `downloadStory.ts`-style canvas export, not its `/i/<hash>`
+upload+link pattern) without itself closing any task — no code changed.
+
+**RESUME HERE (2026-09-21, after OQ-4's resolution).** Phase FO-3 is closed (Step 24). OQ-4 is now
+resolved, unblocking Phase FO-4's design. Next agent step: **T-FO-4.1** (rig art — backgrounds,
+characters, co-characters, props matched to the existing mascot style; content-authoring time, not
+code) — since this is art content rather than something an agent implements directly, the concrete
+next step is likely drafting the asset spec/list first, then handing off for the actual artwork,
+unless the owner already has art in hand and wants to jump to T-FO-4.2 (compositor) once assets
+exist. Phase 9 stays paused (T-9.3 is its easiest re-entry); the Apple/Google developer-account
 enrollment sequence (Phase S, D-U-N-S lookup first) remains an owner action running in parallel.
 
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone

@@ -1192,7 +1192,7 @@ No TypeScript logic changed — new art components and `RIG_ART.md` only.*
 
 ---
 
-**RESUME HERE (2026-09-22, after Step 25).** All 40 rig assets exist and render cleanly
+~~**RESUME HERE (2026-09-22, after Step 25).** All 40 rig assets exist and render cleanly
 (`apps/funny-one-client/src/components/art/rig/`); `RIG_ART.md` documents the full set. T-FO-4.1 is
 closed. Next agent step: **T-FO-4.2** — the rig compositor: a `rigIndex.ts` id→component registry
 (deferred here on purpose), layered assembly (`where` → `who` → `with` → `did`, z-index 0–3 per
@@ -1205,4 +1205,70 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–25
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 26 below.)*
+
+## Step 26 — T-FO-4.2: rig compositor — registry, layered assembly, spring reveal (2026-09-22)
+
+**Shipped:** `art/rig/rigIndex.ts` — a static `OptionId → component` map for the 4 visual slots,
+one import per asset (no dynamic `import()`, matching the rest of the client's bundling). Guarded
+by `rigIndex.test.ts`, which asserts the map's key set is exactly `POOLS[0/1/2/4]`'s id set — the
+failure mode worth catching here is a pool edit silently losing its art (or the reverse: orphaned
+art for a retired id), not the lookup itself. `components/RigScene.tsx` is the compositor
+(FO-IMG-1): given a `Story`, it layers `where` (z0, full-bleed) → `who` (z1, stage-left third,
+bottom-anchored) → `with` (z2, stage-right third) → `did` (z3, centered, bridging the two) inside
+a `relative`/`absolute` stack per `RIG_ART.md`'s conventions — CSS, no canvas (funny-one-design.md
+§3, the FM-NFR-2 low-end-Android bar). A layer with no answer yet (`story.answers[slot] === null`)
+simply isn't rendered, so a partial story degrades gracefully. `reveal` (default `false`) drives
+FO-IMG-3's spring-physics stagger, reusing `motion.ts`'s `goofy` preset unmodified — each layer
+fades/springs in with a per-layer delay when `true`, or renders already-settled when `false` (the
+mode T-FO-4.3's gallery needs, so a finished story doesn't replay its reveal on every scroll).
+
+**Owner decisions this session:** FO-IMG-4 (in-round dedup) stays **bot-only** — the existing
+`usedOptionsThisQuestion` exclusion in `roundRobin.ts` already covers virtual seats; humans keep
+the unfiltered pool. Reasoning: it's a SHOULD, a visually identical scene needs all 4 slots to
+collide (~1-in-10⁴), and greying out an option a human player wants is worse feel than a rare
+repeat. The 400×300 (4:3) frame from `RIG_ART.md` is **locked**, not revisited — no reason to
+redraw 40 assets. Recorded in `funny-one-tasks.md`'s T-FO-4.2 note.
+
+**Verified:** typecheck (all 4 workspaces), `eslint .`, `prettier --check .`, full `npm test`
+(688/688 across all 6 workspaces, run outside the sandbox), `npm audit --omit=dev` (0
+vulnerabilities) — all clean. Visual check: a render harness (temporarily inside
+`apps/funny-one-client`, esbuild-bundled with a compiled Tailwind stylesheet inlined, deleted after
+use) rendered three `RigScene`s via `react-dom/server` — two full combos and one partial story —
+screenshotted with the Playwright CLI. Confirmed: background full-bleed, `who`/`with` on opposite
+sides bottom-anchored, `did` bridging them in the foreground, correct z-order, no crash on the
+partial story. The spring reveal itself (an animation, not a still) was not eyeballed live in
+`npm run dev` — noted as owed below rather than assumed from the static layout check.
+
+**Not done here, by design:** `RigScene` isn't wired into any screen yet — `App.tsx`'s done phase
+is still the Step 23 stub. That wiring belongs to **T-FO-4.3** (`StoryGallery` + end screen).
+
+**Owed:** the live spring-reveal animation (not just its settled layout) wants one eyeball pass on
+`npm run dev` before this is fully trusted — folding into T-FO-4.3's own in-browser check is fine,
+since that's the first screen that will actually show `reveal={true}`.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 688/688 tests across all 6 workspaces
+(funny-multi-client 190, funny-multi-server 209, funny-one-client 60 [+6], @funny/shared 190,
+cloudflare 39), run outside the sandbox; `npm audit` 0 vulnerabilities. New: `RigScene.tsx`,
+`RigScene.test.tsx`, `art/rig/rigIndex.ts`, `art/rig/rigIndex.test.ts`. No existing file's logic
+changed.*
+
+---
+
+**RESUME HERE (2026-09-22, after Step 26).** T-FO-4.2 is closed: `RigScene` (compositor + spring
+reveal) and `art/rig/rigIndex.ts` (id→component registry, bijection-tested) exist under
+`apps/funny-one-client/src/components/`. Not wired to any screen yet — `App.tsx`'s done phase is
+still Step 23's placeholder text.
+
+Next agent step: **T-FO-4.3** — `StoryGallery` + end screen, adapted from Funny Multi's
+`RoomGallery`/`EndScreen`. Wire `RigScene` (with `reveal={true}` the first time a story's picture is
+shown, `reveal={false}` on any later view) into `App.tsx`'s done phase, one scene per seat's story.
+While there, do the owed live eyeball of the spring reveal on `npm run dev` (Step 26 only checked
+the settled layout via static render).
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–26
 used, since `chromium-cli` is not installed in this environment).

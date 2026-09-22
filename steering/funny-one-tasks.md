@@ -81,8 +81,16 @@ external wait time, elapsed time rather than effort).
       `apps/funny-one-client/src/components/art/rig/`, spec and full id→file mapping in
       `rig/RIG_ART.md`. No `rigIndex.ts` registry yet — that's T-FO-4.2. See
       `docs/IMPLEMENTATION_LOG.md` Step 25.*
-- [ ] **T-FO-4.2 (M)** Rig compositor: layered assembly, spring reveal, in-round dedup. →
+- [x] **T-FO-4.2 (M)** Rig compositor: layered assembly, spring reveal, in-round dedup. →
       FO-IMG-1/3/4
+      *Step 26 (2026-09-22): `art/rig/rigIndex.ts` (id→component registry, bijection-tested
+      against `POOLS[0/1/2/4]`) + `components/RigScene.tsx` (the compositor: `where`→`who`→
+      `with`→`did` z-order/positions per `RIG_ART.md`, spring reveal reusing `motion.ts`'s
+      `goofy` preset unmodified, `reveal={false}` settled mode for T-FO-4.3's gallery). Owner
+      decision (2026-09-22): FO-IMG-4 dedup stays bot-only (existing `usedOptionsThisQuestion`)
+      — humans keep the full pool, a repeat needs a 4-way collision (~1/10⁴) and greying out a
+      wanted answer is worse feel than a rare repeat. 400×300 (4:3) frame locked, not revisited.
+      Not wired to any screen yet — that's T-FO-4.3. See `docs/IMPLEMENTATION_LOG.md` Step 26.*
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
 
 ## Phase FO-5 — i18n breadth

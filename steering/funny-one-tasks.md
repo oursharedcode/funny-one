@@ -73,10 +73,14 @@ external wait time, elapsed time rather than effort).
 
 ## Phase FO-4 — rig art + reveal
 
-- [ ] **T-FO-4.1 (L)** Rig art: backgrounds, characters, co-characters, props — new content,
+- [x] **T-FO-4.1 (L)** Rig art: backgrounds, characters, co-characters, props — new content,
       matched to the existing mascot art style. Sizing is content-authoring time, not code.
       *OQ-4 resolved 2026-09-20 (owner): cross-device sharing wanted, via the OS native share
       sheet only — no upload/link, no network call. See `funny-one-requirements.md` §7.*
+      *Step 25 (2026-09-22): all 40 assets (10 each of `where`/`who`/`with`/`did`) drawn under
+      `apps/funny-one-client/src/components/art/rig/`, spec and full id→file mapping in
+      `rig/RIG_ART.md`. No `rigIndex.ts` registry yet — that's T-FO-4.2. See
+      `docs/IMPLEMENTATION_LOG.md` Step 25.*
 - [ ] **T-FO-4.2 (M)** Rig compositor: layered assembly, spring reveal, in-round dedup. →
       FO-IMG-1/3/4
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.

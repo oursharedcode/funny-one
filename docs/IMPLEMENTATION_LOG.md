@@ -1142,7 +1142,7 @@ PWA) and FO-ID-1 (Play Families eligibility) both stay intact as written. Record
 scope (reuse Funny Multi's local `downloadStory.ts`-style canvas export, not its `/i/<hash>`
 upload+link pattern) without itself closing any task — no code changed.
 
-**RESUME HERE (2026-09-21, after OQ-4's resolution).** Phase FO-3 is closed (Step 24). OQ-4 is now
+~~**RESUME HERE (2026-09-21, after OQ-4's resolution).** Phase FO-3 is closed (Step 24). OQ-4 is now
 resolved, unblocking Phase FO-4's design. Next agent step: **T-FO-4.1** (rig art — backgrounds,
 characters, co-characters, props matched to the existing mascot style; content-authoring time, not
 code) — since this is art content rather than something an agent implements directly, the concrete
@@ -1156,4 +1156,53 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–24
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 25 below.)*
+
+## Step 25 — T-FO-4.1: all 40 rig art assets drawn (2026-09-22)
+
+**Shipped:** all 40 rig assets under `apps/funny-one-client/src/components/art/rig/` — 10 each of
+`where` (background, `0 0 400 300` viewBox, full-bleed), `who` (character), `with`
+(co-character), `did` (prop, all three `0 0 100 100`), one file per pool id from
+`packages/shared/src/pools/options.ts`'s slots 0/1/2/4, matched to the existing mascot style
+(`DESIGN_SYSTEM.md` §5: exaggerated misaligned eyes, `#1f2937` 2.5px outlines, hand-drawn wobble,
+the 8-token brand/state palette, no gradients). Owner-approved split (2026-09-22): separate `.svg`-
+style `.tsx` files (not inline components), drawn by the agent (not commissioned), a 4-asset
+vertical slice first to validate the style before the other 36. `RIG_ART.md` (new) is the written
+spec — file/id mapping, canvas conventions, z-order, style rules — authored before any art, then
+extended with a full 40-row table once the set was complete. The 4-asset slice caught one real bug:
+`AngryGeese.tsx`'s third goose had its beak positioned past its own SVG viewBox (owner-reported from
+a screenshot), fixed by pulling the goose transforms back inside bounds — noted in `RIG_ART.md` as
+a thing to double-check on any asset with off-center elements.
+
+**Verified:** all six gates re-run clean across the full `rig/` tree and the whole repo — eslint,
+`prettier --check`/`--write`, `npm run typecheck` (all 4 workspaces), `npm run lint`,
+`npm run format:check`, `npm run test --workspace=apps/funny-one-client` (54/54, 7 files),
+`npm audit --omit=dev` (0 vulnerabilities). Visual review: bundled all 40 components with esbuild
+(entry file placed temporarily inside `apps/funny-one-client` for node_modules resolution, deleted
+after use — nothing committed there) and rendered them via `react-dom/server` into a composed grid,
+screenshotted with the Playwright CLI (same pattern as the 4-asset slice) and inspected — all 40
+render inside their frame, no clipping, consistent style, on-palette.
+
+**Owed:** none — T-FO-4.1 closes with this step (no registry yet, by design: `rigIndex.ts` is
+T-FO-4.2's job now that all 40 exist).
+
+*Full suite: typecheck, lint, `prettier --check` clean; 54/54 `funny-one-client` tests (the other
+workspaces unaffected by this content-only change), run in-session; `npm audit` 0 vulnerabilities.
+No TypeScript logic changed — new art components and `RIG_ART.md` only.*
+
+---
+
+**RESUME HERE (2026-09-22, after Step 25).** All 40 rig assets exist and render cleanly
+(`apps/funny-one-client/src/components/art/rig/`); `RIG_ART.md` documents the full set. T-FO-4.1 is
+closed. Next agent step: **T-FO-4.2** — the rig compositor: a `rigIndex.ts` id→component registry
+(deferred here on purpose), layered assembly (`where` → `who` → `with` → `did`, z-index 0–3 per
+`RIG_ART.md`'s canvas conventions), spring-physics reveal reusing `motion.ts` presets (FO-IMG-3),
+and in-round dedup reusing FO-BOT-1's existing same-slot exclusion logic (no new algorithm needed).
+Then **T-FO-4.3**: `StoryGallery` + end screen, adapted from Funny Multi's.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–25
 used, since `chromium-cli` is not installed in this environment).

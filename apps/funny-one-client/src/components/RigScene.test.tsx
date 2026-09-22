@@ -17,17 +17,31 @@ const FULL_STORY = storyWith([
   'who.grumpy-pirate',
   'with.angry-geese',
   'where.messy-kitchen',
-  null,
+  'when.hat-festival',
   'did.juggling-pancakes',
 ]);
 
 describe('RigScene', () => {
-  it('renders all 4 visual layers in background-to-foreground z-order', () => {
+  it('renders all 5 drawn layers in background-to-foreground z-order', () => {
     const { container } = render(<RigScene story={FULL_STORY} />);
     const layers = Array.from(container.querySelectorAll('[style*="z-index"]')) as HTMLElement[];
-    expect(layers).toHaveLength(4);
+    expect(layers).toHaveLength(5);
     const zIndexes = layers.map((el) => Number(el.style.zIndex));
-    expect(zIndexes).toEqual([0, 1, 2, 3]);
+    expect(zIndexes).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it('skips the prose-only slots that have no art yet', () => {
+    const withWhyAndEnd = storyWith([
+      'who.grumpy-pirate',
+      null,
+      null,
+      null,
+      null,
+      'why.impress-a-pigeon',
+      'end.duck-complaint',
+    ]);
+    const { container } = render(<RigScene story={withWhyAndEnd} />);
+    expect(container.querySelectorAll('[style*="z-index"]')).toHaveLength(1);
   });
 
   it('renders only the layers that have an answer for a partial story', () => {
@@ -45,7 +59,7 @@ describe('RigScene', () => {
   it('renders the settled scene whether or not reveal is requested', () => {
     const revealed = render(<RigScene story={FULL_STORY} reveal />);
     const settled = render(<RigScene story={FULL_STORY} reveal={false} />);
-    expect(revealed.container.querySelectorAll('svg')).toHaveLength(4);
-    expect(settled.container.querySelectorAll('svg')).toHaveLength(4);
+    expect(revealed.container.querySelectorAll('svg')).toHaveLength(5);
+    expect(settled.container.querySelectorAll('svg')).toHaveLength(5);
   });
 });

@@ -1255,7 +1255,7 @@ changed.*
 
 ---
 
-**RESUME HERE (2026-09-22, after Step 26).** T-FO-4.2 is closed: `RigScene` (compositor + spring
+~~**RESUME HERE (2026-09-22, after Step 26).** T-FO-4.2 is closed: `RigScene` (compositor + spring
 reveal) and `art/rig/rigIndex.ts` (id→component registry, bijection-tested) exist under
 `apps/funny-one-client/src/components/`. Not wired to any screen yet — `App.tsx`'s done phase is
 still Step 23's placeholder text.
@@ -1271,4 +1271,85 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–26
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 27 below.)*
+
+## Step 27 — T-FO-4.2a: `when` badges — 22 assets, top-left badge layer (2026-09-22)
+
+**Why this step exists:** after Step 26 the owner asked for the three prose slots (`when`, `why`,
+`end`) to get *real art in the real `RigScene`*, not just prose under the picture. That amends
+FO-IMG-1 (which locked four layers) and adds 66 assets; the owner chose to land it as three gated
+sub-steps, one slot each, rather than one drop. This is the first.
+
+**Shipped:** 22 `when` assets under `art/rig/when/`, one per `POOLS[3]` id (PascalCase-of-slug
+filenames, same default-export/`className`-only contract as the 40 scene assets), plus
+`when/Plate.tsx` — a shared sticker plate (hard ink shadow under a wobbly cream card) every badge
+draws on, so the 22 read as one set over any of the 10 backgrounds. Question marks and snores are
+paths, not `<text>`, so nothing breaks under the 15 languages. `rigIndex.ts` registers all 22;
+`rigIndex.test.ts` now checks bijection against `RIG_SLOTS = [0, 1, 2, 3, 4]` — Funny One's own
+list, deliberately *not* shared's `VISUAL_SLOTS`, which drives Funny Multi's AI prompt builder and
+both `RoundScreen`s and stays at the four prose-free slots. `RigScene.tsx` gains a fifth layer: slot
+3 at z-index 4, pinned `top-[4%] left-[3%]`, 22% × 30% of the frame. Each layer now carries its own
+`enter` offset, so the badge drops in from above (y −16) while the ground layers keep rising
+(y +16); the `goofy` spring and `LAYER_STAGGER_S` are untouched. `RigScene.test.tsx` expects five
+layers `[0,1,2,3,4]` and adds a "skips the prose-only slots that have no art yet" case
+(`why`/`end` answered → still one layer), which 4.2b/c will narrow as they land.
+
+**Owner decisions this session:** (1) all seven slots get rig art — FO-IMG-1 amended in
+`funny-one-requirements.md`, formula line in `funny-one-design.md` §1 updated; (2) placement:
+`when` = badge top-left, `why` = thought bubble above `who`, `end` = stamp top-right, z-order
+continuing where→who→with→did→when→why→end; (3) three gated sub-steps T-FO-4.2a/b/c, each
+committing on all six gates. Recorded under T-FO-4.2 in `funny-one-tasks.md`. `RIG_ART.md`'s
+canvas table now carries all seven rows (`why`/`end` marked pending), the 22-row `when` id→file
+table, and the 400×300 frame recorded as locked.
+
+**Verified:** typecheck (all 4 workspaces), `eslint .`, `prettier --check .` (after a `--write` on
+`RIG_ART.md`'s new tables), `npm audit` (0 vulnerabilities), full `npm test` outside the sandbox —
+689/689 across all 6 workspaces (funny-multi-client 190, funny-multi-server 209, funny-one-client
+61 [+1], @funny/shared 190, cloudflare 39). Worth writing down: it took three full runs to get one
+clean one, and both failures were load-induced timeouts in workspaces with **no local diff**. Run
+1 (esbuild + Playwright still busy) failed `funny-multi-server`'s `disconnect.socket.test.ts`
+"deletes the room once the last player's window closes" (`await settle()`, then `getRoom` still
+defined — a real-socket timing test); run 2 (Prettier running alongside) failed
+`funny-multi-client`'s `HomeScreen.test.tsx` "offers only authored languages" — a synchronous
+jsdom render that took 6.1 s against vitest's 5 s default. Each workspace passed alone on re-run
+(209/209, 190/190), and run 3 on an idle machine was clean end to end. Filed as flakes, not
+regressions; the lesson is simply: don't run the suite while anything heavy is going. Visual
+check: the Step 26 throwaway-harness pattern (esbuild bundle + compiled
+Tailwind inlined, `react-dom/server`, Playwright screenshot, files deleted after use) rendered all
+22 badges as a grid plus one composed scene (`when.hat-festival` over Draft 4's kitchen / pirate /
+geese / pancakes). No clipping, the plate reads consistently, the badge sits clear of the prop.
+
+**Owed:** unchanged from Step 26 — the live spring reveal (now including the badge's drop-in) gets
+its `npm run dev` eyeball in T-FO-4.3, the first screen that shows `reveal={true}`. If the server
+disconnect flake recurs on CI, its `settle()` margin deserves a look — separate from this work.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 689/689 tests across all 6 workspaces, run
+outside the sandbox; `npm audit` 0 vulnerabilities. New: `art/rig/when/` (22 assets +
+`Plate.tsx`). Changed: `rigIndex.ts`, `rigIndex.test.ts`, `RigScene.tsx`, `RigScene.test.tsx`,
+`RIG_ART.md`, `funny-one-requirements.md` (FO-IMG-1), `funny-one-design.md` §1,
+`funny-one-tasks.md`. `packages/shared` untouched.*
+
+---
+
+**RESUME HERE (2026-09-22, after Step 27).** T-FO-4.2a is closed: the `when` badge layer (22 assets
++ `when/Plate.tsx`) is registered in `rigIndex.ts` and composited by `RigScene` at z-index 4.
+Sub-steps 4.2b and 4.2c remain before T-FO-4.3 — the owner wants all seven slots on the picture
+first.
+
+Next agent step: **T-FO-4.2b** — `why` thought bubbles. 22 assets under `art/rig/why/` (ids =
+`POOLS[5]`, PascalCase of slug; texts in `packages/shared/src/pools/text/en.ts`), on a shared
+bubble shape (cloud outline + two trailing dots down-left toward `who`) the way `when/Plate.tsx`
+anchors the badges. `RigScene.tsx` adds slot 5 at z-index 5, about `top-[6%] left-[26%] h-[30%]
+w-[30%]`, entering from above; `RIG_SLOTS` adds 5; `RigScene.test.tsx` expects six layers and its
+"skips the prose-only slots" case narrows to `end` only; `RIG_ART.md` gets the 22-row table and the
+`why` canvas row loses its "pending" mark. Same visual harness, six gates, commit
+`Step 28 (task T-FO-4.2b): …`, no push. Then **T-FO-4.2c** (`end` stamps, z-index 6, top-right,
+slight rotation) the same way, then **T-FO-4.3** (`StoryGallery` + end screen, with the owed live
+reveal check).
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–27
 used, since `chromium-cli` is not installed in this environment).

@@ -77,6 +77,11 @@ cost, and no network dependency at any point in a play session.
   **New content task**: none of this art exists in the repo; it must be commissioned or drawn,
   matching the existing mascot/art style already used in `apps/funny-multi-client/components/
   art/*` closely enough that both products read as one family.
+  *Amended 2026-09-22 (owner): all seven story slots get rig art, not only the four scene
+  slots — `when` as a badge (top-left), `why` as a thought bubble, `end` as a stamp
+  (top-right), stacked above the prop in that order. Lands in three gated sub-steps
+  (T-FO-4.2a/b/c). `packages/shared`'s `VISUAL_SLOTS` is deliberately unchanged — it drives
+  Funny Multi's AI prompt; Funny One keeps its own rig-slot list.*
 - **FO-IMG-2 (MUST)** Zero network calls during gameplay — full-precache PWA, works in airplane
   mode end-to-end, matching the archive's founding rationale for the whole product (there is no
   other way to be truly offline while Funny Multi's server-held room state cannot be).

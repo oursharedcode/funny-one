@@ -91,6 +91,14 @@ external wait time, elapsed time rather than effort).
       — humans keep the full pool, a repeat needs a 4-way collision (~1/10⁴) and greying out a
       wanted answer is worse feel than a rare repeat. 400×300 (4:3) frame locked, not revisited.
       Not wired to any screen yet — that's T-FO-4.3. See `docs/IMPLEMENTATION_LOG.md` Step 26.*
+      *Owner decision 2026-09-22: the three prose slots get art too (FO-IMG-1 amended) —
+      badge / thought bubble / stamp, z-order continuing where→who→with→did→when→why→end.
+      66 assets (22 per slot), split into three gated sub-steps:*
+  - [x] **T-FO-4.2a (M)** `when` layer: 22 badge assets (`rig/when/`, shared `Plate.tsx`),
+        compositor gains z-index 4 top-left, registry/tests extended to slot 3.
+        *Step 27 (2026-09-22). See `docs/IMPLEMENTATION_LOG.md` Step 27.*
+  - [ ] **T-FO-4.2b (M)** `why` layer: 22 thought-bubble assets (`rig/why/`), z-index 5.
+  - [ ] **T-FO-4.2c (M)** `end` layer: 22 stamp assets (`rig/end/`), z-index 6 top-right.
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
 
 ## Phase FO-5 — i18n breadth

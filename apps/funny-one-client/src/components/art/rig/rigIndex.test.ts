@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Guards the one thing that can silently break here: a pool edit (add/remove/
-// rename an option in POOLS[0/1/2/4]) losing its art, or the reverse — art
+// rename an option in a slot the rig draws) losing its art, or the reverse — art
 // left behind for an id the pool no longer has.
+//
+// RIG_SLOTS is Funny One's own list, deliberately not shared's VISUAL_SLOTS:
+// that one drives Funny Multi's AI prompt and stays at the 4 prose-free slots.
+// `why` (5) and `end` (6) join here in T-FO-4.2b/c.
 
 import { describe, expect, it } from 'vitest';
 import { POOLS } from '@funny/shared';
 import { RIG_INDEX } from './rigIndex';
 
-const VISUAL_SLOTS = [0, 1, 2, 4] as const;
+const RIG_SLOTS = [0, 1, 2, 3, 4] as const;
 
 describe('RIG_INDEX', () => {
-  it('has exactly one entry per visual-slot pool option, no more, no fewer', () => {
-    const poolIds = new Set(VISUAL_SLOTS.flatMap((slot) => POOLS[slot].map((o) => o.id)));
+  it('has exactly one entry per rig-slot pool option, no more, no fewer', () => {
+    const poolIds = new Set(RIG_SLOTS.flatMap((slot) => POOLS[slot].map((o) => o.id)));
     const indexIds = new Set(Object.keys(RIG_INDEX));
 
     expect(indexIds).toEqual(poolIds);

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Id -> component registry for the 4 visual slots (T-FO-4.2, FO-IMG-1), built
-// once all 40 assets existed (RIG_ART.md). Every component shares the mascot
+// Id -> component registry for every slot that has rig art (T-FO-4.2, FO-IMG-1;
+// `when` badges added in T-FO-4.2a). Every component shares the mascot
 // contract: default export, `className` prop only (RIG_ART.md "File / id
-// mapping"). rigIndex.test.ts asserts this map is exactly bijective with
-// `POOLS[0/1/2/4]` — the thing worth guarding here is a pool edit silently
+// mapping"). rigIndex.test.ts asserts this map is exactly bijective with the
+// pools it covers — the thing worth guarding here is a pool edit silently
 // losing its art, not the lookup itself.
 
 import type { ComponentType } from 'react';
@@ -54,6 +54,29 @@ import SortingClouds from './did/SortingClouds';
 import StackingChairs from './did/StackingChairs';
 import StaringContest from './did/StaringContest';
 
+import AfterBreakfast from './when/AfterBreakfast';
+import ClocksStopped from './when/ClocksStopped';
+import DayBeforeBirthday from './when/DayBeforeBirthday';
+import ExactlyNoon from './when/ExactlyNoon';
+import FirstSnow from './when/FirstSnow';
+import FullMoon from './when/FullMoon';
+import HatFestival from './when/HatFestival';
+import InternetOutage from './when/InternetOutage';
+import JustBeforeDinner from './when/JustBeforeDinner';
+import LastDayOfSummer from './when/LastDayOfSummer';
+import LongestLesson from './when/LongestLesson';
+import PowerCut from './when/PowerCut';
+import RushHour from './when/RushHour';
+import SchoolHolidays from './when/SchoolHolidays';
+import SeagullDecision from './when/SeagullDecision';
+import SmallEarthquake from './when/SmallEarthquake';
+import SolarEclipse from './when/SolarEclipse';
+import SomeoneElsesWedding from './when/SomeoneElsesWedding';
+import ThreeInTheMorning from './when/ThreeInTheMorning';
+import Thunderstorm from './when/Thunderstorm';
+import WhileEveryoneSlept from './when/WhileEveryoneSlept';
+import WrongFeelingTuesday from './when/WrongFeelingTuesday';
+
 export interface RigAssetProps {
   className?: string;
 }
@@ -102,4 +125,27 @@ export const RIG_INDEX: Readonly<Record<OptionId, ComponentType<RigAssetProps>>>
   'did.flying-kites': FlyingKites,
   'did.eating-spaghetti': EatingSpaghetti,
   'did.digging-with-spoons': DiggingWithSpoons,
+
+  'when.small-earthquake': SmallEarthquake,
+  'when.solar-eclipse': SolarEclipse,
+  'when.after-breakfast': AfterBreakfast,
+  'when.someone-elses-wedding': SomeoneElsesWedding,
+  'when.wrong-feeling-tuesday': WrongFeelingTuesday,
+  'when.clocks-stopped': ClocksStopped,
+  'when.three-in-the-morning': ThreeInTheMorning,
+  'when.hat-festival': HatFestival,
+  'when.internet-outage': InternetOutage,
+  'when.seagull-decision': SeagullDecision,
+  'when.last-day-of-summer': LastDayOfSummer,
+  'when.thunderstorm': Thunderstorm,
+  'when.first-snow': FirstSnow,
+  'when.school-holidays': SchoolHolidays,
+  'when.full-moon': FullMoon,
+  'when.power-cut': PowerCut,
+  'when.just-before-dinner': JustBeforeDinner,
+  'when.longest-lesson': LongestLesson,
+  'when.day-before-birthday': DayBeforeBirthday,
+  'when.rush-hour': RushHour,
+  'when.while-everyone-slept': WhileEveryoneSlept,
+  'when.exactly-noon': ExactlyNoon,
 };

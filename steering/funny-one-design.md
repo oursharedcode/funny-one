@@ -14,8 +14,8 @@
 │   the same Oracle VM's Caddy at /funny1-game (D-5)               │
 │                                                                   │
 │   Local reducer:  seats (human/virtual) → round-robin turns →    │
-│   rig compositor (background × character × co-character × prop) │
-│   → gallery/end screen                                          │
+│   rig compositor (background × character × co-character × prop  │
+│   × when-badge × why-bubble × end-stamp) → gallery/end screen   │
 │                                                                   │
 │   Zero runtime network calls (FO-IMG-2). No Worker, no R2,       │
 │   no Fastify, no Socket.IO, no secrets — nothing to leak.        │

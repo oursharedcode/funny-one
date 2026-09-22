@@ -1,15 +1,21 @@
 # Funny One rig art — spec (T-FO-4.1)
 
-Status: **all 40 assets drawn.** Started as a 4-asset vertical slice to validate the style before
-drawing the rest (see "Draft 4" below); the remaining 36 followed the same conventions. Governed
-by `DESIGN_SYSTEM.md` §5 (mascot construction rules) — rig art is drawn in the same hand, so both
+Status: **40 scene assets + 22 `when` badges drawn; `why`/`end` overlays pending
+(T-FO-4.2b/c).** Started as a 4-asset vertical slice to validate the style before drawing the
+rest (see "Draft 4" below); everything since followed the same conventions. Governed by
+`DESIGN_SYSTEM.md` §5 (mascot construction rules) — rig art is drawn in the same hand, so both
 products read as one family.
 
-## The 40
+## The 40 (scene) + 66 (overlays)
 
-Exactly 4 pool slots are visual (`packages/shared/src/pools/options.ts`), 10 options each:
-`who` (slot 0), `with` (slot 1), `where` (slot 2), `did` (slot 4) → 10⁴ = 10,000 scene
-combinations from 40 assets. `when`/`why`/`end` (slots 3/5/6) are prose-only and have no art.
+Four pool slots are scene art (`packages/shared/src/pools/options.ts`), 10 options each: `who`
+(slot 0), `with` (slot 1), `where` (slot 2), `did` (slot 4) → 10⁴ = 10,000 scene combinations
+from 40 assets.
+
+Owner decision 2026-09-22 (FO-IMG-1 amended): the three prose slots — `when` (3), `why` (5),
+`end` (6), 22 options each — get overlay art too, so every answer in a story is on the picture:
+`when` as a badge, `why` as a thought bubble, `end` as a stamp. One gated sub-step per slot
+(T-FO-4.2a/b/c). Full set: 106 assets, 10⁴ × 22³ ≈ 1.06 × 10⁸ distinct pictures.
 
 ## File / id mapping
 
@@ -18,8 +24,8 @@ combinations from 40 assets. `when`/`why`/`end` (slots 3/5/6) are prose-only and
 contract as the existing mascots (`BotAvatar.tsx` etc.) — the future compositor (T-FO-4.2) sizes
 everything by parent class, never by props.
 
-**No registry yet.** A `rigIndex.ts` mapping id → component is T-FO-4.2's job, once all 40 exist;
-building a lookup table for a 4/40 set is premature.
+Registry: `rigIndex.ts` (T-FO-4.2) maps every id above to its component; `rigIndex.test.ts`
+keeps it bijective with the pools it covers.
 
 ## Canvas conventions
 
@@ -29,10 +35,14 @@ building a lookup table for a 4/40 set is premature.
 | `who` (character)     | `0 0 100 100` | Stage-left third, bottom-anchored (standing "in" the scene, not floating). z-index 1.         |
 | `with` (co-character) | `0 0 100 100` | Stage-right third, bottom-anchored. z-index 2.                                                |
 | `did` (prop)          | `0 0 100 100` | Foreground, roughly centered, bridging `who`/`with` so the action reads as shared. z-index 3. |
+| `when` (badge)        | `0 0 100 100` | Sticker pinned top-left (22% × 30% of the frame), drops in from above. z-index 4.             |
+| `why` (bubble)        | `0 0 100 100` | Thought bubble above `who`, toward centre-top. z-index 5. _Pending T-FO-4.2b._                |
+| `end` (stamp)         | `0 0 100 100` | Stamp top-right, slightly rotated. z-index 6. _Pending T-FO-4.2c._                            |
 
-400×300 (4:3) picked as a plain "picture" frame — nothing in `funny-one-design.md` locks an
-aspect ratio yet, so this is a draft convention, not a hard gate; revisit if T-FO-4.2's real
-compositor layout wants something else.
+400×300 (4:3) is locked (owner, 2026-09-22): the compositor layout fits it and there's no reason
+to redraw. Every `when` badge draws on the shared `when/Plate.tsx` sticker (hard ink shadow under a
+wobbly cream card) so the 22 read as one set over any background; the icon stays inside roughly
+x 16–84 / y 18–80 of the plate.
 
 ## Style rules (DESIGN_SYSTEM §5, applied to rig art)
 
@@ -111,3 +121,34 @@ Implementer-drafted, designer-reviewed (same standing as the mascot library, DES
 launch criterion is "it exists and it's goofy," not "it's final." All 40 rendered and reviewed
 together (composed grid screenshot) before this note was written — no clipping or off-palette
 fills found beyond the one already noted above.
+
+## The 22 `when` badges (T-FO-4.2a)
+
+| id                           | file                           | on the plate                             |
+| ---------------------------- | ------------------------------ | ---------------------------------------- |
+| `when.small-earthquake`      | `when/SmallEarthquake.tsx`     | tilted house over a zigzag crack         |
+| `when.solar-eclipse`         | `when/SolarEclipse.tsx`        | ink moon sliding over a sun, corona      |
+| `when.after-breakfast`       | `when/AfterBreakfast.tsx`      | fried egg, toast, fork                   |
+| `when.someone-elses-wedding` | `when/SomeoneElsesWedding.tsx` | interlocked rings, hearts                |
+| `when.wrong-feeling-tuesday` | `when/WrongFeelingTuesday.tsx` | calendar, circled day, question mark     |
+| `when.clocks-stopped`        | `when/ClocksStopped.tsx`       | bent-hand clock, popped spring, crack    |
+| `when.three-in-the-morning`  | `when/ThreeInTheMorning.tsx`   | crescent moon, stars, clock at three     |
+| `when.hat-festival`          | `when/HatFestival.tsx`         | sombrero + top hat + party cone, bunting |
+| `when.internet-outage`       | `when/InternetOutage.tsx`      | wifi arcs struck through, sad base dot   |
+| `when.seagull-decision`      | `when/SeagullDecision.tsx`     | smug seagull under a lit bulb            |
+| `when.last-day-of-summer`    | `when/LastDayOfSummer.tsx`     | sun sinking into waves, falling leaf     |
+| `when.thunderstorm`          | `when/Thunderstorm.tsx`        | grumpy cloud, bolt, rain                 |
+| `when.first-snow`            | `when/FirstSnow.tsx`           | three flakes onto a fresh mound          |
+| `when.school-holidays`       | `when/SchoolHolidays.tsx`      | tossed backpack, sun, flying book        |
+| `when.full-moon`             | `when/FullMoon.tsx`            | cratered sleepy moon, stars, cloud wisp  |
+| `when.power-cut`             | `when/PowerCut.tsx`            | crossed-out bulb, lit candle             |
+| `when.just-before-dinner`    | `when/JustBeforeDinner.tsx`    | steaming pot, clock nudging six          |
+| `when.longest-lesson`        | `when/LongestLesson.tsx`       | squiggle chalkboard, drooping clock      |
+| `when.day-before-birthday`   | `when/DayBeforeBirthday.tsx`   | wrapped present, hourglass               |
+| `when.rush-hour`             | `when/RushHour.tsx`            | three honking cars nose to tail          |
+| `when.while-everyone-slept`  | `when/WhileEveryoneSlept.tsx`  | blanket lump, one foot out, snores       |
+| `when.exactly-noon`          | `when/ExactlyNoon.tsx`         | sun overhead, both hands straight up     |
+
+Question marks and snores are drawn as paths, not `<text>`, so nothing in the art breaks under
+the 15 languages. All 22 rendered as a grid plus one composed scene (`when.hat-festival` over the
+Draft 4 kitchen) and reviewed before this table was written.

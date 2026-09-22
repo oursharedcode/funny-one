@@ -1,7 +1,7 @@
 # Funny One rig art — spec (T-FO-4.1)
 
-Status: **40 scene assets + 22 `when` badges drawn; `why`/`end` overlays pending
-(T-FO-4.2b/c).** Started as a 4-asset vertical slice to validate the style before drawing the
+Status: **40 scene assets + 22 `when` badges + 22 `why` bubbles drawn; `end` overlays pending
+(T-FO-4.2c).** Started as a 4-asset vertical slice to validate the style before drawing the
 rest (see "Draft 4" below); everything since followed the same conventions. Governed by
 `DESIGN_SYSTEM.md` §5 (mascot construction rules) — rig art is drawn in the same hand, so both
 products read as one family.
@@ -36,13 +36,18 @@ keeps it bijective with the pools it covers.
 | `with` (co-character) | `0 0 100 100` | Stage-right third, bottom-anchored. z-index 2.                                                |
 | `did` (prop)          | `0 0 100 100` | Foreground, roughly centered, bridging `who`/`with` so the action reads as shared. z-index 3. |
 | `when` (badge)        | `0 0 100 100` | Sticker pinned top-left (22% × 30% of the frame), drops in from above. z-index 4.             |
-| `why` (bubble)        | `0 0 100 100` | Thought bubble above `who`, toward centre-top. z-index 5. _Pending T-FO-4.2b._                |
+| `why` (bubble)        | `0 0 100 100` | Thought bubble over `who`'s head, just inboard of the badge (22% × 30%). z-index 5.           |
 | `end` (stamp)         | `0 0 100 100` | Stamp top-right, slightly rotated. z-index 6. _Pending T-FO-4.2c._                            |
 
 400×300 (4:3) is locked (owner, 2026-09-22): the compositor layout fits it and there's no reason
 to redraw. Every `when` badge draws on the shared `when/Plate.tsx` sticker (hard ink shadow under a
 wobbly cream card) so the 22 read as one set over any background; the icon stays inside roughly
 x 16–84 / y 18–80 of the plate.
+
+Every `why` overlay does the same on `why/Bubble.tsx`: a scalloped cream cloud over a hard ink
+shadow, with two trailing dots down-left — toward `who`'s head, which is why the layer sits where
+it does. Icons stay inside roughly x 22–82 / y 16–64, tighter at the corners, so nothing collides
+with the scallops.
 
 ## Style rules (DESIGN_SYSTEM §5, applied to rig art)
 
@@ -152,3 +157,34 @@ fills found beyond the one already noted above.
 Question marks and snores are drawn as paths, not `<text>`, so nothing in the art breaks under
 the 15 languages. All 22 rendered as a grid plus one composed scene (`when.hat-festival` over the
 Draft 4 kitchen) and reviewed before this table was written.
+
+## The 22 `why` bubbles (T-FO-4.2b)
+
+| id                         | file                         | in the bubble                             |
+| -------------------------- | ---------------------------- | ----------------------------------------- |
+| `why.made-sense-then`      | `why/MadeSenseThen.tsx`      | lit bulb, green tick, one pink doubt curl |
+| `why.impress-a-pigeon`     | `why/ImpressAPigeon.tsx`     | unimpressed blue pigeon, heart            |
+| `why.warranty-forbade-it`  | `why/WarrantyForbadeIt.tsx`  | document under a red prohibition sign     |
+| `why.one-grape`            | `why/OneGrape.tsx`           | a single grape on a plinth, sparkling     |
+| `why.never-back-down`      | `why/NeverBackDown.tsx`      | raised fist, thumb clamped across         |
+| `why.pointless-point`      | `why/PointlessPoint.tsx`     | hand pointing at a dotted circle          |
+| `why.for-science`          | `why/ForScience.tsx`         | flask of green, bubbling                  |
+| `why.pure-stubbornness`    | `why/PureStubbornness.tsx`   | mule, lids half down, two hmph puffs      |
+| `why.horoscope-said-so`    | `why/HoroscopeSaidSo.tsx`    | crystal ball with a star inside           |
+| `why.bet-with-themselves`  | `why/BetWithThemselves.tsx`  | two fists and the coin between them       |
+| `why.to-keep-warm`         | `why/ToKeepWarm.tsx`         | campfire on crossed logs                  |
+| `why.because-tuesday`      | `why/BecauseTuesday.tsx`     | calendar, one day filled, sweat drop      |
+| `why.for-a-sticker`        | `why/ForASticker.tsx`        | gold star on peeling backing              |
+| `why.avoid-homework`       | `why/AvoidHomework.tsx`      | notebook crossed out, pencil down         |
+| `why.everyone-else-did`    | `why/EveryoneElseDid.tsx`    | three identical people, same arrow        |
+| `why.world-record`         | `why/WorldRecord.tsx`        | trophy, pink star on the cup              |
+| `why.simply-hungry`        | `why/SimplyHungry.tsx`       | empty plate, fork and knife, rumble       |
+| `why.impress-grandma`      | `why/ImpressGrandma.tsx`     | grandma, big glasses, verdict pending     |
+| `why.forgot-the-plan`      | `why/ForgotThePlan.tsx`      | clipboard whose lines fade to dots        |
+| `why.instructions-said-so` | `why/InstructionsSaidSo.tsx` | open manual, one huge exclamation         |
+| `why.test-a-theory`        | `why/TestATheory.tsx`        | apple leaving a branch, down-arrow        |
+| `why.no-reason`            | `why/NoReason.tsx`           | full-body shrug, palms up                 |
+
+Same review as the badges: all 22 as a grid plus two composed scenes (`why.impress-a-pigeon` over
+the Draft 4 kitchen, `why.simply-hungry` over the cloud castle). The fist and the pointing hand
+were redrawn after that pass — both read as yellow lumps at badge size first time round.

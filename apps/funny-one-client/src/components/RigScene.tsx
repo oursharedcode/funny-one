@@ -24,10 +24,11 @@ interface Props {
 
 /**
  * Stack order and stage position per RIG_ART.md: where -> who -> with -> did
- * -> when, z-index 0-4. `who`/`with` are bottom-anchored thirds on opposite
- * sides; `did` bridges them in the foreground; `when` is a badge pinned
- * top-left. `enter` is the pre-reveal offset: ground layers rise in, the
- * badge drops in, the background just fades.
+ * -> when -> why, z-index 0-5. `who`/`with` are bottom-anchored thirds on
+ * opposite sides; `did` bridges them in the foreground; `when` is a badge
+ * pinned top-left, and `why` a thought bubble just inboard of it, floating
+ * over `who`'s head. `enter` is the pre-reveal offset: ground layers rise in,
+ * the badge and bubble drop in, the background just fades.
  */
 const LAYERS: readonly {
   slot: SlotIndex;
@@ -45,6 +46,7 @@ const LAYERS: readonly {
     enter: { scale: 0.6, y: 16 },
   },
   { slot: 3, z: 4, position: 'top-[4%] left-[3%] h-[30%] w-[22%]', enter: { scale: 0.6, y: -16 } },
+  { slot: 5, z: 5, position: 'top-[6%] left-[26%] h-[30%] w-[22%]', enter: { scale: 0.6, y: -16 } },
 ];
 
 const LAYER_STAGGER_S = 0.35;

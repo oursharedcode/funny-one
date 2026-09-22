@@ -97,7 +97,9 @@ external wait time, elapsed time rather than effort).
   - [x] **T-FO-4.2a (M)** `when` layer: 22 badge assets (`rig/when/`, shared `Plate.tsx`),
         compositor gains z-index 4 top-left, registry/tests extended to slot 3.
         *Step 27 (2026-09-22). See `docs/IMPLEMENTATION_LOG.md` Step 27.*
-  - [ ] **T-FO-4.2b (M)** `why` layer: 22 thought-bubble assets (`rig/why/`), z-index 5.
+  - [x] **T-FO-4.2b (M)** `why` layer: 22 thought-bubble assets (`rig/why/`, shared
+        `Bubble.tsx`), z-index 5 over `who`'s head, registry/tests extended to slot 5.
+        *Step 28 (2026-09-22). See `docs/IMPLEMENTATION_LOG.md` Step 28.*
   - [ ] **T-FO-4.2c (M)** `end` layer: 22 stamp assets (`rig/end/`), z-index 6 top-right.
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
 

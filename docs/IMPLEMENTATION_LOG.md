@@ -1331,7 +1331,7 @@ outside the sandbox; `npm audit` 0 vulnerabilities. New: `art/rig/when/` (22 ass
 
 ---
 
-**RESUME HERE (2026-09-22, after Step 27).** T-FO-4.2a is closed: the `when` badge layer (22 assets
+~~**RESUME HERE (2026-09-22, after Step 27).** T-FO-4.2a is closed: the `when` badge layer (22 assets
 + `when/Plate.tsx`) is registered in `rigIndex.ts` and composited by `RigScene` at z-index 4.
 Sub-steps 4.2b and 4.2c remain before T-FO-4.3 — the owner wants all seven slots on the picture
 first.
@@ -1352,4 +1352,72 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–27
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 28 below.)*
+
+## Step 28 — T-FO-4.2b: `why` bubbles — 22 assets, thought-bubble layer (2026-09-22)
+
+**Why this step exists:** second of the three gated sub-steps the owner chose for the amended
+FO-IMG-1 (all seven story slots on the picture, not just the four scene slots). `when` landed in
+Step 27; this is `why`.
+
+**Shipped:** 22 `why` assets under `art/rig/why/`, one per `POOLS[5]` id (PascalCase-of-slug file
+names, same `className`-only contract as every other rig asset), plus the shared `why/Bubble.tsx`
+they all draw on — a scalloped cream cloud over a hard ink shadow with two trailing dots down-left,
+pointing back at `who`. The bubble is to `why` what `Plate.tsx` is to `when`: the thing that makes
+22 unrelated icons read as one set over any background. Icons stay inside roughly x 22–82 / y 16–64
+so nothing collides with the scallops. `rigIndex.ts` registers all 22; `RIG_SLOTS` in
+`rigIndex.test.ts` grows to `[0,1,2,3,4,5]`, so the bijection test now guards slot 5 too.
+`RigScene.tsx` gains one layer — slot 5, z-index 5, `top-[6%] left-[26%] h-[30%] w-[22%]`, dropping
+in from above like the badge. `RigScene.test.tsx` expects six layers in z-order `[0..5]` and its
+"skips the prose-only slots" case narrows to `end` alone.
+
+Two deviations from the RESUME HERE plan, both deliberate. The layer is `w-[22%]`, not the sketched
+`w-[30%]`: at 30% the bubble crowded the `when` badge beside it. And `packages/shared` is untouched
+again — `POOLS[5]`'s "prose only" comment is about Funny Multi's AI picture prompt (DD-3), which
+this change does not affect.
+
+**Visual check** (same throwaway harness as Steps 26–27, files deleted before commit): all 22 as a
+grid plus two composed scenes — `why.impress-a-pigeon` over Draft 4's kitchen/pirate/geese/pancakes
+and `why.simply-hungry` over the cloud castle. Two icons failed that pass and were redrawn:
+`never-back-down`'s fist and `pointless-point`'s hand both read as yellow lumps at badge size. The
+fist got four real knuckle arcs, finger creases and a thumb clamped across; the hand got a thinner
+pointing finger against a taller palm. Both read at thumbnail size now. Nothing clips the bubble,
+and the bubble clears both the badge and the prop in the composed scenes.
+
+**Owed:** unchanged — the live spring reveal (background, characters, prop, badge, now bubble) still
+gets its `npm run dev` eyeball in T-FO-4.3, the first screen that renders `reveal={true}`.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 689/689 tests across all 6 workspaces
+(multi-client 190, multi-server 209, one-client 61, shared 190, cloudflare 39), run outside the
+sandbox on an idle machine — clean first try, no repeat of Step 27's load flakes; `npm audit` 0
+vulnerabilities. New: `art/rig/why/` (22 assets + `Bubble.tsx`). Changed: `rigIndex.ts`,
+`rigIndex.test.ts`, `RigScene.tsx`, `RigScene.test.tsx`, `RIG_ART.md`, `funny-one-tasks.md`.
+`packages/shared` untouched.*
+
+---
+
+**RESUME HERE (2026-09-22, after Step 28).** T-FO-4.2b is closed: the `why` thought-bubble layer
+(22 assets + `why/Bubble.tsx`) is registered in `rigIndex.ts` and composited by `RigScene` at
+z-index 5. Six of the seven story slots now draw. Only 4.2c remains before T-FO-4.3.
+
+Next agent step: **T-FO-4.2c** — `end` stamps. 22 assets under `art/rig/end/` (ids = `POOLS[6]`,
+PascalCase of slug; texts in `packages/shared/src/pools/text/en.ts`), on a shared stamp shape the
+way `Plate.tsx` and `Bubble.tsx` anchor their sets — think a rotated ink-bordered seal, the "this
+is how it ended" mark. `RigScene.tsx` adds slot 6 at z-index 6, top-right (`top-[4%] right-[3%]`,
+about `w-[24%] h-[28%]`), with a slight rotation so it reads as stamped rather than placed;
+`RIG_SLOTS` adds 6, which makes the bijection test cover every pool; `RigScene.test.tsx` expects
+seven layers and loses its "skips the prose-only slots" case entirely (nothing is prose-only any
+more — replace it with a partial-story case or fold it into the existing one). `RIG_ART.md` gets
+the 22-row `end` table, the canvas row loses its "pending" mark, and the status line becomes the
+full 106. Same visual harness, six gates, commit `Step 29 (task T-FO-4.2c): …`, no push. Then
+**T-FO-4.3** (`StoryGallery` + end screen, with the owed live reveal check).
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — two unrelated
+timing failures in Step 27 that both passed on an idle re-run. Run it with nothing else going.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–28
 used, since `chromium-cli` is not installed in this environment).

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Id -> component registry for every slot that has rig art (T-FO-4.2, FO-IMG-1;
-// `when` badges added in T-FO-4.2a). Every component shares the mascot
+// `when` badges added in T-FO-4.2a, `why` bubbles in T-FO-4.2b). Every
+// component shares the mascot
 // contract: default export, `className` prop only (RIG_ART.md "File / id
 // mapping"). rigIndex.test.ts asserts this map is exactly bijective with the
 // pools it covers — the thing worth guarding here is a pool edit silently
@@ -77,6 +78,29 @@ import Thunderstorm from './when/Thunderstorm';
 import WhileEveryoneSlept from './when/WhileEveryoneSlept';
 import WrongFeelingTuesday from './when/WrongFeelingTuesday';
 
+import AvoidHomework from './why/AvoidHomework';
+import BecauseTuesday from './why/BecauseTuesday';
+import BetWithThemselves from './why/BetWithThemselves';
+import EveryoneElseDid from './why/EveryoneElseDid';
+import ForASticker from './why/ForASticker';
+import ForScience from './why/ForScience';
+import ForgotThePlan from './why/ForgotThePlan';
+import HoroscopeSaidSo from './why/HoroscopeSaidSo';
+import ImpressAPigeon from './why/ImpressAPigeon';
+import ImpressGrandma from './why/ImpressGrandma';
+import InstructionsSaidSo from './why/InstructionsSaidSo';
+import MadeSenseThen from './why/MadeSenseThen';
+import NeverBackDown from './why/NeverBackDown';
+import NoReason from './why/NoReason';
+import OneGrape from './why/OneGrape';
+import PointlessPoint from './why/PointlessPoint';
+import PureStubbornness from './why/PureStubbornness';
+import SimplyHungry from './why/SimplyHungry';
+import TestATheory from './why/TestATheory';
+import ToKeepWarm from './why/ToKeepWarm';
+import WarrantyForbadeIt from './why/WarrantyForbadeIt';
+import WorldRecord from './why/WorldRecord';
+
 export interface RigAssetProps {
   className?: string;
 }
@@ -148,4 +172,27 @@ export const RIG_INDEX: Readonly<Record<OptionId, ComponentType<RigAssetProps>>>
   'when.rush-hour': RushHour,
   'when.while-everyone-slept': WhileEveryoneSlept,
   'when.exactly-noon': ExactlyNoon,
+
+  'why.made-sense-then': MadeSenseThen,
+  'why.impress-a-pigeon': ImpressAPigeon,
+  'why.warranty-forbade-it': WarrantyForbadeIt,
+  'why.one-grape': OneGrape,
+  'why.never-back-down': NeverBackDown,
+  'why.pointless-point': PointlessPoint,
+  'why.for-science': ForScience,
+  'why.pure-stubbornness': PureStubbornness,
+  'why.horoscope-said-so': HoroscopeSaidSo,
+  'why.bet-with-themselves': BetWithThemselves,
+  'why.to-keep-warm': ToKeepWarm,
+  'why.because-tuesday': BecauseTuesday,
+  'why.for-a-sticker': ForASticker,
+  'why.avoid-homework': AvoidHomework,
+  'why.everyone-else-did': EveryoneElseDid,
+  'why.world-record': WorldRecord,
+  'why.simply-hungry': SimplyHungry,
+  'why.impress-grandma': ImpressGrandma,
+  'why.forgot-the-plan': ForgotThePlan,
+  'why.instructions-said-so': InstructionsSaidSo,
+  'why.test-a-theory': TestATheory,
+  'why.no-reason': NoReason,
 };

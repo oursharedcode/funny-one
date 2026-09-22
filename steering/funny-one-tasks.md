@@ -100,7 +100,10 @@ external wait time, elapsed time rather than effort).
   - [x] **T-FO-4.2b (M)** `why` layer: 22 thought-bubble assets (`rig/why/`, shared
         `Bubble.tsx`), z-index 5 over `who`'s head, registry/tests extended to slot 5.
         *Step 28 (2026-09-22). See `docs/IMPLEMENTATION_LOG.md` Step 28.*
-  - [ ] **T-FO-4.2c (M)** `end` layer: 22 stamp assets (`rig/end/`), z-index 6 top-right.
+  - [x] **T-FO-4.2c (M)** `end` layer: 22 stamp assets (`rig/end/`, shared `Seal.tsx`),
+        z-index 6 top-right with a settled tilt; registry/tests now cover all seven pools —
+        106/106 rig assets drawn. *Step 29 (2026-09-23). See `docs/IMPLEMENTATION_LOG.md`
+        Step 29.*
 - [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
 
 ## Phase FO-5 — i18n breadth

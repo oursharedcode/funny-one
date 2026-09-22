@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Id -> component registry for every slot that has rig art (T-FO-4.2, FO-IMG-1;
-// `when` badges added in T-FO-4.2a, `why` bubbles in T-FO-4.2b). Every
-// component shares the mascot
-// contract: default export, `className` prop only (RIG_ART.md "File / id
+// `when` badges added in T-FO-4.2a, `why` bubbles in T-FO-4.2b, `end` stamps in
+// T-FO-4.2c — all seven pools are covered now). Every component shares the
+// mascot contract: default export, `className` prop only (RIG_ART.md "File / id
 // mapping"). rigIndex.test.ts asserts this map is exactly bijective with the
 // pools it covers — the thing worth guarding here is a pool edit silently
 // losing its art, not the lookup itself.
@@ -101,6 +101,29 @@ import ToKeepWarm from './why/ToKeepWarm';
 import WarrantyForbadeIt from './why/WarrantyForbadeIt';
 import WorldRecord from './why/WorldRecord';
 
+import ASongAboutIt from './end/ASongAboutIt';
+import CatTookCredit from './end/CatTookCredit';
+import CloudLookedAway from './end/CloudLookedAway';
+import DuckComplaint from './end/DuckComplaint';
+import EveryoneFellAsleep from './end/EveryoneFellAsleep';
+import FeelingsAboutPasta from './end/FeelingsAboutPasta';
+import FruitBasket from './end/FruitBasket';
+import HomeForSoup from './end/HomeForSoup';
+import IceCreamForAll from './end/IceCreamForAll';
+import IndoorRainbow from './end/IndoorRainbow';
+import InstantSequel from './end/InstantSequel';
+import InstructionsFinallyClear from './end/InstructionsFinallyClear';
+import LostReceipts from './end/LostReceipts';
+import MuseumExhibit from './end/MuseumExhibit';
+import NeighborsApplauded from './end/NeighborsApplauded';
+import NeverSpokeAgain from './end/NeverSpokeAgain';
+import NewHolidayInvented from './end/NewHolidayInvented';
+import NothingMadeSense from './end/NothingMadeSense';
+import PigeonCertificates from './end/PigeonCertificates';
+import SmelledLikeLemons from './end/SmelledLikeLemons';
+import SomeoneHadToMop from './end/SomeoneHadToMop';
+import ThreeCountryHoliday from './end/ThreeCountryHoliday';
+
 export interface RigAssetProps {
   className?: string;
 }
@@ -195,4 +218,27 @@ export const RIG_INDEX: Readonly<Record<OptionId, ComponentType<RigAssetProps>>>
   'why.instructions-said-so': InstructionsSaidSo,
   'why.test-a-theory': TestATheory,
   'why.no-reason': NoReason,
+
+  'end.feelings-about-pasta': FeelingsAboutPasta,
+  'end.duck-complaint': DuckComplaint,
+  'end.nothing-made-sense': NothingMadeSense,
+  'end.lost-receipts': LostReceipts,
+  'end.pigeon-certificates': PigeonCertificates,
+  'end.fruit-basket': FruitBasket,
+  'end.instant-sequel': InstantSequel,
+  'end.three-country-holiday': ThreeCountryHoliday,
+  'end.cloud-looked-away': CloudLookedAway,
+  'end.never-spoke-again': NeverSpokeAgain,
+  'end.ice-cream-for-all': IceCreamForAll,
+  'end.someone-had-to-mop': SomeoneHadToMop,
+  'end.museum-exhibit': MuseumExhibit,
+  'end.a-song-about-it': ASongAboutIt,
+  'end.neighbors-applauded': NeighborsApplauded,
+  'end.smelled-like-lemons': SmelledLikeLemons,
+  'end.new-holiday-invented': NewHolidayInvented,
+  'end.cat-took-credit': CatTookCredit,
+  'end.everyone-fell-asleep': EveryoneFellAsleep,
+  'end.indoor-rainbow': IndoorRainbow,
+  'end.instructions-finally-clear': InstructionsFinallyClear,
+  'end.home-for-soup': HomeForSoup,
 };

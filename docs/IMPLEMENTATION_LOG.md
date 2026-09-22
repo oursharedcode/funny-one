@@ -1396,7 +1396,7 @@ vulnerabilities. New: `art/rig/why/` (22 assets + `Bubble.tsx`). Changed: `rigIn
 
 ---
 
-**RESUME HERE (2026-09-22, after Step 28).** T-FO-4.2b is closed: the `why` thought-bubble layer
+~~**RESUME HERE (2026-09-22, after Step 28).** T-FO-4.2b is closed: the `why` thought-bubble layer
 (22 assets + `why/Bubble.tsx`) is registered in `rigIndex.ts` and composited by `RigScene` at
 z-index 5. Six of the seven story slots now draw. Only 4.2c remains before T-FO-4.3.
 
@@ -1420,4 +1420,81 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–28
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 29 below.)*
+
+## Step 29 — T-FO-4.2c: `end` stamps — 22 assets, top-right stamp layer (2026-09-23)
+
+**Why this step exists:** last of the three gated sub-steps the owner chose for the amended
+FO-IMG-1. `when` landed in Step 27, `why` in Step 28; this is `end`, and it closes T-FO-4.2 — all
+seven story slots are now on the picture, 106/106 rig assets drawn.
+
+**Shipped:** 22 `end` assets under `art/rig/end/`, one per `POOLS[6]` id, plus the shared
+`end/Seal.tsx` they all draw on. The seal is a white octagonal stamp — hard ink shadow, 3px ink
+border, a pink inner rule, a small pink lozenge top and bottom. Deliberately **not** a third cream
+shape: `Plate.tsx` is a cream card and `Bubble.tsx` a cream cloud, so at thumbnail size a third one
+would have been a coin toss. White plus cut corners gives `end` its own silhouette. Icons stay
+inside roughly x 24–76 / y 24–76, pulled in further at the cut corners. A scalloped rosette was
+tried first and rejected: at a scallop radius big enough to leave room for the icons, the shadow
+overflowed the 100×100 viewBox.
+
+`rigIndex.ts` registers all 22; `RIG_SLOTS` in `rigIndex.test.ts` becomes `[0..6]`, so the
+bijection test now covers **every** pool — the guard is complete, not partial. `RigScene.tsx` gains
+the seventh layer: slot 6, z-index 6, `top-[4%] right-[3%] h-[28%] w-[24%]`. It is the only layer
+with a settled tilt (`rotate: -8`), and it enters oversized and counter-turned (`scale: 1.7`,
+`rotate: 10`) so the spring reveal reads as *pressed on* rather than placed — the layer type grew
+an optional `rotate` for exactly this, defaulting to 0 everywhere else.
+
+`RigScene.test.tsx`: `FULL_STORY` is a full seven now and expects z-order `[0..6]`; the old "skips
+the prose-only slots that have no art yet" case is gone, since nothing is prose-only any more. It
+is replaced by a gap case — answers at slots 0 and 6 only — which asserts the drawn layers keep
+their own z-indexes (`[1, 6]`) instead of being renumbered. `packages/shared` is untouched for the
+third sub-step running: `POOLS[6]`'s "prose only" comment is about Funny Multi's AI picture prompt
+(DD-3), which none of this affects.
+
+**Visual check** (same throwaway harness as Steps 26–28, files deleted before commit): all 22 as a
+tilted 128px grid plus three composed scenes at true stage scale (pirate/geese/kitchen,
+llama/walrus/cloud-castle, dragon/goat/cookbook-library). One icon failed outright and was redrawn:
+`neighbors-applauded`'s two mullioned windows read as a waffle with feet under it — it is now a
+pair of clapping hands with impact marks under a single lit window. Three smaller fixes in the same
+round: `everyone-fell-asleep`'s two Zs were merging into one (separated and resized),
+`museum-exhibit`'s glass highlights crossed the exhibit itself (moved clear, so it stops reading as
+a crossed-out blob), and `smelled-like-lemons` had an ink slash across the fruit (now a white
+highlight). The stamp clears the `when` badge and the `why` bubble at the opposite corner in all
+three scenes.
+
+**Owed:** unchanged — the live spring reveal (background, characters, prop, badge, bubble, now
+stamp) still gets its `npm run dev` eyeball in T-FO-4.3, the first screen that renders
+`reveal={true}`.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 689/689 tests across all 6 workspaces
+(multi-client 190, multi-server 209, one-client 61, shared 190, cloudflare 39), run outside the
+sandbox on an idle machine — clean first try; `npm audit --omit=dev` 0 vulnerabilities. The
+one-client count is unchanged because this step replaced a test rather than adding one. New:
+`art/rig/end/` (22 assets + `Seal.tsx`). Changed: `rigIndex.ts`,
+`rigIndex.test.ts`, `RigScene.tsx`, `RigScene.test.tsx`, `RIG_ART.md`, `funny-one-tasks.md`.
+`packages/shared` untouched.*
+
+---
+
+**RESUME HERE (2026-09-23, after Step 29).** T-FO-4.2 is **closed** — all three sub-steps done.
+Every one of the seven story slots draws: `where`/`who`/`with`/`did` as scene art (Step 25–26),
+`when` badges (27), `why` bubbles (28), `end` stamps (29). 106/106 assets, `rigIndex.ts` bijective
+with all seven pools, `RigScene` compositing z-index 0–6 with the spring reveal.
+
+Next agent step: **T-FO-4.3** — `StoryGallery` + end screen, adapted from Funny Multi's
+(`apps/funny-multi-client`). This is the first screen that renders `RigScene` with `reveal={true}`,
+so it also settles the debt carried since Step 26: eyeball the live spring reveal under
+`npm run dev` — all seven layers staggering in, the stamp landing last. `reveal={false}` is the
+mode the gallery itself wants, so a finished story doesn't replay on every scroll.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — two unrelated
+timing failures in Step 27 that both passed on an idle re-run. Run it with nothing else going.
+Multi-line commit messages must go through `git commit -F <file>`: PowerShell 5.1 mangles
+here-strings containing double quotes on the way to `git.exe`.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
+client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–29
 used, since `chromium-cli` is not installed in this environment).

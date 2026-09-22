@@ -20,19 +20,20 @@ const FULL_STORY = storyWith([
   'when.hat-festival',
   'did.juggling-pancakes',
   'why.impress-a-pigeon',
+  'end.duck-complaint',
 ]);
 
 describe('RigScene', () => {
-  it('renders all 6 drawn layers in background-to-foreground z-order', () => {
+  it('renders all 7 drawn layers in background-to-foreground z-order', () => {
     const { container } = render(<RigScene story={FULL_STORY} />);
     const layers = Array.from(container.querySelectorAll('[style*="z-index"]')) as HTMLElement[];
-    expect(layers).toHaveLength(6);
+    expect(layers).toHaveLength(7);
     const zIndexes = layers.map((el) => Number(el.style.zIndex));
-    expect(zIndexes).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(zIndexes).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 
-  it('skips the prose-only slots that have no art yet', () => {
-    const withEnd = storyWith([
+  it('keeps the z-order of the layers it does draw when a story has gaps', () => {
+    const gappy = storyWith([
       'who.grumpy-pirate',
       null,
       null,
@@ -41,8 +42,9 @@ describe('RigScene', () => {
       null,
       'end.duck-complaint',
     ]);
-    const { container } = render(<RigScene story={withEnd} />);
-    expect(container.querySelectorAll('[style*="z-index"]')).toHaveLength(1);
+    const { container } = render(<RigScene story={gappy} />);
+    const layers = Array.from(container.querySelectorAll('[style*="z-index"]')) as HTMLElement[];
+    expect(layers.map((el) => Number(el.style.zIndex))).toEqual([1, 6]);
   });
 
   it('renders only the layers that have an answer for a partial story', () => {
@@ -60,7 +62,7 @@ describe('RigScene', () => {
   it('renders the settled scene whether or not reveal is requested', () => {
     const revealed = render(<RigScene story={FULL_STORY} reveal />);
     const settled = render(<RigScene story={FULL_STORY} reveal={false} />);
-    expect(revealed.container.querySelectorAll('svg')).toHaveLength(6);
-    expect(settled.container.querySelectorAll('svg')).toHaveLength(6);
+    expect(revealed.container.querySelectorAll('svg')).toHaveLength(7);
+    expect(settled.container.querySelectorAll('svg')).toHaveLength(7);
   });
 });

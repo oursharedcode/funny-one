@@ -24,17 +24,21 @@ interface Props {
 
 /**
  * Stack order and stage position per RIG_ART.md: where -> who -> with -> did
- * -> when -> why, z-index 0-5. `who`/`with` are bottom-anchored thirds on
- * opposite sides; `did` bridges them in the foreground; `when` is a badge
- * pinned top-left, and `why` a thought bubble just inboard of it, floating
- * over `who`'s head. `enter` is the pre-reveal offset: ground layers rise in,
- * the badge and bubble drop in, the background just fades.
+ * -> when -> why -> end, z-index 0-6. `who`/`with` are bottom-anchored thirds
+ * on opposite sides; `did` bridges them in the foreground; `when` is a badge
+ * pinned top-left, `why` a thought bubble just inboard of it floating over
+ * `who`'s head, and `end` a stamp in the opposite corner. `rotate` is the
+ * settled tilt — only the stamp has one, so it reads as pressed on rather than
+ * placed. `enter` is the pre-reveal offset: ground layers rise in, the badge
+ * and bubble drop in, the stamp comes down oversized and counter-turned, and
+ * the background just fades.
  */
 const LAYERS: readonly {
   slot: SlotIndex;
   z: number;
   position: string;
-  enter: { scale: number; y: number };
+  rotate?: number;
+  enter: { scale: number; y: number; rotate?: number };
 }[] = [
   { slot: 2, z: 0, position: 'inset-0', enter: { scale: 1, y: 0 } },
   { slot: 0, z: 1, position: 'bottom-0 left-0 h-2/3 w-1/3', enter: { scale: 0.6, y: 16 } },
@@ -47,6 +51,13 @@ const LAYERS: readonly {
   },
   { slot: 3, z: 4, position: 'top-[4%] left-[3%] h-[30%] w-[22%]', enter: { scale: 0.6, y: -16 } },
   { slot: 5, z: 5, position: 'top-[6%] left-[26%] h-[30%] w-[22%]', enter: { scale: 0.6, y: -16 } },
+  {
+    slot: 6,
+    z: 6,
+    position: 'top-[4%] right-[3%] h-[28%] w-[24%]',
+    rotate: -8,
+    enter: { scale: 1.7, y: -12, rotate: 10 },
+  },
 ];
 
 const LAYER_STAGGER_S = 0.35;
@@ -54,7 +65,7 @@ const LAYER_STAGGER_S = 0.35;
 export default function RigScene({ story, reveal = false, className = '' }: Props) {
   return (
     <div className={`relative aspect-[4/3] overflow-hidden rounded-2xl bg-amber-50 ${className}`}>
-      {LAYERS.map(({ slot, z, position, enter }, i) => {
+      {LAYERS.map(({ slot, z, position, rotate = 0, enter }, i) => {
         const optionId = story.answers[slot];
         if (!optionId) return null;
         const Art = RIG_INDEX[optionId];
@@ -65,8 +76,8 @@ export default function RigScene({ story, reveal = false, className = '' }: Prop
             key={slot}
             className={`absolute ${position}`}
             style={{ zIndex: z }}
-            initial={reveal ? { opacity: 0, ...enter } : false}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={reveal ? { opacity: 0, rotate, ...enter } : false}
+            animate={{ opacity: 1, scale: 1, y: 0, rotate }}
             transition={{ ...goofy, delay: reveal ? i * LAYER_STAGGER_S : 0 }}
           >
             <Art className="h-full w-full" />

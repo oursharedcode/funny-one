@@ -1,7 +1,7 @@
 # Funny One rig art — spec (T-FO-4.1)
 
-Status: **40 scene assets + 22 `when` badges + 22 `why` bubbles drawn; `end` overlays pending
-(T-FO-4.2c).** Started as a 4-asset vertical slice to validate the style before drawing the
+Status: **all 106 drawn — 40 scene assets + 22 `when` badges + 22 `why` bubbles + 22 `end`
+stamps.** Started as a 4-asset vertical slice to validate the style before drawing the
 rest (see "Draft 4" below); everything since followed the same conventions. Governed by
 `DESIGN_SYSTEM.md` §5 (mascot construction rules) — rig art is drawn in the same hand, so both
 products read as one family.
@@ -37,7 +37,7 @@ keeps it bijective with the pools it covers.
 | `did` (prop)          | `0 0 100 100` | Foreground, roughly centered, bridging `who`/`with` so the action reads as shared. z-index 3. |
 | `when` (badge)        | `0 0 100 100` | Sticker pinned top-left (22% × 30% of the frame), drops in from above. z-index 4.             |
 | `why` (bubble)        | `0 0 100 100` | Thought bubble over `who`'s head, just inboard of the badge (22% × 30%). z-index 5.           |
-| `end` (stamp)         | `0 0 100 100` | Stamp top-right, slightly rotated. z-index 6. _Pending T-FO-4.2c._                            |
+| `end` (stamp)         | `0 0 100 100` | Stamp pinned top-right (24% × 28%), tilted −8°, pressed on oversized. z-index 6.              |
 
 400×300 (4:3) is locked (owner, 2026-09-22): the compositor layout fits it and there's no reason
 to redraw. Every `when` badge draws on the shared `when/Plate.tsx` sticker (hard ink shadow under a
@@ -48,6 +48,13 @@ Every `why` overlay does the same on `why/Bubble.tsx`: a scalloped cream cloud o
 shadow, with two trailing dots down-left — toward `who`'s head, which is why the layer sits where
 it does. Icons stay inside roughly x 22–82 / y 16–64, tighter at the corners, so nothing collides
 with the scallops.
+
+Every `end` overlay sits on `end/Seal.tsx`: a white octagonal stamp with a hard ink shadow and a
+pink inner rule, with a small pink lozenge top and bottom. It is deliberately _not_ a third cream
+shape — white plus the cut corners give the `end` set a silhouette that can't be mistaken for the
+`when` card or the `why` cloud at thumbnail size. `RigScene` supplies the tilt, so the art is drawn
+square; icons stay inside roughly x 24–76 / y 24–76, pulled further in at the corners the octagon
+cuts.
 
 ## Style rules (DESIGN_SYSTEM §5, applied to rig art)
 
@@ -188,3 +195,37 @@ Draft 4 kitchen) and reviewed before this table was written.
 Same review as the badges: all 22 as a grid plus two composed scenes (`why.impress-a-pigeon` over
 the Draft 4 kitchen, `why.simply-hungry` over the cloud castle). The fist and the pointing hand
 were redrawn after that pass — both read as yellow lumps at badge size first time round.
+
+## The 22 `end` stamps (T-FO-4.2c)
+
+Each one reads after "In the end, …" (`packages/shared/src/pools/text/*.ts`).
+
+| id                               | file                               | on the stamp                              |
+| -------------------------------- | ---------------------------------- | ----------------------------------------- |
+| `end.feelings-about-pasta`       | `end/FeelingsAboutPasta.tsx`       | bowl of pasta with a heart over it        |
+| `end.duck-complaint`             | `end/DuckComplaint.tsx`            | duck beside a form, stamped in red        |
+| `end.nothing-made-sense`         | `end/NothingMadeSense.tsx`         | baffled face ringed by question marks     |
+| `end.lost-receipts`              | `end/LostReceipts.tsx`             | two torn receipts drifting off            |
+| `end.pigeon-certificates`        | `end/PigeonCertificates.tsx`       | pigeon perched on a sealed certificate    |
+| `end.fruit-basket`               | `end/FruitBasket.tsx`              | woven basket, fruit piled over the rim    |
+| `end.instant-sequel`             | `end/InstantSequel.tsx`            | clapperboard with a play triangle         |
+| `end.three-country-holiday`      | `end/ThreeCountryHoliday.tsx`      | three flags on one horizon line           |
+| `end.cloud-looked-away`          | `end/CloudLookedAway.tsx`          | cloud with both eyes cut hard to one side |
+| `end.never-spoke-again`          | `end/NeverSpokeAgain.tsx`          | speech bubble struck through in red       |
+| `end.ice-cream-for-all`          | `end/IceCreamForAll.tsx`           | three cones, one per everybody            |
+| `end.someone-had-to-mop`         | `end/SomeoneHadToMop.tsx`          | mop and bucket over the puddle            |
+| `end.museum-exhibit`             | `end/MuseumExhibit.tsx`            | the thing under glass on a plinth         |
+| `end.a-song-about-it`            | `end/ASongAboutIt.tsx`             | two notes over a stave                    |
+| `end.neighbors-applauded`        | `end/NeighborsApplauded.tsx`       | hands mid-clap under a still-lit window   |
+| `end.smelled-like-lemons`        | `end/SmelledLikeLemons.tsx`        | one tilted lemon, scent coming off it     |
+| `end.new-holiday-invented`       | `end/NewHolidayInvented.tsx`       | calendar, star on the day, confetti       |
+| `end.cat-took-credit`            | `end/CatTookCredit.tsx`            | smug cat wearing a medal it didn't earn   |
+| `end.everyone-fell-asleep`       | `end/EveryoneFellAsleep.tsx`       | heap of blanket, three shut eyes, two Zs  |
+| `end.indoor-rainbow`             | `end/IndoorRainbow.tsx`            | rainbow off the floorboards, indoors      |
+| `end.instructions-finally-clear` | `end/InstructionsFinallyClear.tsx` | open manual with a green tick over it     |
+| `end.home-for-soup`              | `end/HomeForSoup.tsx`              | steaming bowl, the house behind it        |
+
+Zs and question marks are paths, never `<text>`. Reviewed as a grid at 128px plus three composed
+scenes at true stage scale; `end.neighbors-applauded` was redrawn after that pass (two mullioned
+windows read as a waffle), and the Zs, the museum glass highlights and the lemon's shine were
+adjusted in the same round.

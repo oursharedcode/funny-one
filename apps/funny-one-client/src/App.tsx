@@ -10,13 +10,18 @@
 // {name}" + an explicit "I'm {name} — go" tap). A virtual seat's turn has no
 // one to hand the phone to, so it never shows a HandoffScreen (owner call,
 // 2026-09-20) — only the ThinkingScreen, then an automatic submit.
+//
+// T-FO-4.3a adds the terminal state: `isDone(game)` now renders EndScreen
+// instead of a placeholder. "Play again" re-runs `createGame` with the same
+// seats/language (owner decision 2026-09-23) — App.tsx is the only place
+// that holds both, so the handler lives here rather than in EndScreen.
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import HomeScreen from './screens/HomeScreen';
 import HandoffScreen from './screens/HandoffScreen';
 import RoundScreen from './screens/RoundScreen';
 import ThinkingScreen from './screens/ThinkingScreen';
+import EndScreen from './screens/EndScreen';
 import { pickThinkingDelayMs } from './game/thinkingDelay';
 import {
   createGame,
@@ -31,7 +36,6 @@ import {
 import type { AuthoredLanguage, OptionId } from '@funny/shared';
 
 export default function App() {
-  const { t } = useTranslation();
   const [game, setGame] = useState<GameState | null>(null);
   // Gates the HandoffScreen for the seat currently up. Reset to true
   // whenever a new human turn begins (see the effect below); a "go" tap sets
@@ -66,15 +70,19 @@ export default function App() {
     setGame((prev) => (prev ? submitAnswer(prev, optionId) : prev));
   }
 
+  // Play again: same seats, same language, a fresh game — App.tsx is the
+  // only place that has both `game.seats` and `createGame` in scope.
+  function handlePlayAgain(): void {
+    setGame((prev) => (prev ? createGame(prev.seats, prev.language) : prev));
+  }
+
   if (!game) {
     return <HomeScreen onStart={handleStart} />;
   }
 
   if (isDone(game)) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 py-10">
-        <p className="text-center text-gray-700">{t('home.title')} — game complete</p>
-      </div>
+      <EndScreen game={game} onPlayAgain={handlePlayAgain} onChangePlayers={() => setGame(null)} />
     );
   }
 

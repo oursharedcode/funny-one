@@ -33,6 +33,21 @@
     "submitDisabled": "Pick an answer first",
     "submitted": "Submitted"
   },
+  "gallery": {
+    "title": "The stories",
+    "storyBy": "{{name}}'s story",
+    "pictureAlt": "{{name}}'s story picture",
+    "prev": "Previous story",
+    "next": "Next story",
+    "counter": "{{index}} of {{total}}",
+    "download": "Download",
+    "shareButton": "Share"
+  },
+  "end": {
+    "title": "The stories are ready!",
+    "playAgain": "Play again",
+    "changePlayers": "Change players"
+  },
   "footer": {
     "source": "Source on GitHub",
     "contentNotice": "This game runs entirely on your device. Nothing you type ever leaves it."

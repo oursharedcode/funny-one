@@ -39,8 +39,26 @@ body {
   transform-origin: center;
   animation: mascot-tap 0.55s ease-in-out infinite;
 }
+
+/* EndMascots' wave loop (T-FO-4.3a), same source as mascot-tap above. */
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: rotate(-14deg);
+  }
+  50% {
+    transform: rotate(20deg);
+  }
+}
+.mascot-wave {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-wave 0.9s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .mascot-tap {
+  .mascot-tap,
+  .mascot-wave {
     animation: none;
   }
 }

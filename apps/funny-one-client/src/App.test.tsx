@@ -57,6 +57,35 @@ describe('App', () => {
       await settle();
     }
 
-    expect(screen.getByText('Funny One — game complete')).toBeTruthy();
+    // T-FO-4.3a: the end screen replaces the old placeholder, with both
+    // players' finished stories browsable in the gallery.
+    expect(screen.getByText('The stories are ready!')).toBeTruthy();
+    expect(screen.getByText("Player 1's story")).toBeTruthy();
+    expect(screen.getByText('1 of 2')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(screen.getByText("Bot 1's story")).toBeTruthy();
+    expect(screen.getByText('2 of 2')).toBeTruthy();
+
+    // "Play again" restarts with the same two seats rather than returning to
+    // HomeScreen's setup.
+    fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
+    expect(screen.getByText('Pass to Player 1')).toBeTruthy();
+  });
+
+  it('"Change players" from the end screen returns to setup', { timeout: 20_000 }, async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start game' }));
+
+    for (let question = 0; question < SLOT_COUNT; question++) {
+      fireEvent.click(screen.getByRole('button', { name: "I'm Player 1 — go" }));
+      fireEvent.click(screen.getAllByRole('radio')[0]!);
+      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await settle();
+    }
+
+    fireEvent.click(screen.getByRole('button', { name: 'Change players' }));
+    expect(screen.getByText('Funny One')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Start game' })).toBeTruthy();
   });
 });

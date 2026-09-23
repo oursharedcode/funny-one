@@ -1476,7 +1476,7 @@ one-client count is unchanged because this step replaced a test rather than addi
 
 ---
 
-**RESUME HERE (2026-09-23, after Step 29).** T-FO-4.2 is **closed** — all three sub-steps done.
+~~**RESUME HERE (2026-09-23, after Step 29).** T-FO-4.2 is **closed** — all three sub-steps done.
 Every one of the seven story slots draws: `where`/`who`/`with`/`did` as scene art (Step 25–26),
 `when` badges (27), `why` bubbles (28), `end` stamps (29). 106/106 assets, `rigIndex.ts` bijective
 with all seven pools, `RigScene` compositing z-index 0–6 with the spring reveal.
@@ -1497,4 +1497,111 @@ install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the 
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no project run-skill exists yet for driving either
 client in a browser (`/run-skill-generator` would capture the Playwright-driver pattern Steps 23–29
-used, since `chromium-cli` is not installed in this environment).
+used, since `chromium-cli` is not installed in this environment).~~ *(carried — see Step 31 below.)*
+
+## Step 30 — T-FO-4.3: `StoryGallery` + end screen, rig image export (2026-09-23)
+
+**Why this step exists:** closes Phase FO-4's last task. Owner confirmed (2026-09-23) three plan
+decisions: split T-FO-4.3 into gated sub-steps 4.3a/4.3b, mirroring T-FO-4.2a/b/c's precedent;
+reveal-once-per-story-on-first-view (not replay-every-time); end screen offers "Play again" (same
+seats/language, instant restart) + "Change players" (back to Home/setup). Owner then explicitly
+directed committing both sub-steps together rather than separately — this entry covers both.
+
+**Shipped:**
+
+*T-FO-4.3a.* `StoryGallery.tsx` + `EndScreen.tsx`, adapted from Funny Multi's
+`RoomGallery.tsx`/`EndScreen.tsx` with every socket/lobby/host concept stripped. First real
+consumer of T-FO-2.1's shared prose pipeline: new `game/resolveStory.ts` wraps `POOL_TEXTS`/
+`renderProse`/`polishProse` from `@funny/shared` into a `Story → { answers, prose }` resolver,
+mirroring the server's own `resolveAnswers`/`revealProse` pattern. Reveal-once-per-story: a `seen`
+index `Set` plus `RigScene` remounted per index (`key={index}`) so navigating to an unseen story
+always gets a fresh `initial` mount, while revisiting a seen one mounts fresh too but with
+`reveal={false}` — relies on framer-motion's `initial` prop being read only at mount, not on every
+prop change. `App.tsx` wires `isDone(game)` to `EndScreen`; "Play again" reruns `createGame` on the
+same seats/language, "Change players" clears `game` back to Home. New `gallery.*`/`end.*` i18n
+keys. `ProseText.tsx`, `prose.ts` (`splitProse`) and `art/EndMascots.tsx` copied verbatim from
+Funny Multi (same "copy, unmodified" reuse class as `ScrollBox.tsx`/`SourceFooter.tsx`/
+`LogoStamp.tsx`).
+
+*T-FO-4.3b* (OQ-4 scope: local canvas export + native share sheet only — no upload/link, no
+network call, no video/wobble recording). `components/art/rig/rigGeometry.ts` pulls the
+`RIG_LAYERS` position table (previously inline Tailwind position classes in `RigScene.tsx`) out
+into numeric `xPct`/`yPct`/`wPct`/`hPct`/`rotate`/`enter` percentages of the 400×300 stage — the
+same numbers now drive both the on-screen compositor and the new exporter, rather than a second
+hand-derivation that could silently drift. `rigExport.ts` composites a story into a PNG: each rig
+layer's Art component is serialized via `renderToStaticMarkup`, given explicit `width`/`height` on
+its root `<svg>` (its `className` prop is Tailwind, which has no effect rendered standalone) via
+`DOMParser`/`XMLSerializer`, then rasterized through `HTMLImageElement.decode()` off a `data:`
+URI. Funny One's picture has no fetchable bitmap URL — unlike Funny Multi's `PictureRef.url` —so
+`downloadStory.ts`'s `fetch`/`createImageBitmap` path didn't apply; `recordWobble.ts`'s `new
+Image()`/`.decode()` pattern was the fit instead. Layer compositing (including `ctx.translate`/
+`ctx.rotate` for the tilted end-stamp) reads `RIG_LAYERS` directly; the prose/name/QR-footer layout
+below the rig reuses `downloadStory.ts`'s wrap/measure math unchanged. `share.ts`, `ShareButton.tsx`
+and `testutils/canvasStub.ts` copied verbatim from Funny Multi. `StoryGallery` gained Download +
+Share buttons (Share hidden where `canShareFiles()` is false, same capability probe as Multi's
+gallery); `qrcode`/`@types/qrcode` added to `funny-one-client/package.json`.
+
+**Owed:** none new — the live-reveal eyeball debt carried since Step 26 is closed in Step 31 below,
+not duplicated here.
+
+*Full suite: typecheck, lint, `prettier --check` clean; 703/703 tests across all 6 workspaces
+(multi-client 190, multi-server 209, one-client 75, shared 190, cloudflare 39), run outside the
+sandbox — clean first try, no flakes this run; `npm audit` 0 vulnerabilities. New (one-client):
+`components/{ProseText,ShareButton,StoryGallery,StoryGallery.test}.tsx`,
+`components/art/EndMascots.tsx`, `components/art/rig/rigGeometry.ts`,
+`game/{resolveStory,resolveStory.test}.ts`, `prose.ts`, `rigExport.ts`, `rigExport.test.ts`,
+`screens/EndScreen.tsx`, `share.ts`, `testutils/canvasStub.ts`. Changed: `App.tsx`, `App.test.tsx`,
+`RigScene.tsx`, `i18n/en.json`, `styles/index.css`, `package.json`. `packages/shared` untouched.*
+
+## Step 31 — Playwright devDependency + live reveal verification (2026-09-24)
+
+**Why this step exists:** closes the "eyeball the live spring reveal" debt carried since Step 26
+(Steps 27–29's RESUME notes kept deferring it to T-FO-4.3, the first screen rendering
+`reveal={true}`) and the "no project run-skill for driving a browser" gap noted in every RESUME
+note since Step 23.
+
+**Shipped:** `playwright` added as a root devDependency (Chromium binary was already cached
+locally — no install needed). Used to drive `apps/funny-one-client`'s own dev server headlessly
+(standalone `vite` — the client has no server dependency, so the root `concurrently` script isn't
+needed) through a full 2-seat game (1 human + 1 virtual) to the end screen, screenshotting the
+reveal at ~100–150ms intervals. Confirmed: story 1's reveal stages exactly as `RIG_LAYERS` orders
+it — background at t=0, `who`/`with` corner characters by t≈400ms, prop by t≈900ms, `when`-badge +
+`why`-bubble by t≈1600ms, tilted `end`-stamp landing last around t≈2000ms; stepping to story 2
+("Next story") replays the same staggered sequence from empty; stepping back to story 1 ("Previous
+story") renders fully settled immediately, no replay — confirming the reveal-once contract that
+`StoryGallery.test.tsx`'s mocked-`RigScene` assertions only exercised indirectly. No console/page
+errors beyond the already-known missing-locale-file warning (T-FO-5.1's territory, not a
+regression). The driver script itself was a throwaway (written, run, deleted) — not saved as a
+repo skill.
+
+**Owed:** no project run-skill/`SKILL.md` committed for this Playwright driver — `/run-skill-
+generator` would capture the pattern if a future session wants a durable one.
+
+*No source changes in this step (devDependency + verification only); Step 30's gate run already
+covers the code these screenshots exercised. `npm audit` re-run clean (0 vulnerabilities) after the
+dependency add.*
+
+---
+
+**RESUME HERE (2026-09-24, after Step 31).** Phase FO-4 is **closed** — T-FO-4.3 (both sub-steps)
+landed in Step 30, and the live-reveal eyeball debt it inherited from Step 26 closed in Step 31.
+Funny One is now a complete local game end to end: setup → round-robin play → end screen with a
+browsable, downloadable/shareable story gallery, verified in a real headless browser.
+
+Next agent step: **Phase FO-5** — `T-FO-5.1`, wiring all 15 languages for Funny One's UI catalog
+(`steering/funny-one-tasks.md` §Phase FO-5). Pool texts are already shared per D-2, so this is
+UI-catalog authoring/wiring only, following Funny Multi's existing 15-language pattern
+(`apps/funny-multi-client/src/i18n/*.json`) — no new translation content to invent from scratch,
+just port the catalog shape. Funny One currently ships only `en.json`; the boot-time
+`console.error` for missing `<code>.json` files names exactly which are left.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`: PowerShell 5.1
+mangles here-strings containing double quotes on the way to `git.exe`.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no repo-committed Playwright run-skill yet (Step 31
+used a throwaway driver — see that step's Owed).

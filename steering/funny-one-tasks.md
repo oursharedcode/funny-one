@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document** | `steering/funny-one-tasks.md` |
-| **Status** | Phases FO-0–FO-3 closed. Full local game playable end to end (setup, handoff, combobox, thinking-delay virtual seats, completion). Next: Phase FO-4 (rig art + reveal). |
+| **Status** | Phases FO-0–FO-4 closed. Full local game playable end to end, all 106 rig assets drawn and composited with a spring reveal, StoryGallery/end screen wired, rig-to-PNG export + native share. Next: Phase FO-5 (i18n breadth). |
 
 Execution plan for `steering/funny-one-requirements.md` (FO-\*) per
 `steering/funny-one-design.md`. Same discipline as Funny Multi: phases in order, verify each
@@ -71,7 +71,7 @@ external wait time, elapsed time rather than effort).
       `setGame` update, avoids stale closures under StrictMode's dev double-invoke) instead of
       resolving instantly. See `docs/IMPLEMENTATION_LOG.md` Step 24.*
 
-## Phase FO-4 — rig art + reveal
+## Phase FO-4 — rig art + reveal (CLOSED 2026-09-24)
 
 - [x] **T-FO-4.1 (L)** Rig art: backgrounds, characters, co-characters, props — new content,
       matched to the existing mascot art style. Sizing is content-authoring time, not code.
@@ -104,7 +104,22 @@ external wait time, elapsed time rather than effort).
         z-index 6 top-right with a settled tilt; registry/tests now cover all seven pools —
         106/106 rig assets drawn. *Step 29 (2026-09-23). See `docs/IMPLEMENTATION_LOG.md`
         Step 29.*
-- [ ] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
+- [x] **T-FO-4.3 (M)** `StoryGallery` + end screen, adapted from Funny Multi's.
+      *Owner decision 2026-09-23: split into two gated sub-steps mirroring T-FO-4.2a/b/c;
+      reveal-once-per-story-on-first-view (not replay-every-time); end screen offers "Play
+      again" (same seats/language, instant restart) + "Change players" (back to Home/setup).
+      Owner then directed committing both sub-steps together rather than separately.*
+  - [x] **T-FO-4.3a (M)** `StoryGallery` + `EndScreen`, adapted from Funny Multi's
+        `RoomGallery`/`EndScreen` with sockets/lobby stripped. First consumer of T-FO-2.1's
+        shared prose pipeline (new `game/resolveStory.ts`). Reveal-once via a `seen` index set
+        + `RigScene` remounted per index, reusing framer-motion's mount-only `initial`
+        semantics. *Step 30 (2026-09-23). See `docs/IMPLEMENTATION_LOG.md` Step 30.*
+  - [x] **T-FO-4.3b (M)** Rig-to-PNG export + native share sheet (OQ-4: local canvas export
+        only, no upload, no video). `components/art/rig/rigGeometry.ts` pulls `RIG_LAYERS`
+        geometry out of `RigScene.tsx` so the same table drives the on-screen compositor and
+        the new `rigExport.ts` exporter. `share.ts`/`ShareButton.tsx`/`testutils/canvasStub.ts`
+        copied verbatim from Funny Multi. *Step 30 (2026-09-23). See
+        `docs/IMPLEMENTATION_LOG.md` Step 30.*
 
 ## Phase FO-5 — i18n breadth
 

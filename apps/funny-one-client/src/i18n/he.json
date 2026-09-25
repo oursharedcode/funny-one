@@ -1,0 +1,56 @@
+{
+  "_note": "needs-he-review — machine-translated stub awaiting native Hebrew review.",
+  "home": {
+    "title": "סיפור מתגלגל",
+    "subtitle": "מעבירים את המכשיר ובונים יחד סיפורים מטורפים, בין 2 ל-7 שחקנים, בלי צורך באינטרנט.",
+    "start": "התחל משחק",
+    "gameRules": "חוקי המשחק",
+    "rules": "מעבירים את המכשיר ביניכם. בכל סיבוב, כולם עונים בתורם על אותה שאלה משעשעת. התשובות שלכם מתערבבות לסיפורים מטורפים, ואחר כך לכל סיפור נבנה ציור מצחיק משלו.",
+    "language": "שפה",
+    "seatCountHint": "סה\"כ 2–7 שחקנים",
+    "playerNamePlaceholder": "שם",
+    "humanSeatLabel": "שם השחקן",
+    "virtualSeatLabel": "שם השחקן הווירטואלי",
+    "humanBadge": "את/ה",
+    "virtualBadge": "בוט",
+    "removeSeat": "הסרת שחקן",
+    "addPlayer": "+ הוספת שחקן",
+    "addVirtual": "+ הוספת שחקן וירטואלי"
+  },
+  "thinking": {
+    "title": "{{name}} חושב/ת…"
+  },
+  "handoff": {
+    "title": "העבירו ל{{name}}",
+    "subtitle": "אל תציצו בתשובות של אחרים.",
+    "ready": "אני {{name}} — קדימה"
+  },
+  "round": {
+    "progress": "שאלה {{current}} מתוך {{total}}",
+    "pick": "בחר את התשובה שלך",
+    "optionsLabel": "תשובות לבחירה",
+    "scrollHint": "גלול כדי לראות עוד",
+    "submit": "שליחה",
+    "submitDisabled": "בחר תשובה קודם",
+    "submitted": "נשלח"
+  },
+  "gallery": {
+    "title": "הסיפורים",
+    "storyBy": "הסיפור של {{name}}",
+    "pictureAlt": "ציור הסיפור של {{name}}",
+    "prev": "הסיפור הקודם",
+    "next": "הסיפור הבא",
+    "counter": "{{index}} מתוך {{total}}",
+    "download": "הורדה",
+    "shareButton": "שיתוף"
+  },
+  "end": {
+    "title": "הסיפורים מוכנים!",
+    "playAgain": "לשחק שוב",
+    "changePlayers": "החלפת שחקנים"
+  },
+  "footer": {
+    "source": "קוד המקור ב-GitHub",
+    "contentNotice": "המשחק הזה פועל כולו על המכשיר שלכם. שום דבר שאתם מקלידים לא יוצא ממנו."
+  }
+}

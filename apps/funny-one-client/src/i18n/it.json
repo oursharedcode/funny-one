@@ -1,0 +1,56 @@
+{
+  "_note": "needs-it-review — machine-translated stub awaiting native Italian review.",
+  "home": {
+    "title": "Storia a Catena",
+    "subtitle": "Passatevi il telefono e create insieme storie assurde, da 2 a 7 giocatori, senza bisogno di internet.",
+    "start": "Avvia la partita",
+    "gameRules": "Regole del gioco",
+    "rules": "Passatevi il telefono. A ogni round, tutti rispondono a turno alla stessa domanda divertente. Le vostre risposte vengono mescolate in storie assurde, poi per ciascuna viene creato un disegno buffo.",
+    "language": "Lingua",
+    "seatCountHint": "Da 2 a 7 giocatori in totale",
+    "playerNamePlaceholder": "Nome",
+    "humanSeatLabel": "Nome del giocatore",
+    "virtualSeatLabel": "Nome del giocatore virtuale",
+    "humanBadge": "Tu",
+    "virtualBadge": "Bot",
+    "removeSeat": "Rimuovi giocatore",
+    "addPlayer": "+ Aggiungi giocatore",
+    "addVirtual": "+ Aggiungi virtuale"
+  },
+  "thinking": {
+    "title": "{{name}} sta pensando…"
+  },
+  "handoff": {
+    "title": "Passa il telefono a {{name}}",
+    "subtitle": "Non sbirciare le risposte degli altri.",
+    "ready": "Sono {{name}} — via"
+  },
+  "round": {
+    "progress": "Domanda {{current}} di {{total}}",
+    "pick": "Scegli la tua risposta",
+    "optionsLabel": "Risposte tra cui scegliere",
+    "scrollHint": "Scorri per vederne altre",
+    "submit": "Invia",
+    "submitDisabled": "Scegli prima una risposta",
+    "submitted": "Inviato"
+  },
+  "gallery": {
+    "title": "Le storie",
+    "storyBy": "Storia di {{name}}",
+    "pictureAlt": "Immagine della storia di {{name}}",
+    "prev": "Storia precedente",
+    "next": "Storia successiva",
+    "counter": "{{index}} di {{total}}",
+    "download": "Scarica",
+    "shareButton": "Condividi"
+  },
+  "end": {
+    "title": "Le storie sono pronte!",
+    "playAgain": "Gioca ancora",
+    "changePlayers": "Cambia giocatori"
+  },
+  "footer": {
+    "source": "Sorgente su GitHub",
+    "contentNotice": "Questo gioco funziona interamente sul tuo dispositivo. Niente di ciò che scrivi lo lascia mai."
+  }
+}

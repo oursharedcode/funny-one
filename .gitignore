@@ -17,6 +17,7 @@ coverage/
 .claude/settings.local.json
 .vite/
 .wrangler/
+.screens/
 *.log
 .DS_Store
 Thumbs.db

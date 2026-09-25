@@ -1,0 +1,56 @@
+{
+  "_note": "needs-ko-review — machine-translated stub awaiting native Korean review.",
+  "home": {
+    "title": "패스 스토리",
+    "subtitle": "기기를 돌려가며 2~7명이 함께 엉뚱한 이야기를 만들어요. 인터넷 필요 없음.",
+    "start": "게임 시작",
+    "gameRules": "게임 규칙",
+    "rules": "기기를 돌아가며 전달하세요. 매 라운드마다 모두가 같은 재미있는 질문에 순서대로 답합니다. 여러분의 답은 다른 사람들의 답과 섞여 엉뚱한 이야기가 되고, 각 이야기마다 엉뚱한 그림이 만들어집니다.",
+    "language": "언어",
+    "seatCountHint": "총 2~7명",
+    "playerNamePlaceholder": "이름",
+    "humanSeatLabel": "플레이어 이름",
+    "virtualSeatLabel": "가상 플레이어 이름",
+    "humanBadge": "나",
+    "virtualBadge": "봇",
+    "removeSeat": "플레이어 삭제",
+    "addPlayer": "+ 플레이어 추가",
+    "addVirtual": "+ 가상 플레이어 추가"
+  },
+  "thinking": {
+    "title": "{{name}}이(가) 생각 중…"
+  },
+  "handoff": {
+    "title": "{{name}}에게 전달하세요",
+    "subtitle": "다른 사람의 답을 엿보지 마세요.",
+    "ready": "저는 {{name}} — 시작"
+  },
+  "round": {
+    "progress": "질문 {{current}} / {{total}}",
+    "pick": "답을 선택하세요",
+    "optionsLabel": "선택할 수 있는 답변",
+    "scrollHint": "더 보려면 스크롤하세요",
+    "submit": "제출",
+    "submitDisabled": "먼저 답을 선택하세요",
+    "submitted": "제출됨"
+  },
+  "gallery": {
+    "title": "이야기들",
+    "storyBy": "{{name}}의 이야기",
+    "pictureAlt": "{{name}}의 이야기 그림",
+    "prev": "이전 이야기",
+    "next": "다음 이야기",
+    "counter": "{{index}} / {{total}}",
+    "download": "다운로드",
+    "shareButton": "공유"
+  },
+  "end": {
+    "title": "이야기가 준비됐어요!",
+    "playAgain": "다시 하기",
+    "changePlayers": "플레이어 변경"
+  },
+  "footer": {
+    "source": "GitHub 소스",
+    "contentNotice": "이 게임은 여러분의 기기에서만 실행됩니다. 입력한 내용은 절대 밖으로 나가지 않아요."
+  }
+}

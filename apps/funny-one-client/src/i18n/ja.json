@@ -1,0 +1,56 @@
+{
+  "_note": "needs-ja-review — machine-translated stub awaiting native Japanese review.",
+  "home": {
+    "title": "パスストーリー",
+    "subtitle": "端末を回しながら、2〜7人でめちゃくちゃな物語を作ろう。インターネット不要。",
+    "start": "ゲーム開始",
+    "gameRules": "ゲームのルール",
+    "rules": "端末を順番に回します。各ラウンドで、全員が同じ楽しい質問に順番に答えます。あなたの答えはみんなの答えと混ざって、めちゃくちゃな物語になり、それぞれにおかしな絵が作られます。",
+    "language": "言語",
+    "seatCountHint": "合計2〜7人",
+    "playerNamePlaceholder": "名前",
+    "humanSeatLabel": "プレイヤー名",
+    "virtualSeatLabel": "仮想プレイヤー名",
+    "humanBadge": "あなた",
+    "virtualBadge": "ボット",
+    "removeSeat": "プレイヤーを削除",
+    "addPlayer": "+ プレイヤーを追加",
+    "addVirtual": "+ 仮想プレイヤーを追加"
+  },
+  "thinking": {
+    "title": "{{name}}が考え中…"
+  },
+  "handoff": {
+    "title": "{{name}}に渡してください",
+    "subtitle": "他の人の答えをのぞかないでください。",
+    "ready": "私は{{name}} — スタート"
+  },
+  "round": {
+    "progress": "質問{{current}} / {{total}}",
+    "pick": "答えを選んでください",
+    "optionsLabel": "選べる答え",
+    "scrollHint": "スクロールしてもっと見る",
+    "submit": "送信",
+    "submitDisabled": "先に答えを選んでください",
+    "submitted": "送信済み"
+  },
+  "gallery": {
+    "title": "物語たち",
+    "storyBy": "{{name}}の物語",
+    "pictureAlt": "{{name}}の物語の絵",
+    "prev": "前の物語",
+    "next": "次の物語",
+    "counter": "{{index}} / {{total}}",
+    "download": "ダウンロード",
+    "shareButton": "共有"
+  },
+  "end": {
+    "title": "物語ができました!",
+    "playAgain": "もう一度遊ぶ",
+    "changePlayers": "プレイヤーを変更"
+  },
+  "footer": {
+    "source": "GitHub のソース",
+    "contentNotice": "このゲームは端末上だけで動作します。入力した内容が外部に送られることはありません。"
+  }
+}

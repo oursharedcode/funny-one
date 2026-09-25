@@ -1,0 +1,56 @@
+{
+  "_note": "needs-pt-br-review — machine-translated stub awaiting native Brazilian Portuguese review.",
+  "home": {
+    "title": "Conta e Passa",
+    "subtitle": "Passem o celular e criem histórias absurdas juntos, de 2 a 7 jogadores, sem precisar de internet.",
+    "start": "Começar o jogo",
+    "gameRules": "Regras do jogo",
+    "rules": "Passem o celular entre vocês. A cada rodada, todos respondem à mesma pergunta divertida, na sua vez. Suas respostas se misturam em histórias absurdas, e depois cada uma ganha um desenho bem bobo.",
+    "language": "Idioma",
+    "seatCountHint": "De 2 a 7 jogadores",
+    "playerNamePlaceholder": "Nome",
+    "humanSeatLabel": "Nome do jogador",
+    "virtualSeatLabel": "Nome do jogador virtual",
+    "humanBadge": "Você",
+    "virtualBadge": "Bot",
+    "removeSeat": "Remover jogador",
+    "addPlayer": "+ Adicionar jogador",
+    "addVirtual": "+ Adicionar virtual"
+  },
+  "thinking": {
+    "title": "{{name}} está pensando…"
+  },
+  "handoff": {
+    "title": "Passe para {{name}}",
+    "subtitle": "Não espie as respostas dos outros.",
+    "ready": "Sou {{name}} — vamos lá"
+  },
+  "round": {
+    "progress": "Pergunta {{current}} de {{total}}",
+    "pick": "Escolha sua resposta",
+    "optionsLabel": "Respostas para escolher",
+    "scrollHint": "Role para ver mais",
+    "submit": "Enviar",
+    "submitDisabled": "Escolha uma resposta primeiro",
+    "submitted": "Enviado"
+  },
+  "gallery": {
+    "title": "As histórias",
+    "storyBy": "História de {{name}}",
+    "pictureAlt": "Desenho da história de {{name}}",
+    "prev": "História anterior",
+    "next": "Próxima história",
+    "counter": "{{index}} de {{total}}",
+    "download": "Baixar",
+    "shareButton": "Compartilhar"
+  },
+  "end": {
+    "title": "As histórias estão prontas!",
+    "playAgain": "Jogar de novo",
+    "changePlayers": "Trocar jogadores"
+  },
+  "footer": {
+    "source": "Fonte no GitHub",
+    "contentNotice": "Este jogo roda inteiramente no seu aparelho. Nada do que você digita sai dele."
+  }
+}

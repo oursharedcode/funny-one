@@ -1,0 +1,56 @@
+{
+  "_note": "needs-es-419-review — machine-translated stub awaiting native Latin-American Spanish review.",
+  "home": {
+    "title": "Contá y Pasá",
+    "subtitle": "Pasen el celular y armen historias absurdas juntos, de 2 a 7 jugadores, sin necesidad de internet.",
+    "start": "Empezar partida",
+    "gameRules": "Reglas del juego",
+    "rules": "Pasen el celular entre todos. En cada ronda, todos responden por turno la misma pregunta divertida. Tus respuestas se mezclan con las de los demás en historias absurdas, y después cada una se convierte en un dibujo bien loco.",
+    "language": "Idioma",
+    "seatCountHint": "De 2 a 7 jugadores",
+    "playerNamePlaceholder": "Nombre",
+    "humanSeatLabel": "Nombre del jugador",
+    "virtualSeatLabel": "Nombre del jugador virtual",
+    "humanBadge": "Vos",
+    "virtualBadge": "Bot",
+    "removeSeat": "Quitar jugador",
+    "addPlayer": "+ Agregar jugador",
+    "addVirtual": "+ Agregar virtual"
+  },
+  "thinking": {
+    "title": "{{name}} está pensando…"
+  },
+  "handoff": {
+    "title": "Pasale a {{name}}",
+    "subtitle": "No espíes las respuestas de los demás.",
+    "ready": "Soy {{name}} — dale"
+  },
+  "round": {
+    "progress": "Pregunta {{current}} de {{total}}",
+    "pick": "Elige tu respuesta",
+    "optionsLabel": "Respuestas para elegir",
+    "scrollHint": "Desliza para ver más",
+    "submit": "Enviar",
+    "submitDisabled": "Elige una respuesta primero",
+    "submitted": "Enviado"
+  },
+  "gallery": {
+    "title": "Las historias",
+    "storyBy": "Historia de {{name}}",
+    "pictureAlt": "Dibujo de la historia de {{name}}",
+    "prev": "Historia anterior",
+    "next": "Historia siguiente",
+    "counter": "{{index}} de {{total}}",
+    "download": "Descargar",
+    "shareButton": "Compartir"
+  },
+  "end": {
+    "title": "¡Las historias están listas!",
+    "playAgain": "Jugar de nuevo",
+    "changePlayers": "Cambiar jugadores"
+  },
+  "footer": {
+    "source": "Fuente en GitHub",
+    "contentNotice": "Este juego funciona enteramente en tu dispositivo. Lo que escribís nunca sale de ahí."
+  }
+}

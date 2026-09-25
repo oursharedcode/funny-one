@@ -1,0 +1,56 @@
+{
+  "_note": "needs-es-es-review — machine-translated stub awaiting native European Spanish review.",
+  "home": {
+    "title": "Cuenta y Pasa",
+    "subtitle": "Pasaos el móvil y construid juntos historias absurdas, de 2 a 7 jugadores, sin necesidad de internet.",
+    "start": "Empezar partida",
+    "gameRules": "Reglas del juego",
+    "rules": "Pasaos el móvil. En cada ronda, todos respondéis por turnos a la misma pregunta divertida. Vuestras respuestas se mezclan en historias absurdas, y luego cada una se convierte en un dibujo la mar de tonto.",
+    "language": "Idioma",
+    "seatCountHint": "De 2 a 7 jugadores",
+    "playerNamePlaceholder": "Nombre",
+    "humanSeatLabel": "Nombre del jugador",
+    "virtualSeatLabel": "Nombre del jugador virtual",
+    "humanBadge": "Tú",
+    "virtualBadge": "Bot",
+    "removeSeat": "Quitar jugador",
+    "addPlayer": "+ Añadir jugador",
+    "addVirtual": "+ Añadir virtual"
+  },
+  "thinking": {
+    "title": "{{name}} está pensando…"
+  },
+  "handoff": {
+    "title": "Pásaselo a {{name}}",
+    "subtitle": "No mires las respuestas de los demás.",
+    "ready": "Soy {{name}} — vamos"
+  },
+  "round": {
+    "progress": "Pregunta {{current}} de {{total}}",
+    "pick": "Elige tu respuesta",
+    "optionsLabel": "Respuestas para elegir",
+    "scrollHint": "Desplázate para ver más",
+    "submit": "Enviar",
+    "submitDisabled": "Elige una respuesta primero",
+    "submitted": "Enviado"
+  },
+  "gallery": {
+    "title": "Las historias",
+    "storyBy": "Historia de {{name}}",
+    "pictureAlt": "Dibujo de la historia de {{name}}",
+    "prev": "Historia anterior",
+    "next": "Historia siguiente",
+    "counter": "{{index}} de {{total}}",
+    "download": "Descargar",
+    "shareButton": "Compartir"
+  },
+  "end": {
+    "title": "¡Las historias ya están listas!",
+    "playAgain": "Jugar otra vez",
+    "changePlayers": "Cambiar jugadores"
+  },
+  "footer": {
+    "source": "Fuente en GitHub",
+    "contentNotice": "Este juego funciona por completo en tu dispositivo. Nada de lo que escribes sale de él."
+  }
+}

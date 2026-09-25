@@ -38,6 +38,11 @@ void i18n.use(initReactI18next).init({
   // Remembered pick, else the device locale, else English (uiLanguage.ts).
   lng: initialLanguage(),
   fallbackLng: 'en',
+  // Our codes are lowercase (`pt-br`, `es-es`). Without this, i18next
+  // rewrites them to `pt-BR`/`es-ES`, misses the resource key and silently
+  // falls back to English; `es-419` only escaped because a numeric region
+  // has no case.
+  lowerCaseLng: true,
   interpolation: { escapeValue: false },
 });
 

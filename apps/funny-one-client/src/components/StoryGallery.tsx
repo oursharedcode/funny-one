@@ -81,13 +81,14 @@ export default function StoryGallery({ seats, stories, language }: Props) {
 
       <ProseText prose={prose} answers={answers} className="text-lg" />
 
+      {/* Mirrored under RTL: flex already swaps the buttons, the glyphs must follow. */}
       <div className="flex items-center justify-between pt-1">
         <button
           className="rounded bg-white px-5 py-3 font-semibold text-pink-500"
           onClick={() => step(-1)}
           aria-label={t('gallery.prev')}
         >
-          ◀
+          <span className="inline-block rtl:-scale-x-100">◀</span>
         </button>
         <span className="text-sm text-gray-600">
           {t('gallery.counter', { index: safeIndex + 1, total: stories.length })}
@@ -97,7 +98,7 @@ export default function StoryGallery({ seats, stories, language }: Props) {
           onClick={() => step(1)}
           aria-label={t('gallery.next')}
         >
-          ▶
+          <span className="inline-block rtl:-scale-x-100">▶</span>
         </button>
       </div>
 

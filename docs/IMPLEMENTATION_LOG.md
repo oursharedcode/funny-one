@@ -1643,7 +1643,7 @@ what makes a language pick visibly change the game.
 
 ---
 
-**RESUME HERE (2026-09-25, after Step 32).** T-FO-5.1a is closed — picking a language on Home
+~~**RESUME HERE (2026-09-25, after Step 32).** T-FO-5.1a is closed — picking a language on Home
 now switches the whole UI and remembers the pick; the boot language follows the device locale on
 first launch. Only `en.json` exists, so today every language still renders English text (bar
 names/flags in the picker itself).
@@ -1673,4 +1673,76 @@ Still open, none blocking: making the repo public before any launch announcement
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; no repo-committed Playwright run-skill yet (Step 31
-used a throwaway driver — see that step's Owed).
+used a throwaway driver — see that step's Owed).~~
+
+## Step 33 (task T-FO-5.1b) — 14 UI catalogs, closes Phase FO-5 (2026-09-25)
+
+**Why this step exists:** T-FO-5.1a wired the picker to `i18n.changeLanguage`; the 14 remaining
+catalogs are what makes a language pick actually render translated text. Closes Phase FO-5.
+
+**Shipped:** `apps/funny-one-client/src/i18n/{de,fr,ru,id,it,zh,ja,ko,pt-br,es-419,es-es,uk,he,
+ta}.json` — 39 keys × 14 languages. 13 keys (11 named in Step 32's note, plus `home.start` from
+Multi's `lobby.startGame` and `gallery.storyBy` modulo a `{{nickname}}`→`{{name}}` rename, both
+found while diffing rather than drafted) were lifted verbatim per language from Funny Multi's
+catalogs; the other 26 were drafted by two parallel Sonnet subagents and flagged
+`needs-<code>-review`, with the citation of the non-existent `CONTRIBUTING.md` dropped
+(owner decision 2026-09-25; Funny Multi's catalogs still cite it —
+left as a follow-up). `ru.json` is flagged like the rest (owner decision) except for
+`home.title`, fixed by D-9. `catalogs.test.ts` ported from Funny Multi's, dropping the
+`questions`/`errors`/`round.placeholder` assertions Funny One has no equivalent of; added a check
+that `ru.json`'s `home.title` stays D-9's exact string.
+
+New `scripts/funny-one-screens.mjs` (+ `.claude/skills/run-funny-one/SKILL.md`, owner decision —
+committed rather than thrown away this time, since FO-6's deploy verification will want it too):
+starts Funny One's own Vite dev server, plays a full game in a headless phone-sized Chromium once
+per language, screenshots every screen type, and flags any element narrower than its content or a
+horizontally-scrolling page. Run across all 15 languages, it caught two real bugs, both fixed
+this step:
+- `pt-br`/`es-es` rendered English throughout — i18next's default `lowerCaseLng` rewrote them to
+  `pt-BR`/`es-ES` before the resource lookup, missing the file and silently falling back.
+  `i18n/index.ts` now sets `lowerCaseLng: true`; new `i18n/index.test.ts` renders `home.subtitle`
+  in all 15 languages and asserts it matches that language's own catalog (fails for exactly
+  `pt-br`/`es-es` with the fix reverted).
+- Hebrew's gallery prev/next buttons (◀ ▶) didn't mirror under `dir="rtl"` — flex already swaps
+  which button sits on which side, but the glyphs stayed pointing the original way.
+  `StoryGallery.tsx`'s arrows now wrap in `rtl:-scale-x-100`.
+
+Verified in-browser across all 15 languages (not just `he`/`de`/`ta`/`ru` as originally scoped):
+every language reaches the end screen with 0 console/page errors and 0 overflow; RU's two-line
+home title renders fully; Hebrew's mirrored screens (handoff, seat rows, end buttons) read
+correctly, including the corrected gallery arrows. All six gates: typecheck, lint, format:check,
+`npm test` (735/735, up from 715, run outside the sandbox), `npm audit` (0 vulnerabilities). CI
+not yet run — nothing pushed this session until now.
+
+**Owed:** Funny Multi carries the same two bugs this step found in Funny One (`pt-br`/`es-es`
+falling back to English, Hebrew's gallery arrows not mirroring) — not yet fixed there. The 13
+`home.title`s besides `en`/`ru` are machine-drafted and unreviewed by a native speaker, same as
+Funny Multi's catalogs always have been. Default seat names ("Player 1", "Bot 1" in
+`HomeScreen.tsx`) are hardcoded English in every language, not catalog-driven — not in this
+task's scope, flagged during the session as a possible follow-up.
+
+---
+
+**RESUME HERE (2026-09-25, after Step 33).** Phase FO-5 is **closed** — all 15 languages now
+render translated UI text end to end, verified in a real headless browser with 0 errors and 0
+overflow. `scripts/funny-one-screens.mjs` is a repo-committed run-skill any future Funny One
+screen work can reuse.
+
+Next agent step: **Phase FO-6 — PWA + deploy** (`steering/funny-one-tasks.md` §Phase FO-6; grep
+it for the task list, it wasn't read in full this session). Before starting, two small unscoped
+fixes surfaced this session are worth folding into the next step or doing first as a quick
+standalone one: Funny Multi's `pt-br`/`es-es` `lowerCaseLng` bug and its Hebrew gallery-arrow
+mirroring bug (see this step's Owed) — same root causes as the two this step fixed in Funny One,
+one-line fixes each in `apps/funny-multi-client/src/i18n/index.ts` and
+`apps/funny-multi-client/src/components/RoomGallery.tsx`, not yet applied there.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`: PowerShell 5.1
+mangles here-strings containing double quotes on the way to `git.exe`.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; Funny Multi's `pt-br`/`es-es`/Hebrew-arrow bugs (see
+above); all non-`en`/`ru` `home.title`s in both clients await native-speaker review.

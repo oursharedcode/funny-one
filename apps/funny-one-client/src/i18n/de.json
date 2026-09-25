@@ -1,0 +1,56 @@
+{
+  "_note": "needs-de-review — machine-translated stub awaiting native German review.",
+  "home": {
+    "title": "Unsinn im Kreis",
+    "subtitle": "Gebt das Handy reihum weiter und erfindet gemeinsam absurde Geschichten – 2 bis 7 Spieler, kein Internet nötig.",
+    "start": "Spiel starten",
+    "gameRules": "Spielregeln",
+    "rules": "Gebt das Handy reihum weiter. In jeder Runde beantwortet jeder dieselbe verspielte Frage. Eure Antworten werden zu absurden Geschichten vermischt, und für jede wird ein lustiges Bild erstellt.",
+    "language": "Sprache",
+    "seatCountHint": "2–7 Spieler insgesamt",
+    "playerNamePlaceholder": "Name",
+    "humanSeatLabel": "Spielername",
+    "virtualSeatLabel": "Name des virtuellen Spielers",
+    "humanBadge": "Du",
+    "virtualBadge": "Bot",
+    "removeSeat": "Spieler entfernen",
+    "addPlayer": "+ Spieler hinzufügen",
+    "addVirtual": "+ Virtuell hinzufügen"
+  },
+  "thinking": {
+    "title": "{{name}} überlegt…"
+  },
+  "handoff": {
+    "title": "Weitergeben an {{name}}",
+    "subtitle": "Schau dir nicht die Antworten der anderen an.",
+    "ready": "Ich bin {{name}} — los geht's"
+  },
+  "round": {
+    "progress": "Frage {{current}} von {{total}}",
+    "pick": "Wähle deine Antwort",
+    "optionsLabel": "Antworten zur Auswahl",
+    "scrollHint": "Scrollen für mehr",
+    "submit": "Senden",
+    "submitDisabled": "Wähle zuerst eine Antwort",
+    "submitted": "Gesendet"
+  },
+  "gallery": {
+    "title": "Die Geschichten",
+    "storyBy": "Geschichte von {{name}}",
+    "pictureAlt": "Bild zur Geschichte von {{name}}",
+    "prev": "Vorherige Geschichte",
+    "next": "Nächste Geschichte",
+    "counter": "{{index}} von {{total}}",
+    "download": "Herunterladen",
+    "shareButton": "Teilen"
+  },
+  "end": {
+    "title": "Die Geschichten sind fertig!",
+    "playAgain": "Nochmal spielen",
+    "changePlayers": "Spieler ändern"
+  },
+  "footer": {
+    "source": "Quelle auf GitHub",
+    "contentNotice": "Dieses Spiel läuft komplett auf deinem Gerät. Nichts, was du eingibst, verlässt es jemals."
+  }
+}

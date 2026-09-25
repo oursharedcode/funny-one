@@ -1,0 +1,56 @@
+{
+  "_note": "needs-fr-review — machine-translated stub awaiting native French review.",
+  "home": {
+    "title": "Une Histoire à la Ronde",
+    "subtitle": "Faites circuler l'appareil et inventez des histoires absurdes ensemble, de 2 à 7 joueurs, sans connexion internet.",
+    "start": "Lancer la partie",
+    "gameRules": "Règles du jeu",
+    "rules": "Faites circuler l'appareil. À chaque manche, chacun répond à tour de rôle à la même question amusante. Vos réponses sont mélangées en histoires absurdes, puis une image rigolote est créée pour chacune.",
+    "language": "Langue",
+    "seatCountHint": "De 2 à 7 joueurs au total",
+    "playerNamePlaceholder": "Nom",
+    "humanSeatLabel": "Nom du joueur",
+    "virtualSeatLabel": "Nom du joueur virtuel",
+    "humanBadge": "Toi",
+    "virtualBadge": "Bot",
+    "removeSeat": "Retirer ce joueur",
+    "addPlayer": "+ Ajouter un joueur",
+    "addVirtual": "+ Ajouter un virtuel"
+  },
+  "thinking": {
+    "title": "{{name}} réfléchit…"
+  },
+  "handoff": {
+    "title": "Passe l'appareil à {{name}}",
+    "subtitle": "Ne regarde pas les réponses des autres.",
+    "ready": "Je suis {{name}} — c'est parti"
+  },
+  "round": {
+    "progress": "Question {{current}} sur {{total}}",
+    "pick": "Choisis ta réponse",
+    "optionsLabel": "Réponses au choix",
+    "scrollHint": "Fais défiler pour en voir plus",
+    "submit": "Envoyer",
+    "submitDisabled": "Choisis d'abord une réponse",
+    "submitted": "Envoyé"
+  },
+  "gallery": {
+    "title": "Les histoires",
+    "storyBy": "Histoire de {{name}}",
+    "pictureAlt": "Image de l'histoire de {{name}}",
+    "prev": "Histoire précédente",
+    "next": "Histoire suivante",
+    "counter": "{{index}} sur {{total}}",
+    "download": "Télécharger",
+    "shareButton": "Partager"
+  },
+  "end": {
+    "title": "Les histoires sont prêtes !",
+    "playAgain": "Rejouer",
+    "changePlayers": "Changer les joueurs"
+  },
+  "footer": {
+    "source": "Source sur GitHub",
+    "contentNotice": "Ce jeu fonctionne entièrement sur ton appareil. Rien de ce que tu tapes n'en sort jamais."
+  }
+}

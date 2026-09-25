@@ -1,0 +1,56 @@
+{
+  "_note": "needs-id-review — machine-translated stub awaiting native Indonesian review.",
+  "home": {
+    "title": "Cerita Berputar",
+    "subtitle": "Gilir ponselnya dan buat cerita absurd bersama, 2 sampai 7 pemain, tanpa internet.",
+    "start": "Mulai permainan",
+    "gameRules": "Aturan permainan",
+    "rules": "Gilir ponselnya. Di setiap ronde, semua orang bergiliran menjawab pertanyaan jenaka yang sama. Jawaban kalian dicampur menjadi cerita absurd, lalu setiap cerita dibuatkan gambar lucu.",
+    "language": "Bahasa",
+    "seatCountHint": "Total 2–7 pemain",
+    "playerNamePlaceholder": "Nama",
+    "humanSeatLabel": "Nama pemain",
+    "virtualSeatLabel": "Nama pemain virtual",
+    "humanBadge": "Kamu",
+    "virtualBadge": "Bot",
+    "removeSeat": "Hapus pemain",
+    "addPlayer": "+ Tambah pemain",
+    "addVirtual": "+ Tambah virtual"
+  },
+  "thinking": {
+    "title": "{{name}} sedang berpikir…"
+  },
+  "handoff": {
+    "title": "Serahkan ke {{name}}",
+    "subtitle": "Jangan intip jawaban orang lain.",
+    "ready": "Aku {{name}} — mulai"
+  },
+  "round": {
+    "progress": "Pertanyaan {{current}} dari {{total}}",
+    "pick": "Pilih jawabanmu",
+    "optionsLabel": "Pilihan jawaban",
+    "scrollHint": "Gulir untuk melihat lainnya",
+    "submit": "Kirim",
+    "submitDisabled": "Pilih jawaban dulu",
+    "submitted": "Terkirim"
+  },
+  "gallery": {
+    "title": "Cerita-cerita",
+    "storyBy": "Cerita {{name}}",
+    "pictureAlt": "Gambar cerita {{name}}",
+    "prev": "Cerita sebelumnya",
+    "next": "Cerita berikutnya",
+    "counter": "{{index}} dari {{total}}",
+    "download": "Unduh",
+    "shareButton": "Bagikan"
+  },
+  "end": {
+    "title": "Cerita-ceritanya sudah siap!",
+    "playAgain": "Main lagi",
+    "changePlayers": "Ganti pemain"
+  },
+  "footer": {
+    "source": "Sumber di GitHub",
+    "contentNotice": "Permainan ini berjalan sepenuhnya di perangkatmu. Apa pun yang kamu ketik tidak pernah keluar dari sana."
+  }
+}

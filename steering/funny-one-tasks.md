@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document** | `steering/funny-one-tasks.md` |
-| **Status** | Phases FO-0–FO-4 closed. Full local game playable end to end, all 106 rig assets drawn and composited with a spring reveal, StoryGallery/end screen wired, rig-to-PNG export + native share. Next: Phase FO-5 (i18n breadth). |
+| **Status** | Phases FO-0–FO-5 closed. Full local game playable end to end in all 15 languages, all 106 rig assets drawn and composited with a spring reveal, StoryGallery/end screen wired, rig-to-PNG export + native share. Next: Phase FO-6 (PWA + deploy). |
 
 Execution plan for `steering/funny-one-requirements.md` (FO-\*) per
 `steering/funny-one-design.md`. Same discipline as Funny Multi: phases in order, verify each
@@ -121,7 +121,7 @@ external wait time, elapsed time rather than effort).
         copied verbatim from Funny Multi. *Step 30 (2026-09-23). See
         `docs/IMPLEMENTATION_LOG.md` Step 30.*
 
-## Phase FO-5 — i18n breadth
+## Phase FO-5 — i18n breadth (CLOSED 2026-09-25)
 
 - [ ] **T-FO-5.1 (M)** All 15 languages wired for Funny One's UI catalog (pool texts already
       shared per D-2 — nothing new to author there).
@@ -132,9 +132,12 @@ external wait time, elapsed time rather than effort).
         no UI/content split) and remembers the pick in `localStorage`; first boot takes the
         device locale (`navigator.languages`), else English. `i18n/uiLanguage.ts`.
         *Step 32 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 32.*
-  - [ ] **T-FO-5.1b (M)** The 14 missing catalogs: 11 keys lifted verbatim per language from
-        Funny Multi's catalogs, 28 drafted and flagged `needs-<code>-review`; ported
-        `catalogs.test.ts`. In-browser check: `he` (RTL), `de`/`ta` (overflow), RU home title.
+  - [x] **T-FO-5.1b (M)** The 14 missing catalogs: 13 keys lifted verbatim (or near-verbatim) per
+        language from Funny Multi's catalogs, 26 drafted and flagged `needs-<code>-review`;
+        ported `catalogs.test.ts`. In-browser check across all 15 languages found and fixed two
+        real bugs (`pt-br`/`es-es` falling back to English, Hebrew's gallery arrows not
+        mirroring) — same bugs still open in Funny Multi.
+        *Step 33 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 33.*
 
 ## Phase FO-6 — PWA + deploy
 

@@ -1,0 +1,56 @@
+{
+  "_note": "needs-zh-review — machine-translated stub awaiting native Mandarin Chinese review.",
+  "home": {
+    "title": "故事接龙",
+    "subtitle": "轮流传递手机，一起编写荒诞的故事，2 到 7 名玩家，无需联网。",
+    "start": "开始游戏",
+    "gameRules": "游戏规则",
+    "rules": "轮流传递手机。每一轮，大家依次回答同一个有趣的问题。你们的答案会被混合成荒诞的故事，然后每个故事都会配上一张搞笑的图片。",
+    "language": "语言",
+    "seatCountHint": "共 2–7 名玩家",
+    "playerNamePlaceholder": "名字",
+    "humanSeatLabel": "玩家名字",
+    "virtualSeatLabel": "虚拟玩家名字",
+    "humanBadge": "你",
+    "virtualBadge": "机器人",
+    "removeSeat": "移除玩家",
+    "addPlayer": "+ 添加玩家",
+    "addVirtual": "+ 添加虚拟玩家"
+  },
+  "thinking": {
+    "title": "{{name}} 正在思考…"
+  },
+  "handoff": {
+    "title": "传给 {{name}}",
+    "subtitle": "别偷看别人的答案。",
+    "ready": "我是 {{name}} — 开始"
+  },
+  "round": {
+    "progress": "第 {{current}} 题 / 共 {{total}} 题",
+    "pick": "选择你的答案",
+    "optionsLabel": "可选答案",
+    "scrollHint": "滑动查看更多",
+    "submit": "提交",
+    "submitDisabled": "请先选择一个答案",
+    "submitted": "已提交"
+  },
+  "gallery": {
+    "title": "故事集",
+    "storyBy": "{{name}} 的故事",
+    "pictureAlt": "{{name}} 的故事图片",
+    "prev": "上一个故事",
+    "next": "下一个故事",
+    "counter": "{{index}} / {{total}}",
+    "download": "下载",
+    "shareButton": "分享"
+  },
+  "end": {
+    "title": "故事都准备好了！",
+    "playAgain": "再玩一次",
+    "changePlayers": "更改玩家"
+  },
+  "footer": {
+    "source": "GitHub 上的源代码",
+    "contentNotice": "这个游戏完全在你的设备上运行。你输入的任何内容都不会离开设备。"
+  }
+}

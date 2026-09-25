@@ -12,6 +12,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { LANGUAGES, isLanguage } from '@funny/shared';
+import { initialLanguage } from './uiLanguage';
 
 const modules = import.meta.glob<Record<string, unknown>>('./*.json', {
   eager: true,
@@ -34,7 +35,8 @@ if (missing.length > 0) {
 
 void i18n.use(initReactI18next).init({
   resources,
-  lng: 'en',
+  // Remembered pick, else the device locale, else English (uiLanguage.ts).
+  lng: initialLanguage(),
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
 });

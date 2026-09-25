@@ -34,6 +34,7 @@ cost, and no network dependency at any point in a play session.
 | # | Decision |
 |---|---|
 | D-8 | **Funny One's picture mechanic and turn-passing (2026-09-20).** Picture mechanic: **on-device layered rig** (background × character × co-character × prop), matching the original archived intent (`Initial_Requirements.md` ONE-13/14/17/19) — not Funny Multi's AI-cartoon pipeline. Chosen for: zero AI/network cost forever, the strongest possible App Store Guideline 4.2 defense (a self-contained game, not a wrapped website), and Google Play Families eligibility (no data collected, nothing generated per-session that could dodge review). Cost accepted: rig art (backgrounds/characters/props) is new content that does not exist anywhere in this repo yet. **Turn-passing: per-question round-robin** — every local player answers question *n* before the device passes for question *n+1*, closer to Funny Multi's shared rhythm than the archive's per-player-block default (ONE-6). |
+| D-9 | **Funny One's localized product name (2026-09-25).** `home.title` is localized per language, mirroring Funny Multi's catalogs, and kept distinct from Funny Multi's titles. **RU is binding: «Одна Чепуха: по кругу»**; EN stays "Funny One"; the other 13 are drafted and flagged `needs-<code>-review` like Funny Multi's machine-drafted catalogs. |
 
 ## 3. Core loop (FO-CORE-\*)
 

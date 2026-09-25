@@ -1583,7 +1583,7 @@ dependency add.*
 
 ---
 
-**RESUME HERE (2026-09-24, after Step 31).** Phase FO-4 is **closed** — T-FO-4.3 (both sub-steps)
+~~**RESUME HERE (2026-09-24, after Step 31).** Phase FO-4 is **closed** — T-FO-4.3 (both sub-steps)
 landed in Step 30, and the live-reveal eyeball debt it inherited from Step 26 closed in Step 31.
 Funny One is now a complete local game end to end: setup → round-robin play → end screen with a
 browsable, downloadable/shareable story gallery, verified in a real headless browser.
@@ -1594,6 +1594,75 @@ UI-catalog authoring/wiring only, following Funny Multi's existing 15-language p
 (`apps/funny-multi-client/src/i18n/*.json`) — no new translation content to invent from scratch,
 just port the catalog shape. Funny One currently ships only `en.json`; the boot-time
 `console.error` for missing `<code>.json` files names exactly which are left.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`: PowerShell 5.1
+mangles here-strings containing double quotes on the way to `git.exe`.
+
+Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
+install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
+cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; no repo-committed Playwright run-skill yet (Step 31
+used a throwaway driver — see that step's Owed).~~
+
+## Step 32 (task T-FO-5.1a) — UI-language wiring (2026-09-25)
+
+**Why this step exists:** T-FO-5.1 (all 15 languages for Funny One's UI catalog) split into two
+gated sub-steps (owner decision 2026-09-25) — nothing in Funny One ever called
+`i18n.changeLanguage`, so landing 14 new catalogs alone would have changed nothing a player could
+see. This sub-step lands the wiring first, verifiable on its own before the ~550-string catalog
+diff (T-FO-5.1b).
+
+**Shipped:** new `apps/funny-one-client/src/i18n/uiLanguage.ts` — `pickInitialLanguage`/
+`matchLanguageTag` resolve a boot language from a remembered `localStorage` pick, else
+`navigator.languages` (mapping region variants like `es-MX`→`es-419`, `pt-PT`→`pt-br`, legacy
+`iw`→`he`), else English; `loadStoredLanguage`/`storeLanguage` wrap `localStorage` in try/catch
+so a blocked/private-mode store degrades to "not remembered," not a boot crash. `i18n/index.ts`
+now boots via `initialLanguage()` instead of a hardcoded `'en'`. `HomeScreen.tsx`'s single
+language picker (previously content-language only) now also calls `i18n.changeLanguage` and
+`storeLanguage` on every pick, and pre-selects whatever the UI is already in — the Home/
+"Change players" screen and a relaunch both land on the last choice. 12 new tests
+(`uiLanguage.test.ts` + 3 in `HomeScreen.test.tsx`); 2 existing `HomeScreen.test.tsx` tests
+that read English text after picking Russian were reordered (assert before the click) so they
+survive `ru.json` landing in T-FO-5.1b. Owner decision 2026-09-25 recorded as **D-9**
+(`funny-one-requirements.md` §2) and in `CLAUDE.md`'s binding RU-names rule: Funny One's
+localized product name (`home.title`) is **«Одна Чепуха: по кругу»** in Russian, kept distinct
+from Funny Multi's per-language titles; the other 13 languages are deferred to T-FO-5.1b, drafted
+and flagged `needs-<code>-review` the same way Funny Multi's machine-drafted catalogs are.
+Verified in a real headless browser (Playwright): a phone set to `he-IL` boots right-to-left with
+the Israeli flag pre-selected; a phone set to `en-US` boots on English/GB; picking Deutsch and
+reloading keeps German. All six gates: typecheck, lint, format:check (Prettier reflowed one new
+file), `npm test` (715/715, run outside the sandbox, one-client 75→87), `npm audit` (0
+vulnerabilities). CI not yet run — nothing pushed this session until now.
+
+**Owed:** the UI still renders English text everywhere except the language names/flags —
+`en.json` is still the only catalog. T-FO-5.1b (14 catalogs: 11 keys lifted verbatim per language
+from Funny Multi, 28 drafted and flagged `needs-<code>-review`, ported `catalogs.test.ts`) is
+what makes a language pick visibly change the game.
+
+---
+
+**RESUME HERE (2026-09-25, after Step 32).** T-FO-5.1a is closed — picking a language on Home
+now switches the whole UI and remembers the pick; the boot language follows the device locale on
+first launch. Only `en.json` exists, so today every language still renders English text (bar
+names/flags in the picker itself).
+
+Next agent step: **T-FO-5.1b** — the 14 missing UI catalogs (`steering/funny-one-tasks.md`
+§Phase FO-5). 11 of Funny One's 39 keys already exist verbatim, same path and English text, in
+every one of Funny Multi's 15 catalogs (`round.pick/optionsLabel/scrollHint/submit/
+submitDisabled/submitted`, `gallery.prev/next/shareButton`, `home.gameRules`, `footer.source`) —
+lift those per language for free. The other 28 need drafting, flagged `needs-<code>-review` like
+Funny Multi's machine-drafted catalogs (see any of `apps/funny-multi-client/src/i18n/de.json`
+etc. for the `_note` convention — the wording there cites a `CONTRIBUTING.md` that does not exist
+in this repo; point the new ones at `docs/` instead, or drop the citation). RU's `home.title` is
+fixed by D-9: «Одна Чепуха: по кругу». Port `apps/funny-multi-client/src/i18n/catalogs.test.ts`
+into Funny One's `i18n/` folder, dropping the `questions`/`errors`/`round.placeholder` assertions
+(Funny One has no server-driven questions array, no `ErrorCode` union, no free-text answers).
+In-browser check once catalogs land: `he` for RTL layout on screens Funny Multi never had
+(`HandoffScreen`, the seat-list rows, `EndScreen`'s two buttons), `de`/`ta` for text overflow
+(both ran long in Funny Multi's own layouts), and the RU home header specifically — «Одна Чепуха:
+по кругу» is the longest title in the set.
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a

@@ -6,6 +6,10 @@
 // apps/funny-multi-client/src/screens/HomeScreen.tsx). There is no join mode
 // here — no room, no server (FO-ARC-3) — so this screen only ever plays the
 // host's role.
+//
+// T-FO-5.1a — the same picker also drives the UI language: Funny One has no
+// UI-vs-content split (i18n/index.ts), so a pick switches every screen via
+// i18n.changeLanguage and is remembered for the next launch (uiLanguage.ts).
 
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +17,10 @@ import { withBase } from '../basePath';
 import Wordmark from '../components/art/Wordmark';
 import ScrollBox from '../components/ScrollBox';
 import SourceFooter from '../components/SourceFooter';
-import { LANGUAGES } from '@funny/shared';
+import { LANGUAGES, isLanguage } from '@funny/shared';
 import type { AuthoredLanguage } from '@funny/shared';
 import { MAX_SEATS, MIN_SEATS, type Seat } from '../game/roundRobin';
+import { storeLanguage } from '../i18n/uiLanguage';
 
 // Room-content languages: every registry entry is authored (D-2/T-6.3), so
 // this is presently the same 15 as LANGUAGES — filtered from the registry
@@ -32,7 +37,7 @@ function defaultName(kind: Seat['kind'], ordinal: number): string {
 }
 
 export default function HomeScreen({ onStart }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const nextId = useRef(0);
 
   function makeSeat(kind: Seat['kind'], ordinal: number): Seat {
@@ -44,7 +49,11 @@ export default function HomeScreen({ onStart }: Props) {
   // OQ-3's default: a solo quick-start, one human seat (the device holder)
   // plus one virtual seat, right at MIN_SEATS.
   const [seats, setSeats] = useState<Seat[]>(() => [makeSeat('human', 1), makeSeat('virtual', 1)]);
-  const [language, setLanguage] = useState<AuthoredLanguage>('en');
+  // Starts on whatever the UI booted in (remembered pick or device locale),
+  // so "Change players" and a relaunch both land on the last choice.
+  const [language, setLanguage] = useState<AuthoredLanguage>(() =>
+    isLanguage(i18n.language) ? i18n.language : 'en',
+  );
 
   const humanCount = seats.filter((s) => s.kind === 'human').length;
   const virtualCount = seats.filter((s) => s.kind === 'virtual').length;
@@ -66,6 +75,12 @@ export default function HomeScreen({ onStart }: Props) {
 
   const namesValid = seats.every((s) => s.name.trim().length >= 1 && s.name.trim().length <= 20);
   const canStart = seats.length >= MIN_SEATS && seats.length <= MAX_SEATS && namesValid;
+
+  function pickLanguage(code: AuthoredLanguage): void {
+    setLanguage(code);
+    storeLanguage(code);
+    void i18n.changeLanguage(code);
+  }
 
   function start(): void {
     const trimmed = seats.map((s) => ({ ...s, name: s.name.trim() }));
@@ -105,7 +120,7 @@ export default function HomeScreen({ onStart }: Props) {
                   ? 'bg-pink-500 text-white'
                   : 'border border-amber-300 bg-white text-gray-800'
               }`}
-              onClick={() => setLanguage(opt.code as AuthoredLanguage)}
+              onClick={() => pickLanguage(opt.code as AuthoredLanguage)}
             >
               <img
                 src={withBase(`flags/${opt.code}.png`)}

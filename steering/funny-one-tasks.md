@@ -125,6 +125,16 @@ external wait time, elapsed time rather than effort).
 
 - [ ] **T-FO-5.1 (M)** All 15 languages wired for Funny One's UI catalog (pool texts already
       shared per D-2 — nothing new to author there).
+      *Owner decision 2026-09-25: split into two gated sub-steps — nothing called
+      `i18n.changeLanguage`, so catalogs alone would change nothing on screen. Product name
+      localized per language (D-9, RU «Одна Чепуха: по кругу»).*
+  - [x] **T-FO-5.1a (S)** UI-language wiring: the Home picker switches the UI too (one picker,
+        no UI/content split) and remembers the pick in `localStorage`; first boot takes the
+        device locale (`navigator.languages`), else English. `i18n/uiLanguage.ts`.
+        *Step 32 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 32.*
+  - [ ] **T-FO-5.1b (M)** The 14 missing catalogs: 11 keys lifted verbatim per language from
+        Funny Multi's catalogs, 28 drafted and flagged `needs-<code>-review`; ported
+        `catalogs.test.ts`. In-browser check: `he` (RTL), `de`/`ta` (overflow), RU home title.
 
 ## Phase FO-6 — PWA + deploy
 

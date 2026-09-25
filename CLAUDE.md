@@ -32,7 +32,8 @@
   NEVER Glob/Grep/read under it unless the current task explicitly cites SRC. Copy, never edit.
 - Six gates before any commit: typecheck, lint, format:check, `npm test`, `npm audit`, CI green.
 - Phases strictly in order; verify the phase gate before moving on.
-- RU product names are binding: «Чепуха 37» (this game), umbrella «Семейная Чепуха».
+- RU product names are binding: «Чепуха 37» (this game), «Одна Чепуха: по кругу» (Funny One,
+  D-9), umbrella «Семейная Чепуха».
 - Commit style: `Step N (task X): title` for one step, `Steps N–M: summary` for several —
   per the /endsession ritual (owner decision 2026-08-20; earlier history used conventional
   commits). Push only after the owner confirms.

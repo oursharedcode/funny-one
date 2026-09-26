@@ -156,7 +156,7 @@ export default function RoomGallery({ entries }: Props) {
           onClick={() => step(-1)}
           aria-label={t('gallery.prev')}
         >
-          ◀
+          <span className="inline-block rtl:-scale-x-100">◀</span>
         </button>
         <span className="text-sm text-gray-600">
           {t('gallery.counter', { index: safeIndex + 1, total: entries.length })}
@@ -166,7 +166,7 @@ export default function RoomGallery({ entries }: Props) {
           onClick={() => step(1)}
           aria-label={t('gallery.next')}
         >
-          ▶
+          <span className="inline-block rtl:-scale-x-100">▶</span>
         </button>
       </div>
     </section>

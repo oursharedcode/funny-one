@@ -1723,18 +1723,102 @@ task's scope, flagged during the session as a possible follow-up.
 
 ---
 
-**RESUME HERE (2026-09-25, after Step 33).** Phase FO-5 is **closed** — all 15 languages now
+~~**RESUME HERE (2026-09-25, after Step 33).** Phase FO-5 is **closed** — all 15 languages now
 render translated UI text end to end, verified in a real headless browser with 0 errors and 0
 overflow. `scripts/funny-one-screens.mjs` is a repo-committed run-skill any future Funny One
-screen work can reuse.
+screen work can reuse.~~ Carried forward: the two Funny Multi bugs below are fixed in Step 34.
 
-Next agent step: **Phase FO-6 — PWA + deploy** (`steering/funny-one-tasks.md` §Phase FO-6; grep
-it for the task list, it wasn't read in full this session). Before starting, two small unscoped
-fixes surfaced this session are worth folding into the next step or doing first as a quick
-standalone one: Funny Multi's `pt-br`/`es-es` `lowerCaseLng` bug and its Hebrew gallery-arrow
-mirroring bug (see this step's Owed) — same root causes as the two this step fixed in Funny One,
-one-line fixes each in `apps/funny-multi-client/src/i18n/index.ts` and
-`apps/funny-multi-client/src/components/RoomGallery.tsx`, not yet applied there.
+## Step 34 — Funny Multi: `pt-br`/`es-es` fallback and Hebrew gallery-arrow mirroring (2026-09-26)
+
+**Shipped:** the two bugs Step 33 found and fixed in Funny One turned out to have the identical
+root cause in Funny Multi, owed since that step. `apps/funny-multi-client/src/i18n/index.ts` gets
+the same `lowerCaseLng: true` (i18next was rewriting `pt-br`/`es-es` to `pt-BR`/`es-ES`, missing
+the resource and silently falling back to English); `RoomGallery.tsx`'s ◀ ▶ prev/next buttons now
+wrap in `rtl:-scale-x-100` so they mirror under Hebrew. `i18n/index.test.ts` ported from Funny
+One's — asserts every one of the 15 catalogs renders `home.subtitle` from its own JSON; fails for
+exactly `pt-br`/`es-es` with the fix reverted, confirmed both ways this session.
+
+No in-browser verification this step (Funny Multi needs a live server + room to reach a gallery
+screen, unlike Funny One's local rig) — the fix is the same one-liner already verified in-browser
+in Funny One. All six gates: typecheck, lint, format:check, `npm test` (750/750, up from 735, run
+outside the sandbox), `npm audit` (0 vulnerabilities). CI checked after push together with Step 35.
+
+**Owed:** none.
+
+## Step 35 (task T-FO-6.1) — Funny One: full precache, real airplane-mode playthrough (2026-09-26)
+
+**Shipped:** Funny One reaches genuine offline-first (FO-IMG-2). Built for the real deploy path
+(`BASE_PATH=/funny1-game`) and audited with two new scripts:
+
+- `scripts/funny-one-play.mjs` — the play-a-full-game driver factored out of
+  `funny-one-screens.mjs` so both it and the new offline check share one playthrough.
+- `scripts/funny-one-offline.mjs` — builds, serves with `vite preview`, plays a full game online
+  while asserting zero cross-origin requests, then kills the server, takes the browser context
+  offline, opens the app cold, plays a second full game, exports a story picture (the lazily
+  loaded QR chunk), and checks the Fredoka font actually loaded from cache. Run across `en`/`he`
+  (Hebrew exercises both the RTL layout and a different font subset).
+
+That audit found and this step fixed four real bugs, none caught by the existing browser
+screenshots (Step 33) because none of them needed the network gone to reproduce them wrong, or in
+QR export's case, a real (non-stubbed) canvas:
+
+- **The one runtime network call left:** `index.html` loaded Fredoka from `fonts.googleapis.com`.
+  Self-hosted now — `public/fonts/fredoka-{latin,latin-ext,hebrew}.woff2` (43 KB, the three
+  subsets Fredoka actually ships; no Cyrillic/Tamil/CJK coverage, so those languages fall back to
+  `system-ui` exactly as before) plus `OFL.txt`, wired via `@font-face` in `styles/index.css`.
+- **`index.html` itself was never precached.** `vite.config.ts`'s `globPatterns` overrides the
+  plugin's default and had dropped `html` (and now `woff2` for the fonts above) — confirmed by
+  building with the old pattern and finding zero `index.html` entries in the service worker's
+  precache manifest, i.e. an installed app couldn't have opened offline at all.
+- **First visit reloaded itself mid-setup.** `swReload.ts`'s `controllerchange` listener fires the
+  first time a service worker claims the page (`clientsClaim`), not just on a later update; the
+  once-per-session guard copied from Funny Multi stopped it looping but still reloaded once,
+  wiping whatever seats/players were mid-setup. Now gated on `navigator.serviceWorker.controller` having existed before the event, so
+  it only fires for a genuine update. New `swReload.test.ts`; fails on the pre-fix code.
+- **Story export never actually worked in a browser.** `rigExport.ts`'s `sizedSvgDataUri` builds a
+  standalone `data:image/svg+xml` from each rig-art component's markup, but none of the 112 art
+  components (nor `renderToStaticMarkup`) emit an `xmlns` — valid for SVG inlined in HTML, not for
+  a freestanding SVG document, which `HTMLImageElement.decode()` then rejects with "The source
+  image cannot be decoded". Step 30's unit tests used a canvas stub and couldn't see it. Now adds
+  the namespace when missing; new tests in `rigExport.test.ts` cover both cases (missing and
+  already-present), fail on the pre-fix code.
+
+Verified in-browser (not just the unit regressions): both `en` and `he` reach the end screen with
+0 errors in both the online and airplane passes, all airplane-pass requests served from cache
+(21–22 per language), Fredoka reports loaded fonts in both languages, and the exported PNG
+downloads successfully offline — visually inspected the Hebrew export and it's complete (art,
+translated text, font, QR). `funny-one-screens.mjs` still passes for `en`/`he` after the shared
+extraction. All six gates: typecheck, lint, format:check, `npm test` (754/754, run outside the
+sandbox), `npm audit` (0 vulnerabilities). CI not yet run — nothing pushed this session until now.
+
+**Owed:** Funny Multi has the same first-visit-reload bug in its own `swReload.ts` — not yet
+fixed there. A mid-game reload on a real update
+(not just first install) would still wipe the game in progress in Funny One too — not in this
+task's scope, flagged as a possible follow-up. The exported picture's Hebrew paragraph renders
+left-to-right rather than right-to-left (canvas `ctx.direction` isn't set) — cosmetic, pre-existing
+since Step 30, not caused or fixed by this step. T-FO-6.1's checkbox stays unticked below: it also
+called for a device session, which is a real-phone airplane-mode play test this session didn't
+have hardware for — the scripted browser-level equivalent above is what's done.
+
+---
+
+**RESUME HERE (2026-09-26, after Step 35).** T-FO-6.1's automated half is done — Funny One is a
+genuine offline-first PWA, verified by a real online+airplane browser playthrough in two
+languages including an offline story export. Not yet done: an actual device session (see Owed).
+Also fixed this session: Funny Multi's `pt-br`/`es-es` and Hebrew-arrow bugs (Step 34), closing
+last step's carried-forward item.
+
+Next agent step: **T-FO-6.2** — deploy Funny One's static build under `/funny1-game` on the
+existing Oracle VM's Caddy (`steering/funny-one-tasks.md` §Phase FO-6). Owner decisions already
+made for this step: ship with Funny Multi's placeholder icons (swap before any announcement, not
+before deploy); point `sourceUrl.ts`'s QR/label at the live `/funny1-game/` URL instead of the
+still-private GitHub repo (wording changes in all 15 catalogs' `gallery`-adjacent source-label
+string — grep for it, don't assume the key name). Needs: a second `handle /funny1-game/*` block in
+`deploy/caddy/Caddyfile`, a read-only static-file volume on the `caddy` service in
+`docker-compose.yml`, and a new `deploy/ship-funny-one.sh` (build with `BASE_PATH=/funny1-game`,
+scp `dist/` to the VM, curl-verify). No new container or image stream — this is a static bundle.
+Once live, an actual phone in airplane mode should confirm T-FO-6.1's real device-session leg
+before Phase FO-6 is called closed; the owner will need to do the airplane-mode part by hand.
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
@@ -1744,5 +1828,7 @@ mangles here-strings containing double quotes on the way to `git.exe`.
 Still open, none blocking: making the repo public before any launch announcement; T-7.1's iPhone
 install leg (closes Gate 7); B-8 (Play Protect warning on Android install); the Arm VM retry; a
 cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
-`apps/funny-multi-server/src/prompt.ts:72`; Funny Multi's `pt-br`/`es-es`/Hebrew-arrow bugs (see
-above); all non-`en`/`ru` `home.title`s in both clients await native-speaker review.
+`apps/funny-multi-server/src/prompt.ts:72`; Funny Multi's own first-visit `swReload.ts` reload bug
+(see Step 35 Owed); a mid-game reload-on-update risk in both clients' `swReload.ts`; the exported
+story picture's Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both
+clients await native-speaker review.

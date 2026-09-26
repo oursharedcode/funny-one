@@ -7,10 +7,11 @@
 //     Funny One makes zero runtime network calls of any kind (FO-IMG-2,
 //     D-8): the navigateFallbackDenylist for `socket.io|health` has no
 //     equivalent here because there is no server to deny-list.
-//  2. `globPatterns` will need to widen once the rig art lands (T-FO-4.1) —
-//     the whole point of this product is that gameplay works with the
-//     network off, so every asset the compositor reads must be precached,
-//     not just the app shell.
+//  2. Everything is precached, not just the app shell — gameplay must work
+//     with the network off. The rig art (T-FO-4.1) is TSX inlined in the JS
+//     bundle and the i18n catalogs are eager imports, so `globPatterns`
+//     below only has to cover the bundle, public/ (flags, icons, fonts) and
+//     index.html.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -63,8 +64,11 @@ export default defineConfig({
       workbox: {
         // Precache everything — there is no server to fall back to, so this
         // is a full offline PWA rather than the NetworkFirst-shell strategy
-        // apps/funny-multi-client uses (FO-IMG-2).
-        globPatterns: ['**/*.{js,css,png,svg,webmanifest}'],
+        // apps/funny-multi-client uses (FO-IMG-2). Setting globPatterns
+        // replaces the plugin's default, so `html` must be listed or
+        // index.html is never precached and offline navigation has nothing
+        // to fall back to; `woff2` is the self-hosted Fredoka.
+        globPatterns: ['**/*.{html,js,css,png,svg,woff2,webmanifest}'],
       },
     }),
   ],

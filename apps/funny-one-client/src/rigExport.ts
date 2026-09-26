@@ -44,6 +44,7 @@ const NOTICE_FONT = 'italic 13px Georgia, serif';
 const NOTICE_LINE_HEIGHT = 18;
 const NOTICE_COLOR = '#4b5563';
 const QR_SIZE = 96;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const QR_TEXT_GAP = 14;
 const SOURCE_LABEL_FONT = 'bold 13px system-ui, sans-serif';
 const SOURCE_LABEL_HEIGHT = 16;
@@ -93,8 +94,15 @@ async function renderQrCanvas(value: string): Promise<HTMLCanvasElement> {
 // their own (className is Tailwind, which has no effect outside the page's
 // stylesheet), so an unset width/height would rasterize at the SVG's
 // viewBox-derived default and blur when drawn larger.
-function sizedSvgDataUri(markup: string, widthPx: number, heightPx: number): string {
-  const doc = new DOMParser().parseFromString(markup, 'image/svg+xml');
+//
+// The SVG namespace is added too: inline <svg> in HTML needs no xmlns, so
+// neither the art components nor renderToStaticMarkup emit one, but a
+// standalone data: SVG without it is not an image — decode() rejects with
+// "The source image cannot be decoded" (found by scripts/funny-one-offline.mjs,
+// T-FO-6.1; the canvas-stubbed unit tests could not see it).
+export function sizedSvgDataUri(markup: string, widthPx: number, heightPx: number): string {
+  const namespaced = markup.replace(/^<svg(?![^>]*\sxmlns=)/, `<svg xmlns="${SVG_NS}"`);
+  const doc = new DOMParser().parseFromString(namespaced, 'image/svg+xml');
   const svg = doc.documentElement;
   svg.setAttribute('width', String(widthPx));
   svg.setAttribute('height', String(heightPx));

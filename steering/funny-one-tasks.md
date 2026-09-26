@@ -142,7 +142,10 @@ external wait time, elapsed time rather than effort).
 ## Phase FO-6 — PWA + deploy
 
 - [ ] **T-FO-6.1 (M)** Full precache verification: zero runtime network calls, real airplane-mode
-      playthrough. → FO-IMG-2
+      playthrough. → FO-IMG-2. **Step 35 (2026-09-26):** scripted browser-level online+airplane
+      playthrough done (2 languages, 0 errors, all cache) and four real precache/offline bugs
+      found and fixed — see `docs/IMPLEMENTATION_LOG.md`. Stays unticked: the "real" leg is an
+      actual phone in actual airplane mode, still owed.
 - [ ] **T-FO-6.2 (S)** Deploy under `/funny1-game` on the existing Oracle VM's Caddy (static
       files, no new container).
 

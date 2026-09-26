@@ -15,7 +15,7 @@ vi.mock('qrcode', () => ({ default: { toCanvas } }));
 const downloadFile = vi.fn();
 vi.mock('./share', () => ({ downloadFile }));
 
-const { buildStoryImageFile, downloadStoryImage } = await import('./rigExport');
+const { buildStoryImageFile, downloadStoryImage, sizedSvgDataUri } = await import('./rigExport');
 
 function fullStory(): Story {
   return {
@@ -103,5 +103,26 @@ describe('downloadStoryImage', () => {
     await downloadStoryImage({ name: 'Ann', prose: 'x', story: fullStory() });
     expect(downloadFile).toHaveBeenCalledTimes(1);
     expect(downloadFile.mock.calls[0]?.[0]).toBeInstanceOf(File);
+  });
+});
+
+describe('sizedSvgDataUri', () => {
+  const decode = (uri: string) => decodeURIComponent(uri.slice(uri.indexOf(',') + 1));
+
+  // Regression: without the namespace a data: SVG is not an image, so every
+  // real-browser export failed at decode() (T-FO-6.1 offline check).
+  it('adds the SVG namespace the inline art components leave out', () => {
+    const out = decode(sizedSvgDataUri('<svg viewBox="0 0 4 3"><rect width="4"/></svg>', 8, 6));
+    expect(out).toMatch(/^<svg [^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+    expect(out).toContain('width="8"');
+    expect(out).toContain('height="6"');
+    expect(out).toContain('<rect width="4"');
+  });
+
+  it('keeps an existing namespace without doubling it', () => {
+    const out = decode(
+      sizedSvgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"/>', 8, 6),
+    );
+    expect(out.match(/xmlns=/g)).toHaveLength(1);
   });
 });

@@ -139,15 +139,21 @@ external wait time, elapsed time rather than effort).
         mirroring) — same bugs still open in Funny Multi.
         *Step 33 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 33.*
 
-## Phase FO-6 — PWA + deploy
+## Phase FO-6 — PWA + deploy (CLOSED 2026-09-26)
 
-- [ ] **T-FO-6.1 (M)** Full precache verification: zero runtime network calls, real airplane-mode
+- [x] **T-FO-6.1 (M)** Full precache verification: zero runtime network calls, real airplane-mode
       playthrough. → FO-IMG-2. **Step 35 (2026-09-26):** scripted browser-level online+airplane
       playthrough done (2 languages, 0 errors, all cache) and four real precache/offline bugs
-      found and fixed — see `docs/IMPLEMENTATION_LOG.md`. Stays unticked: the "real" leg is an
-      actual phone in actual airplane mode, still owed.
-- [ ] **T-FO-6.2 (S)** Deploy under `/funny1-game` on the existing Oracle VM's Caddy (static
-      files, no new container).
+      found and fixed. **Step 38 (2026-09-26):** the real leg — owner's Samsung phone, installed
+      from the live URL, airplane mode on, full Russian game to the end screen, story export
+      worked. See `docs/IMPLEMENTATION_LOG.md` Steps 35, 38.
+- [x] **T-FO-6.2 (S)** Deploy under `/funny1-game` on the existing Oracle VM's Caddy (static
+      files, no new container). *Step 36 (2026-09-26):* Caddy `handle /funny1-game/*` block,
+      read-only `./static` mount, `deploy/ship-funny-one.sh`; footer link and export QR now point
+      at the game itself (`gameUrl.ts`, runtime-derived) instead of the private GitHub repo.
+      Live at `https://www.staging-oursharedcode.com/funny1-game/`.
+- [x] **T-FO-6.2a (S)** *Filed 2026-09-26 (scope beyond T-FO-6.2's text; owner decision in the
+      Step 36 plan):* port Step 35's first-visit `swReload.ts` fix to Funny Multi. *Step 37.*
 
 ## Phase FO-7 — acceptance
 

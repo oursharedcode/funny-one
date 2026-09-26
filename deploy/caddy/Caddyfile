@@ -33,8 +33,31 @@
 		reverse_proxy funny-multi:3000
 	}
 
-	# A second game on the same host gets its own handle block here; anything
-	# else on this name is not a game.
+	# Funny One «Одна Чепуха: по кругу» (T-FO-6.2) — no container, just the
+	# static bundle deploy/ship-funny-one.sh copies to ./static/funny-one,
+	# mounted read-only at /srv/static. The path is hardcoded rather than an
+	# .env value: it is baked into that bundle at build time, and the script
+	# builds with this same /funny1-game.
+	redir /funny1-game /funny1-game/ permanent
+
+	handle /funny1-game/* {
+		# `header` runs before `uri` in Caddy's directive order, so these
+		# matchers see the full, unstripped path. The service worker and the
+		# entry files must revalidate on every load or an installed copy can
+		# stay pinned to an old build; everything under assets/ is
+		# content-hashed and never changes under a given name.
+		@fo_entry path /funny1-game/ /funny1-game/index.html /funny1-game/sw.js /funny1-game/registerSW.js /funny1-game/manifest.webmanifest
+		header @fo_entry Cache-Control "no-cache"
+		@fo_hashed path /funny1-game/assets/*
+		header @fo_hashed Cache-Control "public, max-age=31536000, immutable"
+
+		uri strip_prefix /funny1-game
+		root * /srv/static/funny-one
+		try_files {path} /index.html
+		file_server
+	}
+
+	# Anything else on this name is not a game.
 	handle {
 		respond "Not found" 404
 	}

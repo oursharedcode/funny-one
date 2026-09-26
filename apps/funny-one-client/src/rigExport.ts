@@ -16,7 +16,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { Story } from '@funny/shared';
 import i18n from './i18n/index';
-import { SOURCE_URL } from './sourceUrl';
+import { gameUrl } from './gameUrl';
 import { downloadFile } from './share';
 import { RIG_INDEX } from './components/art/rig/rigIndex';
 import { RIG_LAYERS } from './components/art/rig/rigGeometry';
@@ -158,9 +158,10 @@ export async function buildStoryImageFile(opts: {
   const { name, prose, story } = opts;
 
   const notice = i18n.t('footer.contentNotice');
-  const sourceLabel = i18n.t('footer.source');
+  const sourceLabel = i18n.t('footer.playYourself');
+  const url = gameUrl();
 
-  const qrCanvas = await renderQrCanvas(SOURCE_URL);
+  const qrCanvas = await renderQrCanvas(url);
 
   const rightColX = PAD + QR_SIZE + QR_TEXT_GAP;
   const rightColWidth = WIDTH - rightColX - PAD;
@@ -226,7 +227,7 @@ export async function buildStoryImageFile(opts: {
   ctx.fillText(sourceLabel, rightColX, sourceLabelY);
 
   ctx.font = URL_FONT;
-  ctx.fillText(SOURCE_URL, rightColX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(url, rightColX, sourceLabelY + URL_LINE_HEIGHT + 4);
 
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob((b) => resolve(b), 'image/png');

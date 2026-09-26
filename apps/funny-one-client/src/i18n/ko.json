@@ -50,7 +50,8 @@
     "changePlayers": "플레이어 변경"
   },
   "footer": {
-    "source": "GitHub 소스",
+    "gameLink": "이 게임 링크",
+    "playYourself": "직접 플레이해 보세요",
     "contentNotice": "이 게임은 여러분의 기기에서만 실행됩니다. 입력한 내용은 절대 밖으로 나가지 않아요."
   }
 }

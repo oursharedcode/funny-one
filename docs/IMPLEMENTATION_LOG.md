@@ -1802,7 +1802,7 @@ have hardware for — the scripted browser-level equivalent above is what's done
 
 ---
 
-**RESUME HERE (2026-09-26, after Step 35).** T-FO-6.1's automated half is done — Funny One is a
+~~**RESUME HERE (2026-09-26, after Step 35).** T-FO-6.1's automated half is done — Funny One is a
 genuine offline-first PWA, verified by a real online+airplane browser playthrough in two
 languages including an offline story export. Not yet done: an actual device session (see Owed).
 Also fixed this session: Funny Multi's `pt-br`/`es-es` and Hebrew-arrow bugs (Step 34), closing
@@ -1831,4 +1831,99 @@ cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; Funny Multi's own first-visit `swReload.ts` reload bug
 (see Step 35 Owed); a mid-game reload-on-update risk in both clients' `swReload.ts`; the exported
 story picture's Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both
-clients await native-speaker review.
+clients await native-speaker review.~~ Carried forward: T-FO-6.2 shipped in Step 36, the Funny Multi `swReload.ts` bug in Step 37, the device leg in Step 38.
+
+## Step 36 (task T-FO-6.2) — Funny One live under `/funny1-game` (2026-09-26)
+
+**Shipped:** Funny One is live at `https://www.staging-oursharedcode.com/funny1-game/`, served
+as static files by the Caddy already fronting Funny Multi — no container, image or secret.
+
+- `deploy/caddy/Caddyfile` — `redir /funny1-game` → `/funny1-game/` and a
+  `handle /funny1-game/*` block (`uri strip_prefix`, `root /srv/static/funny-one`, `try_files`,
+  `file_server`). Cache headers: `no-cache` for `/`, `index.html`, `sw.js`, `registerSW.js` and
+  the manifest, so an installed copy picks up a new deploy; `immutable` for hashed `assets/`.
+  Header matchers use the full, unstripped path — `header` runs before `uri` in Caddy's
+  directive order.
+- `docker-compose.yml` — `./static:/srv/static:ro` on `caddy`. The parent is mounted, not
+  `funny-one/`: a bind mount pins its starting inode, so the script's directory swap would
+  otherwise go unseen until a Caddy restart.
+- `deploy/ship-funny-one.sh` — builds with `BASE_PATH=/funny1-game`, tar-streams `dist/` into
+  `static/funny-one.new` and swaps it in, copies compose + Caddyfile, `up -d caddy` plus an
+  explicit `caddy reload` (a changed bind-mounted file isn't picked up by `up` alone — the same
+  latent gap exists in `deploy/ship.sh`), then curl-checks the page, `sw.js`, manifest, redirect
+  and Funny Multi's `/health`. `DEPLOYMENT.md` §2c; `/static/` gitignored.
+- Owner decisions from the plan: the footer link and the exported picture's QR/URL now point at
+  the game, not the private GitHub repo — `sourceUrl.ts` → `gameUrl.ts`, derived at runtime
+  (`location.origin` + `BASE_URL`) so the staging domain isn't baked into shared pictures and a
+  self-hoster's copy points at itself. `footer.source` ("Source on GitHub") is replaced by
+  `footer.gameLink` ("Link to this game", footer, plain link icon instead of the GitHub mark) and
+  `footer.playYourself` ("Play it yourself", export label) in all 15 catalogs, each in its
+  catalog's register (voseo in `es-419`, informal in `ru`/`uk`, plural in `he`). New
+  `gameUrl.test.ts`.
+
+Verified: the real Caddyfile in a local `caddy:2` container (301/200/404 and all three cache
+headers); `funny-one-offline.mjs` for `en`/`he`/`ru` (all airplane requests from cache; the `ru`
+export visually checked — new label, runtime URL); then live: page/`sw.js`/manifest 200,
+redirect 301, `no-cache` on `sw.js`, index references `/funny1-game/assets/`, Funny Multi
+`/health` 200. Gates: typecheck, lint, format:check, `npm audit` (0), `npm test` 758/758 — the
+server's real-socket suite threw a different lone timing failure on two full runs and passed
+twice run alone (known flake; server untouched). CI runs on push.
+
+Also this session: SSH to the VM timed out — the owner's home IP had changed. Re-ran
+`deploy/oci/network.py 118.102.109.169` (idempotent) to update the port-22 rule. The deploy was
+run by the owner from a Git Bash terminal: the agent's attempt was refused by the auto-mode
+classifier, and the chat panel's `!` prefix doesn't execute in the VS Code extension.
+
+**Owed:** a pre-existing `caddy fmt` warning (blank line after the Caddyfile's header comment),
+cosmetic; `deploy/ship.sh`'s missing `caddy reload` (above); real icons before any announcement
+(owner decision: placeholders are fine for deploy).
+
+## Step 37 (task T-FO-6.2a) — Funny Multi: no reload on first visit (2026-09-26)
+
+**Shipped:** Step 35's fix ported to `apps/funny-multi-client/src/swReload.ts` — the
+`controllerchange` fired by the first `clientsClaim` no longer reloads the page (which wiped a
+room mid-setup as soon as the precache finished); only a page that already had a controller
+reloads, once. New `swReload.test.ts` (same shape as Funny One's), confirmed failing on the
+pre-fix code.
+
+**Owed:** a mid-game reload on a _real_ update still wipes a game in progress, in both clients —
+unchanged, still flagged.
+
+## Step 38 (task T-FO-6.1) — Funny One: real-phone airplane-mode playthrough (2026-09-26)
+
+**Shipped:** T-FO-6.1's owed leg. The owner installed Funny One on a Samsung phone from the live
+URL, turned airplane mode on, played a full Russian game to the end screen (screenshot: airplane
+icon in the status bar, rig art and prose rendered) and exported a story picture successfully.
+T-FO-6.1 ticked; **Phase FO-6 closed.**
+
+**Owed:** nothing for this task. Only Russian was played on the phone — the 15-language check on
+a real device belongs to Gate FO.
+
+---
+
+**RESUME HERE (2026-09-26, after Step 38).** Phase FO-6 is **closed** — Funny One is live at
+`https://www.staging-oursharedcode.com/funny1-game/` and proven offline on a real phone.
+
+Next agent step: **T-FO-7.1** — the device acceptance session (`steering/funny-one-tasks.md`
+§Phase FO-7), modelled on `docs/ACCEPTANCE.md`. Gate FO needs, on a real phone: a full game in
+airplane mode (done in Step 38 for `ru` — decide whether it counts or is repeated inside the
+scripted session), all 15 languages rendering, and the six gates clean. Agent's part: write the
+Funny One acceptance checklist (one language per line, with what to look for — RTL in `he`,
+overflow in `de`/`ta`, fallback fonts in `ja`/`ko`/`zh`) and pre-check each language headlessly
+with `scripts/funny-one-screens.mjs` against the live URL, so the phone pass only confirms.
+Owner's part: the phone pass.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. SSH to the VM is
+allowed only from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>`
+(current IP from `curl https://api.ipify.org`). Production deploys are run by the owner in a Git
+Bash terminal — the agent's auto mode refuses them.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement; T-7.1's iPhone install leg (closes Gate 7); B-8 (Play Protect
+warning on Android install); the Arm VM retry; a cosmetic "Render" sweep in code comments; the
+stray T-4.2 comment in `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a
+`caddy reload` (Step 36); a mid-game reload-on-update risk in both clients' `swReload.ts`; the
+exported story picture's Hebrew text rendering LTR instead of RTL; all non-`en`/`ru`
+`home.title`s in both clients await native-speaker review.

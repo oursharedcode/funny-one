@@ -50,7 +50,8 @@
     "changePlayers": "Ganti pemain"
   },
   "footer": {
-    "source": "Sumber di GitHub",
+    "gameLink": "Tautan ke permainan ini",
+    "playYourself": "Ayo main sendiri",
     "contentNotice": "Permainan ini berjalan sepenuhnya di perangkatmu. Apa pun yang kamu ketik tidak pernah keluar dari sana."
   }
 }

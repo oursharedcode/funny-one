@@ -19,11 +19,14 @@ let refreshing = false;
 export function installSwReloadListener(): void {
   if (typeof navigator === 'undefined') return;
   if (!('serviceWorker' in navigator)) return;
+  // controllerchange also fires the first time a SW claims the page
+  // (clientsClaim), when there was no previous controller. Reloading then
+  // would wipe a first visit's room mid-setup as soon as the precache
+  // finishes, so only a page that was already controlled — a real update —
+  // reloads. The `refreshing` guard keeps that to once per session.
+  const hadController = navigator.serviceWorker.controller != null;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    // controllerchange also fires the first time a SW claims the page,
-    // when there was no previous controller. Reloading then would loop
-    // forever. The guard makes sure we only reload once per session.
-    if (refreshing) return;
+    if (!hadController || refreshing) return;
     refreshing = true;
     window.location.reload();
   });

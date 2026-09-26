@@ -137,6 +137,27 @@ container idles at ~50 MB with Caddy at ~20 MB, Let's Encrypt certificates for b
 first boot, HTTP→HTTPS and apex→`www` redirects, and a scripted 3-player room over TLS
 WebSockets through Caddy in under a second.
 
+### 2c. Funny One on the same host (optional)
+
+Funny One («Одна Чепуха: по кругу», `apps/funny-one-client`) has no server — it is a static,
+fully offline PWA, so it needs no container, image or secret: the same Caddy serves its files
+under `/funny1-game`. It needs the host set up by 2a–2b first (only `SITE_HOST` is read).
+
+```bash
+deploy/ship-funny-one.sh ubuntu@<host-ip>   # remote dir defaults to ~/funny
+```
+
+The script builds the client with `BASE_PATH=/funny1-game` — the path the Caddyfile hardcodes,
+since it is baked into the bundle and its service-worker scope — streams `dist/` into
+`~/funny/static/funny-one` (swapped in whole, never half-copied), copies the compose file and
+Caddyfile, reloads Caddy, and checks `/funny1-game/`, `sw.js`, the manifest, the
+`/funny1-game` → `/funny1-game/` redirect and that Funny Multi's `/health` still answers.
+Compose mounts `./static` (the parent directory, so the swap is visible without restarting
+Caddy); the first run recreates the Caddy container to add that mount, which drops Funny
+Multi's open sockets for a moment — clients reconnect on their own. Caddy sends `no-cache` for
+the entry files and the service worker, so an installed copy picks up a new deploy on its next
+launch, and a year-long `immutable` for the content-hashed `assets/`.
+
 ### Variant: your own TLS proxy instead of Caddy
 
 `ship.sh` always uses the Caddy profile. If you already terminate TLS elsewhere (nginx,

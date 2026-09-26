@@ -50,7 +50,8 @@
     "changePlayers": "プレイヤーを変更"
   },
   "footer": {
-    "source": "GitHub のソース",
+    "gameLink": "このゲームへのリンク",
+    "playYourself": "あなたも遊んでみよう",
     "contentNotice": "このゲームは端末上だけで動作します。入力した内容が外部に送られることはありません。"
   }
 }

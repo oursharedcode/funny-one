@@ -39,6 +39,12 @@ services:
       - '443:443'
     volumes:
       - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Static games served straight by Caddy — Funny One's bundle lands in
+      # ./static/funny-one (deploy/ship-funny-one.sh). The parent directory is
+      # mounted, not funny-one itself, so the script's swap of that directory
+      # is visible here without restarting Caddy: a bind mount pins the
+      # inode it started with.
+      - ./static:/srv/static:ro
       - caddy_data:/data
       - caddy_config:/config
     # Plain `${VAR}` rather than the `:?` required form: Compose interpolates

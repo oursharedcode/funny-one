@@ -50,7 +50,8 @@
     "changePlayers": "Trocar jogadores"
   },
   "footer": {
-    "source": "Fonte no GitHub",
+    "gameLink": "Link para este jogo",
+    "playYourself": "Jogue você também",
     "contentNotice": "Este jogo roda inteiramente no seu aparelho. Nada do que você digita sai dele."
   }
 }

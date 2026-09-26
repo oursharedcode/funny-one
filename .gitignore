@@ -21,3 +21,7 @@ coverage/
 *.log
 .DS_Store
 Thumbs.db
+
+# Static games streamed to the host by deploy/ship-funny-one.sh (mounted by
+# the caddy service); only ever exists on a host, never committed.
+/static/

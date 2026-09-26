@@ -50,7 +50,8 @@
     "changePlayers": "更改玩家"
   },
   "footer": {
-    "source": "GitHub 上的源代码",
+    "gameLink": "本游戏链接",
+    "playYourself": "你也来玩吧",
     "contentNotice": "这个游戏完全在你的设备上运行。你输入的任何内容都不会离开设备。"
   }
 }

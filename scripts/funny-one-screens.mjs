@@ -5,12 +5,15 @@
 // home → handoff → round → thinking → end/gallery. Also flags any element whose
 // content overflows its box (clipped button text, horizontal page scroll).
 //
-//   node scripts/funny-one-screens.mjs [lang ...] [--out <dir>] [--width <px>]
+//   node scripts/funny-one-screens.mjs [lang ...] [--out <dir>] [--width <px>] [--url <base>]
 //
 // Default langs: en. Default out: ./.screens (gitignored). Needs
 // packages/shared built (`npm run build -w packages/shared`).
 //
 // It starts its own Vite dev server in-process, so nothing else needs to run.
+// With --url it drives that deployed build instead (e.g. the live
+// /funny1-game/); selectors still come from the local catalogs, so the
+// deploy must match the checked-out commit.
 // The game itself is driven by funny-one-play.mjs, shared with the offline
 // check (funny-one-offline.mjs).
 
@@ -33,6 +36,7 @@ function option(name, fallback) {
 }
 const outDir = resolve(option('--out', join(ROOT, '.screens')));
 const width = Number(option('--width', '360'));
+const liveUrl = option('--url', null);
 const langs = args.length > 0 ? args : ['en'];
 
 /** Elements whose content is wider than their box, plus page-level horizontal scroll. */
@@ -100,15 +104,18 @@ async function runLanguage(browser, baseUrl, lang) {
 await mkdir(outDir, { recursive: true });
 // PostCSS finds tailwind.config.js, and Tailwind resolves its content globs,
 // relative to cwd — the same place `npm run dev -w` puts it.
-process.chdir(CLIENT);
-const server = await createServer({
-  root: CLIENT,
-  configFile: join(CLIENT, 'vite.config.ts'),
-  logLevel: 'error',
-  server: { port: 0 },
-});
-await server.listen();
-const baseUrl = server.resolvedUrls.local[0];
+let server = null;
+if (!liveUrl) {
+  process.chdir(CLIENT);
+  server = await createServer({
+    root: CLIENT,
+    configFile: join(CLIENT, 'vite.config.ts'),
+    logLevel: 'error',
+    server: { port: 0 },
+  });
+  await server.listen();
+}
+const baseUrl = liveUrl ?? server.resolvedUrls.local[0];
 const browser = await chromium.launch();
 let failed = false;
 try {
@@ -129,7 +136,7 @@ try {
   }
 } finally {
   await browser.close();
-  await server.close();
+  await server?.close();
 }
 console.log(`screenshots: ${outDir}`);
 process.exit(failed ? 1 : 0);

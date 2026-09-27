@@ -1901,7 +1901,7 @@ a real device belongs to Gate FO.
 
 ---
 
-**RESUME HERE (2026-09-26, after Step 38).** Phase FO-6 is **closed** — Funny One is live at
+~~**RESUME HERE (2026-09-26, after Step 38).** Phase FO-6 is **closed** — Funny One is live at
 `https://www.staging-oursharedcode.com/funny1-game/` and proven offline on a real phone.
 
 Next agent step: **T-FO-7.1** — the device acceptance session (`steering/funny-one-tasks.md`
@@ -1926,4 +1926,47 @@ warning on Android install); the Arm VM retry; a cosmetic "Render" sweep in code
 stray T-4.2 comment in `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a
 `caddy reload` (Step 36); a mid-game reload-on-update risk in both clients' `swReload.ts`; the
 exported story picture's Hebrew text rendering LTR instead of RTL; all non-`en`/`ru`
-`home.title`s in both clients await native-speaker review.
+`home.title`s in both clients await native-speaker review.~~ *(carried — see Step 39 below.)*
+
+## Step 39 (task T-FO-7.1) — Funny One: acceptance doc + 15-language headless pre-check (2026-09-27)
+
+**Shipped:** the agent's half of T-FO-7.1. `scripts/funny-one-screens.mjs` gained a `--url`
+flag so it can drive a deployed build instead of only a local dev server. All 15 languages
+played a full game headlessly against the live `/funny1-game/` URL at 360px: 0 overflow hits,
+0 console errors, `he` reports `dir=rtl`. New `docs/ACCEPTANCE_FUNNY_ONE.md`, modelled on
+`docs/ACCEPTANCE.md`: Part A (install), Part B (one full online game), Part C (offline — Step
+38's airplane-mode Russian playthrough recorded as a pass per owner decision 2026-09-27, plus
+one force-close re-check), Part D (six languages to eyeball on the phone: `ru`/`en`/`he`/`ta`/
+one of `ja`/`ko`/`zh`/`de`), and a results table. Owner decisions this session: Step 38's
+offline pass counts for Gate FO (no repeat needed); the pre-check hits the live URL, not local
+dev; six languages get a phone pass, the other nine rest on headless; the maskable-icon check
+(A3) is marked deferred until real icons ship, not waived — it stays required before any
+announcement.
+
+**Owed:** the owner's phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` — T-FO-7.1 stays
+unticked and Gate FO stays open until that session's results are recorded.
+
+---
+
+**RESUME HERE (2026-09-27, after Step 39).** T-FO-7.1's agent half is done; the phone session is
+next, run by the owner alone (no agent needed — Funny One has no server to flip). Fill in
+`docs/ACCEPTANCE_FUNNY_ONE.md`'s results table on the phone; once every row is pass/deferred,
+tell the next agent so it can tick T-FO-7.1, close Gate FO and Phase FO-7, move the task's block
+to `steering/tasks-done.md`, and start Phase S-3 (Funny One's store-app replicate of S-1/S-2,
+`steering/funny-one-tasks.md`).
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. SSH to the VM is
+allowed only from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>`
+(current IP from `curl https://api.ipify.org`). Production deploys are run by the owner in a Git
+Bash terminal — the agent's auto mode refuses them.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in the new acceptance doc); T-7.1's iPhone install
+leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both games); the
+Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review.

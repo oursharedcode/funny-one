@@ -1948,7 +1948,7 @@ unticked and Gate FO stays open until that session's results are recorded.
 
 ---
 
-**RESUME HERE (2026-09-27, after Step 39).** T-FO-7.1's agent half is done; the phone session is
+~~**RESUME HERE (2026-09-27, after Step 39).** T-FO-7.1's agent half is done; the phone session is
 next, run by the owner alone (no agent needed — Funny One has no server to flip). Fill in
 `docs/ACCEPTANCE_FUNNY_ONE.md`'s results table on the phone; once every row is pass/deferred,
 tell the next agent so it can tick T-FO-7.1, close Gate FO and Phase FO-7, move the task's block
@@ -1966,6 +1966,76 @@ Still open, none blocking: making the repo public before any launch announcement
 icons before any announcement (also blocks A3 in the new acceptance doc); T-7.1's iPhone install
 leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both games); the
 Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review.~~ *(carried — see Step 40 below.)*
+
+## Step 40 (task T-9.2) — `cloudflare/pregenerate.mjs`: the library pre-generator, code and tests (2026-09-27)
+
+**Shipped:** the agent's half of T-9.2. `cloudflare/pregenerate.mjs` walks every combination of
+the four `VISUAL_SLOTS` (10⁴ with today's pools, generic in the pool sizes), builds each prompt
+with the server's own `buildPrompt` from `apps/funny-multi-server/dist` so the R2 keys are the
+game's bytes, probes `/exists` and calls `/generate` only on a miss. Resumable by construction,
+≤ 4 requests in flight, 429/5xx/network errors retried with exponential backoff (1 s → 60 s, six
+attempts), any other non-200 fatal — stop taking new work, let the in-flight calls settle, exit
+1. `--dry-run` probes only (free); `--limit N` caps generations, counted before the await so
+parallel workers cannot overshoot. Progress every 100, summary with an ≈ $0.001/image estimate.
+`npm run pregenerate -w cloudflare` builds shared + server first. `cloudflare/pregenerate.test.js`
+(11 tests against a fake Worker): exactly 10⁴ distinct prompts matching `buildPrompt`; skip-
+existing; second run generates nothing; dry run never hits `/generate`; `--limit` holds under
+concurrency; peak in-flight is exactly 4; backoff sequence 1 s, 2 s, 1 s; a 401 stops after one
+probe; retry budget exhausted → fatal; a `/generate` that raced a live game to the image counts
+as existed. Gates: typecheck, lint, format:check, `npm test` (5 workspaces, all green), `npm
+audit` 0 vulnerabilities. Also this step: `local_docs/tests/` gitignored (owner decision
+2026-09-28 — phone screenshots stay local; the acceptance docs carry the results).
+
+**Owed:** the production run. A `--dry-run` against the live Worker stopped correctly on its
+first probe with 403 — the local `.env` secret is not production's — so there is no live proof
+yet. The real run needs T-9.1's paid Workers AI plan (deferred) plus the production
+`CLOUDFLARE_WORKER_URL`/`CLOUDFLARE_WORKER_SECRET` in a Git Bash shell: `--dry-run`, then
+`--limit 5`, then the full run on a quiet day (every miss bumps the Worker's daily counter). T-9.2
+stays unticked until R2 holds 10⁴ objects.
+
+## Step 41 (task T-9.1) — support rails registered: PayID, Lightning, Sponsors tiers (2026-09-28)
+
+**Shipped:** owner ops, recorded under T-9.1 in `steering/tasks.md`. PayID
+`funny@oursharedcode.com`, bank displays **MARK WEB TOOLS**. Lightning
+`curvyhockey439@walletofsatoshi.com`, verified resolving via LNURL-pay. GitHub Sponsors: three
+one-time tiers $1/$3/$5 published on `github.com/sponsors/oursharedcode`, verified via GraphQL.
+Decisions on the way: Strike was the first choice (direct AUD withdrawal) but its app is not
+offered in Play AU and web sign-up hands off to the app for ID checks, so Wallet of Satoshi
+(Australian, custodial) was chosen; the random address is published as-is — a custom name costs
+10 LN transactions plus ≥ 100k sats on-chain, and a branded LNURL proxy on our own domain was
+judged cosmetic and dropped; cash-out is Lightning → Kraken → AUD, never on-chain.
+
+**Owed:** the paid Workers AI plan — deferred by the owner 2026-09-28. T-9.1 stays unticked on
+that one item; it gates T-9.2's production run and Gate 9's "library complete" leg, nothing else.
+
+---
+
+**RESUME HERE (2026-09-28, after Step 41).** Next is **T-9.3** (server: `DEPLOYER_PAYID`,
+`DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` → the config
+endpoint's `support` object, never in a socket event; tests unset → nulls, set → passed through)
+— every value is now known (Step 41), so T-9.3 and then T-9.4 (the `SupportScreen`) can land
+without waiting on the paid plan. Two owner items run in parallel and block nothing here: the
+Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase
+S-3), and the paid Workers AI plan followed by T-9.2's production run (`--dry-run`, `--limit 5`,
+full). Owner decision still pending from the 2026-09-27 morning plan: which track after Gate FO
+— finish Phase 9, or S-1/S-2, or S-3.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. SSH to the VM is
+allowed only from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>`
+(current IP from `curl https://api.ipify.org`). Production deploys are run by the owner in a Git
+Bash terminal — the agent's auto mode refuses them. The local `.env`'s Worker secret is not
+production's: any live Worker call from this PC needs the production pair exported first.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
+games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await

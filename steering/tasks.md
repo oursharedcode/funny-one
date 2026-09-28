@@ -83,10 +83,24 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       name** the payer's bank displays; pick a Lightning wallet and get its address; on GitHub
       Sponsors (`oursharedcode`) add **one-time** tiers $1/$3/$5; enable the paid Workers AI plan
       for the batch. → D-6, D-7
+      **Landed so far (2026-09-28):** PayID `funny@oursharedcode.com`, bank displays
+      **MARK WEB TOOLS**. Lightning: `curvyhockey439@walletofsatoshi.com` (resolves via
+      LNURL-pay, checked 2026-09-28). Owner decisions: Strike was first choice (direct AUD
+      withdrawal) but its app is not offered in Play AU, so Wallet of Satoshi (Australian,
+      custodial) was chosen; the random address is published as-is — a custom name needs 10 LN
+      transactions plus ≥100k sats on-chain, and a branded proxy address on our domain was
+      judged cosmetic (A over B, 2026-09-28); cash-out is Lightning → Kraken → AUD, never
+      on-chain. Sponsors: three one-time tiers ($1/$3/$5) published on
+      `github.com/sponsors/oursharedcode`, verified via GraphQL 2026-09-28. **Still to do:**
+      the paid Workers AI plan — deferred by the owner 2026-09-28; T-9.2's production run
+      waits on it.
 - [ ] **T-9.2 (M)** `cloudflare/pregenerate.mjs`: enumerate all `VISUAL_SLOTS` combinations via
       `buildPrompt`, `/exists` → `/generate`, resumable, concurrency ≤ 4, backoff on 429/5xx,
       progress + cost summary. Tests: enumeration is exactly 10⁴ distinct prompts, skip-existing,
       stop-on-fatal. Then run it to completion against production. → FM-TIER-2, design §10.1
+      **Code + 11 tests landed Step 40 (2026-09-27)**, plus `--dry-run` (probes only) and
+      `--limit N`. **Remaining:** the production run — needs the paid plan (T-9.1) and the
+      production Worker pair in the shell; `--dry-run`, `--limit 5`, then full, on a quiet day.
 - [ ] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
       `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
       set → passed through, never in any socket event. → FM-TIER-3

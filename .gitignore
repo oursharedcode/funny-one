@@ -25,3 +25,7 @@ Thumbs.db
 # Static games streamed to the host by deploy/ship-funny-one.sh (mounted by
 # the caddy service); only ever exists on a host, never committed.
 /static/
+
+# Phone screenshots and other device-session evidence the owner drops here; the
+# acceptance docs record the results, so the images themselves stay local.
+local_docs/tests/

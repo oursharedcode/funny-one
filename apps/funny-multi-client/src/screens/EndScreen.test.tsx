@@ -10,8 +10,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
-import type { GalleryReadyPayload, Player } from '@funny/shared';
+import type { GalleryReadyPayload, Player, SupportConfig } from '@funny/shared';
 import type { LobbyState } from '../App';
+
+const NO_RAILS: SupportConfig = {
+  payId: null,
+  payIdName: null,
+  sponsorsUrl: null,
+  lightningAddress: null,
+  donateUrl: null,
+};
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
@@ -29,7 +37,6 @@ function lobby(overrides: Partial<LobbyState> = {}): LobbyState {
     hostId: 's0',
     language: 'en',
     players: players({ id: 's0' }, { id: 's1' }, { id: 's2' }),
-    donateUrl: null,
     ...overrides,
   };
 }
@@ -70,6 +77,8 @@ function renderEnd(props: {
   readyIds?: string[];
   gameOver?: boolean;
   gallery?: GalleryReadyPayload | null;
+  support?: SupportConfig | null;
+  onOpenSupport?: () => void;
 }) {
   return render(
     <EndScreen
@@ -77,6 +86,8 @@ function renderEnd(props: {
       readyIds={props.readyIds ?? []}
       gameOver={props.gameOver ?? false}
       gallery={props.gallery ?? null}
+      support={props.support}
+      onOpenSupport={props.onOpenSupport}
     />,
   );
 }
@@ -251,15 +262,24 @@ describe('guest — ready toggle', () => {
   });
 });
 
-describe('donate link', () => {
-  it('is absent when the deployer set no donate URL', () => {
-    renderEnd({ lobby: lobby({ donateUrl: null }) });
+describe('support entry point (T-9.4)', () => {
+  it('is absent when the deployer set no rail', () => {
+    renderEnd({ support: NO_RAILS });
     expect(screen.queryByText('Support this server')).toBeNull();
   });
 
-  it('links to the deployer URL when set', () => {
-    renderEnd({ lobby: lobby({ donateUrl: 'https://example.com/donate' }) });
-    const link = screen.getByText('Support this server') as HTMLAnchorElement;
-    expect(link.href).toBe('https://example.com/donate');
+  it('is absent when no config has been fetched yet', () => {
+    renderEnd({ support: null });
+    expect(screen.queryByText('Support this server')).toBeNull();
+  });
+
+  it('opens support when clicked once at least one rail is set', () => {
+    const onOpenSupport = vi.fn();
+    renderEnd({
+      support: { ...NO_RAILS, donateUrl: 'https://example.com/donate' },
+      onOpenSupport,
+    });
+    fireEvent.click(screen.getByText('Support this server'));
+    expect(onOpenSupport).toHaveBeenCalledTimes(1);
   });
 });

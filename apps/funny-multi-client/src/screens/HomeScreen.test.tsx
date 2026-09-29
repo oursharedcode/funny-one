@@ -15,8 +15,17 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import { AUTHORED_LANGUAGES, LANGUAGES } from '@funny/shared';
+import type { SupportConfig } from '@funny/shared';
 import { createSocketMock, setUrl } from '../testutils/socketMock';
 import i18n from '../i18n';
+
+const NO_RAILS: SupportConfig = {
+  payId: null,
+  payIdName: null,
+  sponsorsUrl: null,
+  lightningAddress: null,
+  donateUrl: null,
+};
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
@@ -166,7 +175,6 @@ describe('room:create payload', () => {
       // The creator is their own host.
       hostId: 's1',
       language: 'ru',
-      donateUrl: null,
     });
     expect(state.players).toEqual([{ id: 's1', nickname: 'hostie', isBot: false }]);
   });
@@ -298,6 +306,31 @@ describe('failures reported as an error event, not an ack', () => {
     fireEvent.click(screen.getByText('Create room'));
     socketMock.fire('error', { code: 'RATE_LIMITED', message: 'Slow down a moment' });
     expect(screen.queryByText('Slow down a moment')).toBeNull();
+  });
+});
+
+describe('support entry point (T-9.4)', () => {
+  it('shows no ♥ when the deployer set no rail', () => {
+    render(<HomeScreen onJoined={vi.fn()} support={NO_RAILS} />);
+    expect(screen.queryByLabelText('Support this game')).toBeNull();
+  });
+
+  it('shows no ♥ when App has not fetched a config yet', () => {
+    render(<HomeScreen onJoined={vi.fn()} />);
+    expect(screen.queryByLabelText('Support this game')).toBeNull();
+  });
+
+  it('shows the ♥ once at least one rail is set, and opens the support screen', () => {
+    const onOpenSupport = vi.fn();
+    render(
+      <HomeScreen
+        onJoined={vi.fn()}
+        support={{ ...NO_RAILS, donateUrl: 'https://example.com/give' }}
+        onOpenSupport={onOpenSupport}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Support this game'));
+    expect(onOpenSupport).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -25,7 +25,8 @@ import { socket } from '../socket';
 import EndMascots from '../components/art/EndMascots';
 import RoomGallery from '../components/RoomGallery';
 import SourceFooter from '../components/SourceFooter';
-import type { GalleryReadyPayload } from '@funny/shared';
+import { hasAnyRail } from '../support';
+import type { GalleryReadyPayload, SupportConfig } from '@funny/shared';
 import type { LobbyState } from '../App';
 
 interface Props {
@@ -36,9 +37,21 @@ interface Props {
   gameOver: boolean;
   // The shared room gallery, or null until the host shares it (spec §24).
   gallery: GalleryReadyPayload | null;
+  // T-9.4/T-9.4a (FM-TIER-4): replaces the old direct donate link with a
+  // button that opens SupportScreen. Optional so screen-level tests that
+  // don't care about it need not pass it.
+  support?: SupportConfig | null;
+  onOpenSupport?: () => void;
 }
 
-export default function EndScreen({ lobby, readyIds, gameOver, gallery }: Props) {
+export default function EndScreen({
+  lobby,
+  readyIds,
+  gameOver,
+  gallery,
+  support = null,
+  onOpenSupport = () => {},
+}: Props) {
   const { t } = useTranslation();
 
   const isHost = lobby.socketId === lobby.hostId;
@@ -129,15 +142,14 @@ export default function EndScreen({ lobby, readyIds, gameOver, gallery }: Props)
         </>
       )}
 
-      {lobby.donateUrl && (
-        <a
-          href={lobby.donateUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+      {hasAnyRail(support) && (
+        <button
+          type="button"
           className="mt-2 text-sm text-gray-500 underline"
+          onClick={onOpenSupport}
         >
           {t('endScreen.supportServer')}
-        </a>
+        </button>
       )}
 
       <SourceFooter />

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { baseUrl, homeUrl, withBase } from './basePath';
+import { baseUrl, homeUrl, serverOrigin, withBase } from './basePath';
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -21,5 +21,12 @@ describe('basePath', () => {
     expect(withBase('/deployer-logo.png')).toBe('/funny37-game/deployer-logo.png');
     expect(`${baseUrl()}socket.io`).toBe('/funny37-game/socket.io');
     expect(`${homeUrl()}?room=ABCDEF`).toBe(`${window.location.origin}/funny37-game/?room=ABCDEF`);
+  });
+});
+
+describe('serverOrigin', () => {
+  it('points at :3000 under Vite dev/test (import.meta.env.DEV) — never a same-origin fetch, which would silently hit Vite instead of the server', () => {
+    expect(import.meta.env.DEV).toBe(true);
+    expect(serverOrigin()).toBe('http://localhost:3000');
   });
 });

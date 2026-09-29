@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "このサーバーを応援する"
   },
+  "support": {
+    "openLabel": "このゲームを応援する",
+    "title": "サポート",
+    "intro": "これは自由意志による贈り物です。何の義務もなく、何も解除されません。",
+    "close": "閉じる",
+    "payId": "PayID",
+    "payIdBankNote": "銀行には次のように表示されます: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "単発の支援額を選んでください",
+    "lightning": "Lightning",
+    "donate": "寄付する",
+    "copy": "コピー",
+    "copied": "コピーしました！"
+  },
   "gallery": {
     "share": "ルームの絵を共有",
     "shareButton": "共有",

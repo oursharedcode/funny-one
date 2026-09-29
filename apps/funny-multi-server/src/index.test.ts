@@ -185,13 +185,12 @@ describe('GET /config', () => {
     expect(root.statusCode).toBe(404);
   });
 
-  it('never puts a new rail in any socket event or ack', async () => {
-    // Static config stays off the socket (FM-TIER-3). With all four new vars
-    // set, nothing either client receives through a create + join — event or
-    // ack — may carry one of the values. `DEPLOYER_DONATE_URL` is left out on
-    // purpose: `lobby:update` still carries `donateUrl` until it moves to
-    // /config with the SupportScreen.
-    Object.assign(process.env, NEW_RAILS);
+  it('never puts a support rail in any socket event or ack', async () => {
+    // Static config stays off the socket (FM-TIER-3). T-9.4a moved
+    // `donateUrl` off `lobby:update` onto /config alongside the other four
+    // rails, so with all five vars set, nothing either client receives
+    // through a create + join — event or ack — may carry one of the values.
+    Object.assign(process.env, NEW_RAILS, { DEPLOYER_DONATE_URL: DONATE_URL });
     const h = await listen();
     const host = await connect(h);
     const joiner = await connect(h);
@@ -223,10 +222,10 @@ describe('GET /config', () => {
     const traffic = JSON.stringify(received);
     // Guards the assertions below against passing on an empty recording.
     expect(traffic).toContain('lobby:update');
-    for (const value of Object.values(NEW_RAILS)) {
+    for (const value of [...Object.values(NEW_RAILS), DONATE_URL]) {
       expect(traffic).not.toContain(value);
     }
-    for (const field of ['payId', 'payIdName', 'sponsorsUrl', 'lightningAddress']) {
+    for (const field of ['payId', 'payIdName', 'sponsorsUrl', 'lightningAddress', 'donateUrl']) {
       expect(traffic).not.toContain(`"${field}"`);
     }
   });
@@ -316,16 +315,11 @@ describe('room:create', () => {
   it('broadcasts lobby:update to the creator', async () => {
     const h = await listen();
     const host = await connect(h);
-    const lobby = once<{ players: { nickname: string }[]; hostId: string; donateUrl: unknown }>(
-      host,
-      'lobby:update',
-    );
+    const lobby = once<{ players: { nickname: string }[]; hostId: string }>(host, 'lobby:update');
     void emitWithAck(host, 'room:create', { nickname: 'Ada', language: 'en' });
     const payload = await lobby;
     expect(payload.players.map((p) => p.nickname)).toEqual(['Ada']);
     expect(payload.hostId).toBe(host.id);
-    // donateUrl is null unless the operator set DEPLOYER_DONATE_URL.
-    expect(payload.donateUrl).toBeNull();
   });
 
   it('emits error (not an ack) for a bad nickname', async () => {

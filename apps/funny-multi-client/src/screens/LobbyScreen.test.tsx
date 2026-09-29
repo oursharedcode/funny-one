@@ -31,7 +31,6 @@ function lobbyState(over: Partial<LobbyState> = {}): LobbyState {
     hostId: 's0',
     language: 'en',
     players: players(3),
-    donateUrl: null,
     ...over,
   };
 }

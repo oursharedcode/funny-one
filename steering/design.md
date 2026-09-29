@@ -482,10 +482,15 @@ retired by D-6; nothing of it was built.*
   URL. Each row: label, the address in a `<code>`, a copy button using `navigator.clipboard`
   with a 2 s "Copied!" state; PayID row shows "your bank will display: <name>"; Sponsors row
   is a plain link with the "choose one-time" hint; Lightning row is an `<a href="lightning:…">`
-  plus a QR drawn on a `<canvas>` by a small vendored encoder (no CDN). Header copy: voluntary
-  gift, nothing owed. All strings in the 15 locale files.
-- Store shells (FM-APP-3): the screen is compiled in but gated off by the shell build flag until
-  the platform review at B-1/B-2.
+  plus a QR rendered by the existing `QRCode` component (design-system copy, no CDN, no new
+  encoder). Header copy: voluntary gift, nothing owed. All strings in the 15 locale files.
+  *(Corrected 2026-09-29 — owner decision was to reuse the existing component rather than vendor
+  a new canvas encoder; the original text was written before that component existed in this
+  client.)*
+- Store shells (FM-APP-3): the screen is compiled in but not yet gated by a shell build flag —
+  no flag exists because no store shell exists yet (B-1/B-2 are still Post-v1 backlog). Gating
+  is deferred to whichever of B-1/B-2 lands first, since the flag only means something once
+  there's a shell build to gate. *(Noted 2026-09-29, T-9.4.)*
 - Not built: any card checkout, key redemption, entitlement token, premium room flag.
 
 ## 11. Environment variables

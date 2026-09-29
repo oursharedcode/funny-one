@@ -28,3 +28,15 @@ export function withBase(relative: string): string {
 export function homeUrl(): string {
   return window.location.origin + baseUrl();
 }
+
+/**
+ * Origin of the Socket.IO/REST server. In dev the client (Vite, :5173) and
+ * server (:3000) run on separate origins, so a same-origin fetch from the
+ * client never reaches the server — it silently hits Vite's dev server
+ * instead. In prod they're the same origin. Socket.IO has needed this split
+ * since T-8.1; any REST call to this server (e.g. `GET /config`) needs it
+ * too.
+ */
+export function serverOrigin(): string {
+  return import.meta.env.DEV ? 'http://localhost:3000' : window.location.origin;
+}

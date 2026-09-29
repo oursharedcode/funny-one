@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "Diesen Server unterstützen"
   },
+  "support": {
+    "openLabel": "Dieses Spiel unterstützen",
+    "title": "Unterstützung",
+    "intro": "Dies ist ein freiwilliges Geschenk — es wird nichts geschuldet und nichts freigeschaltet.",
+    "close": "Schließen",
+    "payId": "PayID",
+    "payIdBankNote": "Deine Bank zeigt an: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Eine einmalige Stufe wählen",
+    "lightning": "Lightning",
+    "donate": "Spenden",
+    "copy": "Kopieren",
+    "copied": "Kopiert!"
+  },
   "gallery": {
     "share": "Die Bilder des Raums teilen",
     "shareButton": "Teilen",

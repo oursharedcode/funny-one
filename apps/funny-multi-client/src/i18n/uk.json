@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "Підтримати цей сервер"
   },
+  "support": {
+    "openLabel": "Підтримати цю гру",
+    "title": "Підтримка",
+    "intro": "Це добровільний подарунок — ви нічого не винні, і це нічого не розблоковує.",
+    "close": "Закрити",
+    "payId": "PayID",
+    "payIdBankNote": "У вашому банку відобразиться: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Оберіть одноразовий внесок",
+    "lightning": "Lightning",
+    "donate": "Підтримати",
+    "copy": "Копіювати",
+    "copied": "Скопійовано!"
+  },
   "gallery": {
     "share": "Показати картинки всієї кімнати",
     "shareButton": "Поділитися",

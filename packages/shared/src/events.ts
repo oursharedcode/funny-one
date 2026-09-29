@@ -21,8 +21,8 @@
 //      now takes no payload.
 //
 // Deliberately NOT here: `entitlementToken` on `room:create` and `Room.premium`.
-// They belong to the premium phase (design §10) and land in T-9.3/T-9.4, since
-// D-4 keeps that risk in the final phase.
+// The Polar premium design (design §10) they belonged to was superseded by
+// D-6's support rails (`SupportConfig` below) before either shipped.
 
 import type { Language } from './languages.js';
 import type { OptionId } from './pools/schema.js';
@@ -178,8 +178,6 @@ export interface GameReadyPayload {
 export interface LobbyUpdatePayload {
   players: Player[];
   hostId: string;
-  // Deployer's DEPLOYER_DONATE_URL env var value, or null when unset (spec §18, §20).
-  donateUrl: string | null;
 }
 
 // The `support` object of the GET /config response (T-9.3, FM-TIER-3, design

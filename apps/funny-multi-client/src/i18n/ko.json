@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "이 서버 후원하기"
   },
+  "support": {
+    "openLabel": "이 게임 후원하기",
+    "title": "후원",
+    "intro": "이것은 자발적인 선물입니다 — 아무 의무도 없고 아무것도 잠금 해제되지 않습니다.",
+    "close": "닫기",
+    "payId": "PayID",
+    "payIdBankNote": "은행에 다음과 같이 표시됩니다: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "일회성 후원 등급을 선택하세요",
+    "lightning": "Lightning",
+    "donate": "후원하기",
+    "copy": "복사",
+    "copied": "복사됨!"
+  },
   "gallery": {
     "share": "방의 그림 공유",
     "shareButton": "공유",

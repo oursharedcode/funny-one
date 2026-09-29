@@ -105,12 +105,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
       QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
       off in store-shell builds. Tests: rows follow config, copy button, no rail → no ♥. → FM-TIER-4
-- [ ] **T-9.4a (S)** *Filed 2026-09-29 (scope beyond T-9.4's text; owner decision the same
-      day):* move `donateUrl` off the `lobby:update` broadcast onto `GET /config`, so all five
-      support strings have one source: drop the field from `LobbyUpdatePayload` and
-      `broadcastLobby`, feed `App.tsx`, `HomeScreen` and `EndScreen` from the fetched config,
-      and extend T-9.3's socket test to `DEPLOYER_DONATE_URL`. Lands in the same step as T-9.4.
-      → FM-TIER-3
+      *Landed Step 44 (2026-09-29), everything above except "gated off in store-shell builds."
+      QR via the existing `QRCode` component, not a new vendored canvas encoder (owner decision
+      2026-09-29, reuse over vendoring — design §10.2 corrected). **Remaining:** the store-shell
+      gate itself — no flag exists because no store shell exists yet; deferred to whichever of
+      B-1/B-2 lands first (noted there).*
 - [ ] **T-9.5 (S)** Docs: README "Support" and "Why no card payments" paragraphs; `.env.example`
       + DEPLOYMENT.md variables; ACCEPTANCE.md gets a support-screen row. → FM-TIER-3/6
 - **Gate 9**: library complete (object count in R2 = 10⁴; a full game on production leaves
@@ -124,6 +123,9 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   **Pulled forward 2026-09-20** — owner wants store apps for both products now rather than
   post-v1; see `steering/funny-one-tasks.md` Phase S for the sequencing (developer-account
   enrollment under the existing ABN, then Funny Multi's shells, then Funny One's once it exists).
+  Whichever of B-1/B-2 lands first also adds the store-shell build flag that gates T-9.4's
+  `SupportScreen` off per FM-APP-3 (deferred there 2026-09-29 — no flag can mean anything before
+  a shell build exists to gate).
 - **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
   **Pulled forward 2026-09-20**, same note as B-1.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).

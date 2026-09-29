@@ -32,12 +32,17 @@ import Wordmark from '../components/art/Wordmark';
 import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
+import { hasAnyRail } from '../support';
 import { AUTHORED_LANGUAGES, LANGUAGES, isLanguage } from '@funny/shared';
 import type { LobbyState } from '../App';
-import type { AuthoredLanguage, Language, StatsPayload } from '@funny/shared';
+import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
 
 interface Props {
   onJoined: (state: LobbyState) => void;
+  // T-9.4 (FM-TIER-4): drives the ♥ affordance. Optional so screen-level
+  // tests that don't care about the support screen need not pass it.
+  support?: SupportConfig | null;
+  onOpenSupport?: () => void;
 }
 
 // Room-content languages: the subset of the registry whose answer pools are
@@ -52,7 +57,7 @@ function isAuthoredLanguage(value: string | null | undefined): value is Authored
   return typeof value === 'string' && (AUTHORED_LANGUAGES as readonly string[]).includes(value);
 }
 
-export default function HomeScreen({ onJoined }: Props) {
+export default function HomeScreen({ onJoined, support = null, onOpenSupport = () => {} }: Props) {
   const { t, i18n } = useTranslation();
 
   const params = new URLSearchParams(window.location.search);
@@ -142,7 +147,6 @@ export default function HomeScreen({ onJoined }: Props) {
         hostId: ack.socketId,
         language,
         players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
-        donateUrl: null,
       });
     });
   }
@@ -186,7 +190,6 @@ export default function HomeScreen({ onJoined }: Props) {
         hostId: ack.hostId,
         language: roomLanguage,
         players: ack.players,
-        donateUrl: null,
       });
     });
   }
@@ -204,6 +207,16 @@ export default function HomeScreen({ onJoined }: Props) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6">
+      {hasAnyRail(support) && (
+        <button
+          type="button"
+          aria-label={t('support.openLabel')}
+          className="fixed right-3 top-3 z-30 text-2xl leading-none text-pink-500"
+          onClick={onOpenSupport}
+        >
+          ♥
+        </button>
+      )}
       <Wordmark />
       <p className="text-center text-gray-700">{t('home.subtitle')}</p>
 

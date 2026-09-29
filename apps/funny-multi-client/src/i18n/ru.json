@@ -75,6 +75,20 @@
   "endScreen": {
     "supportServer": "Поддержать сервер"
   },
+  "support": {
+    "openLabel": "Поддержать игру",
+    "title": "Поддержка",
+    "intro": "Это добровольный подарок — вы ничего не должны, и это ничего не разблокирует.",
+    "close": "Закрыть",
+    "payId": "PayID",
+    "payIdBankNote": "В вашем банке отобразится: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Выберите разовый взнос",
+    "lightning": "Lightning",
+    "donate": "Пожертвовать",
+    "copy": "Копировать",
+    "copied": "Скопировано!"
+  },
   "gallery": {
     "share": "Показать картинки всей комнаты",
     "shareButton": "Поделиться",

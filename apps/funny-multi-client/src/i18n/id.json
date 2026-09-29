@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "Dukung server ini"
   },
+  "support": {
+    "openLabel": "Dukung game ini",
+    "title": "Dukungan",
+    "intro": "Ini adalah hadiah sukarela — tidak ada kewajiban dan tidak ada yang terbuka.",
+    "close": "Tutup",
+    "payId": "PayID",
+    "payIdBankNote": "Bank Anda akan menampilkan: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Pilih satu tingkat sekali bayar",
+    "lightning": "Lightning",
+    "donate": "Donasi",
+    "copy": "Salin",
+    "copied": "Disalin!"
+  },
   "gallery": {
     "share": "Bagikan gambar-gambar ruangan",
     "shareButton": "Bagikan",

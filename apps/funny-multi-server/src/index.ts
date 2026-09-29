@@ -202,7 +202,6 @@ export async function buildServer({
     const payload: LobbyUpdatePayload = {
       players: room.players,
       hostId: room.hostId,
-      donateUrl: process.env.DEPLOYER_DONATE_URL || null,
     };
     io.to(room.code).emit('lobby:update', payload);
   }

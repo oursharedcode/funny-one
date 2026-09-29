@@ -14,7 +14,7 @@
 // screen — including when the phase machine moves *backwards*, which is the
 // whole content of the forward-only lock.
 
-import { describe, expect, it, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+import { describe, expect, it, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import type { RevealStartPayload } from '@funny/shared';
 import { createSocketMock, setUrl } from './testutils/socketMock';
@@ -82,10 +82,23 @@ afterAll(() => {
   vi.useRealTimers();
 });
 
+// App fetches `${base}config` once at mount (T-9.4). Defaulting to a rejected
+// promise matches "offline, or a pre-T-9.3 server" — no support config, no ♥
+// — so every test that doesn't care about support rails behaves exactly as
+// before this fetch existed. Tests that do care call fetchMock.mockResolvedValueOnce.
+const fetchMock = vi.fn().mockRejectedValue(new Error('no /config in this test'));
+
 beforeEach(async () => {
   socketMock.reset();
   setUrl('');
+  fetchMock.mockClear();
+  fetchMock.mockRejectedValue(new Error('no /config in this test'));
+  vi.stubGlobal('fetch', fetchMock);
   await i18n.changeLanguage('en');
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('phase routing', () => {
@@ -190,7 +203,6 @@ describe('lobby:update', () => {
         { id: 's2', nickname: 'guest', isBot: false },
       ],
       hostId: 's2',
-      donateUrl: null,
     });
 
     expect(screen.getByText('guest')).toBeTruthy();
@@ -290,6 +302,63 @@ describe('spec §17: the transition is forward-only', () => {
     }
     expect(screenSlide.initial.x).toBe('-100%');
     expect(screenSlide.exit.x).toBe('100%');
+  });
+});
+
+describe('support (T-9.4)', () => {
+  function resolveConfig(support: Partial<Record<string, string | null>>): void {
+    fetchMock.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          support: {
+            payId: null,
+            payIdName: null,
+            sponsorsUrl: null,
+            lightningAddress: null,
+            donateUrl: null,
+            ...support,
+          },
+        }),
+    });
+  }
+
+  it('shows no ♥ on Home when the fetched config has no rail set', async () => {
+    resolveConfig({});
+    render(<App />);
+    await act(async () => {});
+    expect(screen.queryByLabelText('Support this game')).toBeNull();
+  });
+
+  it('shows no ♥ on Home when /config answers with something unparseable', async () => {
+    // Production answers unknown paths with index.html at HTTP 200 until its
+    // next deploy — the fetch must fail closed on that, not throw past the app.
+    fetchMock.mockResolvedValueOnce({ json: () => Promise.reject(new SyntaxError('not json')) });
+    render(<App />);
+    await act(async () => {});
+    expect(screen.queryByLabelText('Support this game')).toBeNull();
+  });
+
+  it('shows a ♥ on Home once the config has a rail, and opens the support screen from it', async () => {
+    resolveConfig({ payId: 'me@bank', payIdName: 'Me' });
+    render(<App />);
+    await act(async () => {});
+
+    const heart = screen.getByLabelText('Support this game');
+    fireEvent.click(heart);
+    expect(screen.getByText('me@bank')).toBeTruthy();
+
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(screen.queryByText('me@bank')).toBeNull();
+  });
+
+  it('offers the same support entry point from the end screen', async () => {
+    resolveConfig({ donateUrl: 'https://example.com/give' });
+    renderInLobby();
+    await act(async () => {});
+    socketMock.fire('game:over', undefined);
+
+    fireEvent.click(screen.getByText('Support this server'));
+    expect(screen.getByText('Donate')).toBeTruthy();
   });
 });
 

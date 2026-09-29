@@ -68,6 +68,20 @@
   "endScreen": {
     "supportServer": "לתמוך בשרת הזה"
   },
+  "support": {
+    "openLabel": "תמכו במשחק הזה",
+    "title": "תמיכה",
+    "intro": "זו מתנה וולונטרית — אינכם חייבים דבר, ושום דבר לא נפתח בעקבותיה.",
+    "close": "סגור",
+    "payId": "PayID",
+    "payIdBankNote": "הבנק שלכם יציג: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "בחרו תרומה חד־פעמית",
+    "lightning": "Lightning",
+    "donate": "לתרום",
+    "copy": "העתק",
+    "copied": "הועתק!"
+  },
   "gallery": {
     "share": "שיתוף הציורים של החדר",
     "shareButton": "שיתוף",

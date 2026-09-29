@@ -19,9 +19,10 @@ import WaitingScreen from './screens/WaitingScreen';
 import RevealScreen from './screens/RevealScreen';
 import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
+import SupportScreen from './components/SupportScreen';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
-import { baseUrl } from './basePath';
+import { baseUrl, withBase, serverOrigin } from './basePath';
 import { APP_VERSION } from './version';
 import type {
   AuthoredLanguage,
@@ -34,6 +35,7 @@ import type {
   RevealStartPayload,
   RoundStartPayload,
   RoundWaitingPayload,
+  SupportConfig,
 } from '@funny/shared';
 
 export type GamePhase = 'home' | 'lobby' | 'writing' | 'waiting' | 'reveal' | 'end';
@@ -55,8 +57,6 @@ export interface LobbyState {
    */
   language: AuthoredLanguage;
   players: Player[];
-  // Deployer's "Support this server" link, or null when unset (spec §20).
-  donateUrl: string | null;
 }
 
 export default function App() {
@@ -73,6 +73,30 @@ export default function App() {
   // notice banner (spec §12). Only the host's client ever receives the event.
   const [lostPlayer, setLostPlayer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // T-9.4/T-9.4a (FM-TIER-3/4): the support rails, fetched once at start-up so
+  // Home's ♥ can show before any room exists. null until the fetch resolves
+  // or fails — either way that means "no rails, no ♥" (see hasAnyRail).
+  const [support, setSupport] = useState<SupportConfig | null>(null);
+  const [supportOpen, setSupportOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    // Check the response's shape, not `res.ok`: a server without this route
+    // (production, until its next deploy) answers the path with index.html at
+    // status 200. `res.json()` throws on that HTML body, which the catch below
+    // treats the same as "offline" — no rails, no ♥.
+    fetch(serverOrigin() + withBase('config'))
+      .then((res) => res.json())
+      .then((data: { support?: SupportConfig }) => {
+        if (!cancelled && data?.support) setSupport(data.support);
+      })
+      .catch(() => {
+        // No config route reachable — leave support at null.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const onRoundStart = (data: RoundStartPayload): void => {
@@ -101,7 +125,6 @@ export default function App() {
               ...prev,
               players: data.players,
               hostId: data.hostId,
-              donateUrl: data.donateUrl,
             }
           : prev,
       );
@@ -157,7 +180,16 @@ export default function App() {
 
   let body: JSX.Element;
   if (phase === 'end' && lobby) {
-    body = <EndScreen lobby={lobby} readyIds={readyIds} gameOver={gameOver} gallery={gallery} />;
+    body = (
+      <EndScreen
+        lobby={lobby}
+        readyIds={readyIds}
+        gameOver={gameOver}
+        gallery={gallery}
+        support={support}
+        onOpenSupport={() => setSupportOpen(true)}
+      />
+    );
   } else if (phase === 'reveal' && reveal) {
     body = <RevealScreen reveal={reveal} onContinue={() => setPhase('end')} />;
   } else if (phase === 'writing' && round && lobby) {
@@ -187,6 +219,8 @@ export default function App() {
           setLobby(state);
           setPhase('lobby');
         }}
+        support={support}
+        onOpenSupport={() => setSupportOpen(true)}
       />
     );
   }
@@ -246,6 +280,9 @@ export default function App() {
             </button>
           </div>
         </div>
+      )}
+      {supportOpen && support && (
+        <SupportScreen support={support} onClose={() => setSupportOpen(false)} />
       )}
     </MotionConfig>
   );

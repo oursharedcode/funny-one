@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "Apoie este servidor"
   },
+  "support": {
+    "openLabel": "Apoie este jogo",
+    "title": "Apoio",
+    "intro": "Este é um presente voluntário — nada é devido e nada é desbloqueado.",
+    "close": "Fechar",
+    "payId": "PayID",
+    "payIdBankNote": "Seu banco mostrará: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Escolha um valor único",
+    "lightning": "Lightning",
+    "donate": "Doar",
+    "copy": "Copiar",
+    "copied": "Copiado!"
+  },
   "gallery": {
     "share": "Compartilhar as imagens da sala",
     "shareButton": "Compartilhar",

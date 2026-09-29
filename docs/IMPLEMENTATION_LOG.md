@@ -2088,19 +2088,63 @@ already name them). Production serves `/config` only after the next deploy.
 
 ---
 
-**RESUME HERE (2026-09-29, after Step 43).** Next is **T-9.4** (client `SupportScreen`: Home ♥ +
-end screen, rows follow the config, hidden when no rail is set) with **T-9.4a** in the same step
-(move `donateUrl` off `lobby:update` onto `GET /config`); then T-9.5 (docs). Owner decision
-2026-09-29: finish Phase 9 before the store-app phases. What T-9.3 leaves for the client: fetch
-`${base}config` once at start-up — in dev that is cross-origin (Vite → `SERVER_URL`), which the
-server's CORS already allows. The service worker has no rule matching that request, so it always
-goes to the network; offline means no rails and no ♥. Check the response's shape, not `res.ok`:
-a server without the route answers the path with `index.html` and status 200 (production does,
-checked 2026-09-29, until its next deploy). T-9.4 needs an in-browser pass: desktop and 360 px,
-one RTL language, and once with no rail set. Two owner items run in parallel and block nothing
-here: the Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks
-Phase S-3), and the paid Workers AI plan followed by T-9.2's production run (`--dry-run`,
-`--limit 5`, full).
+## Step 44 (task T-9.4, T-9.4a) — support screen: Home ♥, end screen, tap-to-copy (2026-09-29)
+
+**Shipped:** T-9.4 and T-9.4a, both closed and landed together as filed. `SupportScreen`:
+PayID → Sponsors → Lightning → donate URL, each row conditional on its field being set;
+PayID row states "your bank will display: <name>"; Sponsors row carries the "choose one-time"
+hint; Lightning row is a `lightning:` link plus a QR rendered by the existing `QRCode`
+component (owner decision: reuse over vendoring a new canvas encoder — design §10.2 corrected);
+copy buttons use `navigator.clipboard.writeText` with a `textarea`/`execCommand('copy')`
+fallback and a 1.5 s "Copied!" flash; header states the gift is voluntary, nothing owed. Entry
+points: a small ♥ in Home's corner (`hasAnyRail` gates it — hidden with no rail set) and a
+button on the end screen replacing the old bare donate link. All support strings in the 15
+locale catalogs. T-9.4a: `donateUrl` dropped from `LobbyUpdatePayload` and `broadcastLobby`;
+`App.tsx`, `HomeScreen` and `EndScreen` now read all five rails from one source, the `GET
+/config` route T-9.3 built; T-9.3's socket-leak test extended to set `DEPLOYER_DONATE_URL` too
+and assert it never reaches a socket event. `App.tsx` fetches `${base}config` once at mount,
+shape-checked (`data?.support`) rather than `res.ok`-checked, so production's pre-deploy
+`index.html`-at-200 response is treated the same as offline — no rails, no ♥ — matching the
+RESUME note's plan.
+
+Found and fixed along the way: the mount-time fetch used a same-origin relative URL, which in
+dev (client on :5173, server on :3000, per T-8.1's existing split) always resolved against
+Vite's own dev server and silently never reached the API — the support feature was broken in
+every local dev session while working in production, where the origins coincide. Generalized
+`socket.ts`'s existing inline dev/prod split into `basePath.ts`'s new `serverOrigin()`, used by
+both `socket.ts` (replacing its old inline constant) and the new fetch call. Covered by a test
+in `basePath.test.ts`. Confirmed by direct `curl` comparison of `:3000/config` vs `:5173/config`
+before writing the fix, not just by the Playwright check below.
+
+Gates: typecheck, lint, format:check clean. `npm test`, run outside the sandbox: client 225/225,
+server 214/214, shared 190/190, cloudflare 50/50, all green. `funny-one-client` showed 3 timing
+failures on the full run (`App.test.tsx`, `StoryGallery.test.tsx`) — this session never touched
+that workspace; re-run alone it was 113/113, confirming the documented load-flakiness rather
+than a regression. `npm audit`: 0 vulnerabilities (run before the `serverOrigin()` fix, which
+added no dependency). In-browser pass via headless Playwright plus manual `curl`: no-rail case
+clean at desktop 1280×800, mobile 360×740, and `he` (RTL) — no ♥ in any of the three; with-rail
+case at the same three — ♥ present, opens to the correct PayID/donate rows, Close leaves the ♥
+in place — confirmed both before and after the `serverOrigin()` fix (the fix being what made the
+with-rail case observable in dev at all).
+
+**Owed:** T-9.4's "gated off in store-shell builds" clause — not built. Owner decision this
+session (recommendation, approved): no shell build exists yet to gate against (B-1/B-2 are still
+Post-v1 backlog), so a flag today would gate nothing; deferred to whichever of B-1/B-2 lands
+first. Noted on both `steering/tasks.md`'s B-1/B-2 bullets and design.md's store-shell line.
+T-9.5 (docs: README, `.env.example`/DEPLOYMENT.md, ACCEPTANCE.md) not started. Gate 9's real-
+money device pass (PayID, Sponsors, Lightning, on desktop and Android) not run — needs the owner
+to hold the device and make real transfers.
+
+---
+
+**RESUME HERE (2026-09-29, after Step 44).** Next is **T-9.5** (docs: README "Support" and "Why
+no card payments" paragraphs, `.env.example` + DEPLOYMENT.md's four `DEPLOYER_*` variables, an
+ACCEPTANCE.md support-screen row). After that, Gate 9 itself needs the owner in the loop: the
+real-money device pass (a real $1 PayID transfer arrives under the displayed name, a $1
+Sponsors payment, a Lightning invoice from a second wallet — desktop and Android). Two owner
+items still run in parallel and block nothing here: the Funny One phone pass through
+`docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3), and the paid Workers AI
+plan followed by T-9.2's production run (`--dry-run`, `--limit 5`, full).
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
@@ -2117,6 +2161,6 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
-native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
-the stale header comment in `packages/shared/src/events.ts` (lines 23–25 still name T-9.3/T-9.4
-for the dropped Polar premium work).
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).
+
+*(2026-09-29, after Step 43 — carried: superseded by the note above.)*

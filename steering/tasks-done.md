@@ -1306,3 +1306,18 @@ unless they carry advisories:
       *Full suite: typecheck, lint, `prettier --check` clean; 774/774 tests (client 207, server
       214, funny-one-client 113, shared 190, cloudflare 50), run outside the sandbox; `npm
       audit` 0 vulnerabilities after Step 42's `undici` bump.*
+
+- [x] **T-9.4a (S)** *Filed 2026-09-29 (scope beyond T-9.4's text; owner decision the same
+      day):* move `donateUrl` off the `lobby:update` broadcast onto `GET /config`, so all five
+      support strings have one source: drop the field from `LobbyUpdatePayload` and
+      `broadcastLobby`, feed `App.tsx`, `HomeScreen` and `EndScreen` from the fetched config,
+      and extend T-9.3's socket test to `DEPLOYER_DONATE_URL`. Lands in the same step as T-9.4.
+      → FM-TIER-3
+      *Landed Step 44 (2026-09-29), together with T-9.4. `donateUrl` dropped from
+      `LobbyUpdatePayload`/`broadcastLobby`; the three client consumers read all five rails from
+      `GET /config` instead; T-9.3's socket-leak test now sets `DEPLOYER_DONATE_URL` too and
+      asserts it never reaches a socket event.*
+      *Full suite: typecheck, lint, `prettier --check` clean; client 225/225, server 214/214,
+      shared 190/190, cloudflare 50/50, run outside the sandbox (`funny-one-client`'s 3 timing
+      failures on the full run were load-flakiness, unrelated to this step — confirmed 113/113
+      on an isolated re-run); `npm audit` 0 vulnerabilities.*

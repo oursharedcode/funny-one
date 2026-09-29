@@ -76,6 +76,20 @@
   "endScreen": {
     "supportServer": "Soutenir ce serveur"
   },
+  "support": {
+    "openLabel": "Soutenir ce jeu",
+    "title": "Soutien",
+    "intro": "Ceci est un don volontaire — rien n'est dû et rien n'est débloqué.",
+    "close": "Fermer",
+    "payId": "PayID",
+    "payIdBankNote": "Votre banque affichera : {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Choisissez un montant ponctuel",
+    "lightning": "Lightning",
+    "donate": "Faire un don",
+    "copy": "Copier",
+    "copied": "Copié !"
+  },
   "gallery": {
     "share": "Partager les images de la salle",
     "shareButton": "Partager",

@@ -1290,3 +1290,19 @@ unless they carry advisories:
       are otherwise covered. A2–A3 also drove a real fix: `icon-512-maskable.png` (T-7.1 note).*
       *Full suite: typecheck, lint, `prettier --check` clean; 628/628 tests, run outside the
       sandbox; `npm audit` 0 vulnerabilities.*
+
+## Phase 9 — Commercial: pre-generated library + support rails (final phase, D-6/D-7)
+
+- [x] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
+      `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
+      set → passed through, never in any socket event. → FM-TIER-3
+      *Landed Step 43 (2026-09-29). The "config endpoint" did not exist, so the step created it
+      (owner decision 2026-09-29: a REST route, not a wider `lobby:update`): `GET ${base}config`
+      → `{ support: { payId, payIdName, sponsorsUrl, lightningAddress, donateUrl } }`, each
+      `string|null`, read once at boot, empty counted as unset; `SupportConfig` exported from
+      `@funny/shared`; design §10.2 corrected. Five tests — unset, empty, set, base-path mount,
+      and no rail value or field name in any event or ack through a create + join, proven by a
+      deliberate leak. `lobby:update` still carries `donateUrl`: moving it is T-9.4a.*
+      *Full suite: typecheck, lint, `prettier --check` clean; 774/774 tests (client 207, server
+      214, funny-one-client 113, shared 190, cloudflare 50), run outside the sandbox; `npm
+      audit` 0 vulnerabilities after Step 42's `undici` bump.*

@@ -6,7 +6,7 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–8 complete; Phase 9 (commercial rails) **paused 2026-09-20** by owner direction while two new fronts get planned — see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` (new product) and this file's B-1/B-2 (store apps, pulled forward). Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
+| **Progress** | Phases 0–8 complete; Phase 9 (commercial rails) **in progress** — paused 2026-09-20 by owner direction while two new fronts were planned (see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` for the new product and this file's B-1/B-2 for the store apps, pulled forward), resumed 2026-09-27; owner decision 2026-09-29: finish Phase 9 before the store-app phases. Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
 | **Build state** | Tracked per step in `docs/IMPLEMENTATION_LOG.md`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
@@ -101,13 +101,16 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       **Code + 11 tests landed Step 40 (2026-09-27)**, plus `--dry-run` (probes only) and
       `--limit N`. **Remaining:** the production run — needs the paid plan (T-9.1) and the
       production Worker pair in the shell; `--dry-run`, `--limit 5`, then full, on a quiet day.
-- [ ] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
-      `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
-      set → passed through, never in any socket event. → FM-TIER-3
 - [ ] **T-9.4 (M)** Client: `SupportScreen` (Home ♥ + end screen), tap-to-copy with "Copied!",
       PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
       QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
       off in store-shell builds. Tests: rows follow config, copy button, no rail → no ♥. → FM-TIER-4
+- [ ] **T-9.4a (S)** *Filed 2026-09-29 (scope beyond T-9.4's text; owner decision the same
+      day):* move `donateUrl` off the `lobby:update` broadcast onto `GET /config`, so all five
+      support strings have one source: drop the field from `LobbyUpdatePayload` and
+      `broadcastLobby`, feed `App.tsx`, `HomeScreen` and `EndScreen` from the fetched config,
+      and extend T-9.3's socket test to `DEPLOYER_DONATE_URL`. Lands in the same step as T-9.4.
+      → FM-TIER-3
 - [ ] **T-9.5 (S)** Docs: README "Support" and "Why no card payments" paragraphs; `.env.example`
       + DEPLOYMENT.md variables; ACCEPTANCE.md gets a support-screen row. → FM-TIER-3/6
 - **Gate 9**: library complete (object count in R2 = 10⁴; a full game on production leaves

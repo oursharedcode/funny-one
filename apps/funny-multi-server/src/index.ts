@@ -13,6 +13,7 @@ import type {
   LobbyUpdatePayload,
   Room,
   ServerToClientEvents,
+  SupportConfig,
 } from './types.js';
 import {
   RoomError,
@@ -138,6 +139,18 @@ export async function buildServer({
   });
 
   fastify.get(`${base}health`, async () => ({ ok: true }));
+
+  // T-9.3 (FM-TIER-3, design §10.2): support-rail addresses, read once at
+  // boot from DEPLOYER_* env vars. A REST route rather than a socket payload
+  // because the Home ♥ affordance has to show this before any room exists.
+  const support: SupportConfig = {
+    payId: process.env.DEPLOYER_PAYID || null,
+    payIdName: process.env.DEPLOYER_PAYID_NAME || null,
+    sponsorsUrl: process.env.DEPLOYER_SPONSORS_URL || null,
+    lightningAddress: process.env.DEPLOYER_LIGHTNING_ADDRESS || null,
+    donateUrl: process.env.DEPLOYER_DONATE_URL || null,
+  };
+  fastify.get(`${base}config`, async () => ({ support }));
 
   // Production: this same Fastify process serves the built client bundle —
   // one process, no nginx sidecar (spec §14). Unmatched routes fall back to

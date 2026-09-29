@@ -27,4 +27,5 @@ export type {
   ServerToClientEvents,
   StatsPayload,
   Story,
+  SupportConfig,
 } from '@funny/shared';

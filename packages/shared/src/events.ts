@@ -182,6 +182,18 @@ export interface LobbyUpdatePayload {
   donateUrl: string | null;
 }
 
+// The `support` object of the GET /config response (T-9.3, FM-TIER-3, design
+// §10.2). Read once at server boot from the DEPLOYER_* env vars; each field is
+// null when its var is unset. Fetched over REST, not a socket event, so it can
+// be shown on Home before any room exists.
+export interface SupportConfig {
+  payId: string | null;
+  payIdName: string | null;
+  sponsorsUrl: string | null;
+  lightningAddress: string | null;
+  donateUrl: string | null;
+}
+
 export interface RoundStartPayload {
   roundNumber: number;
   // Question text in the room's language.

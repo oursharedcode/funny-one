@@ -79,4 +79,5 @@ export type {
   ServerToClientEvents,
   StatsPayload,
   Story,
+  SupportConfig,
 } from './events.js';

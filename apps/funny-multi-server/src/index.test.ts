@@ -107,6 +107,131 @@ describe('http', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// T-9.3 — support-rail config surface (FM-TIER-3, design §10.2)
+// ---------------------------------------------------------------------------
+
+describe('GET /config', () => {
+  // Made-up values: a test must never be a place to copy a payment address from.
+  const NEW_RAILS = {
+    DEPLOYER_PAYID: 'payid-rail@example.com',
+    DEPLOYER_PAYID_NAME: 'EXAMPLE ACCOUNT NAME',
+    DEPLOYER_SPONSORS_URL: 'https://github.com/sponsors/example-rail',
+    DEPLOYER_LIGHTNING_ADDRESS: 'lightning-rail@wallet.example',
+  };
+  const DONATE_URL = 'https://example.com/donate';
+  const SUPPORT_VARS = [...Object.keys(NEW_RAILS), 'DEPLOYER_DONATE_URL'];
+
+  function clearSupportVars(): void {
+    for (const key of SUPPORT_VARS) delete process.env[key];
+  }
+
+  afterEach(clearSupportVars);
+
+  it('returns nulls when no DEPLOYER_* var is set', async () => {
+    // Cleared first: a developer's own .env may set any of them.
+    clearSupportVars();
+    const server = await boot();
+    const res = await server.fastify.inject({ method: 'GET', url: '/config' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({
+      support: {
+        payId: null,
+        payIdName: null,
+        sponsorsUrl: null,
+        lightningAddress: null,
+        donateUrl: null,
+      },
+    });
+  });
+
+  it('treats an empty DEPLOYER_* var as unset', async () => {
+    // `.env.example` ships the keys with empty values, so this is the state
+    // of every deployment that copied it and filled in nothing.
+    for (const key of SUPPORT_VARS) process.env[key] = '';
+    const server = await boot();
+    const res = await server.fastify.inject({ method: 'GET', url: '/config' });
+    expect(res.json<{ support: Record<string, unknown> }>().support).toEqual({
+      payId: null,
+      payIdName: null,
+      sponsorsUrl: null,
+      lightningAddress: null,
+      donateUrl: null,
+    });
+  });
+
+  it('passes through every DEPLOYER_* var when set', async () => {
+    Object.assign(process.env, NEW_RAILS, { DEPLOYER_DONATE_URL: DONATE_URL });
+    const server = await boot();
+    const res = await server.fastify.inject({ method: 'GET', url: '/config' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({
+      support: {
+        payId: NEW_RAILS.DEPLOYER_PAYID,
+        payIdName: NEW_RAILS.DEPLOYER_PAYID_NAME,
+        sponsorsUrl: NEW_RAILS.DEPLOYER_SPONSORS_URL,
+        lightningAddress: NEW_RAILS.DEPLOYER_LIGHTNING_ADDRESS,
+        donateUrl: DONATE_URL,
+      },
+    });
+  });
+
+  it('is mounted under the base path', async () => {
+    const server = await buildServer({ logger: false, basePath: '/funny37-game/' });
+    built = server;
+    const under = await server.fastify.inject({ method: 'GET', url: '/funny37-game/config' });
+    expect(under.statusCode).toBe(200);
+    const root = await server.fastify.inject({ method: 'GET', url: '/config' });
+    expect(root.statusCode).toBe(404);
+  });
+
+  it('never puts a new rail in any socket event or ack', async () => {
+    // Static config stays off the socket (FM-TIER-3). With all four new vars
+    // set, nothing either client receives through a create + join — event or
+    // ack — may carry one of the values. `DEPLOYER_DONATE_URL` is left out on
+    // purpose: `lobby:update` still carries `donateUrl` until it moves to
+    // /config with the SupportScreen.
+    Object.assign(process.env, NEW_RAILS);
+    const h = await listen();
+    const host = await connect(h);
+    const joiner = await connect(h);
+    const received: unknown[] = [];
+    host.onAny((...args: unknown[]) => received.push(args));
+    joiner.onAny((...args: unknown[]) => received.push(args));
+
+    // The host's first lobby:update is the create's own, so "a lobby:update
+    // arrived" is not enough — wait for the one that lists both players.
+    const seesBothPlayers = (socket: Socket): Promise<void> =>
+      new Promise((resolve, reject) => {
+        socket.on('lobby:update', (payload: { players: unknown[] }) => {
+          if (payload.players.length === 2) resolve();
+        });
+        setTimeout(() => reject(new Error('timed out waiting for the join broadcast')), 5000);
+      });
+
+    const created = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
+      nickname: 'Ada',
+      language: 'en',
+    });
+    const [joined] = await Promise.all([
+      emitWithAck(joiner, 'room:join', { roomCode: created.roomCode, nickname: 'Bob' }),
+      seesBothPlayers(host),
+      seesBothPlayers(joiner),
+    ]);
+    received.push(created, joined);
+
+    const traffic = JSON.stringify(received);
+    // Guards the assertions below against passing on an empty recording.
+    expect(traffic).toContain('lobby:update');
+    for (const value of Object.values(NEW_RAILS)) {
+      expect(traffic).not.toContain(value);
+    }
+    for (const field of ['payId', 'payIdName', 'sponsorsUrl', 'lightningAddress']) {
+      expect(traffic).not.toContain(`"${field}"`);
+    }
+  });
+});
+
 describe('socket.io', () => {
   it('accepts a websocket connection', async () => {
     const h = await listen();

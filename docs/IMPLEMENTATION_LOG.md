@@ -2014,7 +2014,7 @@ that one item; it gates T-9.2's production run and Gate 9's "library complete" l
 
 ---
 
-**RESUME HERE (2026-09-28, after Step 41).** Next is **T-9.3** (server: `DEPLOYER_PAYID`,
+~~**RESUME HERE (2026-09-28, after Step 41).** Next is **T-9.3** (server: `DEPLOYER_PAYID`,
 `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` → the config
 endpoint's `support` object, never in a socket event; tests unset → nulls, set → passed through)
 — every value is now known (Step 41), so T-9.3 and then T-9.4 (the `SupportScreen`) can land
@@ -2039,4 +2039,84 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
-native-speaker review.
+native-speaker review.~~ *(carried — see Step 42 below.)*
+
+## Step 42 — `undici` 7.29.0 → 7.30.0: `npm audit` clean again (2026-09-29)
+
+**Shipped:** a lockfile-only bump, found while running T-9.3's gates and not caused by that
+step's diff. `npm audit` reported one moderate advisory, GHSA-3wwx-pv8p-q78v (denial of service,
+`undici` 7.28.0–7.29.0). `undici` is in the tree only through `jsdom@28.1.0`, a dev dependency
+of the Funny Multi client's tests, and `jsdom`'s declared range `^7.21.0` already admits the
+fixed release — so `npm audit fix` changed three lines of `package-lock.json` (version, resolved
+URL, integrity hash) and nothing else; no `package.json` changed. Production was never exposed:
+`npm audit --omit=dev` was clean before the bump, and the runtime image installs with
+`--omit=dev`. `npm audit signatures` verifies the new tree. Owner decision 2026-09-29: fix now,
+in its own commit, rather than carry a known advisory through the rest of Phase 9. An
+`overrides` pin and a `jsdom` major bump were considered and rejected — an in-range fix needs
+neither, and an override would outlive its reason.
+
+**Owed:** nothing. Noted on the way: CI (`.github/workflows/ci.yml`) has no `npm audit` step, so
+that gate is local-only. Adding one is an owner decision — it would also turn CI red on a day
+nobody touched the code.
+
+## Step 43 (task T-9.3) — `GET /config`: the support rails' config surface (2026-09-29)
+
+**Shipped:** T-9.3, closed. The "config endpoint" that the task and design §10.2 assumed did
+not exist — `donateUrl` has always travelled in the `lobby:update` broadcast (flagged at Step
+17). Owner decision 2026-09-29: a new REST route, not a wider socket payload, because the Home ♥
+has to show before any room exists. `GET ${base}config` returns `{ support: { payId, payIdName,
+sponsorsUrl, lightningAddress, donateUrl } }`, each `string | null`, built once at boot from the
+four new `DEPLOYER_*` vars plus `DEPLOYER_DONATE_URL`; an empty value counts as unset, which is
+what copying `.env.example` untouched gives. `SupportConfig` is exported from `@funny/shared`
+for T-9.4's client. Design §10.2 corrected. Five tests: unset → nulls; empty → nulls; set →
+passed through; mounted under the base path (root `/config` is 404); and the socket guarantee —
+with all four rails set, two real sockets go through a create and a join while every event and
+both acks are recorded, and neither a rail value nor a rail field name appears. That test was
+proven non-vacuous by a deliberate leak into `lobby:update`, since reverted. Test values are
+made-up `example` addresses, never the real rails. Two defects caught in review and fixed before
+logging: the route read the environment on every request although the design says "once at
+boot", and the socket test checked one `lobby:update` where the task says "any socket event".
+Verified on the built server under `BASE_PATH=funny37-game`: `/funny37-game/config` → 200
+`application/json`, root `/config` → 404. Gates: typecheck, lint, format:check, `npm test` (5
+workspaces, 774 tests, all green), `npm audit` 0 vulnerabilities. No in-browser check: nothing
+consumes the route until T-9.4.
+
+**Owed:** `lobby:update` still carries `donateUrl` — the move to `/config` is filed as T-9.4a
+and lands with the `SupportScreen`, when the socket test extends to `DEPLOYER_DONATE_URL`.
+`DEPLOYMENT.md` does not describe the four variables yet (T-9.5; `.env.example` and README
+already name them). Production serves `/config` only after the next deploy.
+
+---
+
+**RESUME HERE (2026-09-29, after Step 43).** Next is **T-9.4** (client `SupportScreen`: Home ♥ +
+end screen, rows follow the config, hidden when no rail is set) with **T-9.4a** in the same step
+(move `donateUrl` off `lobby:update` onto `GET /config`); then T-9.5 (docs). Owner decision
+2026-09-29: finish Phase 9 before the store-app phases. What T-9.3 leaves for the client: fetch
+`${base}config` once at start-up — in dev that is cross-origin (Vite → `SERVER_URL`), which the
+server's CORS already allows. The service worker has no rule matching that request, so it always
+goes to the network; offline means no rails and no ♥. Check the response's shape, not `res.ok`:
+a server without the route answers the path with `index.html` and status 200 (production does,
+checked 2026-09-29, until its next deploy). T-9.4 needs an in-browser pass: desktop and 360 px,
+one RTL language, and once with no rail set. Two owner items run in parallel and block nothing
+here: the Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks
+Phase S-3), and the paid Workers AI plan followed by T-9.2's production run (`--dry-run`,
+`--limit 5`, full).
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. SSH to the VM is
+allowed only from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>`
+(current IP from `curl https://api.ipify.org`). Production deploys are run by the owner in a Git
+Bash terminal — the agent's auto mode refuses them. The local `.env`'s Worker secret is not
+production's: any live Worker call from this PC needs the production pair exported first.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
+games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
+the stale header comment in `packages/shared/src/events.ts` (lines 23–25 still name T-9.3/T-9.4
+for the dropped Polar premium work).

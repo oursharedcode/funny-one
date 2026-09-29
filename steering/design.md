@@ -470,9 +470,13 @@ retired by D-6; nothing of it was built.*
 
 - **Server**: four optional env vars next to `DEPLOYER_DONATE_URL` — `DEPLOYER_PAYID`,
   `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` — read once at
-  boot and returned by the same config endpoint that already carries `donateUrl`
-  (`support: { payId, payIdName, sponsorsUrl, lightningAddress, donateUrl }`, each `string|null`).
-  Nothing else server-side: no accounts, no webhooks, no payment state.
+  boot and returned by a new `GET /config` REST route, not the `lobby:update` socket broadcast
+  that carries `donateUrl` today (five static strings do not belong on a per-join payload, and
+  Home needs them before any room exists). Shape: `{ support: { payId, payIdName, sponsorsUrl,
+  lightningAddress, donateUrl } }`, each `string|null`. T-9.4a moves `donateUrl` off
+  `lobby:update` onto this same route so there is one source of truth. Nothing else
+  server-side: no accounts, no webhooks, no payment state. *(Corrected 2026-09-29 — no such
+  endpoint existed until T-9.3.)*
 - **Client**: `SupportScreen` opened from Home (♥ affordance) and from the end screen (replacing
   the single donate button when any rail is set). Order: PayID → Sponsors → Lightning → donate
   URL. Each row: label, the address in a `<code>`, a copy button using `navigator.clipboard`

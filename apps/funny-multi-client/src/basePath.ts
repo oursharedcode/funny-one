@@ -30,7 +30,7 @@ export function homeUrl(): string {
 }
 
 /**
- * Origin of the Socket.IO/REST server. In dev the client (Vite, :5173) and
+ * Origin of the Socket.IO/REST server. In dev the client (Vite, :5183) and
  * server (:3000) run on separate origins, so a same-origin fetch from the
  * client never reaches the server — it silently hits Vite's dev server
  * instead. In prod they're the same origin. Socket.IO has needed this split

@@ -2137,7 +2137,7 @@ to hold the device and make real transfers.
 
 ---
 
-**RESUME HERE (2026-09-29, after Step 44).** Next is **T-9.5** (docs: README "Support" and "Why
+~~**RESUME HERE (2026-09-29, after Step 44).** Next is **T-9.5** (docs: README "Support" and "Why
 no card payments" paragraphs, `.env.example` + DEPLOYMENT.md's four `DEPLOYER_*` variables, an
 ACCEPTANCE.md support-screen row). After that, Gate 9 itself needs the owner in the loop: the
 real-money device pass (a real $1 PayID transfer arrives under the displayed name, a $1
@@ -2161,6 +2161,77 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
-native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).~~ *(carried — see Step 45 below.)*
 
 *(2026-09-29, after Step 43 — carried: superseded by the note above.)*
+
+## Step 45 — `engine.io`, `fast-uri`, `brace-expansion` bumps: `npm audit` clean again (2026-09-30)
+
+**Shipped:** a lockfile-only bump, found while running Step 46's gates and not caused by that
+step's diff. `npm audit` reported three advisories: `engine.io` 6.6.9 → 6.6.11
+(GHSA-2gc4-cqfq-p2gv, high, protocol-revision-mismatch DoS — under `socket.io` on the Funny
+Multi server); `fast-uri` 4.1.4 → 4.2.1 and 3.1.7 → 3.1.8 (GHSA-hrr3-gc8f-f4qj,
+GHSA-jvvf-x445-j334, moderate — under fastify's `ajv` and `fast-json-stringify`); and
+`brace-expansion` 1.1.18 → 1.1.21, 2.1.4 → 2.1.7, 5.0.9 → 5.0.12 (GHSA-q2hr-2g5m-vwhr,
+GHSA-qhr7-859c-m2p7, GHSA-6j4f-fj2g-mc7p, high, DoS — mostly ESLint/glob/workbox tooling, but 5.x
+also sits under `@fastify/static`'s `glob`). Every fixed release is inside its dependents'
+declared ranges, so `npm audit fix` changed exactly those 13 lockfile entries (and `engine.io`
+6.6.11 drops its `base64id` dependency); no `package.json` changed. Unlike Step 42, production
+was exposed: `npm audit --omit=dev` reported all three. `npm audit signatures` verifies the new
+tree. Owner decision 2026-09-30: fix now, in its own commit ahead of the port move's, per the
+Step 42 rule. Gates on the lockfile-only tree: typecheck, lint, format:check clean; `npm test`
+outside the sandbox — client 225/225, server 214/214, funny-one-client 113/113, shared 190/190,
+cloudflare 50/50; `npm audit` 0 vulnerabilities.
+
+**Owed:** the fix reaches production only with the next owner-run deploy (`deploy/ship.sh`);
+until then the live server still runs `engine.io` 6.6.9.
+
+## Step 46 — dev ports into funnyone's decade: 5173 → 5183, 5174 → 5184 (2026-09-30)
+
+**Shipped:** the move recorded for this repo in the machine port register
+(`C:\Mark\Dev\machine\ports.md`, made 2026-09-30 because several projects' agent sessions
+share this laptop; each project owns a decade, funnyone's is the 5180s plus 3000). Both Vite
+clients sat on geoheli's numbers: `funny-multi-client` 5173 → 5183 (`vite.config.ts:173`),
+`funny-one-client` 5174 → 5184 (`vite.config.ts:76`); both keep `strictPort`, so a busy port
+fails loudly instead of bumping. The server's dev CORS origin followed
+(`apps/funny-multi-server/src/index.ts:74`, and its test at `index.test.ts:95,97`), as did the
+`serverOrigin()` comment in `basePath.ts`. `scripts/funny-one-screens.mjs` and
+`funny-one-offline.mjs` ask Vite for port 0 and needed nothing; production is untouched (the
+client is served from the server's own origin there). The old numbers in earlier log entries are
+history and stay. In the `machine` repo, the register's two funnyone rows now read 5183/5184 and
+its rule line says only 3000 is still shared (smartmaphue's move to 3001 is its own session).
+Gates on the final tree: typecheck, lint, format:check clean; `npm test` outside the sandbox all
+green (225/214/113/190/50); `npm audit` 0 after Step 45. Both clients, started from their real
+configs, answered 200 on 5183 and 5184.
+
+**Owed:** nothing.
+
+---
+
+**RESUME HERE (2026-09-30, after Step 46).** Next is **T-9.5** (docs: README "Support" and "Why
+no card payments" paragraphs, `.env.example` + DEPLOYMENT.md's four `DEPLOYER_*` variables, an
+ACCEPTANCE.md support-screen row). After that, Gate 9 itself needs the owner in the loop: the
+real-money device pass (a real $1 PayID transfer arrives under the displayed name, a $1
+Sponsors payment, a Lightning invoice from a second wallet — desktop and Android). Owner items
+that block nothing here: a production deploy to take Step 45's `engine.io` fix live; the Funny
+One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3); and
+the paid Workers AI plan followed by T-9.2's production run (`--dry-run`, `--limit 5`, full).
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. Dev ports are
+5183 (Funny Multi client), 5184 (Funny One client) and 3000 (server); read
+`C:\Mark\Dev\machine\ports.md` before binding anything new. SSH to the VM is allowed only from
+the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
+`curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
+the agent's auto mode refuses them. The local `.env`'s Worker secret is not production's: any
+live Worker call from this PC needs the production pair exported first.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
+games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).

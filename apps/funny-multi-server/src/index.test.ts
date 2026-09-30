@@ -92,9 +92,9 @@ describe('http', () => {
     const res = await server.fastify.inject({
       method: 'GET',
       url: '/health',
-      headers: { origin: 'http://localhost:5173' },
+      headers: { origin: 'http://localhost:5183' },
     });
-    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5173');
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5183');
   });
 
   it('serves no client bundle outside production', async () => {

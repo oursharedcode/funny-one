@@ -71,7 +71,7 @@ import { buildStats, broadcastStats } from './stats.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
-const DEV_CLIENT_ORIGIN = 'http://localhost:5173';
+const DEV_CLIENT_ORIGIN = 'http://localhost:5183';
 
 // Number of trusted reverse-proxy hops in front of this process, for
 // `clientIp`'s x-forwarded-for parsing (rateLimit.ts). Default 1 matches

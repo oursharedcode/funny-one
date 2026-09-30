@@ -110,12 +110,10 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       2026-09-29, reuse over vendoring — design §10.2 corrected). **Remaining:** the store-shell
       gate itself — no flag exists because no store shell exists yet; deferred to whichever of
       B-1/B-2 lands first (noted there).*
-- [ ] **T-9.5 (S)** Docs: README "Support" and "Why no card payments" paragraphs; `.env.example`
-      + DEPLOYMENT.md variables; ACCEPTANCE.md gets a support-screen row. → FM-TIER-3/6
 - **Gate 9**: library complete (object count in R2 = 10⁴; a full game on production leaves
   `/stats` unchanged); Support screen on desktop + Android: a real $1 PayID transfer arrives
   under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
-  from a second wallet arrives.
+  from a second wallet arrives. The device pass is scripted in `docs/ACCEPTANCE.md` Part D.
 
 ## Post-v1 backlog (not scheduled)
 

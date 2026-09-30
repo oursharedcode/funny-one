@@ -18,6 +18,9 @@ flow after each flip starts with a fresh room.
 Fill in the template at the end as you go. Record the app commit shown in the page footer /
 `git rev-parse --short HEAD` of what `deploy/ship.sh` shipped.
 
+Part D (Gate 9: the Support screen and one real gift per rail) was added later, on
+2026-10-01, and runs as a session of its own with its own results table at the very end.
+
 ---
 
 ## Part A — Gate 7 device legs
@@ -113,3 +116,54 @@ rooms reset with the restart, so **start a fresh room after each flip**.
 **Sign-off:** T-8.2 passes when every B and C row is _pass_. Gate 7 closes when A2–A4 pass and
 A1 is later run on a borrowed iPhone. Gate 8 additionally needs the "stranger self-deploys from
 README alone" judgement, made against `DEPLOYMENT.md` after this session.
+
+---
+
+## Part D — Support screen and real gifts (Gate 9)
+
+Checks the Support screen (FM-TIER-4) on **A = desktop Chrome** and **C = the Android phone**,
+and sends one real $1 gift over each rail (FM-TIER-3). Same URL as above.
+
+**Before the session:**
+
+1. Production runs Step 44 or later (`deploy/ship.sh`). Until then
+   `/funny37-game/config` answers with the app's `index.html`, and there is no ♥.
+2. The agent adds the four rails to `~/funny/.env` on the VM — T-9.1's values:
+   `DEPLOYER_PAYID=funny@oursharedcode.com`, `DEPLOYER_PAYID_NAME="MARK WEB TOOLS"`,
+   `DEPLOYER_SPONSORS_URL=https://github.com/sponsors/oursharedcode`,
+   `DEPLOYER_LIGHTNING_ADDRESS=curvyhockey439@walletofsatoshi.com` — restarts
+   (`docker compose --profile caddy up -d`), and checks
+   `curl https://www.staging-oursharedcode.com/funny37-game/config` returns all four.
+3. The owner has: a bank account other than the one the PayID pays into; a GitHub account
+   other than `oursharedcode` (an account cannot sponsor itself); a second Lightning wallet
+   (not the receiving Wallet of Satoshi) with a few dollars in it.
+
+| #   | Step | Pass when |
+| --- | ---- | --------- |
+| D1  | **Entry points.** On A, then on C: open the URL, tap the ♥ in the Home screen's top-right corner, then close with ×. Then finish a game (three tabs on A are enough) and tap _Support this server_ under the end-screen buttons. | On both devices the ♥ opens _Support_: the line _This is a voluntary gift — nothing is owed and nothing unlocks._, then **PayID → GitHub Sponsors → Lightning** in that order (plus _Donate_ last if the VM's `.env` also sets `DEPLOYER_DONATE_URL`). PayID shows _Your bank will display: MARK WEB TOOLS_; Sponsors shows _Choose a one-time tier_; Lightning shows the address as a link and a QR code. × returns to Home with the ♥ still there. The end-screen link opens the same screen. |
+| D2  | **Tap-to-copy.** On C, tap **Copy** on the PayID row and paste into any notes app; the same for the Lightning row. Repeat both on A. | The button reads _Copied!_ for about 1.5 s, then _Copy_ again. Each paste is exactly the address shown — no spaces, no `lightning:` prefix. |
+| D3  | **PayID gift.** In the other bank's app, pay $1 to the PayID pasted in D2. | Before you confirm, the bank shows the payee as **MARK WEB TOOLS**, the same name as the screen. The $1 arrives in the receiving account (Osko: usually within a minute). |
+| D4  | **Sponsors gift.** On A, signed in to GitHub as the other account, tap the Sponsors link; pick the **$1 one-time** tier and pay. | The link opens `github.com/sponsors/oursharedcode` in a new tab, with the one-time tiers ($1/$3/$5) offered. After paying, `oursharedcode`'s Sponsors dashboard lists a $1 one-time sponsorship (the money follows on GitHub's payout schedule). |
+| D5  | **Lightning gift.** (a) On A, scan the screen's QR code with the second wallet and pay about $1. (b) On C, tap the Lightning address link. | (a) The wallet reads the address from the QR code, fetches an invoice and pays; the payment shows in Wallet of Satoshi within seconds. (b) Android opens a Lightning wallet app, or offers a chooser, with the address filled in — paying again is optional. |
+
+### Part D results
+
+| Field      | Value |
+| ---------- | ----- |
+| Date       |       |
+| App commit |       |
+| A          |       |
+| C          |       |
+| Tester(s)  |       |
+
+| #   | Result (pass / fail / deferred) | Note |
+| --- | ------------------------------- | ---- |
+| D1  |                                 |      |
+| D2  |                                 |      |
+| D3  |                                 |      |
+| D4  |                                 |      |
+| D5  |                                 |      |
+
+**Sign-off:** Gate 9's support-screen leg passes when D1–D5 are _pass_. Gate 9 also needs the
+library complete (R2 holds all 10⁴ pictures; a full game on production leaves `/stats`
+unchanged) — T-9.2's production run, not part of this script.

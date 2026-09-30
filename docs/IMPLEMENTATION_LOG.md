@@ -2208,7 +2208,7 @@ configs, answered 200 on 5183 and 5184.
 
 ---
 
-**RESUME HERE (2026-09-30, after Step 46).** Next is **T-9.5** (docs: README "Support" and "Why
+~~**RESUME HERE (2026-09-30, after Step 46).** Next is **T-9.5** (docs: README "Support" and "Why
 no card payments" paragraphs, `.env.example` + DEPLOYMENT.md's four `DEPLOYER_*` variables, an
 ACCEPTANCE.md support-screen row). After that, Gate 9 itself needs the owner in the loop: the
 real-money device pass (a real $1 PayID transfer arrives under the displayed name, a $1
@@ -2234,4 +2234,71 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 `apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
-native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today).~~ *(carried — see Step 47 below.)*
+
+## Step 47 (task T-9.5) — support docs: README, `.env.example`, DEPLOYMENT.md, ACCEPTANCE.md Part D (2026-10-01)
+
+**Shipped:** T-9.5, closed. Most of it already existed: Step 17's D-6 rewrite (2026-09-16) had
+put the support and no-card text into README's AGPL section and all five rails into
+`.env.example`, before T-9.3/T-9.4 built anything. So this step moved and corrected the text
+rather than writing it from scratch. README: a new "Support" section — the ♥ on Home and
+_Support this server_ on the end screen, the three rails (tap-to-copy on PayID and Lightning;
+Sponsors is a link with the one-time hint; Lightning is also a link and a QR code), the
+`DEPLOYER_*` variables, no ♥ with nothing set — and under it "Why no card payments" (the
+$15–30 dispute fee on a $1 gift, and why each of the three rails has no chargeback; the
+Sponsors wording follows `local_docs/gift-payments-no-chargeback-research.md`: GitHub is the
+merchant of record, so a dispute is not debited from the recipient). The AGPL section keeps
+the "nothing to buy" paragraph (FM-TIER-6). `.github/FUNDING.yml`'s comment now names the
+"Support" heading. `.env.example`: the rails are read once at boot and served at
+`<BASE_PATH>/config`, so restart after editing. DEPLOYMENT.md: a new "Optional: the Support
+screen" subsection under 2a — an example block (no inline comments, and the PayID name
+quoted, so Compose's env-file parser reads it safely), a note per variable, the restart
+command, `curl …/config` to check — and a fifth item in the five-minute check (no ♥ → `curl`
+`/config`). `docs/ACCEPTANCE.md`: Part D, the script for Gate 9's real-money device pass — the
+preconditions (production on Step 44 or later; the agent sets T-9.1's four values on the VM;
+the owner brings a second bank account, a second GitHub account and a second Lightning wallet)
+and rows D1–D5 (entry points and screen contents on desktop and Android, tap-to-copy, then one
+$1 gift each over PayID, Sponsors and Lightning), with their own results table. `steering/tasks.md`'s
+Gate 9 line points at it. Checked on the way: production's `/funny37-game/config` still
+answers with `index.html` (200, `text/html`) — Steps 43–46 are not deployed yet.
+
+Gates: typecheck, lint, format:check clean; `npm test` outside the sandbox — client 225/225,
+server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 50/50; `npm audit` 0
+vulnerabilities. Docs-only step, so no in-browser pass.
+
+**Owed:** nothing inside T-9.5. Noted: design §10.2 says the "Copied!" state lasts 2 s; the
+code (`SupportScreen.tsx`) and Step 44's entry say 1.5 s, and Part D follows the code. One of
+the two needs correcting — owner's call, not blocking.
+
+---
+
+**RESUME HERE (2026-10-01, after Step 47).** Phase 9's agent-only work is done. What is left
+needs the owner in the loop, in this order: (1) a production deploy (`deploy/ship.sh`, owner
+in Git Bash) — it takes Steps 43–47 live, including `GET /config` and Step 45's `engine.io`
+fix; (2) the agent sets the four `DEPLOYER_*` rails in `~/funny/.env` on the VM, restarts and
+checks `curl …/funny37-game/config` (`docs/ACCEPTANCE.md` Part D, "Before the session");
+(3) the Part D device session, D1–D5, recorded in its results table; (4) the paid Workers AI
+plan, then T-9.2's production run (`--dry-run`, `--limit 5`, full) — the library half of
+Gate 9. Gate 9 closes when both halves pass; then the store-app phases (owner decision
+2026-09-29: Phase 9 first). The Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md`
+(closes Gate FO, unblocks Phase S-3) still runs in parallel and blocks nothing here.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. Dev ports are
+5183 (Funny Multi client), 5184 (Funny One client) and 3000 (server); read
+`C:\Mark\Dev\machine\ports.md` before binding anything new. SSH to the VM is allowed only from
+the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
+`curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
+the agent's auto mode refuses them. The local `.env`'s Worker secret is not production's: any
+live Worker call from this PC needs the production pair exported first.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
+games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
+design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47).

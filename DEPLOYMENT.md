@@ -116,6 +116,35 @@ exit
 address, legacy donate URL — for the Support screen, `MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
 `ROUND_DURATION_MS`, `PORT`). The defaults are right for a family-sized deployment.
 
+#### Optional: the Support screen
+
+The in-game **Support** screen (♥ on Home, _Support this server_ on the end screen) lists
+gift addresses — yours, on your deployment; none are in the code. Add any of these lines to
+the same `.env`; the screen shows only the rails you set, and with none set there is no ♥:
+
+```bash
+DEPLOYER_PAYID=you@example.com
+DEPLOYER_PAYID_NAME="YOUR REGISTERED NAME"
+DEPLOYER_SPONSORS_URL=https://github.com/sponsors/<you>
+DEPLOYER_LIGHTNING_ADDRESS=you@your-wallet.com
+DEPLOYER_DONATE_URL=https://example.com/donate
+```
+
+- `DEPLOYER_PAYID` is the email, phone number or ABN you registered as a PayID (Osko, so
+  Australian banks only). `DEPLOYER_PAYID_NAME` must match the registered account name to the
+  letter: the payer's bank shows that name before they confirm, and a mismatch makes people
+  abort. Check it with a $1 transfer from another account.
+- `DEPLOYER_SPONSORS_URL`: GitHub Sponsors defaults to monthly, so create _one-time_ tiers
+  and a gift stays a one-off (the screen tells players to choose one).
+- `DEPLOYER_LIGHTNING_ADDRESS` is a Lightning address (`user@wallet`), shown as a
+  `lightning:` link and a QR code. Pay it once from a second wallet before you publish it.
+- `DEPLOYER_DONATE_URL` is any other single link, listed last.
+
+The server reads these once at boot, so restart it after editing:
+`cd ~/funny && docker compose --profile caddy up -d` (without `--profile caddy` if you run
+your own proxy), or just re-run `ship.sh`. Then `curl https://<SITE_HOST><BASE_PATH>/config`
+shows what the screen will list, with `null` for each rail left unset.
+
 ### 2b. From your PC: ship it
 
 From your clone, on any machine with Docker (a 1 GB host is too small to build on, so the
@@ -196,4 +225,7 @@ trusted window).
    `wrangler secret list` in `cloudflare/`.
 4. Play the same story again: the second reveal is instant (R2 cache hit), and the Worker's
    `/stats` count (the `curl` from step 1) did not move.
-5. Logs, when something is off: `ssh ubuntu@<host-ip> 'cd ~/funny && docker compose logs --tail 50'`.
+5. If you set any `DEPLOYER_*` rail: the Home screen has a ♥ in its corner that opens the
+   Support screen with exactly those rails. No ♥: `curl` the `/config` route — all `null`
+   means the server has not restarted since the `.env` edit, or a variable name is misspelt.
+6. Logs, when something is off: `ssh ubuntu@<host-ip> 'cd ~/funny && docker compose logs --tail 50'`.

@@ -49,18 +49,36 @@ self-hoster. If you deploy your own copy — modified or not — the AGPL requir
 your source available to your users, same as everyone else deploying this game.
 
 There is nothing to buy: no premium tier, no license keys, no paywall. A self-hosted
-deployment gets every feature this repo has. The game is free to play; if you'd like to say
-thanks, the official deployment has a **Support** screen (♥ on the Home screen) with
-voluntary gifts — nothing is owed, nothing is unlocked.
+deployment gets every feature this repo has — a gift is support, never a key to anything.
 
-Only chargeback-free rails are offered: **PayID/Osko** (Australian banks), **GitHub
-Sponsors** (choose _one-time_; GitHub is the merchant of record; the **Sponsor** button on
-this repo is the same account, wired by `.github/FUNDING.yml`) and **Bitcoin Lightning**.
-No card checkout, Stripe, PayPal, Ko-fi or Buy Me a Coffee: on those a single disputed $1
-gift costs the recipient $15–30 in dispute fees, which is a bet a small project cannot take.
-The addresses are not in the code — a deployer sets their own via `DEPLOYER_PAYID`,
-`DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` (and the older
-`DEPLOYER_DONATE_URL`; see `.env.example`), so gifts on any deployment go to whoever runs it.
+## Support
+
+The game is free to play. If you'd like to say thanks, the official deployment has a
+**Support** screen — the ♥ in the corner of the Home screen, or _Support this server_ on the
+end screen — for voluntary gifts: nothing is owed, nothing is unlocked. It offers three
+rails:
+
+- **PayID/Osko** (Australian banks): tap to copy the PayID. The screen also shows the account
+  name your bank will display, so you can check it before you confirm.
+- **GitHub Sponsors**: choose a _one-time_ tier — the Sponsors flow defaults to monthly. The
+  **Sponsor** button on this repo is the same account, wired by `.github/FUNDING.yml`.
+- **Bitcoin Lightning**: tap to copy the address, open it as a `lightning:` link in your
+  wallet app, or scan its QR code from another device.
+
+On your own deployment the addresses are yours. None are in the code: set `DEPLOYER_PAYID`
+and `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` (and, if
+you like, the older single-link `DEPLOYER_DONATE_URL`) in the server's `.env`, and gifts go
+to whoever runs the server. Leave them all unset and neither the ♥ nor the screen appears.
+See [DEPLOYMENT.md](DEPLOYMENT.md#optional-the-support-screen).
+
+### Why no card payments
+
+No card checkout — not Stripe, PayPal, Ko-fi or Buy Me a Coffee, nor any other card-based
+merchant of record. On those, a single disputed $1 gift costs the recipient $15–30 in
+dispute fees, which is a bet a small project cannot take. Only chargeback-free rails are
+offered: a PayID transfer is a push from the payer's own bank; on GitHub Sponsors GitHub is
+the merchant of record, so a dispute is not debited from the recipient's account; a
+Lightning payment is final.
 
 ## Adding a language
 

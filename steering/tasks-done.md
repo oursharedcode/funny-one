@@ -1321,3 +1321,16 @@ unless they carry advisories:
       shared 190/190, cloudflare 50/50, run outside the sandbox (`funny-one-client`'s 3 timing
       failures on the full run were load-flakiness, unrelated to this step — confirmed 113/113
       on an isolated re-run); `npm audit` 0 vulnerabilities.*
+
+- [x] **T-9.5 (S)** Docs: README "Support" and "Why no card payments" paragraphs; `.env.example`
+      + DEPLOYMENT.md variables; ACCEPTANCE.md gets a support-screen row. → FM-TIER-3/6
+      *Landed Step 47 (2026-10-01). Most of the README text and all five `.env.example` rails
+      already existed from Step 17 (the D-6 rewrite, 2026-09-16), inside README's AGPL section.
+      This step gave them their own "Support" section with a "Why no card payments" subsection,
+      brought them in line with what T-9.3/T-9.4 built (the end-screen entry, which rails have
+      tap-to-copy, no ♥ with nothing set), and pointed `.github/FUNDING.yml`'s comment at the new
+      heading. `.env.example`: read once at boot, served at `<BASE_PATH>/config`, restart after
+      editing. DEPLOYMENT.md: a new "Optional: the Support screen" subsection under 2a (example
+      block, a note per variable, restart, `curl …/config`) and a support item in the
+      five-minute check. ACCEPTANCE.md: Part D, rows D1–D5 with their own results table — the
+      script for Gate 9's real-money device pass.*

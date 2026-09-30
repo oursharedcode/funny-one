@@ -1,4 +1,4 @@
-# GitHub Sponsors button on the repo page (README "AGPL, and what that means for you").
+# GitHub Sponsors button on the repo page (README "Support").
 # Same account as the official deployment's DEPLOYER_SPONSORS_URL (design §10.2). Create
 # one-time tiers: the Sponsors flow defaults to monthly.
 github: oursharedcode

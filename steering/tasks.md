@@ -114,6 +114,8 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   `/stats` unchanged); Support screen on desktop + Android: a real $1 PayID transfer arrives
   under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
   from a second wallet arrives. The device pass is scripted in `docs/ACCEPTANCE.md` Part D.
+  **Part D run 2026-10-01 (Step 49):** D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR
+  payment from a second wallet) deferred — still owed before Gate 9 closes.
 
 ## Post-v1 backlog (not scheduled)
 

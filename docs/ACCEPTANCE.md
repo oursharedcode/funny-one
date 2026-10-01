@@ -148,21 +148,21 @@ and sends one real $1 gift over each rail (FM-TIER-3). Same URL as above.
 
 ### Part D results
 
-| Field      | Value |
-| ---------- | ----- |
-| Date       |       |
-| App commit |       |
-| A          |       |
-| C          |       |
-| Tester(s)  |       |
+| Field      | Value                                                               |
+| ---------- | ------------------------------------------------------------------- |
+| Date       | 2026-10-01                                                          |
+| App commit | 11037cd (deployed by `deploy/ship.sh` the same day)                 |
+| A          | desktop Chrome — Windows 10 (owner's PC)                            |
+| C          | Android phone — owner's (model not recorded)                        |
+| Tester(s)  | owner (devices, gifts); agent set the VM rails and checked `/config` |
 
 | #   | Result (pass / fail / deferred) | Note |
 | --- | ------------------------------- | ---- |
-| D1  |                                 |      |
-| D2  |                                 |      |
-| D3  |                                 |      |
-| D4  |                                 |      |
-| D5  |                                 |      |
+| D1  | pass                            | ♥ on C and A; end-screen link on A after a three-tab game. |
+| D2  | pass                            | PayID and Lightning, on C and A. |
+| D3  | pass                            | $1 from the owner's other bank: payee shown as MARK WEB TOOLS; arrived. |
+| D4  | deferred                        | Owner reported paying the $1 one-time tier; arrival not confirmed — the dashboard check was not done, and the agent's `gh` token (no `read:user`) listed 0 sponsorships — inconclusive, since that token may not see one-time or private ones. |
+| D5  | deferred                        | (b) pass: the address link on C opened a Lightning wallet with the address filled in. (a) not done — the QR payment from a second wallet. |
 
 **Sign-off:** Gate 9's support-screen leg passes when D1–D5 are _pass_. Gate 9 also needs the
 library complete (R2 holds all 10⁴ pictures; a full game on production leaves `/stats`

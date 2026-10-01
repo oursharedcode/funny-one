@@ -2272,7 +2272,7 @@ the two needs correcting — owner's call, not blocking.
 
 ---
 
-**RESUME HERE (2026-10-01, after Step 47).** Phase 9's agent-only work is done. What is left
+~~**RESUME HERE (2026-10-01, after Step 47).** Phase 9's agent-only work is done. What is left
 needs the owner in the loop, in this order: (1) a production deploy (`deploy/ship.sh`, owner
 in Git Bash) — it takes Steps 43–47 live, including `GET /config` and Step 45's `engine.io`
 fix; (2) the agent sets the four `DEPLOYER_*` rails in `~/funny/.env` on the VM, restarts and
@@ -2292,6 +2292,88 @@ the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (cur
 `curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
 the agent's auto mode refuses them. The local `.env`'s Worker secret is not production's: any
 live Worker call from this PC needs the production pair exported first.
+
+Still open, none blocking: making the repo public before any launch announcement; real Funny One
+icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
+games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
+Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
+native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
+design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47).~~ *(carried — see Steps 48–49 below.)*
+
+## Step 48 — `fastify` 5.12.4 → 5.12.5: `npm audit` clean again (2026-10-01)
+
+**Shipped:** a lockfile-only bump, found while running Step 49's gates and not caused by that
+step's diff. `npm audit` reported GHSA-4mh8-r7rc-xpvc (moderate): `fastify` below 5.12.5 can be
+crashed by an unhandled exception on HTTP/2 trailer responses. 5.12.5 is inside the server's
+declared range (`^5.11.3`), so `npm audit fix` changed only that one lockfile entry; no
+`package.json` changed. Production was not exposed: the server never enables HTTP/2 (Caddy
+terminates TLS and proxies HTTP/1.1). It goes live with the next `deploy/ship.sh`. Owner
+decision 2026-10-01: fix now, in its own commit ahead of Step 49's, per the Step 42 rule.
+`npm audit signatures` verifies the new tree. Gates on the lockfile-only tree: typecheck, lint,
+format:check clean; `npm test` outside the sandbox — client 225/225, server 214/214,
+funny-one-client 113/113, shared 190/190, cloudflare 50/50; `npm audit` 0 vulnerabilities.
+
+**Owed:** nothing.
+
+## Step 49 — production deploy, VM support rails, Part D device pass (2026-10-01)
+
+**Shipped:** the owner's leg of Phase 9's support half, run one small operation at a time.
+(1) The owner ran `deploy/ship.sh ubuntu@152.69.166.212`: production now runs `11037cd` (Steps
+43–47, including `GET /config` and Step 45's `engine.io` fix); `/funny37-game/health` answered
+`{"ok":true}` and `/funny37-game/config` now answers JSON. (2) The agent added T-9.1's four
+rails to `~/funny/.env` on the VM over SSH (backup `~/funny/.env.bak-2026-10-01`, mode 600 kept;
+the empty `DEPLOYER_DONATE_URL=` line left as it was), recreated the container with `docker
+compose --profile caddy up -d`, and checked `/config` returns all four with `donateUrl: null`.
+Also checked from here: the Sponsors page answers 200 and offers $1/$3/$5 one-time tiers; the
+Lightning address resolves via LNURL-pay. (3) The Part D session, recorded in
+`docs/ACCEPTANCE.md`: D1 (♥ on Android and desktop, end-screen link after a three-tab game),
+D2 (tap-to-copy, both rails, both devices) and D3 ($1 PayID gift, payee shown as MARK WEB
+TOOLS, arrived) pass. D4 is deferred: the owner reported paying the $1 one-time tier but could
+not check the Sponsors dashboard, and the agent's `gh` token (scopes without `read:user`)
+listed 0 sponsorships even with `activeOnly: false` — inconclusive. D5 is deferred: (b) the
+address link on Android opened a Lightning wallet with the address filled in; (a) the QR
+payment from a second wallet was not done. An attempt to drive the desktop legs with a
+headless Playwright run against production was refused by the agent's auto mode, so the
+owner ran them by hand.
+
+Gates: typecheck, lint, format:check clean; `npm test` outside the sandbox — client 225/225, server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 50/50;
+`npm audit` 0 vulnerabilities (after Step 48). Docs-only step.
+
+**Owed:** D4 — confirm the $1 one-time sponsorship on
+`github.com/sponsors/oursharedcode/dashboard/your_sponsors` (signed in as `oursharedcode`), or
+the agent can check it once `gh auth refresh -s read:user` has been run. D5(a) — a QR payment
+from a second Lightning wallet. Both stand between Part D and Gate 9's support leg.
+
+---
+
+**RESUME HERE (2026-10-01, after Step 49).** Production runs `11037cd` with the four support
+rails live; Step 48's `fastify` bump is not deployed yet (not urgent — no HTTP/2). Part D:
+D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR payment from a second wallet) are owed by the
+owner whenever convenient — see Step 49's **Owed**. Next in order: the
+paid Workers AI plan (owner, Cloudflare dashboard — T-9.1's last item), then T-9.2's production
+run (`--dry-run`, `--limit 5`, full; the production Worker pair must be exported in the shell
+first) — the library half of Gate 9. Gate 9 closes when both halves pass; then the store-app
+phases (owner decision 2026-09-29: Phase 9 first). The Funny One phone pass through
+`docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3) still runs in parallel and
+blocks nothing here.
+
+The owner wants owner-facing work run one small operation per message (≤50 words, who does
+what, wait for "done", automate first). Production's `.env` now holds the support rails; the
+backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM.
+
+Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
+nothing else going, and re-run any lone timing failure in isolation before treating it as a
+regression. Multi-line commit messages must go through `git commit -F <file>`. Dev ports are
+5183 (Funny Multi client), 5184 (Funny One client) and 3000 (server); read
+`C:\Mark\Dev\machine\ports.md` before binding anything new. SSH to the VM is allowed only from
+the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
+`curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
+the agent's auto mode refuses them, and also refused a headless browser run against production
+(Step 49). The local `.env`'s Worker secret is not production's: any live Worker call from this
+PC needs the production pair exported first.
 
 Still open, none blocking: making the repo public before any launch announcement; real Funny One
 icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone

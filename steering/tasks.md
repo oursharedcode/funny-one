@@ -79,28 +79,6 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
 
 *Rewritten 2026-09-16; the Polar premium tasks that stood here were never started.*
 
-- [ ] **T-9.1 (S)** Owner, not code: register a PayID and note the **exact registered account
-      name** the payer's bank displays; pick a Lightning wallet and get its address; on GitHub
-      Sponsors (`oursharedcode`) add **one-time** tiers $1/$3/$5; enable the paid Workers AI plan
-      for the batch. → D-6, D-7
-      **Landed so far (2026-09-28):** PayID `funny@oursharedcode.com`, bank displays
-      **MARK WEB TOOLS**. Lightning: `curvyhockey439@walletofsatoshi.com` (resolves via
-      LNURL-pay, checked 2026-09-28). Owner decisions: Strike was first choice (direct AUD
-      withdrawal) but its app is not offered in Play AU, so Wallet of Satoshi (Australian,
-      custodial) was chosen; the random address is published as-is — a custom name needs 10 LN
-      transactions plus ≥100k sats on-chain, and a branded proxy address on our domain was
-      judged cosmetic (A over B, 2026-09-28); cash-out is Lightning → Kraken → AUD, never
-      on-chain. Sponsors: three one-time tiers ($1/$3/$5) published on
-      `github.com/sponsors/oursharedcode`, verified via GraphQL 2026-09-28. **Still to do:**
-      the paid Workers AI plan — deferred by the owner 2026-09-28; T-9.2's production run
-      waits on it.
-- [ ] **T-9.2 (M)** `cloudflare/pregenerate.mjs`: enumerate all `VISUAL_SLOTS` combinations via
-      `buildPrompt`, `/exists` → `/generate`, resumable, concurrency ≤ 4, backoff on 429/5xx,
-      progress + cost summary. Tests: enumeration is exactly 10⁴ distinct prompts, skip-existing,
-      stop-on-fatal. Then run it to completion against production. → FM-TIER-2, design §10.1
-      **Code + 11 tests landed Step 40 (2026-09-27)**, plus `--dry-run` (probes only) and
-      `--limit N`. **Remaining:** the production run — needs the paid plan (T-9.1) and the
-      production Worker pair in the shell; `--dry-run`, `--limit 5`, then full, on a quiet day.
 - [ ] **T-9.4 (M)** Client: `SupportScreen` (Home ♥ + end screen), tap-to-copy with "Copied!",
       PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
       QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
@@ -110,12 +88,16 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
       2026-09-29, reuse over vendoring — design §10.2 corrected). **Remaining:** the store-shell
       gate itself — no flag exists because no store shell exists yet; deferred to whichever of
       B-1/B-2 lands first (noted there).*
-- **Gate 9**: library complete (object count in R2 = 10⁴; a full game on production leaves
-  `/stats` unchanged); Support screen on desktop + Android: a real $1 PayID transfer arrives
+- **Gate 9**: library complete (`pregenerate --dry-run` reports 10⁴ in R2, 0 missing; a full
+  game on production adds no Workers AI usage on the Cloudflare dashboard — reworded
+  2026-10-02: production's `/stats` reads 0 always, `STATS_KV` being unbound, so "leaves
+  `/stats` unchanged" could not fail); Support screen on desktop + Android: a real $1 PayID transfer arrives
   under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
   from a second wallet arrives. The device pass is scripted in `docs/ACCEPTANCE.md` Part D.
   **Part D run 2026-10-01 (Step 49):** D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR
   payment from a second wallet) deferred — still owed before Gate 9 closes.
+  **Library run 2026-10-02 (Step 50):** `--dry-run` reports 10,000 in R2, 0 missing; the
+  full-game check against the dashboard is still owed.
 
 ## Post-v1 backlog (not scheduled)
 

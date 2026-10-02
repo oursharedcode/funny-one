@@ -65,9 +65,9 @@ this — `worker.js` treats `STATS_KV` as optional.
 ### Optional: pre-generate the whole picture library (Phase 9, D-7)
 
 The game only ever asks for one of 10,000 possible pictures. Generating them all once
-(`node cloudflare/pregenerate.mjs`, resumable) costs about $10 on the paid Workers AI plan and
-about 3 GB of R2, after which every request is a cache hit, the daily cap never fires and R2
-egress is free. Without it the cache fills organically and `MAX_IMAGES_PER_DAY` applies.
+(`node cloudflare/pregenerate.mjs`, resumable) costs about $21 on the paid Workers AI plan and
+about 7 GB of R2 (inside R2's free 10 GB), after which every request is a cache hit, the daily
+cap never fires and R2 egress is free. Without it the cache fills organically and `MAX_IMAGES_PER_DAY` applies.
 
 ## 2. Deploy the game server
 

@@ -1293,6 +1293,41 @@ unless they carry advisories:
 
 ## Phase 9 — Commercial: pre-generated library + support rails (final phase, D-6/D-7)
 
+- [x] **T-9.1 (S)** Owner, not code: register a PayID and note the **exact registered account
+      name** the payer's bank displays; pick a Lightning wallet and get its address; on GitHub
+      Sponsors (`oursharedcode`) add **one-time** tiers $1/$3/$5; enable the paid Workers AI plan
+      for the batch. → D-6, D-7
+      **Landed so far (2026-09-28):** PayID `funny@oursharedcode.com`, bank displays
+      **MARK WEB TOOLS**. Lightning: `curvyhockey439@walletofsatoshi.com` (resolves via
+      LNURL-pay, checked 2026-09-28). Owner decisions: Strike was first choice (direct AUD
+      withdrawal) but its app is not offered in Play AU, so Wallet of Satoshi (Australian,
+      custodial) was chosen; the random address is published as-is — a custom name needs 10 LN
+      transactions plus ≥100k sats on-chain, and a branded proxy address on our domain was
+      judged cosmetic (A over B, 2026-09-28); cash-out is Lightning → Kraken → AUD, never
+      on-chain. Sponsors: three one-time tiers ($1/$3/$5) published on
+      `github.com/sponsors/oursharedcode`, verified via GraphQL 2026-09-28.
+      *Landed Step 50 (2026-10-02): owner enabled the Workers Paid plan ($5/month) in the
+      Cloudflare dashboard, closing the task.*
+- [x] **T-9.2 (M)** `cloudflare/pregenerate.mjs`: enumerate all `VISUAL_SLOTS` combinations via
+      `buildPrompt`, `/exists` → `/generate`, resumable, concurrency ≤ 4, backoff on 429/5xx,
+      progress + cost summary. Tests: enumeration is exactly 10⁴ distinct prompts, skip-existing,
+      stop-on-fatal. Then run it to completion against production. → FM-TIER-2, design §10.1
+      **Code + 11 tests landed Step 40 (2026-09-27)**, plus `--dry-run` (probes only) and
+      `--limit N`.
+      *Production run landed Step 50 (2026-10-02): `--dry-run` (free, 62/10,000 already
+      cached), `--limit 5` smoke (≈$0.01, each image checked to serve publicly), then the full
+      run in two legs — the owner stopped the first at about 500 images to check the dashboard
+      rate, then re-ran it; resumable by design, no duplicate generations — to completion.
+      Measured 1.89M neurons for 9,938 generations ≈ $21 (design
+      §10.1's ≈$10 estimate corrected); final `--dry-run` confirms 10,000/10,000 in R2, 0
+      missing. Measured mean image size 731 KB (80-image sample) → library ≈7 GB, not the
+      ≈3 GB estimate (still inside R2's free 10 GB). `USD_PER_IMAGE` and the design/requirements/
+      DEPLOYMENT.md cost figures corrected to match. Gate 9's library proof reworded (the
+      agent's recommendation, accepted by the owner): production's `/stats` reads 0 always
+      (`STATS_KV` unbound there), so
+      the old proof ("a full game leaves `/stats` unchanged") could never fail; replaced with
+      `--dry-run` 10⁴/0 plus an unmoved Workers AI dashboard reading across a full game — that
+      dashboard check is still owed, after the daily neuron counter next resets.*
 - [x] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
       `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
       set → passed through, never in any socket event. → FM-TIER-3

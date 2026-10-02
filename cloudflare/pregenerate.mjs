@@ -30,9 +30,11 @@ export const MAX_ATTEMPTS = 6;
 const BASE_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 60_000;
 const PROGRESS_EVERY = 100;
-// Design §10.1's budget: 10⁴ images ≈ $10 on the paid plan. An estimate for the
-// summary line, not a bill — the Cloudflare dashboard is the real number.
-export const USD_PER_IMAGE = 0.001;
+// Measured on the first full run (2026-10-02): 1.89M neurons for 9,938 images,
+// ≈ 190 neurons each at $0.011 per 1,000 — 10⁴ images ≈ $21 (design §10.1). An
+// estimate for the summary line, not a bill — the Cloudflare dashboard is the
+// real number.
+export const USD_PER_IMAGE = 0.0021;
 
 /**
  * Every combination of the visual slots, in a fixed mixed-radix order, as the

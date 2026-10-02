@@ -2349,7 +2349,7 @@ from a second Lightning wallet. Both stand between Part D and Gate 9's support l
 
 ---
 
-**RESUME HERE (2026-10-01, after Step 49).** Production runs `11037cd` with the four support
+~~**RESUME HERE (2026-10-01, after Step 49).** Production runs `11037cd` with the four support
 rails live; Step 48's `fastify` bump is not deployed yet (not urgent — no HTTP/2). Part D:
 D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR payment from a second wallet) are owed by the
 owner whenever convenient — see Step 49's **Owed**. Next in order: the
@@ -2358,11 +2358,62 @@ run (`--dry-run`, `--limit 5`, full; the production Worker pair must be exported
 first) — the library half of Gate 9. Gate 9 closes when both halves pass; then the store-app
 phases (owner decision 2026-09-29: Phase 9 first). The Funny One phone pass through
 `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3) still runs in parallel and
+blocks nothing here.~~ — the paid plan and the production run both landed, Step 50.
+
+## Step 50 (tasks T-9.1, T-9.2) — paid Workers AI plan, pre-generated library run to completion (2026-10-02)
+
+**Shipped:** Phase 9's last code-adjacent task. (1) Owner enabled the Workers Paid plan
+($5/month) in the Cloudflare dashboard — closes T-9.1. (2) Agent verified the production
+Worker secret already on this PC (`~/.cloudflare/worker-secret`) against `/stats` (200 with
+it, 403 with a wrong one) rather than SSH-reading it from the VM. (3) `--dry-run` against
+production: 10,000 prompts probed, 62 already in R2 from real games, 9,938 missing (free —
+`/exists` only). (4) `--limit 5` smoke: 5 images generated (≈$0.01), each checked to serve
+publicly from its `/i/<hash>.png` link at 1024×1024. (5) Full run, by the owner in Git Bash,
+in two legs: the owner stopped the first with Ctrl-C at about 500 images to check the
+dashboard rate, then re-ran the same command to the end (resumable by design — no duplicate
+generations). 9,938 generated in all for a measured **1.89M neurons ≈ $21** (≈ 190 neurons an
+image — not the design doc's ≈$10 estimate, corrected below; the mid-run reading of ≈ 140 came
+from a lagging graph), landing **10,000/10,000 in R2, 0 missing** per a final `--dry-run`. Measured
+image size on an 80-image sample: mean 731 KB, so the library is **≈7 GB**, not the ≈3 GB
+estimate — still inside R2's free 10 GB.
+
+**Corrected, now the real numbers are in:** `cloudflare/pregenerate.mjs`'s `USD_PER_IMAGE`
+0.001 → 0.0021; design §10.1 and DD-11, requirements D-7, and DEPLOYMENT.md's pre-generate
+section all updated from ≈$10/≈3 GB to ≈$21/≈7 GB, each noting the old figure was an estimate.
+Gate 9's library proof in `steering/tasks.md` reworded: production's `/stats` reads 0 always
+(`STATS_KV` is unbound there), so "a full game leaves `/stats` unchanged" could never fail and
+proved nothing; the proof is now a `--dry-run` of 10⁴/0 plus an unmoved Workers AI dashboard
+reading across a full game — the agent's recommendation, accepted by the owner with this
+record.
+
+**Owed:** the dashboard half of Gate 9's library proof — play one full game on production
+after the Cloudflare daily neuron counter resets (≈10:00 Sydney time) and confirm it still
+reads 0. D4 (Sponsors arrival) and D5(a) (QR payment from a second wallet) remain owed from
+Step 49 for Gate 9's support half.
+
+Gates: typecheck, lint, format:check clean; `npm test` outside the sandbox — client 225/225,
+server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 50/50; `npm audit`
+0 vulnerabilities. Docs + one constant, no behavior change to the game path.
+
+---
+
+**RESUME HERE (2026-10-02, after Step 50).** The pre-generated library is complete in R2
+(10,000/10,000) and production serves it under `11037cd`; the paid Workers AI plan is active.
+One check is still owed before Gate 9's library half can be marked closed: after the daily
+neuron counter resets, play a full game on production and confirm the Cloudflare dashboard's
+*Neurons used today* for `flux-1-schnell` stays at 0 (every request should be a cache hit).
+Gate 9's support half still owes D4 (Sponsors dashboard — or `gh auth refresh -s read:user`
+once, then the agent can check it) and D5(a) (a QR Lightning payment from a second wallet) —
+see Step 49's **Owed**. Gate 9 closes when both halves pass; then the store-app phases (owner
+decision 2026-09-29: Phase 9 first). The Funny One phone pass through
+`docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3) still runs in parallel and
 blocks nothing here.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` now holds the support rails; the
-backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM.
+backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM. The production Worker
+secret used for the pregenerate run is on this PC at `~/.cloudflare/worker-secret` (verified
+against `/stats`, not re-copied from the VM).
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
@@ -2383,4 +2434,9 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
 native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
-design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47).
+design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); from Step 50 — whether to keep the
+$5/month Workers plan now the library is complete (owner decision after Gate 9; the free
+plan's 10k neurons/day covers about 50 on-demand images), Funny One showing the library's
+cartoons when online (same pools, public `/i/` links; needs `buildPrompt` in
+`packages/shared`), and re-encoding the ≈ 730 KB JPEGs at store time. Pasting a command into
+the owner's Git Bash can prepend `[200~`: `bind 'set enable-bracketed-paste off'` first.

@@ -458,7 +458,10 @@ retired by D-6; nothing of it was built.*
   (the same bytes the game sends, so the R2 keys match), and for each calls `GET /exists` then
   `GET /generate` on the Worker with `X-Secret`. Resumable (skips what exists), concurrency ≤ 4,
   retries 429/5xx with backoff, prints a running count and stops on the first non-retryable
-  error. 10⁴ prompts ≈ $10 on the paid Workers AI plan, ≈ 3 GB of R2; both within one evening.
+  error. 10⁴ prompts ≈ $21 on the paid Workers AI plan (≈ 190 neurons per 1024×1024 image at
+  4 steps), ≈ 7 GB of R2 (mean ≈ 730 KB an image, inside R2's free 10 GB); both within one
+  evening. *(Measured on the production run, 2026-10-02 — the estimate that stood here was
+  ≈ $10 and ≈ 3 GB.)*
 - Nothing in the game path changes: `/generate` on a full library is always a cache hit,
   `/stats` does not move, and the reservation/refund logic of §7.3 keeps working as the
   backstop for a pool change or a self-hoster who skipped the batch.
@@ -582,5 +585,5 @@ post-v1 phase; nothing in v1 may preclude it.
 | DD-8 | Filter/translate stack deleted rather than disabled | Dead code invites re-enabling half of it; FM-CPL-4 guards the future instead |
 | DD-9 | Lottie recording engine dropped, `wobbleEngine` field removed from protocol | ARC-3 locks the stack (no Lottie); removing the field is the honest protocol |
 | DD-10 | ~~Premium as cap-bypass on the existing free path~~ Retired 2026-09-16 by D-6/D-7 — no premium tier; nothing was built | — |
-| DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $10 once; keys match because the same function makes them; free egress means no per-view cost |
+| DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $21 once (measured 2026-10-02; estimated ≈ $10); keys match because the same function makes them; free egress means no per-view cost |
 | DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |

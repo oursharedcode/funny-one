@@ -37,6 +37,10 @@ npx wrangler r2 bucket create funny-multi-images
 # string (e.g. `openssl rand -hex 32`) and paste it when prompted.
 npx wrangler secret put WORKER_SECRET
 
+# Switch generation on: uncomment the two-line `[ai]` block in wrangler.toml.
+# The repository ships it off (see "The generation switch" below), and a fresh
+# deployment has no pictures to serve until something generates them.
+
 npx wrangler deploy
 ```
 
@@ -45,8 +49,21 @@ Keep that and the `WORKER_SECRET` value — the game server needs both. A quick 
 
 ```bash
 curl -H "X-Secret: <your WORKER_SECRET>" https://funny-multi-image.<your-subdomain>.workers.dev/stats
-# → {"date":"2026-09-16","count":0}   (a 403 means the secret doesn't match)
+# → {"date":"2026-09-16","count":0,"generation":true}   (a 403 means the secret doesn't match)
 ```
+
+### The generation switch
+
+The `[ai]` block in `cloudflare/wrangler.toml` is the only thing that lets the Worker call the
+image model. Commented out, the Worker still serves every picture already in R2 and answers a
+request for a new one with `503` — nothing can spend Neurons, not even a caller holding
+`WORKER_SECRET`. `/stats` reports the state as `generation`.
+
+That matters on the paid Workers plan, which has no spending cap (a budget alert under Manage
+Account → Billing → Billable Usage only emails you): the shared secret is otherwise all that
+stands between a leak and the bill. So keep the block on while the library is filling, and
+comment it out and `wrangler deploy` again once it is complete. Production has run with it off
+since 2026-10-03.
 
 ### Optional: persistent stats counter
 
@@ -68,6 +85,9 @@ The game only ever asks for one of 10,000 possible pictures. Generating them all
 (`node cloudflare/pregenerate.mjs`, resumable) costs about $21 on the paid Workers AI plan and
 about 7 GB of R2 (inside R2's free 10 GB), after which every request is a cache hit, the daily
 cap never fires and R2 egress is free. Without it the cache fills organically and `MAX_IMAGES_PER_DAY` applies.
+
+The batch needs the generation switch on. When `--dry-run` reports nothing missing, switch it
+off (above); switch it back on for the re-run after any pool edit.
 
 ## 2. Deploy the game server
 
@@ -222,7 +242,8 @@ trusted window).
 3. Create a room, join from two more devices (or browser tabs) via the QR code, play a round.
    The reveal should show a cartoon within ~10 s. "Generation failed" on every reveal means
    `CLOUDFLARE_WORKER_URL`/`CLOUDFLARE_WORKER_SECRET` don't match the Worker — compare with
-   `wrangler secret list` in `cloudflare/`.
+   `wrangler secret list` in `cloudflare/` — or that the generation switch is off on a library
+   that is not complete (`"generation":false` in the `curl` from step 1).
 4. Play the same story again: the second reveal is instant (R2 cache hit), and the Worker's
    `/stats` count (the `curl` from step 1) did not move.
 5. If you set any `DEPLOYER_*` rail: the Home screen has a ♥ in its corner that opens the

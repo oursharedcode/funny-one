@@ -21,7 +21,8 @@ serves the client). The full walkthrough is [DEPLOYMENT.md](DEPLOYMENT.md) — i
 nothing beyond a Cloudflare account, a Linux host with Docker and a domain name. In short:
 
 1. `cd cloudflare && npx wrangler deploy` (after creating the R2 bucket and the shared
-   secret) gives you the Worker URL.
+   secret, and uncommenting `[ai]` in `wrangler.toml` so the Worker may generate) gives you
+   the Worker URL.
 2. On the host, a six-line `.env` from `.env.example` (Worker URL + secret, `BASE_PATH`, site
    name).
 3. From your PC, `deploy/ship.sh user@host` builds the image, streams it over SSH and starts

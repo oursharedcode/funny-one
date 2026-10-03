@@ -13,6 +13,11 @@
 // and really bumps the Worker's daily counter, so a full run belongs on a day the
 // game is quiet — or on a deployment whose MAX_IMAGES_PER_DAY cap has room.
 //
+// Also needs the Worker's generation switch on (the `[ai]` block in
+// wrangler.toml) for anything but `--dry-run`: with it off the first miss comes
+// back 503 and, the retries spent, the run stops there. Switch it off again once
+// the dry run reports nothing missing.
+//
 // The prompts come from the server's own `buildPrompt`, imported from its build
 // output rather than re-assembled here: the R2 key is the sha256 of the prompt
 // bytes, so a copy of the skeleton that drifted by one character would fill R2

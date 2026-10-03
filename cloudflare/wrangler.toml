@@ -18,8 +18,24 @@ enabled = true
 [observability.logs]
 enabled = true
 
-[ai]
-binding = "AI"
+# Workers AI — THE GENERATION SWITCH. Commented out = off: the Worker serves
+# every picture already in R2 and answers a miss with 503 (worker.js: `if
+# (!env.AI)`), so nothing can spend Neurons — not even a caller holding
+# WORKER_SECRET. `/stats` reports the state as `generation`.
+#
+# Off here because production's library is complete (design §10.1, all 10⁴
+# pictures in R2 since 2026-10-02) and a paid Workers AI plan has no spending
+# cap: the shared secret would otherwise be the only thing between a leak and
+# the bill.
+#
+# A fresh deployment has an empty bucket and needs it ON to get any pictures:
+# uncomment the block, `wrangler deploy`, and either run the pre-generation
+# batch (DEPLOYMENT.md) or let the cache fill as people play. Comment it out and
+# deploy again once the library is complete — and switch it back on for the
+# batch after any pool edit.
+#
+# [ai]
+# binding = "AI"
 
 # R2 — REQUIRED. The image cache itself (design §7.2): one generation per
 # distinct story for the whole world, and the reason a repeated story reveals

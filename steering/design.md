@@ -336,7 +336,10 @@ untrusted text remains, FM-ANS), the RU/EN slot-1 connective synthesis and `ruAc
 ### 7.2 Cloudflare Worker — `cloudflare/worker.js` (FM-IMG-3)
 
 Bindings: `AI`, `STATS_KV` (existing), **new** `IMAGES` (R2 bucket). All routes except
-`/i/*` require `X-Secret`.
+`/i/*` require `X-Secret`. `AI` is optional and doubles as the **generation switch** (added
+2026-10-03): without it a miss is a `503` and every hit is served as before, so a deployment
+whose library is complete (§10.1) runs with no way to spend Neurons — the paid plan has no
+spending cap, and the secret would otherwise be the only guard.
 
 - `GET /generate?prompt=…` → `hash = hex(sha256(prompt))`; `IMAGES.head('i/'+hash+'.png')`:
   - **hit** → `200 {url, width, height, cached:true}` — no AI call, no KV bump.
@@ -365,7 +368,8 @@ Bindings: `AI`, `STATS_KV` (existing), **new** `IMAGES` (R2 bucket). All routes 
   do not match `^i/[0-9a-f]{64}\.png$` are 404'd without asking R2. No `OPTIONS` handler: every
   request we make for these URLs is a plain `GET` with no custom headers, which is never
   preflighted.
-- `GET /stats` → unchanged from SRC.
+- `GET /stats` → SRC's `{date, count}`, plus `generation` (is the `AI` binding deployed), so the
+  switch can be read without risking a generation. The server ignores the extra field.
 - No `/entitlement` route: the Polar premium design was retired by D-6 (§10). Routing still
   dispatches on pathname first, leaving method checks to the routes.
 
@@ -466,6 +470,9 @@ retired by D-6; nothing of it was built.*
   `/stats` does not move, and the reservation/refund logic of §7.3 keeps working as the
   backstop for a pool change or a self-hoster who skipped the batch.
 - Re-run after any pool edit; a new option in one slot costs 10³ images.
+- The batch needs the Worker's `AI` binding; once `--dry-run` reports 0 missing the binding
+  comes out again (§7.2's generation switch). Production: off since 2026-10-03, so the §7.3
+  backstop there is a `503` → `reveal:pictureError` until the binding returns for a re-run.
 - Version 2 (backlog B-9): animate the still client-side (SRC's Lottie/`MediaRecorder` idea);
   no server or Worker change.
 

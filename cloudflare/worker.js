@@ -14,13 +14,19 @@
 // Routes:
 //   GET /generate?prompt=…  X-Secret  → {url,width,height,cached} — generates on a miss
 //   GET /exists?prompt=…    X-Secret  → {cached:false} | {url,width,height,cached:true}
-//   GET /stats              X-Secret  → {date,count} — unchanged from SRC
+//   GET /stats              X-Secret  → {date,count,generation} — SRC's, plus the switch
 //   GET /i/<hash>.png       public    → the image bytes, immutable, CORS-open
 //
 // `/i/*` is the one public route: the keys are sha256 digests of prompts the
 // caller never sees, the images contain no user data (FM-IMG-4), and a phone
 // rendering a cartoon has no secret to present. Everything else is gated on
 // the shared secret, as in SRC (spec §15, §18).
+//
+// The `AI` binding is the generation switch (wrangler.toml). The secret is the
+// only thing between a stranger and the model, and a paid Workers AI plan has
+// no spending cap, so a deployment whose library is complete (design §10.1)
+// runs without the binding: hits are served exactly as before, a miss is a
+// 503, and a leaked secret can spend nothing.
 //
 // POST /entitlement arrives with the premium phase (design §10), which is why
 // routing dispatches on pathname first and leaves method checks to the routes.
@@ -135,6 +141,15 @@ async function serveGenerate(url, env) {
   const head = await env.IMAGES.head(key);
   if (head) return json({ ...describe(url, key, head), cached: true });
 
+  // The generation switch (see the header): no binding, no model call. Below
+  // the head check on purpose — switching generation off must not cost a
+  // single picture that already exists.
+  if (!env.AI) {
+    return new Response('Generation is switched off: no AI binding (wrangler.toml)', {
+      status: 503,
+    });
+  }
+
   let result;
   try {
     result = await env.AI.run(MODEL, { prompt, steps: STEPS });
@@ -195,18 +210,23 @@ function imageUrl(url, key) {
 }
 
 // ---------------------------------------------------------------------------
-// GET /stats — unchanged from SRC
+// GET /stats — SRC's {date,count}, plus the generation switch
 // ---------------------------------------------------------------------------
 
 /**
  * The server polls this lazily (30 s TTL) to recover the day-total after a
  * Render restart. Returns 0 when the KV binding is unconfigured or the key is
  * absent — neither is an error condition.
+ *
+ * `generation` reports whether the `AI` binding is deployed, so the state of
+ * the switch can be read for free — the only other probe is a `/generate` miss,
+ * which costs an image exactly when the answer is the unwelcome one. The server
+ * reads `date` and `count` and ignores the rest.
  */
 async function serveStats(env) {
   const date = utcDayKey();
   const count = env.STATS_KV ? await readCount(env.STATS_KV, date) : 0;
-  return json({ date, count });
+  return json({ date, count, generation: Boolean(env.AI) });
 }
 
 /**

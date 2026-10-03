@@ -309,6 +309,38 @@ describe('GET /generate', () => {
   });
 });
 
+describe('the generation switch', () => {
+  // No `AI` binding is how a deployment with a complete library runs
+  // (wrangler.toml): the secret alone must not be able to spend anything.
+  it('answers a miss with 503 and stores nothing when the AI binding is absent', async () => {
+    const env = makeEnv({ AI: undefined });
+    const res = await generate(env);
+
+    expect(res.status).toBe(503);
+    expect(await res.text()).toMatch(/switched off/);
+    expect(env.IMAGES.put).not.toHaveBeenCalled();
+    expect(env.STATS_KV.put).not.toHaveBeenCalled();
+  });
+
+  it('still serves every picture that exists, on all three routes', async () => {
+    const env = makeEnv({ AI: undefined });
+    seed(env, { width: 1024, height: 768 });
+    const hit = { url: `${ORIGIN}/${PROMPT_KEY}`, width: 1024, height: 768, cached: true };
+
+    expect(await (await generate(env)).json()).toEqual(hit);
+    const probe = await call(env, `/exists?prompt=${encodeURIComponent(PROMPT)}`);
+    expect(await probe.json()).toEqual(hit);
+    expect((await call(env, `/${PROMPT_KEY}`, { secret: null })).status).toBe(200);
+  });
+
+  it('reports its state on /stats, so reading it costs nothing', async () => {
+    const on = await (await call(makeEnv(), '/stats')).json();
+    const off = await (await call(makeEnv({ AI: undefined }), '/stats')).json();
+    expect(on.generation).toBe(true);
+    expect(off.generation).toBe(false);
+  });
+});
+
 describe('GET /exists', () => {
   it('reports a miss without generating anything', async () => {
     const env = makeEnv();

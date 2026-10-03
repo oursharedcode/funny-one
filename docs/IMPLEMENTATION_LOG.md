@@ -2397,23 +2397,63 @@ server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 50/50; `npm
 
 ---
 
-**RESUME HERE (2026-10-02, after Step 50).** The pre-generated library is complete in R2
-(10,000/10,000) and production serves it under `11037cd`; the paid Workers AI plan is active.
-One check is still owed before Gate 9's library half can be marked closed: after the daily
-neuron counter resets, play a full game on production and confirm the Cloudflare dashboard's
-*Neurons used today* for `flux-1-schnell` stays at 0 (every request should be a cache hit).
-Gate 9's support half still owes D4 (Sponsors dashboard — or `gh auth refresh -s read:user`
-once, then the agent can check it) and D5(a) (a QR Lightning payment from a second wallet) —
-see Step 49's **Owed**. Gate 9 closes when both halves pass; then the store-app phases (owner
-decision 2026-09-29: Phase 9 first). The Funny One phone pass through
-`docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks Phase S-3) still runs in parallel and
-blocks nothing here.
+## Step 51 (task T-9.2a) — generation switch: production can no longer spend Workers AI (2026-10-03)
+
+**Shipped:** The owner asked whether a leaked secret or a bad actor could run up the Cloudflare
+bill, given the paid Workers plan has no spending cap (checked against Cloudflare's pricing
+docs: true — overage is billed with no documented ceiling; a budget alert only emails, it does
+not pause or cap usage). Until now the shared secret was the *only* thing standing between a
+leak and the bill. Since the picture library is complete, the fix is to remove the one thing
+able to spend: `cloudflare/worker.js`'s `AI` binding is now optional and doubles as a
+generation switch — absent, `/generate` answers a miss with `503` and stores nothing; present,
+behaviour is unchanged. `/stats` gained a `generation: boolean` field so the switch state can be
+read for free. `wrangler.toml` ships `[ai]` commented out by default, with a note on when to
+turn it on (a fresh deploy with an empty library, or a pre-generation re-run after a pool edit).
+Filed and closed same-session as **T-9.2a** (scope beyond T-9.2's text).
+
+Three new `worker.test.js` cases cover the switch (miss → 503 with nothing stored; all three
+routes still serve existing hits; `/stats` reports the state) — 53/53 cloudflare tests, up from
+50. Docs updated to match: `DEPLOYMENT.md`'s deploy walkthrough and five-minute check gained a
+"The generation switch" subsection; `pregenerate.mjs`'s header comment, `.env.example`,
+`README.md`, and design §7.2/§10.1 all note the switch.
+
+The owner deployed it to production (`npx wrangler deploy`, Git Bash — the agent's auto mode
+refuses production deploys). Verified read-only against production afterward: `/stats` reads
+`"generation":false`; a never-seen prompt sent with the real production secret returns `503`;
+three sampled library pictures (prompt indices 0, 4321 and 9999 of the 10⁴) still serve
+correctly at full size. The owner also added a $10 Cloudflare budget alert in the dashboard the
+same session, as a secondary (email-only) signal — not a cap.
+
+**Owed:** none for this task. The owner noticed the alert hadn't emailed for the Oct 2 spend;
+likely cause is the alert watches the Oct 3–Nov 2 cycle while that spend fell in the prior
+cycle — owner to check the Oct 2026 billing period and the notifications list to confirm.
+
+Gates: typecheck, lint, format:check clean; `npm test` outside the sandbox — client 225/225,
+server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 53/53 (795 total);
+`npm audit` 0 vulnerabilities.
+
+---
+
+**RESUME HERE (2026-10-03, after Step 51).** ~~RESUME HERE (2026-10-02, after Step 50)~~ —
+carried into this note. The pre-generated library is complete in R2 (10,000/10,000); production
+serves it with Workers AI generation switched off (Step 51), so no further Neuron spend is
+possible from production until someone deliberately uncomments `[ai]` in `wrangler.toml` and
+redeploys. One check is still owed before Gate 9's library half can be marked closed: after the
+daily neuron counter resets, play a full game on production and confirm the Cloudflare
+dashboard's *Neurons used today* for `flux-1-schnell` stays at 0 — it necessarily will now
+(generation is off), so this check has become a formality rather than a real test; consider
+whether to still run it or just close the library half on Step 51's evidence. Gate 9's support
+half still owes D4 (Sponsors dashboard — or `gh auth refresh -s read:user` once, then the agent
+can check it) and D5(a) (a QR Lightning payment from a second wallet) — see Step 49's **Owed**.
+Gate 9 closes when both halves pass; then the store-app phases (owner decision 2026-09-29:
+Phase 9 first). The Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO,
+unblocks Phase S-3) still runs in parallel and blocks nothing here.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` now holds the support rails; the
 backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM. The production Worker
-secret used for the pregenerate run is on this PC at `~/.cloudflare/worker-secret` (verified
-against `/stats`, not re-copied from the VM).
+secret is on this PC at `~/.cloudflare/worker-secret` (verified against `/stats`, not re-copied
+from the VM).
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
@@ -2434,9 +2474,10 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
 native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
-design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); from Step 50 — whether to keep the
-$5/month Workers plan now the library is complete (owner decision after Gate 9; the free
-plan's 10k neurons/day covers about 50 on-demand images), Funny One showing the library's
-cartoons when online (same pools, public `/i/` links; needs `buildPrompt` in
-`packages/shared`), and re-encoding the ≈ 730 KB JPEGs at store time. Pasting a command into
-the owner's Git Bash can prepend `[200~`: `bind 'set enable-bracketed-paste off'` first.
+design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); whether to keep the $5/month Workers
+plan now the library is complete and generation is switched off (owner decision after Gate 9 —
+it now only matters for re-running the batch after a pool edit; the free plan's 10k neurons/day
+would still cover that over a few days), Funny One showing the library's cartoons when online
+(same pools, public `/i/` links; needs `buildPrompt` in `packages/shared`), and re-encoding the
+≈ 730 KB JPEGs at store time. Pasting a command into the owner's Git Bash can prepend `[200~`:
+`bind 'set enable-bracketed-paste off'` first.

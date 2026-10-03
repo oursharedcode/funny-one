@@ -1328,6 +1328,22 @@ unless they carry advisories:
       the old proof ("a full game leaves `/stats` unchanged") could never fail; replaced with
       `--dry-run` 10⁴/0 plus an unmoved Workers AI dashboard reading across a full game — that
       dashboard check is still owed, after the daily neuron counter next resets.*
+- [x] **T-9.2a (S)** *Filed 2026-10-03 (scope beyond T-9.2's text; owner decision the same
+      day).* Generation switch: the paid Workers plan has no spending cap and the shared secret
+      is the Worker's only guard, so once the library is complete the `AI` binding comes out.
+      `worker.js` answers a miss with `503` when `env.AI` is absent and serves every hit as
+      before; `/stats` gains `generation`; `wrangler.toml` ships `[ai]` commented out; docs
+      (DEPLOYMENT.md, design §7.2/§10.1) say when to switch it on. Tests: miss → 503 and nothing
+      stored, hits on all three routes, `/stats` state. → FM-IMG-3, FM-TIER-2
+      *Landed Step 51 (2026-10-03). Prompted by the owner asking whether a leaked secret or bad
+      actor could run up the bill, given Workers Paid has no Cloudflare-side spending cap
+      (confirmed against the pricing docs) — this closes that for production by removing the
+      only thing able to spend, rather than trusting the secret alone. Deployed by the owner
+      (`npx wrangler deploy`; production deploys are outside the agent's auto mode). Verified on
+      production: `/stats` reads `"generation":false`; a never-seen prompt sent with the real
+      secret returns `503`; three sampled library pictures (indices 0, 4321, 9999) still serve
+      at full size. The owner also set a $10 Cloudflare budget alert the same session
+      (dashboard-native, email-only — does not cap usage, a secondary signal only).*
 - [x] **T-9.3 (S)** Server: `DEPLOYER_PAYID`, `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`,
       `DEPLOYER_LIGHTNING_ADDRESS` → config endpoint `support` object. Tests: unset → nulls,
       set → passed through, never in any socket event. → FM-TIER-3

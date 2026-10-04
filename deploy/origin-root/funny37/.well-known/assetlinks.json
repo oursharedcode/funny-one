@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.oursharedcode.funny37",
-      "sha256_cert_fingerprints": []
+      "sha256_cert_fingerprints": [
+        "6B:BF:A7:3A:E8:64:A2:56:EE:05:B9:5F:92:1C:71:F8:FF:53:0D:2F:0D:F4:9B:EE:73:26:9F:48:8D:AF:44:0B"
+      ]
     }
   }
 ]

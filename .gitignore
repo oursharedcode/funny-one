@@ -12,6 +12,16 @@ coverage/
 # Environment / secrets
 .env
 .env.local
+# Android signing keys live in ~/.android-keys/ (deploy/android/README.md);
+# this only catches a stray copy.
+*.jks
+*.keystore
+
+# Android store app (B-1d): Bubblewrap regenerates the Gradle project and the
+# build outputs from twa-manifest.json, so only these two files are tracked.
+/deploy/android/*
+!/deploy/android/twa-manifest.json
+!/deploy/android/README.md
 
 # Tooling / OS
 .claude/settings.local.json

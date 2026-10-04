@@ -1461,3 +1461,22 @@ unless they carry advisories:
       browser run. After the owner ran `deploy/ship.sh`, production's bundle and service worker
       were checked by curl. The referrer signal is first exercised for real at B-1d's install.
       → FM-APP-3
+- [x] **B-1d (M)** Bubblewrap project under `deploy/android/`, signing key, local build; install
+      on the owner's Android phone — opens with no URL bar and no support entries; note whether
+      the TWA sidesteps B-8's Play Protect warning. → FM-APP-1
+      _Closed 2026-10-05 (Step 59)._ Only `twa-manifest.json` and a `README.md` are tracked;
+      Bubblewrap's generated Gradle project and build outputs are ignored. Launch URL
+      `/?shell=android`, host `www.funny37.oursharedcode.com`, launcher name «Чепуха 37», target
+      SDK 36 / min SDK 21. Signing key (RSA 2048, alias `funny37`) at
+      `~/.android-keys/funny37-upload.jks`, never in the repo, backed up hash-verified to
+      `F:\Mark\android-keys\`; its SHA-256 fingerprint is now in `assetlinks.json`. Bubblewrap's
+      own JDK on Windows is 32-bit and cannot reserve the build's heap — fixed by fetching
+      Adoptium's 64-bit build of the same version directly, checksum-verified, and pointing
+      Bubblewrap at it. `apksigner verify` confirmed the built APK is signed with the generated
+      key; `aapt2 dump badging` confirmed `targetSdkVersion` 36 and no extra permissions. The
+      owner ran `deploy/ship.sh` to publish the fingerprint; Google's Digital Asset Links API
+      echoed it back live. On the owner's phone: no Play Protect warning (**answers B-8** — a TWA
+      sidesteps the "Unsafe app" block the plain PWA/WebAPK install showed 2026-09-16), no URL
+      bar, and no ♥ on Home from either signal — the launch URL, and (the one leg Step 58 could
+      not reach) a cold-started app opening a plain link sent through another app, proving the
+      `android-app://` referrer for real.

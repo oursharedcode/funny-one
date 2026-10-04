@@ -2833,22 +2833,88 @@ and runs on the push.
 
 ---
 
-**RESUME HERE (2026-10-04, after Step 58).** ~~RESUME HERE (after Step 57)~~ — carried into this
-note. **B-1c is closed and deployed: the Support screen is hidden inside the Android store app
-(`storeShell.ts`, gated in `hasAnyRail()`), matching the live privacy policy's "the Android app
-does not offer gifts".** **Next step: B-1d** — Bubblewrap project under
-`deploy/android/`; launch URL `https://www.funny37.oursharedcode.com/?shell=android`; Bubblewrap
-fetches JDK 17 and the build-tools into its own cache (owner decision 2026-10-04); signing key;
-local build; install on the owner's phone. The install is also the first real test of B-1c's
-referrer signal. It fills `assetlinks.json`'s fingerprint. None of B-1c–B-1d waits for the Play
-account (B-1e).
+## Step 59 (task B-1d) — Android TWA built, signed, installed, deployed (2026-10-04/05)
+
+**Shipped:** `deploy/android/twa-manifest.json` and `deploy/android/README.md`, the only two
+files of the Android project tracked — Bubblewrap's generated Gradle project (`app/`, `gradle/`,
+`build.gradle`, …) and its build outputs are ignored (`.gitignore`, `.prettierignore`). The
+manifest: package `com.oursharedcode.funny37`, host `www.funny37.oursharedcode.com`, launch URL
+`/?shell=android` (B-1c's launch-URL signal), launcher name «Чепуха 37», icons and colors read
+straight from the live `manifest.webmanifest`, notifications off, target SDK 36 / min SDK 21
+(Bubblewrap 1.25.0's own defaults). `deploy/origin-root/funny37/.well-known/assetlinks.json`
+gets its first fingerprint.
+
+A signing key was generated: RSA 2048, alias `funny37`, 20000-day validity, PKCS12, at
+`~/.android-keys/funny37-upload.jks` (never in the repo). Its SHA-256 fingerprint is the one now
+in `assetlinks.json`. A copy is on the external drive at `F:\Mark\android-keys\`, verified
+byte-identical by hash. The build produced `app-release-signed.apk` and
+`app-release-bundle.aab` (the latter for B-1e's eventual Play upload); `apksigner verify`
+confirms the APK's signer certificate hashes to the same SHA-256 as the generated key, and
+`aapt2 dump badging` confirms `targetSdkVersion` 36 and no requested permission beyond the TWA's
+own self-declared `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`.
+
+**Found and fixed en route:** Bubblewrap's own JDK install on Windows is 32-bit Temurin 17.0.11,
+and a 32-bit JVM cannot reserve the 1536 MB heap the generated `gradle.properties` asks for
+("Could not reserve enough space for object heap") — the first build would have failed on this
+PC. Fetched the 64-bit build of the same Temurin release directly from Adoptium, checked its
+SHA-256 against Adoptium's own published checksum file, and pointed Bubblewrap at it with
+`updateConfig --jdkPath`. `deploy/android/README.md` records this so a future rebuild (or a
+rebuild on another PC) does not rediscover it.
+
+**Verified end to end:** the deployed `assetlinks.json` was confirmed through Google's own
+Digital Asset Links `statements:list` API, which echoes the fingerprint back. On the owner's
+Android phone, the installed app passed every check B-1d asked for: no Play Protect warning
+(answers **B-8** for this app — a TWA does sidestep the "Unsafe app" block the plain PWA/WebAPK
+install showed on 2026-09-16), no URL bar (the asset link verified), and no ♥ on Home — first
+from the launch-URL signal, then (closing the one leg Step 58's browser-only tests could not
+reach) from a cold-started app opening a plain `https://www.funny37.oursharedcode.com/` link sent
+through another app, proving the `android-app://com.oursharedcode.funny37` referrer signal for
+real. Home and the end screen share one `hasAnyRail()` gate (`support.ts:12`), so the Home result
+stands for the end screen too, without playing a full game.
+
+**Deployed:** the owner ran `deploy/ship.sh` from Git Bash to publish the fingerprint; SSH
+reachability from the owner's current IP was checked first. Production's `/health` and the
+existing origin-root files were unaffected — only `assetlinks.json`'s content changed.
+
+B-1d is closed. B-1a–B-1d are now all closed (`steering/tasks-done.md`); only B-1e is left on
+B-1, and it is an owner-only step blocked on Equifax (unchanged this session).
+
+**Owed:** nothing on B-1d itself. Before B-1e's Play App Signing is turned on, Google's own
+re-signing fingerprint will need adding to `assetlinks.json` beside this one — `README.md` notes
+this. The phone's sideloaded copy must be uninstalled before the Play-delivered one can replace
+it, since the two are signed differently.
+
+**Owner decisions this session:** all four recommended options taken — Bubblewrap run via `npx`,
+never added as a dependency; the key at `~/.android-keys/` with a hash-verified `F:` backup;
+launcher name «Чепуха 37»; the APK moved to the phone by hand rather than installing
+`adb`/platform-tools system-wide.
+
+Gates: typecheck, lint, `format:check` clean. `npm test` outside the sandbox: all 812 tests
+passed (236 + 220 + 113 + 190 + 53), no flake this run. `npm audit --omit=dev`: 0. Full
+`npm audit`: only GHSA-vfj7-8cjw-p6xm (`braces`; `npm view braces version` still 3.0.3 this
+session). CI is the sixth gate and runs on the push.
+
+---
+
+~~RESUME HERE (after Step 58)~~ — carried into this note.
+
+**RESUME HERE (2026-10-05, after Step 59).** **B-1d is closed and deployed: the Android TWA is
+built, signed, installed on the owner's phone, and passed every check** — no Play Protect
+warning (answers B-8 for this app), no URL bar, no Home ♥ from either the launch-URL signal or
+(new this step) the `android-app://` referrer signal, the one leg Step 58 could not test itself.
+**B-1a–B-1d are now all closed; only B-1e is left on B-1, and it is an owner-only step blocked on
+Equifax.**
 
 B-1e (Play account) is waiting on Equifax: the listing address is the one on the Equifax request
 (owner decision 2026-10-04). Do not retry the Play signup before the D-U-N-S record is fixed;
-Google limits the tries. Ask whether Equifax has replied. B-2 (Apple) starts in parallel (owner
-decision 2026-10-04). A sole trader can only enrol as an Individual, with the personal legal name
-shown as seller (Step 58). The open owner choice is Individual now, or form a company first.
+Google limits the tries. Ask whether Equifax has replied. B-2 (Apple) is open in parallel: the
+owner still has to choose Individual now, or form a company first (Step 58) — nothing else on
+B-2 can proceed until that choice is made, since it decides which enrollment flow to start.
 Enrollment identifiers are not in this repo (Step 54).
+
+Next step is therefore an owner decision, not code: ask whether Equifax has replied, and ask
+Individual-vs-company for Apple. Until one of those lands, the available agent-only work is the
+non-blocking items in the "still open" paragraph below — none of them gates B-1/B-2.
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
 may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
@@ -2865,7 +2931,9 @@ Step 55) `BASE_PATH=/`, `FM_HOST`, `FM_APEX`; backups `~/funny/.env.bak-2026-10-
 `~/funny/.env.bak-b1a` on the VM. The production Worker secret is on this PC at
 `~/.cloudflare/worker-secret` (verified against `/stats`, not re-copied from the VM). Cloudflare
 Email Routing for `privacy@oursharedcode.com` was added by the owner by hand in the dashboard
-(Step 57) — the stored token cannot manage it.
+(Step 57) — the stored token cannot manage it. The Android app-signing key (Step 59) is
+`~/.android-keys/funny37-upload.jks`, alias `funny37`; a hash-verified copy is on the external
+drive at `F:\Mark\android-keys\`. Losing both means the installed app can never be updated.
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
@@ -2884,8 +2952,12 @@ Still open, none blocking: the `game.picture.socket.test.ts` mock missing `image
 (an `npm test` flake under load, Step 58; one-line fix awaiting the owner's go-ahead); making the
 repo public before any launch announcement; real Funny One
 icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
-install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
-games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
+install leg (closes Gate 7, Funny Multi); B-8 answered for Funny Multi's TWA — no Play Protect
+warning on install (Step 59) — but still open for a direct PWA/WebAPK install (where it was first
+seen, 2026-09-16) and for Funny One's own store app, not yet built; whether to delete the unused
+32-bit JDK Bubblewrap installed to `~/.bubblewrap/jdk/` (1.1 GB, superseded by the 64-bit one at
+`~/.bubblewrap/jdk64/`, Step 59) — asked, no owner answer yet; the Arm VM retry; a cosmetic
+"Render" sweep in code comments; the stray T-4.2 comment in
 `apps/funny-multi-server/src/prompt.ts:72`; a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await

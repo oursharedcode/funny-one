@@ -100,13 +100,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-1c** — **closed 2026-10-04 (Step 58)**, block in `steering/tasks-done.md`. The Support
   screen is hidden inside the Android store app, on production; this closes T-9.4's FM-APP-3
   clause.
-- **B-1d (M)** Bubblewrap project under `deploy/android/`, signing key, local build; install on
-  the owner's Android phone — opens with no URL bar and no support entries; note whether the TWA
-  sidesteps B-8's Play Protect warning. Needs JDK 17 + Android build-tools (absent on this PC;
-  Bubblewrap fetches them into its own cache — owner decision 2026-10-04, no system-wide
-  install). The launch URL must be `https://www.funny37.oursharedcode.com/?shell=android` (B-1c's
-  first signal); the install check also proves B-1c's referrer signal, which a desktop browser
-  cannot fake.
+- **B-1d** — **closed 2026-10-05 (Step 59)**, block in `steering/tasks-done.md`. The Android TWA
+  is built, signed, and installed on the owner's phone; every check passed, including B-8's.
 - **B-1e (owner)** Play developer account — organization, under the ABN (owner decision
   2026-10-03). Stopped at the signup's "Payments profile" step: the D-U-N-S record's address is
   incomplete, fix requested from Equifax 2026-10-03. **Owner decided 2026-10-04: stay with the
@@ -130,9 +125,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-7** Optional AI Gateway / output classifier if the audience broadens (MODERATION.md
   operator guidance).
 - **B-8** Google Play Protect shows "Unsafe app blocked — built for an older version of
-  Android" on install, requiring "Install anyway" (seen 2026-09-16, A2). Likely the WebAPK's
-  minified/unsigned nature reading as unrecognized rather than a real manifest defect —
-  investigate `targetSdkVersion`-equivalent metadata and whether a TWA (B-1) sidesteps it.
+  Android" on install, requiring "Install anyway" (seen 2026-09-16, A2, on the plain PWA/WebAPK
+  install). **Answered 2026-10-05 (Step 59): a TWA does sidestep it** — no warning on the
+  Bubblewrap-built, signed install. Still open for a direct PWA install and for Funny One's own
+  store app, once built.
 - **B-9** Version 2 animated cartoon: animate the still client-side and export WebM via
   `MediaRecorder` (SRC's `VIDEO_GENERATION_ANALYSIS.md` option 2). Zero AI cost. Note DD-9
   dropped SRC's Lottie engine — reinstating it is a v2 decision, not a revert.

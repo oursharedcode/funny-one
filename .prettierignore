@@ -13,3 +13,6 @@ package-lock.json
 
 # Verbatim upstream text
 LICENSE
+
+# Owned by Bubblewrap, which rewrites it with JSON.stringify on a version bump
+deploy/android/twa-manifest.json

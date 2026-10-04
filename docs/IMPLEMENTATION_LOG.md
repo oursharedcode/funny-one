@@ -2434,20 +2434,145 @@ server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 53/53 (795 
 
 ---
 
-**RESUME HERE (2026-10-03, after Step 51).** ~~RESUME HERE (2026-10-02, after Step 50)~~ —
-carried into this note. The pre-generated library is complete in R2 (10,000/10,000); production
-serves it with Workers AI generation switched off (Step 51), so no further Neuron spend is
-possible from production until someone deliberately uncomments `[ai]` in `wrangler.toml` and
-redeploys. One check is still owed before Gate 9's library half can be marked closed: after the
-daily neuron counter resets, play a full game on production and confirm the Cloudflare
-dashboard's *Neurons used today* for `flux-1-schnell` stays at 0 — it necessarily will now
-(generation is off), so this check has become a formality rather than a real test; consider
-whether to still run it or just close the library half on Step 51's evidence. Gate 9's support
-half still owes D4 (Sponsors dashboard — or `gh auth refresh -s read:user` once, then the agent
-can check it) and D5(a) (a QR Lightning payment from a second wallet) — see Step 49's **Owed**.
-Gate 9 closes when both halves pass; then the store-app phases (owner decision 2026-09-29:
-Phase 9 first). The Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO,
-unblocks Phase S-3) still runs in parallel and blocks nothing here.
+## Step 52 (Gate 9 sign-off) — Phase 9 closed (2026-10-03)
+
+**Shipped:** Docs only. The owner played one full game on production (desktop Chrome, three
+tabs, to the end screen) and a cartoon appeared. With generation off since Step 51, that proves
+a real game's prompt is a library hit rather than a 503 — the library half of Gate 9. The owner
+waived Part D's D4 (Sponsors arrival) and D5(a) (QR payment from a second wallet) and asked not
+to be reminded: recorded as *waived*, not *passed*, in `docs/ACCEPTANCE.md` (results table, a
+waiver paragraph, sign-off line) and `steering/tasks.md`. The support half therefore stands on
+D1–D3 and D5(b). The owner also cancelled the paid Workers AI plan ($5/month) the same day;
+`DEPLOYMENT.md`'s pre-generation paragraph now says a re-run on the free plan (10k neurons/day)
+is a several-day job. T-9.4 ticked and moved with Gate 9 into `steering/tasks-done.md` (the
+store-shell gate clause stays deferred to B-1/B-2); `tasks.md` marks Phase 9 closed.
+
+**Owed:** none. (D4/D5(a) are waived — do not list them.)
+
+Gates (run 2026-10-03/04; one run covers Steps 52–54 — docs only, the code tree is unchanged
+since Step 51): typecheck, lint, format:check clean; `npm test` outside the sandbox — client
+225/225, server 214/214, funny-one-client 113/113, shared 190/190, cloudflare 53/53 (795
+total); `npm audit` — production tree 0 vulnerabilities, full tree one dev-only advisory,
+accepted by ID (Step 53).
+
+---
+
+## Step 53 — `npm audit`: one unfixable dev-only advisory accepted by ID (2026-10-04)
+
+**Shipped:** Docs only — a gate rule, no dependency change. Running the gates for Step 52 found
+`npm audit` failing with 11 high. All eleven are one advisory, counted once per package on the
+path: GHSA-vfj7-8cjw-p6xm (CVE-2026-93687), `braces` ≤ 3.0.3 — stack exhaustion (denial of
+service) on deeply nested brace patterns, published 2026-09-18. It covers every published
+version (3.0.3 is the latest), so no in-range fix exists; the only fixes `npm audit` offers are
+two major upgrades, `tailwindcss` 4 and `@typescript-eslint/*` 8.
+
+`braces` reaches the tree by two dev-only routes: `tailwindcss` 3.4.19 in both clients
+(`chokidar`, `micromatch`, `fast-glob`) and the root's `@typescript-eslint/*` 7.18.0
+(`typescript-estree` → `globby` → `fast-glob` → `micromatch`). Production is not exposed:
+`npm audit --omit=dev` reports 0, the `Dockerfile`'s runtime stage installs with `--omit=dev`,
+and both clients ship as built static files. `braces` runs only at build and lint time, on glob
+patterns from this repo's own config — never on player input.
+
+Owner decision 2026-10-04, after weighing the alternatives: accept this one advisory **by ID**
+and keep the gate strict otherwise. The `npm audit` gate now reads: (a) `npm audit --omit=dev`
+reports 0 vulnerabilities; (b) the full `npm audit` lists no advisory other than
+GHSA-vfj7-8cjw-p6xm. Any other advisory, or any production one, fails the gate as before — stop
+and ask. Exit: check `npm view braces version` each session; once it is above 3.0.3, take the
+fix in range as its own lockfile commit (the Step 42 rule) and delete the exception.
+
+Rejected: `npm audit fix --force` (two breaking major upgrades under a docs commit); migrating
+to Tailwind 4 and typescript-eslint 8 now (tasks in their own right — Tailwind 4 also raises the
+minimum browser versions, a product decision); holding every commit until upstream ships a fix
+(blocks all work for an unknown time, for a risk production does not carry); an `overrides` pin
+to a fork (trades a known, low-reach risk for an unreviewed supply-chain one).
+
+**Owed:** nothing. Optional, not approved: a small in-repo script that enforces (a) and (b), so
+the rule does not rest on reading the audit output by eye.
+
+Gates: as Step 52.
+
+---
+
+## Step 54 (task B-1, started) — store-app decisions, Play enrollment groundwork (2026-10-03/04)
+
+**Shipped:** No code — decisions, findings and owner-side enrollment operations. B-1 stays
+unticked; its work is filed in `steering/tasks.md` as B-1a–B-1e, plus B-11 (hub site).
+
+*Owner decisions (2026-10-03).* Each game gets its own host: Funny Multi
+`www.funny37.oursharedcode.com`, Funny One `www.funny1.oursharedcode.com`, and a hub with
+history and links at `www.funny.oursharedcode.com`. Package ids `com.oursharedcode.funny37` and
+`com.oursharedcode.funny1` (permanent once published; the second recorded on Phase S-3 in
+`steering/funny-one-tasks.md`). Play developer account: organization, under the existing ABN;
+Android first, the D-U-N-S fix running in parallel. Privacy policy: authored in this repo and
+served by our own deploy. Recommended and not objected to, so still to confirm: the game sits at
+the new host's root and the old origin keeps serving; shell detection uses two signals (a
+Bubblewrap launch-URL parameter kept in `sessionStorage`, and the `android-app://` referrer);
+the Support screen is hidden entirely inside the shell.
+
+*Findings (read-only).* A TWA renders the live deployed origin in Chrome — the same bundle the
+web serves — so the "store-shell build flag" in B-1's and T-9.4's text cannot be a build-time
+flag; detection has to happen at runtime. Support has a single gating point, the `setSupport`
+call in `apps/funny-multi-client/src/App.tsx`. Digital Asset Links needs
+`/.well-known/assetlinks.json` at the origin root of the exact host, without a redirect, and
+`deploy/caddy/Caddyfile` answers 404 for everything outside the two game paths. The origin is
+baked into the APK, which is why the move (B-1a) comes before the build (B-1d). The repo has no
+privacy policy, and this PC has no JDK or Android build-tools. `oursharedcode.com`'s DNS is at
+Cloudflare; the three new hosts do not exist yet; `www.oursharedcode.com` is a live site and
+can serve as the organization website the signup asks for.
+
+*Enrollment (owner operations, one at a time).* The ABN register shows a sole trader with a
+registered business name. Google's account-type help says an organization account is for
+commercial activity and needs a D-U-N-S number; it does not mention sole traders either way. A
+D-U-N-S record for the ABN already exists, but the Play signup rejected it — "The address is
+incomplete for the D-U-N-S number that you entered" — and stopped at the "Payments profile"
+step. Google limits the tries, so the owner cancelled rather than retry. dnb.com's update form
+covers US records only; Australian records are handled by Equifax, D&B's partner for Australia.
+The owner sent Equifax's D&B request form on 2026-10-03 asking for a full street address on the
+record (reply promised within 48 hours; phone 138 332, Mon–Fri, is the faster follow-up).
+
+Identifiers — the ABN, the D-U-N-S number, the signup account — are kept out of this repo on
+purpose, since it is due to go public; the owner has them, and so does the agent's memory
+(`funnyone-store-enrollment`).
+
+**Owed:**
+- Owner decision, raised 2026-10-04: Play shows an organization's legal name, legal address,
+  developer email and phone on every listing, and the address is the D-U-N-S one. Options:
+  (1) keep the organization account with that address; (2) organization with a business street
+  address (D&B refuses PO boxes; Equifax needs the new address before fixing the record);
+  (3) a personal account — no D-U-N-S, but 12 testers for 14 days before production.
+- Equifax's reply. The address on the corrected record goes into Google's payments profile
+  character for character; do not retry the signup before the record is fixed.
+- Owner decision: where the privacy policy lives — the hub, or each game's own root.
+- B-1a–B-1d (all the code and deploy work) and B-1e (the account and the listing).
+- Where Apple enrollment stands (B-2) — not asked this session.
+
+Gates: as Step 52.
+
+---
+
+**RESUME HERE (2026-10-04, after Step 54).** ~~RESUME HERE (after Step 52)~~ — carried
+into this note. **B-1 (Android TWA + Play listing, Funny Multi) is started; no code yet.**
+Step 54 holds the decisions, `steering/tasks.md` the split into B-1a–B-1e. **Next step: B-1a**,
+the origin move to `https://www.funny37.oursharedcode.com/` — DNS at Cloudflare, a Caddy site
+block, production `BASE_PATH=/`. Then B-1b (origin-root `assetlinks.json` + privacy policy),
+B-1c (shell detection, Support hidden — closes T-9.4's FM-APP-3 clause) and B-1d (Bubblewrap
+build, check on the owner's Android phone). None of these waits for the Play account (B-1e).
+
+Ask the owner before starting: (1) B-1a's two unconfirmed points — the game at the host root,
+the old origin still serving; (2) B-1c's two — both detection signals, Support hidden entirely;
+(3) the privacy policy's host — hub or each game's root; (4) the public-address decision for the
+Play account (Step 54, three options); (5) whether Equifax has replied about the D-U-N-S
+address — do not retry the Play signup before the record is fixed, Google limits the tries;
+(6) where Apple enrollment stands. Enrollment identifiers are not in this repo (Step 54).
+
+`npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
+may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
+gate — stop and ask. Each session run `npm view braces version`: above 3.0.3 means a fix is
+out — take it in range as its own lockfile commit and delete the exception.
+
+The Funny One phone pass through `docs/ACCEPTANCE_FUNNY_ONE.md` (closes Gate FO, unblocks
+Phase S-3) still runs in parallel and blocks nothing. The paid Workers AI plan is cancelled;
+production generation is off (`[ai]` commented out in `wrangler.toml`).
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` now holds the support rails; the
@@ -2474,10 +2599,10 @@ games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray 
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
 native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
-design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); whether to keep the $5/month Workers
-plan now the library is complete and generation is switched off (owner decision after Gate 9 —
-it now only matters for re-running the batch after a pool edit; the free plan's 10k neurons/day
-would still cover that over a few days), Funny One showing the library's cartoons when online
+a script enforcing Step 53's audit rule (optional, not approved); Tailwind 4 and
+typescript-eslint 8 as tasks of their own (Tailwind 4 raises the browser floor — a product
+decision); B-11 (hub site);
+design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); Funny One showing the library's cartoons when online
 (same pools, public `/i/` links; needs `buildPrompt` in `packages/shared`), and re-encoding the
 ≈ 730 KB JPEGs at store time. Pasting a command into the owner's Git Bash can prepend `[200~`:
 `bind 'set enable-bracketed-paste off'` first.

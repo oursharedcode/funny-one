@@ -6,7 +6,7 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–8 complete; Phase 9 (commercial rails) **in progress** — paused 2026-09-20 by owner direction while two new fronts were planned (see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` for the new product and this file's B-1/B-2 for the store apps, pulled forward), resumed 2026-09-27; owner decision 2026-09-29: finish Phase 9 before the store-app phases. Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
+| **Progress** | Phases 0–9 complete (Gate 9 closed 2026-10-03). Next: the store-app phases (B-1/B-2, pulled forward 2026-09-20; see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` for Funny One). Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
 | **Build state** | Tracked per step in `docs/IMPLEMENTATION_LOG.md`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
@@ -75,29 +75,11 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   **Still open:** the iPhone install leg (A1), deferred for lack of a phone this session; Gate 7
   closes once that runs.
 
-## Phase 9 — Commercial: pre-generated library + support rails (final phase, D-6/D-7)
+## Phase 9 — Commercial: pre-generated library + support rails (CLOSED 2026-10-03, Gate 9)
 
-*Rewritten 2026-09-16; the Polar premium tasks that stood here were never started.*
-
-- [ ] **T-9.4 (M)** Client: `SupportScreen` (Home ♥ + end screen), tap-to-copy with "Copied!",
-      PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
-      QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
-      off in store-shell builds. Tests: rows follow config, copy button, no rail → no ♥. → FM-TIER-4
-      *Landed Step 44 (2026-09-29), everything above except "gated off in store-shell builds."
-      QR via the existing `QRCode` component, not a new vendored canvas encoder (owner decision
-      2026-09-29, reuse over vendoring — design §10.2 corrected). **Remaining:** the store-shell
-      gate itself — no flag exists because no store shell exists yet; deferred to whichever of
-      B-1/B-2 lands first (noted there).*
-- **Gate 9**: library complete (`pregenerate --dry-run` reports 10⁴ in R2, 0 missing; a full
-  game on production adds no Workers AI usage on the Cloudflare dashboard — reworded
-  2026-10-02: production's `/stats` reads 0 always, `STATS_KV` being unbound, so "leaves
-  `/stats` unchanged" could not fail); Support screen on desktop + Android: a real $1 PayID transfer arrives
-  under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
-  from a second wallet arrives. The device pass is scripted in `docs/ACCEPTANCE.md` Part D.
-  **Part D run 2026-10-01 (Step 49):** D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR
-  payment from a second wallet) deferred — still owed before Gate 9 closes.
-  **Library run 2026-10-02 (Step 50):** `--dry-run` reports 10,000 in R2, 0 missing; the
-  full-game check against the dashboard is still owed.
+*Closed task blocks and Gate 9 live in `steering/tasks-done.md`. The one clause left over —
+T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 lands first
+(filed as **B-1c**, 2026-10-03).*
 
 ## Post-v1 backlog (not scheduled)
 
@@ -108,6 +90,32 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   Whichever of B-1/B-2 lands first also adds the store-shell build flag that gates T-9.4's
   `SupportScreen` off per FM-APP-3 (deferred there 2026-09-29 — no flag can mean anything before
   a shell build exists to gate).
+  **Started 2026-10-03 (Step 54)** — owner decisions and enrollment state are in that log entry;
+  the work beyond this text is filed as B-1a–B-1e, to be done in that order (B-1e runs in
+  parallel). Package id `com.oursharedcode.funny37` — permanent once published.
+- **B-1a (M)** Origin move: Funny Multi to `https://www.funny37.oursharedcode.com/` (owner
+  decision 2026-10-03) — DNS at Cloudflare, a Caddy site block, production `BASE_PATH=/`. Must
+  land before B-1d: a TWA's origin is baked into the APK. Two points are the agent's reading,
+  not yet confirmed by the owner — ask before starting: the game sits at the host root (no
+  sub-path), and the old `www.staging-oursharedcode.com/funny37-game` keeps serving for
+  installed PWAs.
+- **B-1b (S)** Origin-root files on the new host: `/.well-known/assetlinks.json` (Digital Asset
+  Links — exact host, origin root, no redirect) and a repo-authored privacy policy, which Play
+  requires and the repo does not have. Today's Caddyfile answers 404 outside the game paths.
+- **B-1c (S)** Store-shell detection, then the Support screen hidden entirely inside the shell —
+  closes T-9.4's FM-APP-3 clause. Runtime detection (a TWA renders the deployed bundle, so a
+  build-time flag cannot see it): a Bubblewrap launch-URL parameter persisted to
+  `sessionStorage`, plus the `android-app://` referrer. Both choices (two signals; hide
+  entirely) were recommended 2026-10-03 and not objected to — confirm before starting.
+- **B-1d (M)** Bubblewrap project under `deploy/android/`, signing key, local build; install on
+  the owner's Android phone — opens with no URL bar and no support entries; note whether the TWA
+  sidesteps B-8's Play Protect warning. Needs JDK 17 + Android build-tools (absent on this PC;
+  Bubblewrap fetches them).
+- **B-1e (owner)** Play developer account — organization, under the ABN (owner decision
+  2026-10-03). Stopped at the signup's "Payments profile" step: the D-U-N-S record's address is
+  incomplete, fix requested from Equifax 2026-10-03. Open owner decision first: an organization
+  account shows its legal address on every listing (Step 54). Then payments profile, contacts,
+  fee; then the listing (assets, content rating 12+, Data Safety, release).
 - **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
   **Pulled forward 2026-09-20**, same note as B-1.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).
@@ -132,6 +140,9 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   affiliate links in README/HUB only; the v2 animation export as the gift thank-you;
   grants/credits (Screen Australia games fund, Cloudflare/Oracle startup credits, Open
   Collective for language packs); ad network on «Чепуха 37» only — separate decision.
+- **B-11** Hub site at `https://www.funny.oursharedcode.com/` — the common page for both games:
+  history and links (owner decision 2026-10-03). Candidate host for the shared privacy policy
+  (open: hub or each game's own root — B-1b).
 
 ## Dependency notes
 

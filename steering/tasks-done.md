@@ -1385,3 +1385,28 @@ unless they carry advisories:
       block, a note per variable, restart, `curl …/config`) and a support item in the
       five-minute check. ACCEPTANCE.md: Part D, rows D1–D5 with their own results table — the
       script for Gate 9's real-money device pass.*
+
+- [x] **T-9.4 (M)** Client: `SupportScreen` (Home ♥ + end screen), tap-to-copy with "Copied!",
+      PayID registered-name line, Sponsors "choose one-time" hint, `lightning:` link + canvas
+      QR, "voluntary gift, nothing owed" copy in 15 locales; hidden when no rail is set; gated
+      off in store-shell builds. Tests: rows follow config, copy button, no rail → no ♥. → FM-TIER-4
+      *Landed Step 44 (2026-09-29), everything above except "gated off in store-shell builds."
+      QR via the existing `QRCode` component, not a new vendored canvas encoder (owner decision
+      2026-09-29, reuse over vendoring — design §10.2 corrected). **Remaining:** the store-shell
+      gate itself — no flag exists because no store shell exists yet; deferred to whichever of
+      B-1/B-2 lands first (noted there).*
+- **Gate 9**: library complete (`pregenerate --dry-run` reports 10⁴ in R2, 0 missing; a full
+  game on production adds no Workers AI usage on the Cloudflare dashboard — reworded
+  2026-10-02: production's `/stats` reads 0 always, `STATS_KV` being unbound, so "leaves
+  `/stats` unchanged" could not fail); Support screen on desktop + Android: a real $1 PayID transfer arrives
+  under the displayed name, a $1 one-time Sponsors payment arrives, a Lightning invoice paid
+  from a second wallet arrives. The device pass is scripted in `docs/ACCEPTANCE.md` Part D.
+  **Part D run 2026-10-01 (Step 49):** D1–D3 pass; D4 (Sponsors arrival) and D5(a) (QR
+  payment from a second wallet) deferred. **Waived by the owner 2026-10-03:** D4 and D5(a)
+  will not be run and are no longer owed; the support half of Gate 9 stands on D1–D3 + D5(b).
+  **Library run 2026-10-02 (Step 50):** `--dry-run` reports 10,000 in R2, 0 missing; the
+  full-game check is recorded below.
+  **Closed 2026-10-03 (Step 52).** Library half: one full production game (desktop, three tabs)
+  ended with a cartoon — a real prompt is a library hit with generation off. Support half:
+  D1–D3 and D5(b) pass; D4 (Sponsors arrival) and D5(a) (QR from a second wallet) waived by the
+  owner. The owner also cancelled the paid Workers AI plan the same day (back on free).

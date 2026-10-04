@@ -84,7 +84,10 @@ this — `worker.js` treats `STATS_KV` as optional.
 The game only ever asks for one of 10,000 possible pictures. Generating them all once
 (`node cloudflare/pregenerate.mjs`, resumable) costs about $21 on the paid Workers AI plan and
 about 7 GB of R2 (inside R2's free 10 GB), after which every request is a cache hit, the daily
-cap never fires and R2 egress is free. Without it the cache fills organically and `MAX_IMAGES_PER_DAY` applies.
+cap never fires and R2 egress is free. Without it the cache fills organically and
+`MAX_IMAGES_PER_DAY` applies. The project's own run used the paid plan, then went back to free
+on 2026-10-03 — on free, the 10k neurons/day make a full re-run a several-day job instead of
+one.
 
 The batch needs the generation switch on. When `--dry-run` reports nothing missing, switch it
 off (above); switch it back on for the re-run after any pool edit.

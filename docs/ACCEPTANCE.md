@@ -161,9 +161,16 @@ and sends one real $1 gift over each rail (FM-TIER-3). Same URL as above.
 | D1  | pass                            | ♥ on C and A; end-screen link on A after a three-tab game. |
 | D2  | pass                            | PayID and Lightning, on C and A. |
 | D3  | pass                            | $1 from the owner's other bank: payee shown as MARK WEB TOOLS; arrived. |
-| D4  | deferred                        | Owner reported paying the $1 one-time tier; arrival not confirmed — the dashboard check was not done, and the agent's `gh` token (no `read:user`) listed 0 sponsorships — inconclusive, since that token may not see one-time or private ones. |
-| D5  | deferred                        | (b) pass: the address link on C opened a Lightning wallet with the address filled in. (a) not done — the QR payment from a second wallet. |
+| D4  | waived (owner, 2026-10-03)      | Owner reported paying the $1 one-time tier; arrival not confirmed — the dashboard check was not done, and the agent's `gh` token (no `read:user`) listed 0 sponsorships — inconclusive, since that token may not see one-time or private ones. |
+| D5  | (b) pass; (a) waived (owner, 2026-10-03) | (b) pass: the address link on C opened a Lightning wallet with the address filled in. (a) not done — the QR payment from a second wallet. |
 
-**Sign-off:** Gate 9's support-screen leg passes when D1–D5 are _pass_. Gate 9 also needs the
+**Owner waiver, 2026-10-03:** the owner will not run D4 (Sponsors arrival) or D5(a) (QR payment
+from a second wallet) in this project and does not want to be reminded of them. They are
+closed as waived, not passed: the Sponsors link and the Lightning QR are verified only as far
+as D1/D2/D5(b) and Step 49's read-only checks (Sponsors page 200 with $1/$3/$5 one-time tiers;
+Lightning address resolves via LNURL-pay). No agent should list either as owed.
+
+**Sign-off:** Gate 9's support-screen leg passes when D1–D3 and D5(b) are _pass_ and D4/D5(a)
+are waived (above). Gate 9 also needs the
 library complete (R2 holds all 10⁴ pictures; a full game on production leaves `/stats`
 unchanged) — T-9.2's production run, not part of this script.

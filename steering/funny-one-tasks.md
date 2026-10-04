@@ -174,7 +174,10 @@ with everything above — it has its own multi-week lead time and does not block
   unblocked, expect an *easier* pass than Funny Multi's — no App Store 4.2 online-only risk, and
   Google Play Families eligibility is a realistic target (FO-ID-1) — plus one new task neither
   product's deploy has yet: publish `.well-known/assetlinks.json` for Android Digital Asset
-  Links verification.
+  Links verification. **Owner decisions 2026-10-03:** Funny One's origin becomes
+  `https://www.funny1.oursharedcode.com/` and its package id `com.oursharedcode.funny1`
+  (permanent once published); Funny Multi's B-1b builds the origin-root `.well-known` handling
+  this task then reuses.
 
 ## Dependency notes
 

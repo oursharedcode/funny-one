@@ -2730,26 +2730,125 @@ tree. `npm test` outside the sandbox: 801 tests across all workspaces passed, in
 GHSA-vfj7-8cjw-p6xm (`braces`, still 3.0.3 per Step 53's exception). CI is the sixth gate and runs
 on the push.
 
+## Step 58 (task B-1c) — Support screen hidden inside the Android store app, deployed (2026-10-04)
+
+**Shipped:** new `apps/funny-multi-client/src/storeShell.ts`. `isStoreShell()` is true on either
+of two signals (owner decision 2026-10-04): `?shell=android` on the launch URL, which B-1d's
+Bubblewrap project will set, or a referrer of `android-app://com.oursharedcode.funny37` (with or
+without a trailing slash). The referrer catches a `?room=` invitation that the app's link
+handling opens directly, without the launch parameter. Matching only our own package is a
+tightening of the confirmed design, not a change to it: the Google app and Gmail send
+`android-app://` referrers of their own when they hand a link to Chrome, and a bare prefix match
+would have hidden the ♥ from those web visitors. Either signal is written to `sessionStorage`,
+because a session can lose both. "New room" (`App.tsx`'s `createNewRoom`) navigates to the bare
+home URL with our own page as referrer, and Home's "start over" strips the query. Storage access
+is wrapped, so a browser that blocks it still gets the launch-URL signal, without persistence.
+Each call reads the signals fresh, with no memo; it costs one `URLSearchParams` and one storage
+read.
+
+`support.ts`'s `hasAnyRail()` already decides whether Home's ♥ and the end screen's "Support
+this server" show. It now returns false inside the shell, so the existing two call sites needed
+no change. `App.tsx` renders `SupportScreen` only when `hasAnyRail(support)` also holds, so no
+path opens it inside the shell. `SupportScreen` stays in the bundle: a TWA renders the deployed
+web bundle, so a build-time exclusion is not possible, and FM-APP-3 asks for the screen to be
+hidden, not absent. Every gift surface goes through that one screen, the operator's
+`DEPLOYER_DONATE_URL` button included. Design §10.2's deferral note is rewritten to describe all
+this.
+
+Tests: new `storeShell.test.ts` (6 tests): a plain visit and an invitation link are not the shell;
+the launch URL is, and stays so once the query is gone; our referrer is, and stays so; other
+`shell=` values, the Google app's referrer and a look-alike package `…funny37x` are not, and
+leave nothing in storage; blocked storage still honours the launch URL. New `support.test.ts`
+(3 tests; `hasAnyRail` had no direct test before). `App.test.tsx` adds 2 tests in the T-9.4 block:
+with every rail set and `?shell=android`, no ♥ on Home and no entry on the end screen. Its
+`beforeEach` now clears `sessionStorage`, since the flag outlives the URL by design. Negative
+control: with the one gate line removed from `hasAnyRail`, exactly those 3 shell tests failed;
+restored.
+
+**Verified in a browser:** the dev client and server ran locally, the server with one test rail
+(`DEPLOYER_LIGHTNING_ADDRESS` set inline, no `.env` touched). A throwaway headless Playwright
+script at phone width (390 × 844) checked these cases:
+
+- a plain visit shows the ♥, top right;
+- `?shell=android` shows no ♥ and leaves no layout gap;
+- the bare URL in the same tab, and a reload, still show no ♥;
+- `?room=ABCD&lang=en&shell=android` opens "Joining room ABCD" with no ♥;
+- a new tab in the same browser shows the ♥ again, because `sessionStorage` belongs to one tab.
+
+Chrome would not pass an `android-app://` referer through Playwright's `goto` (`document.referrer`
+came back empty). The referrer leg is therefore covered by unit tests only until B-1d's install
+on the owner's phone. The end-screen entry is covered by `App.test.tsx`, not by a browser run: a
+browser check would need a full three-player game, and both screens read the same function.
+
+**Deployed:** the owner ran `deploy/ship.sh` from Git Bash. Production curl checks afterwards:
+
+- `/health` 200, and `/config` returns the support rails as before.
+- The single served bundle, `assets/index-DljFyzwy.js`, contains both `funny37.storeShell` and
+  `android-app://com.oursharedcode.funny37`, and `sw.js` precaches that bundle.
+- `/privacy` 200 `text/html`, and `/.well-known/assetlinks.json` 200 `application/json`. Both are
+  still served by Caddy itself after the deploy.
+
+B-1c is closed.
+
+**Owed:** B-1d's launch URL must be `https://www.funny37.oursharedcode.com/?shell=android`.
+B-1d's install is also the first real test of the referrer signal.
+
+**Found, not fixed:** the first full `npm test` run exited 1 on an unhandled error in
+`apps/funny-multi-server/src/game.picture.socket.test.ts`: `No "imagesGeneratedToday" export is
+defined on the "./image.js" mock`. That file's `vi.mock('./image.js')` factory leaves out
+`imagesGeneratedToday`, which `stats.ts` calls. Under load, a stats read lands before teardown
+and hits the gap. All 220 server tests passed, and two isolated re-runs of that workspace were
+clean. The fault is in an existing test, and this step touched no server code. A fix is a
+one-line addition to the mock; it needs the owner's go-ahead as its own step.
+
+**Owner decisions this session:**
+
+- B-1e's listing address is the one already on the Equifax request.
+- Equifax has not replied, so B-1e stays untouched.
+- B-1d lets Bubblewrap fetch JDK 17 and the build-tools into its own cache.
+- Apple enrollment (B-2) starts now, in parallel.
+
+A web check of Apple's own pages (developer.apple.com/programs/enroll,
+/help/account/membership/program-enrollment, /support/D-U-N-S) found the following:
+
+- A sole proprietor must enroll as an **Individual**, and the seller shown is the personal
+  legal name. Organizations must be legal entities, and Apple refuses "DBAs, fictitious
+  business names, trade names, or branches", so the registered business name cannot be the
+  seller.
+- An Individual needs no D-U-N-S, so the Equifax fix does not block Apple.
+- The fee is US $99 a year.
+- Apple moves an Individual account to an Organization later on request. The account holder
+  must be a founder, supply the company's D-U-N-S, and accept a one-way change that resets
+  vendor IDs.
+- EU DSA trader status applies to free apps too, and a trader's address, phone and email show on
+  EU product pages.
+
+Open for the owner: Individual now, or form a company first.
+
+Gates: typecheck, lint, `format:check` clean. `npm test` outside the sandbox: 812 tests passed
+(801 + 11 new). The run's one unhandled error is the pre-existing server-test flake above, and
+two isolated re-runs of that workspace were clean. `npm audit --omit=dev`: 0. Full `npm audit`:
+only GHSA-vfj7-8cjw-p6xm (`braces`; `npm view braces version` still 3.0.3). CI is the sixth gate
+and runs on the push.
+
 ---
 
-**RESUME HERE (2026-10-04, after Step 57).** ~~RESUME HERE (after Step 55)~~ — carried into this
-note. **B-1b is closed and deployed: `https://www.funny37.oursharedcode.com/privacy` and
-`/.well-known/assetlinks.json` are live, served by Caddy itself; the font fix (Step 56) landed in
-the same deploy.** B-1 (Android TWA + Play listing) continues. **Next step: B-1c** — store-shell
-detection (a Bubblewrap launch-URL parameter persisted to `sessionStorage`, plus the
-`android-app://` referrer — both signals, hide entirely, confirmed by the owner 2026-10-04) then
-the Support screen hidden entirely inside the shell, closing T-9.4's FM-APP-3 clause. This must
-land before B-1d's install check, since the privacy policy already says the Android app offers no
-gifts. Then **B-1d** (Bubblewrap project under `deploy/android/`, signing key, local build, install
-on the owner's phone — also fills `assetlinks.json`'s fingerprint). None of B-1b–B-1d waits for
-the Play account (B-1e).
+**RESUME HERE (2026-10-04, after Step 58).** ~~RESUME HERE (after Step 57)~~ — carried into this
+note. **B-1c is closed and deployed: the Support screen is hidden inside the Android store app
+(`storeShell.ts`, gated in `hasAnyRail()`), matching the live privacy policy's "the Android app
+does not offer gifts".** **Next step: B-1d** — Bubblewrap project under
+`deploy/android/`; launch URL `https://www.funny37.oursharedcode.com/?shell=android`; Bubblewrap
+fetches JDK 17 and the build-tools into its own cache (owner decision 2026-10-04); signing key;
+local build; install on the owner's phone. The install is also the first real test of B-1c's
+referrer signal. It fills `assetlinks.json`'s fingerprint. None of B-1c–B-1d waits for the Play
+account (B-1e).
 
-Ask the owner before starting B-1e work (unrelated to B-1c/B-1d, runs in parallel): (1) the Play
-account's public address — an organization account shows its legal address on every listing
-(Step 54): the one on the Equifax request, or a separate business street address; (2) whether
-Equifax has replied about the D-U-N-S address — do not retry the Play signup before the record is
-fixed, Google limits the tries; (3) where Apple enrollment stands. Enrollment identifiers are not
-in this repo (Step 54).
+B-1e (Play account) is waiting on Equifax: the listing address is the one on the Equifax request
+(owner decision 2026-10-04). Do not retry the Play signup before the D-U-N-S record is fixed;
+Google limits the tries. Ask whether Equifax has replied. B-2 (Apple) starts in parallel (owner
+decision 2026-10-04). A sole trader can only enrol as an Individual, with the personal legal name
+shown as seller (Step 58). The open owner choice is Individual now, or form a company first.
+Enrollment identifiers are not in this repo (Step 54).
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
 may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
@@ -2781,7 +2880,9 @@ an `nslookup` of the new hosts (Step 55); `deploy/oci/network.py` and the Cloudf
 were allowed. The local `.env`'s Worker secret is not production's: any live Worker call from this
 PC needs the production pair exported first.
 
-Still open, none blocking: making the repo public before any launch announcement; real Funny One
+Still open, none blocking: the `game.picture.socket.test.ts` mock missing `imagesGeneratedToday`
+(an `npm test` flake under load, Step 58; one-line fix awaiting the owner's go-ahead); making the
+repo public before any launch announcement; real Funny One
 icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
 install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
 games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in

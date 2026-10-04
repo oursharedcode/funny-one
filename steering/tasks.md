@@ -97,25 +97,31 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   is live at `https://www.funny37.oursharedcode.com/`; the old `/funny37-game` path forwards.
 - **B-1b** — **closed 2026-10-04 (Step 57)**, block in `steering/tasks-done.md`. Origin-root
   privacy policy and `/.well-known/assetlinks.json` live on `FM_HOST`, served by Caddy itself.
-- **B-1c (S)** Store-shell detection, then the Support screen hidden entirely inside the shell —
-  closes T-9.4's FM-APP-3 clause. Runtime detection (a TWA renders the deployed bundle, so a
-  build-time flag cannot see it): a Bubblewrap launch-URL parameter persisted to
-  `sessionStorage`, plus the `android-app://` referrer. Both choices (two signals; hide
-  entirely) **confirmed by the owner 2026-10-04**.
+- **B-1c** — **closed 2026-10-04 (Step 58)**, block in `steering/tasks-done.md`. The Support
+  screen is hidden inside the Android store app, on production; this closes T-9.4's FM-APP-3
+  clause.
 - **B-1d (M)** Bubblewrap project under `deploy/android/`, signing key, local build; install on
   the owner's Android phone — opens with no URL bar and no support entries; note whether the TWA
   sidesteps B-8's Play Protect warning. Needs JDK 17 + Android build-tools (absent on this PC;
-  Bubblewrap fetches them).
+  Bubblewrap fetches them into its own cache — owner decision 2026-10-04, no system-wide
+  install). The launch URL must be `https://www.funny37.oursharedcode.com/?shell=android` (B-1c's
+  first signal); the install check also proves B-1c's referrer signal, which a desktop browser
+  cannot fake.
 - **B-1e (owner)** Play developer account — organization, under the ABN (owner decision
   2026-10-03). Stopped at the signup's "Payments profile" step: the D-U-N-S record's address is
   incomplete, fix requested from Equifax 2026-10-03. **Owner decided 2026-10-04: stay with the
   organization account** (not the personal one, so no 12-testers-for-14-days rule). An
-  organization account shows its legal address on every listing (Step 54); still open is which
-  address that is — the one on the Equifax request, or a different business street address (which
-  Equifax must put on the record first). Then payments profile, contacts, fee; then the listing
-  (assets, content rating 12+, Data Safety, release).
+  organization account shows its legal address on every listing (Step 54). **Owner decided
+  2026-10-04: the listing address is the one already on the Equifax request.** Equifax had not
+  replied as of 2026-10-04; nothing more here until it does. Then payments profile, contacts,
+  fee; then the listing (assets, content rating 12+, Data Safety, release).
 - **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
-  **Pulled forward 2026-09-20**, same note as B-1.
+  **Pulled forward 2026-09-20**, same note as B-1. **Apple enrollment starts now, in parallel
+  with B-1** (owner decision 2026-10-04). Apple does not take sole traders as organizations:
+  a sole trader enrolls as an **Individual**, the seller shown is the personal legal name, and no
+  D-U-N-S is needed. Apple will move the account to an Organization later, on request, if a
+  company is ever formed. US $99/year. Findings in Step 58. Open (owner): enroll as an
+  Individual now, or form a company first.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared

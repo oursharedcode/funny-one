@@ -91,6 +91,8 @@ const fetchMock = vi.fn().mockRejectedValue(new Error('no /config in this test')
 beforeEach(async () => {
   socketMock.reset();
   setUrl('');
+  // B-1c's store-shell flag outlives the URL that set it, by design.
+  sessionStorage.clear();
   fetchMock.mockClear();
   fetchMock.mockRejectedValue(new Error('no /config in this test'));
   vi.stubGlobal('fetch', fetchMock);
@@ -359,6 +361,25 @@ describe('support (T-9.4)', () => {
 
     fireEvent.click(screen.getByText('Support this server'));
     expect(screen.getByText('Donate')).toBeTruthy();
+  });
+
+  // B-1c (FM-APP-3): the Android store app offers no gifts, whatever the
+  // server's config says — neither entry point, on either screen.
+  it('offers no support entry point anywhere inside the Android store app', async () => {
+    setUrl('?shell=android');
+    resolveConfig({ payId: 'me@bank', payIdName: 'Me', donateUrl: 'https://example.com/give' });
+    renderInLobby();
+    await act(async () => {});
+    socketMock.fire('game:over', undefined);
+    expect(screen.queryByText('Support this server')).toBeNull();
+  });
+
+  it('shows no ♥ on Home inside the Android store app', async () => {
+    setUrl('?shell=android');
+    resolveConfig({ payId: 'me@bank', payIdName: 'Me' });
+    render(<App />);
+    await act(async () => {});
+    expect(screen.queryByLabelText('Support this game')).toBeNull();
   });
 });
 

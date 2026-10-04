@@ -1448,3 +1448,16 @@ unless they carry advisories:
       redirect, no caching; Google's Digital Asset Links checker reaches the file (objects only to
       the still-empty fingerprint list, expected before B-1d); the owner confirmed both the policy
       and the game's font on their phone. → FM-APP-1
+- [x] **B-1c (S)** Store-shell detection, then the Support screen hidden entirely inside the
+      shell — closes T-9.4's FM-APP-3 clause. Runtime detection, because a TWA renders the
+      deployed bundle and a build-time flag cannot see it. Owner decisions 2026-10-04: two
+      signals, hide entirely.
+      _Closed 2026-10-04 (Step 58)._ `storeShell.ts` reports the shell on `?shell=android`
+      (B-1d's launch URL) or a referrer of `android-app://com.oursharedcode.funny37`. Only our
+      own package counts, because other Android apps send `android-app://` referrers too. Either
+      signal is kept in `sessionStorage`. `hasAnyRail()` returns false inside the shell, which
+      removes the Home ♥, the end-screen entry and `SupportScreen` together; the screen stays in
+      the bundle. Verified by 11 new tests, a negative control, and a local headless phone-width
+      browser run. After the owner ran `deploy/ship.sh`, production's bundle and service worker
+      were checked by curl. The referrer signal is first exercised for real at B-1d's install.
+      → FM-APP-3

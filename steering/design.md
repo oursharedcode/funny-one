@@ -501,10 +501,16 @@ retired by D-6; nothing of it was built.*
   *(Corrected 2026-09-29 — owner decision was to reuse the existing component rather than vendor
   a new canvas encoder; the original text was written before that component existed in this
   client.)*
-- Store shells (FM-APP-3): the screen is compiled in but not yet gated by a shell build flag —
-  no flag exists because no store shell exists yet (B-1/B-2 are still Post-v1 backlog). Gating
-  is deferred to whichever of B-1/B-2 lands first, since the flag only means something once
-  there's a shell build to gate. *(Noted 2026-09-29, T-9.4.)*
+- Store shells (FM-APP-3): the screen stays in the bundle and is hidden at run time — a TWA
+  renders the deployed web bundle, so no build flag can see it. `storeShell.ts` reports the
+  Android app on either of two signals: `?shell=android` on the launch URL (set by the
+  Bubblewrap project), or a referrer of `android-app://com.oursharedcode.funny37` (an invitation
+  link the app opened). Only that package counts — other Android apps send `android-app://`
+  referrers of their own. Either signal is kept in `sessionStorage`, since "new room" and
+  "start over" drop both. `hasAnyRail()` returns false inside the shell, which removes the
+  Home ♥, the end-screen entry and the screen itself together. The iOS shell (B-2) adds its
+  own signal when it exists. *(Rewritten 2026-10-04, B-1c; owner decision the same day: two
+  signals, hide entirely.)*
 - Not built: any card checkout, key redemption, entitlement token, premium room flag.
 
 ## 11. Environment variables

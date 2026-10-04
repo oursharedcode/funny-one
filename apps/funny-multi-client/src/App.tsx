@@ -20,6 +20,7 @@ import RevealScreen from './screens/RevealScreen';
 import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
 import SupportScreen from './components/SupportScreen';
+import { hasAnyRail } from './support';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { baseUrl, withBase, serverOrigin } from './basePath';
@@ -281,7 +282,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {supportOpen && support && (
+      {supportOpen && support && hasAnyRail(support) && (
         <SupportScreen support={support} onClose={() => setSupportOpen(false)} />
       )}
     </MotionConfig>

@@ -88,8 +88,13 @@ See [LANGUAGES.md](LANGUAGES.md).
 
 See [MODERATION.md](MODERATION.md). In short: there is no free-text input anywhere in this
 game, so there is nothing to filter — every player choice is a validated pick from a curated
-pool. No accounts, no analytics, no third-party requests from the client; room state is
-in-memory and dies with the room.
+pool. No accounts, no analytics, no third-party requests from the client (fonts are
+self-hosted); room state is in-memory and dies with the room.
+
+The privacy policy players read, in all 15 languages, is
+[deploy/origin-root/funny37/privacy.html](deploy/origin-root/funny37/privacy.html), served by
+Caddy at `https://<FM_HOST>/privacy`. Change it in the same commit as any change to what the
+game collects, keeps or sends.
 
 ## License
 

@@ -36,6 +36,10 @@ means touching both:
    the AI image prompt is built once in English and shared across all 15 languages' rooms
    (FM-POOL-2), so the same generated cartoon is reused regardless of which language the room
    played in. Only the prose display text is per-language.
+6. Add the language to the privacy policy, `deploy/origin-root/funny37/privacy.html`: a
+   `<section id="privacy-<code>" lang="<code>">` translated from the English one (plus
+   `dir="rtl"` for a right-to-left script) and a link to it in the language list at the top.
+   `originRoot.test.ts` (server) checks every registry language has both.
 
 ## What review means
 
@@ -43,7 +47,9 @@ A "machine-drafted, needs review" language is playable today — `pools.test.ts`
 same structural and grammar rules regardless of authoring method — but hasn't had a native
 speaker confirm the pool sentences read naturally and the UI copy isn't stilted. To pick up
 B-3 (post-v1 backlog): remove the `needs-<code>-review` header comment from every file for
-that language once reviewed, and fix anything a native speaker flags.
+that language once reviewed, and fix anything a native speaker flags. The privacy policy is
+outside that rule: English is its master text and all 14 other sections, Russian included, are
+machine translations that say the English version applies.
 
 es-419 and es-es are deliberately separate files (Latin-American vs. Iberian Spanish) — they
 may read identically today but are flagged for independent regional review, not merged.

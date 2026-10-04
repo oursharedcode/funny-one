@@ -2628,24 +2628,128 @@ expects of this machine; every other test passed. CI is the sixth gate and runs 
 
 ---
 
-**RESUME HERE (2026-10-04, after Step 55).** ~~RESUME HERE (after Step 54)~~ — carried into this
-note. **B-1a is closed: Funny Multi is live at `https://www.funny37.oursharedcode.com/`, and the
-old path forwards.** B-1 (Android TWA + Play listing) continues. **Next step: B-1b**, the
-origin-root files on the new host — the repo-authored privacy policy (at the game's own root,
-decided) and `/.well-known/assetlinks.json`. Both need a Caddy `handle` block ahead of the proxy
-in the `FM_HOST` site of `deploy/caddy/Caddyfile`, because the app's SPA fallback would answer
-either path with `index.html`. Note: `assetlinks.json` carries the SHA-256 fingerprint of the key
-that signs the app — a key B-1d creates, and Play's own signing key once Play App Signing is on —
-so B-1b can ship the route and the policy first while the file's final content waits for that
-key. Then B-1c (shell detection, Support hidden — closes T-9.4's FM-APP-3 clause) and B-1d
-(Bubblewrap build, check on the owner's Android phone). None of these waits for the Play account
-(B-1e).
+## Step 56 — Funny Multi client self-hosts Fredoka, FM-CPL-2 fix (2026-10-04)
 
-Ask the owner before starting: (1) the Play account's public address — an organization account
-shows its legal address on every listing (Step 54): the one on the Equifax request, or a separate
-business street address; (2) whether Equifax has replied about the D-U-N-S address — do not retry
-the Play signup before the record is fixed, Google limits the tries; (3) where Apple enrollment
-stands. Enrollment identifiers are not in this repo (Step 54).
+**Shipped:** Funny Multi's client loaded its Fredoka font from a Google Fonts `<link>` since
+bootstrap (`dbba3b0`, 2026-08-13) — a standing contradiction of FM-CPL-2 ("no third-party
+requests from the client") that B-1b's privacy-policy drafting surfaced. Fixed by copying Funny
+One's already-self-hosted fonts across: `apps/funny-multi-client/public/fonts/` now holds the
+same three variable-font woff2 subsets (latin, latin-ext, hebrew) and `OFL.txt` licence,
+byte-identical to `apps/funny-one-client/public/fonts/`. `src/styles/index.css` gets the matching
+three `@font-face` blocks (weight `500 700`, `font-display: swap`, Google's own unicode-ranges);
+`index.html` drops the two preconnect links and the stylesheet `<link>`; `vite.config.ts` adds
+`woff2` to the PWA precache glob and drops both `google-fonts-*` runtime-caching rules (only the
+`app-shell` navigation rule remains).
+
+Verified: the build puts the fonts under `dist/fonts`, `sw.js` precaches all three, the CSS
+references `/fonts/…`, and nothing in `dist` mentions `googleapis`/`gstatic`. A throwaway
+Playwright check (`vite preview` on port 5183, the registered Funny Multi client port) loaded
+Home in `en` and `he`: both loaded Fredoka from the game's own origin, zero off-origin requests,
+and the `h1` computed `font-family` is Fredoka in both.
+
+**Owed:**
+
+- Installed clients keep a now-unused `google-fonts-*` service-worker cache entry until it
+  expires or they clear storage — harmless, not worth a migration.
+- CI green on the push — the sixth gate.
+
+Gates: typecheck, lint, `format:check`, `npm test` (outside the sandbox) and `npm audit` all ran
+clean this session together with Step 57's changes — see that entry.
+
+## Step 57 (task B-1b) — origin-root privacy policy + Android app-link file, deployed (2026-10-04)
+
+**Shipped:** `FM_HOST` now serves two paths itself, ahead of the app's reverse proxy, closing
+B-1b. Owner decisions confirmed this session: the files live in a repo directory
+(`deploy/origin-root/funny37`) that `deploy/ship.sh` streams into the existing `./static` Caddy
+mount (1a); the privacy policy covers all 15 UI languages (2c); the contact address is a
+dedicated alias `privacy@oursharedcode.com` (3a); no in-app link to the policy yet (4a).
+
+`deploy/origin-root/funny37/privacy.html` is one self-contained page (inline `<style>` only, no
+script/link/img/iframe, `prefers-color-scheme` light/dark) with a `<section id="privacy-<code>"
+lang="<code>">` per `LANGUAGES` entry (Hebrew also `dir="rtl"`), each covering: no accounts, ads,
+analytics or cookies; the nickname kept in server memory only and never sent to the AI; answers
+picked from curated pools; room deletion on host-end/empty-lobby/restart; IP addresses counted
+in memory ~1 minute for rate limiting; no access logs (an error log may carry an IP); pictures
+built only from pre-written phrases, stored by Cloudflare, with one anonymous daily count kept;
+downloads/shares happening on-device; gifts shown only on the website, not in the Android app;
+Oracle (Sydney) and Cloudflare named as processors; 12+ rating; HTTPS; and the contact address.
+English is the master text; the other 14 sections, Russian included, are agent-drafted machine
+translations, each saying the English version applies (noted in `LANGUAGES.md`, whose checklist
+now has a step for the policy section).
+`deploy/origin-root/funny37/.well-known/assetlinks.json` declares `com.oursharedcode.funny37`
+with an empty fingerprint list — filled in by B-1d.
+
+`deploy/caddy/Caddyfile`'s `FM_HOST` block gets two `handle` blocks ahead of the catch-all proxy
+handle (Caddy's `handle` blocks are mutually exclusive, tried in order): one for
+`/.well-known/assetlinks.json`, one (via a `@privacy` path matcher covering `/privacy`,
+`/privacy/` and `/privacy.html`) that rewrites to `/privacy.html`; both set `Cache-Control:
+no-cache` so an edit shows at once. `deploy/ship.sh` tars `deploy/origin-root/funny37` to the
+host and swaps it into `static/funny37-root` the same way `ship-funny-one.sh` swaps its bundle
+(new dir built alongside, old one kept until the new one is renamed in), then after the health
+check curls both paths through Caddy and fails the deploy if either doesn't come back as itself
+rather than the game's `index.html`.
+
+New `apps/funny-multi-server/src/originRoot.test.ts` reads both origin-root files directly and
+checks: `assetlinks.json` has exactly one statement with the right relation/namespace/package and
+fingerprints matching the SHA-256-colon-hex shape (or none); `privacy.html` has exactly
+`LANGUAGES.length` `<section>`s, one per registry code with a matching nav link, Hebrew's marked
+`dir="rtl"`, the contact `mailto:` appearing exactly once per section, and no script/link/
+img/iframe/src=/url()/@import anywhere on the page.
+
+**Verified:**
+
+- A throwaway `caddy:2` container (repo Caddyfile + origin-root mounted read-only, fake
+  hostnames, no bound port): `assetlinks.json` 200 `application/json` `no-cache`; `/privacy`,
+  `/privacy/` and `/privacy.html` 404 until the page was written, then 200 `text/html`
+  `no-cache`; every other path, `/.well-known/other.json` included, still reaches the proxy (502,
+  no game container in that check).
+- A throwaway Playwright render of `privacy.html` at phone width, light and dark: 15 sections,
+  no horizontal overflow, zero network requests beyond the file itself; screenshots of the top
+  (light and dark) and the `he` and `ta` sections look right (Hebrew right-to-left, Tamil
+  rendered).
+- The owner ran `deploy/ship.sh` from Git Bash after adding a Cloudflare Email Routing rule for
+  `privacy@oursharedcode.com` by hand (the stored Cloudflare token is DNS-only; the Email Routing
+  API returns auth error 10000 for it). Production curl checks afterwards: both paths 200 with no
+  redirect and no caching; the live stylesheet and service worker reference only
+  `/fonts/fredoka-*.woff2` (Step 56's fix); Google's own Digital Asset Links checker
+  (`digitalassetlinks.googleapis.com/v1/statements:list`) reaches the file and objects only to
+  the empty fingerprint list, as expected before B-1d. The owner then opened `/privacy` and the
+  game itself on their phone and confirmed both looked right.
+
+**Owed:**
+
+- B-1d fills `assetlinks.json`'s fingerprint list with the app signing key's SHA-256 once that
+  key exists.
+- B-1c (Support screen hidden in the store shell) must land before the Android app ships, since
+  the policy already states the app offers no gifts.
+- CI green on the push — the sixth gate.
+
+Gates (both this step and Step 56 together): typecheck, lint, `format:check` clean on the final
+tree. `npm test` outside the sandbox: 801 tests across all workspaces passed, including the new
+`originRoot.test.ts` (6 tests). `npm audit --omit=dev`: 0; full `npm audit`: only
+GHSA-vfj7-8cjw-p6xm (`braces`, still 3.0.3 per Step 53's exception). CI is the sixth gate and runs
+on the push.
+
+---
+
+**RESUME HERE (2026-10-04, after Step 57).** ~~RESUME HERE (after Step 55)~~ — carried into this
+note. **B-1b is closed and deployed: `https://www.funny37.oursharedcode.com/privacy` and
+`/.well-known/assetlinks.json` are live, served by Caddy itself; the font fix (Step 56) landed in
+the same deploy.** B-1 (Android TWA + Play listing) continues. **Next step: B-1c** — store-shell
+detection (a Bubblewrap launch-URL parameter persisted to `sessionStorage`, plus the
+`android-app://` referrer — both signals, hide entirely, confirmed by the owner 2026-10-04) then
+the Support screen hidden entirely inside the shell, closing T-9.4's FM-APP-3 clause. This must
+land before B-1d's install check, since the privacy policy already says the Android app offers no
+gifts. Then **B-1d** (Bubblewrap project under `deploy/android/`, signing key, local build, install
+on the owner's phone — also fills `assetlinks.json`'s fingerprint). None of B-1b–B-1d waits for
+the Play account (B-1e).
+
+Ask the owner before starting B-1e work (unrelated to B-1c/B-1d, runs in parallel): (1) the Play
+account's public address — an organization account shows its legal address on every listing
+(Step 54): the one on the Equifax request, or a separate business street address; (2) whether
+Equifax has replied about the D-U-N-S address — do not retry the Play signup before the record is
+fixed, Google limits the tries; (3) where Apple enrollment stands. Enrollment identifiers are not
+in this repo (Step 54).
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
 may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
@@ -2657,20 +2761,22 @@ Phase S-3) still runs in parallel and blocks nothing. The paid Workers AI plan i
 production generation is off (`[ai]` commented out in `wrangler.toml`).
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
-what, wait for "done", automate first). Production's `.env` now holds the support rails; the
-backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM; since 2026-10-04 it also holds `BASE_PATH=/`,
-`FM_HOST` and `FM_APEX`, backed up before that change at `~/funny/.env.bak-b1a`. The production Worker
-secret is on this PC at `~/.cloudflare/worker-secret` (verified against `/stats`, not re-copied
-from the VM).
+what, wait for "done", automate first). Production's `.env` holds the support rails and (since
+Step 55) `BASE_PATH=/`, `FM_HOST`, `FM_APEX`; backups `~/funny/.env.bak-2026-10-01` and
+`~/funny/.env.bak-b1a` on the VM. The production Worker secret is on this PC at
+`~/.cloudflare/worker-secret` (verified against `/stats`, not re-copied from the VM). Cloudflare
+Email Routing for `privacy@oursharedcode.com` was added by the owner by hand in the dashboard
+(Step 57) — the stored token cannot manage it.
 
 Note for whoever runs the gates: `npm test` is flaky under load on this machine — run it with
 nothing else going, and re-run any lone timing failure in isolation before treating it as a
 regression. Multi-line commit messages must go through `git commit -F <file>`. Dev ports are
-5183 (Funny Multi client), 5184 (Funny One client) and 3000 (server); read
-`C:\Mark\Dev\machine\ports.md` before binding anything new. SSH to the VM is allowed only from
-the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
-`curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
-the agent's auto mode refuses them, and also refused a headless browser run against production (Step 49), an SSH edit of the VM's `.env` and
+5183 (Funny Multi client), 5184 (Funny One client) and 3000 (server, now funnyone's own in the
+machine-wide port register since 2026-10-01); read `C:\Mark\Dev\machine\ports.md` before binding
+anything new. SSH to the VM is allowed only from the owner's home IP; when it times out, re-run
+`deploy/oci/network.py <ip>` (current IP from `curl https://api.ipify.org`). Production deploys
+are run by the owner in a Git Bash terminal — the agent's auto mode refuses them, and also
+refused a headless browser run against production (Step 49), an SSH edit of the VM's `.env` and
 an `nslookup` of the new hosts (Step 55); `deploy/oci/network.py` and the Cloudflare DNS calls
 were allowed. The local `.env`'s Worker secret is not production's: any live Worker call from this
 PC needs the production pair exported first.
@@ -2685,7 +2791,8 @@ Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in bot
 native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
 a script enforcing Step 53's audit rule (optional, not approved); Tailwind 4 and
 typescript-eslint 8 as tasks of their own (Tailwind 4 raises the browser floor — a product
-decision); B-11 (hub site);
+decision); B-11 (hub site, and whether it should host the privacy policy instead of each game's
+own root — B-1b went with each game's own root);
 design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); Funny One showing the library's cartoons when online
 (same pools, public `/i/` links; needs `buildPrompt` in `packages/shared`), and re-encoding the
 ≈ 730 KB JPEGs at store time. Pasting a command into the owner's Git Bash can prepend `[200~`:

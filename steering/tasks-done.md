@@ -1428,3 +1428,23 @@ unless they carry advisories:
       `/config` support rails, manifest scope `/`, apex and old path (with and without slash,
       `?room=` kept) 301 to the new host, `/funny1-game/` 200; the owner's two-device round in a
       browser passed.
+- [x] **B-1b (S)** Origin-root files on the new host: `/.well-known/assetlinks.json` (Digital
+      Asset Links — exact host, origin root, no redirect) and a repo-authored privacy policy,
+      which Play requires and the repo did not have. Host decided 2026-10-04: **each game's own
+      root** (a redirect target from the hub once B-11 exists). Since B-1a, `FM_HOST` forwarded
+      every path to the container — whose SPA fallback would answer `/.well-known/assetlinks.json`
+      with `index.html` — so B-1b added Caddy `handle` blocks for these two paths ahead of the
+      proxy.
+      _Closed 2026-10-04 (Step 57)._ Owner decisions confirmed the same day: files live in
+      `deploy/origin-root/funny37`, streamed by `deploy/ship.sh` into the `./static` Caddy mount;
+      the privacy policy covers all 15 UI languages (English hand-authored, the other 14 machine
+      translations that each say English governs);
+      contact is a dedicated `privacy@oursharedcode.com` alias; no in-app link yet. Along the way,
+      fixed a standing FM-CPL-2 contradiction found while drafting the policy: the client had
+      loaded Fredoka from Google Fonts since bootstrap — now self-hosted (Step 56), copied from
+      Funny One's existing self-hosted fonts. Verified in a throwaway Caddy container and a
+      throwaway Playwright render before deploy, then on production after the owner ran
+      `deploy/ship.sh` and added the Cloudflare Email Routing rule by hand: both paths 200, no
+      redirect, no caching; Google's Digital Asset Links checker reaches the file (objects only to
+      the still-empty fingerprint list, expected before B-1d); the owner confirmed both the policy
+      and the game's font on their phone. → FM-APP-1

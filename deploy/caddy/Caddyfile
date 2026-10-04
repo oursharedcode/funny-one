@@ -26,12 +26,41 @@
 
 # Funny Multi, at the root of its own host — a Trusted Web Activity's origin
 # is baked into the Android app, so the game cannot share a name with another
-# game (B-1a). Everything is forwarded untouched: the container serves the
-# static bundle, /health, /config and Socket.IO itself.
+# game (B-1a). Everything but two paths is forwarded untouched: the container
+# serves the static bundle, /health, /config and Socket.IO itself.
 {$FM_HOST} {
 	encode zstd gzip
 
-	reverse_proxy funny-multi:3000
+	# Origin-root files the game itself does not serve (B-1b), from
+	# deploy/origin-root/funny37 in the repo — deploy/ship.sh copies them to
+	# ./static/funny37-root. They are answered here because the container's
+	# SPA fallback would answer either path with index.html. `handle` blocks
+	# are mutually exclusive and tried in the order written, so the proxy
+	# below only sees what these two do not match.
+	#
+	# Digital Asset Links: what lets the Android app open this origin without
+	# a URL bar. Google reads it at this exact path — 200, application/json
+	# (file_server's type for .json), no redirect. no-cache because its
+	# fingerprints change when the signing key does (B-1d).
+	handle /.well-known/assetlinks.json {
+		header Cache-Control "no-cache"
+		root * /srv/static/funny37-root
+		file_server
+	}
+
+	# The privacy policy, linked from the Play listing. One page holds every
+	# language the game offers; no-cache so an edit shows at once.
+	@privacy path /privacy /privacy/ /privacy.html
+	handle @privacy {
+		header Cache-Control "no-cache"
+		rewrite * /privacy.html
+		root * /srv/static/funny37-root
+		file_server
+	}
+
+	handle {
+		reverse_proxy funny-multi:3000
+	}
 }
 
 {$FM_APEX} {

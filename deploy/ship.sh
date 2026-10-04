@@ -15,11 +15,15 @@
 #      value the server will run under (they must agree — DEPLOYMENT.md);
 #   2. builds the image with that build-arg, tagged with the git commit;
 #   3. streams it over SSH (docker save | gzip | ssh docker load), ~80 MB;
-#   4. copies docker-compose.yml and deploy/caddy/Caddyfile alongside .env;
+#   4. copies docker-compose.yml and deploy/caddy/Caddyfile alongside .env,
+#      and streams deploy/origin-root/funny37 (the privacy policy and
+#      assetlinks.json, served by Caddy itself — B-1b) into
+#      static/funny37-root, swapped in whole like Funny One's bundle;
 #   5. `docker compose --profile caddy up -d` on the host, reloads Caddy (a
 #      changed Caddyfile is not picked up by `up` alone), then checks
-#      FM_HOST/health through Caddy and that the old /funny37-game address
-#      on SITE_HOST forwards to FM_HOST.
+#      FM_HOST/health through Caddy, that the two origin-root files come from
+#      Caddy rather than the game's index.html, and that the old
+#      /funny37-game address on SITE_HOST forwards to FM_HOST.
 set -euo pipefail
 
 HOST="${1:?usage: deploy/ship.sh user@host [remote-dir]}"
@@ -58,6 +62,17 @@ ssh "$HOST" "mkdir -p '$REMOTE_DIR/deploy/caddy'"
 scp -q docker-compose.yml "$HOST:$REMOTE_DIR/docker-compose.yml"
 scp -q deploy/caddy/Caddyfile "$HOST:$REMOTE_DIR/deploy/caddy/Caddyfile"
 
+# Before `up`: on a host without Funny One, Docker would otherwise create the
+# ./static mount source itself, owned by root. tar, not scp: .well-known is a
+# dot-directory and the swap needs the whole tree in one stream.
+echo "==> stream deploy/origin-root/funny37 to $HOST:$REMOTE_DIR/static/funny37-root"
+tar -C deploy/origin-root/funny37 -czf - . | ssh "$HOST" "set -e
+  cd '$REMOTE_DIR' && mkdir -p static && cd static
+  rm -rf funny37-root.new funny37-root.old && mkdir funny37-root.new
+  tar -xzf - -C funny37-root.new
+  if [ -d funny37-root ]; then mv funny37-root funny37-root.old; fi
+  mv funny37-root.new funny37-root && rm -rf funny37-root.old"
+
 echo "==> compose up (profile caddy)"
 ssh "$HOST" "cd '$REMOTE_DIR' && docker compose --profile caddy up -d --no-build --remove-orphans && docker image prune -f >/dev/null"
 
@@ -82,6 +97,22 @@ for i in $(seq 1 30); do
   sleep 2
 done
 [ "$healthy" = 1 ] || { echo "    $URL not healthy after 60 s — check: ssh $HOST 'cd $REMOTE_DIR && docker compose logs --tail 50'" >&2; exit 1; }
+
+# Both files must come from Caddy, not the container: its SPA fallback would
+# answer either path 200 with index.html, so the status alone proves nothing.
+# Google also refuses an assetlinks.json behind a redirect or of another type.
+origin_ok=1
+got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "https://$FM_HOST/.well-known/assetlinks.json" || true)"
+echo "    https://$FM_HOST/.well-known/assetlinks.json -> $got"
+case "$got" in "200 application/json"*) ;; *) origin_ok=0 ;; esac
+got="$(curl -s --max-time 10 "https://$FM_HOST/privacy" || true)"
+if printf '%s' "$got" | grep -q 'id="privacy-en"'; then
+  echo "    https://$FM_HOST/privacy -> the policy"
+else
+  echo "    https://$FM_HOST/privacy -> not the policy" >&2
+  origin_ok=0
+fi
+[ "$origin_ok" = 1 ] || { echo "    origin-root files not served by Caddy — check the Caddyfile and $REMOTE_DIR/static/funny37-root" >&2; exit 1; }
 
 # The old address must forward, not serve: one container, one room registry.
 OLD="https://$SITE_HOST/funny37-game/?room=CHECK"

@@ -105,8 +105,10 @@ Two files make it production rather than "a container on :3000":
 
 - `docker-compose.yml`'s **`caddy` profile** adds Caddy on 80/443 with automatic HTTPS
   (`deploy/caddy/Caddyfile`). Two hosts: **`FM_HOST`** is the game's own — Caddy forwards
-  everything on it to the game container untouched, WebSockets included, and redirects
-  `FM_APEX` (the bare name) to it. **`SITE_HOST`** is the shared host: it serves Funny One
+  everything on it to the game container untouched, WebSockets included, except two files it
+  serves itself from `deploy/origin-root/funny37` (B-1b): the privacy policy at `/privacy`
+  and `/.well-known/assetlinks.json` for the Android app. It redirects `FM_APEX` (the bare
+  name) to `FM_HOST`. **`SITE_HOST`** is the shared host: it serves Funny One
   under `/funny1-game` (2c), forwards Funny Multi's former address `/funny37-game` to
   `FM_HOST`, redirects `SITE_APEX` to itself and 404s everything else. A game has its own host
   because an Android app wrapping it (a Trusted Web Activity) bakes the origin in. Certificates
@@ -186,9 +188,11 @@ deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
 `ship.sh` reads `BASE_PATH` and the four hosts from the host's `.env` (and stops if one is
 missing), builds the image with `BASE_PATH` (tagged with the git commit),
 `docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml` and the
-Caddyfile next to `.env`, runs `docker compose --profile caddy up -d`, reloads Caddy, waits for
-`https://FM_HOST/health` to answer through Caddy and checks that
-`https://SITE_HOST/funny37-game/` forwards to `FM_HOST`. The first run takes a minute longer
+Caddyfile next to `.env`, streams `deploy/origin-root/funny37` into `static/funny37-root`
+(swapped in whole), runs `docker compose --profile caddy up -d`, reloads Caddy, waits for
+`https://FM_HOST/health` to answer through Caddy, checks that `/privacy` and
+`/.well-known/assetlinks.json` on `FM_HOST` come from Caddy (not the game's `index.html`) and
+that `https://SITE_HOST/funny37-game/` forwards to `FM_HOST`. The first run takes a minute longer
 while Caddy obtains its certificates. Re-run it to deploy a new commit; Caddy keeps its
 certificates across restarts.
 

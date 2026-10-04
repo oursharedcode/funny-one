@@ -6,7 +6,8 @@
 //
 // Adding a language: append one row to LANGUAGES, drop matching JSONs in
 // apps/funny-multi-client/src/i18n/ and apps/funny-multi-server/src/i18n/, plus
-// a pool display-text file in packages/shared/src/pools/text/<code>.ts. The
+// a pool display-text file in packages/shared/src/pools/text/<code>.ts and a
+// section in deploy/origin-root/funny37/privacy.html (originRoot.test.ts). The
 // `Language` union below derives from this array via `as const`, so a missed
 // code in any consumer becomes a compile error — and pools.test.ts fails on a
 // missing text file (FM-POOL-4). See docs/LANGUAGES.md (T-8.3) for the full

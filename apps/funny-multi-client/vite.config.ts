@@ -27,9 +27,10 @@
 //     Socket.IO path) — docker-compose.yml feeds both from one value.
 //
 // Everything else — the NetworkFirst navigation strategy, the deliberately
-// un-precached index.html, the Google Fonts rules — is carried verbatim,
-// including the reasoning: it is what makes a deploy visible to a player
-// whose PWA shell is already installed (spec §13).
+// un-precached index.html — is carried verbatim, including the reasoning: it
+// is what makes a deploy visible to a player whose PWA shell is already
+// installed (spec §13). SRC's two Google Fonts runtime-caching rules were
+// dropped when Fredoka became self-hosted (FM-CPL-2, see styles/index.css).
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -131,8 +132,9 @@ export default defineConfig({
         // the precache so a fresh navigation always picks up the latest
         // shell (spec §13). Socket.IO traffic is never cached; neither are
         // the Worker's `/i/<hash>.png` cartoons, which carry their own
-        // immutable cache headers (design §7.2).
-        globPatterns: ['**/*.{js,css,png,svg,webmanifest}'],
+        // immutable cache headers (design §7.2). `woff2` is the self-hosted
+        // Fredoka (styles/index.css).
+        globPatterns: ['**/*.{js,css,png,svg,woff2,webmanifest}'],
         // Disable the default precached-index.html fallback for SPA
         // navigations — the NetworkFirst rule below handles them.
         navigateFallback: null,
@@ -149,22 +151,6 @@ export default defineConfig({
               cacheName: 'app-shell',
               networkTimeoutSeconds: 3,
               expiration: { maxEntries: 4 },
-            },
-          },
-          {
-            // Google Fonts stylesheet — revalidate in the background.
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'google-fonts-stylesheets' },
-          },
-          {
-            // Google Fonts files — immutable, cache for a year.
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-webfonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],

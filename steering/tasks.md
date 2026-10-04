@@ -95,12 +95,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   parallel). Package id `com.oursharedcode.funny37` — permanent once published.
 - **B-1a** — **closed 2026-10-04 (Step 55)**, block in `steering/tasks-done.md`. Funny Multi
   is live at `https://www.funny37.oursharedcode.com/`; the old `/funny37-game` path forwards.
-- **B-1b (S)** Origin-root files on the new host: `/.well-known/assetlinks.json` (Digital Asset
-  Links — exact host, origin root, no redirect) and a repo-authored privacy policy, which Play
-  requires and the repo does not have. Host decided 2026-10-04: **each game's own root** (a
-  redirect target from the hub once B-11 exists). Since B-1a, `FM_HOST` forwards every path to
-  the container — whose SPA fallback would answer `/.well-known/assetlinks.json` with
-  `index.html` — so B-1b adds Caddy `handle` blocks for these two paths ahead of the proxy.
+- **B-1b** — **closed 2026-10-04 (Step 57)**, block in `steering/tasks-done.md`. Origin-root
+  privacy policy and `/.well-known/assetlinks.json` live on `FM_HOST`, served by Caddy itself.
 - **B-1c (S)** Store-shell detection, then the Support screen hidden entirely inside the shell —
   closes T-9.4's FM-APP-3 clause. Runtime detection (a TWA renders the deployed bundle, so a
   build-time flag cannot see it): a Bubblewrap launch-URL parameter persisted to

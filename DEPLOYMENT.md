@@ -16,9 +16,11 @@ Deploy the Worker first: the game server needs its URL and shared secret before 
   enable R2, even though the free tier itself costs nothing.
 - A **Linux host with Docker** (Compose v2 included) that can be reached on ports 80 and 443,
   and SSH access to it. Production is an Oracle Cloud _Always Free_ VM — any VPS works.
-- A **domain name** you control, with DNS `A` records for the site name (e.g. `www.example.com`)
-  and its bare domain (`example.com`) pointing at the host. Caddy fetches its certificates on
-  first boot, so the records must resolve before the first start.
+- A **domain name** you control, with DNS `A` records for the game's host (e.g.
+  `www.funny37.example.com`), its bare name (`funny37.example.com`) and the shared host and its
+  bare name (`www.example.com`, `example.com` — see `SITE_HOST` below) pointing at the host.
+  Caddy fetches its certificates on first boot, so the records must resolve before the first
+  start.
 - On the machine you deploy _from_ (your PC is fine): Node 20, git, Docker, `ssh`/`scp` and
   `curl`. On Windows use Git Bash — `deploy/ship.sh` is a bash script and already handles
   Git Bash's path rewriting.
@@ -94,7 +96,7 @@ off (above); switch it back on for the re-run after any pool edit.
 
 ## 2. Deploy the game server
 
-Production (`https://www.staging-oursharedcode.com/funny37-game`) is an Oracle Cloud _Always
+Production (`https://www.funny37.oursharedcode.com/`) is an Oracle Cloud _Always
 Free_ VM (1 GB, Sydney) provisioned by the two scripts in `deploy/oci/` (`network.py`, then
 `vm.py` — each file's header says what it creates; both need `pip install oci` and an API key
 in `~/.oci/config`). Those scripts are optional: any host from the list above will do.
@@ -102,17 +104,20 @@ in `~/.oci/config`). Those scripts are optional: any host from the list above wi
 Two files make it production rather than "a container on :3000":
 
 - `docker-compose.yml`'s **`caddy` profile** adds Caddy on 80/443 with automatic HTTPS
-  (`deploy/caddy/Caddyfile`): it redirects the bare domain to `SITE_HOST`, forwards
-  `BASE_PATH/*` to the game container untouched, forwards WebSockets without any extra
-  configuration, and 404s everything else on the host — a second game on the same name gets
-  its own `handle` block. Certificates live in the `caddy_data` volume.
-- **`BASE_PATH`** (`.env`), the URL sub-path the game is served under — `/funny37-game` in
-  production, so a sibling game can share the domain (design §1). It must reach two places:
-  the image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO
-  path) and the running server (static prefix, `/health`, Socket.IO path). Compose feeds one
-  value to both; the server and client accept any spelling, the Caddyfile pastes it verbatim,
-  so write it **without** a trailing slash. Unset means `/` — the game at the root of the
-  site name.
+  (`deploy/caddy/Caddyfile`). Two hosts: **`FM_HOST`** is the game's own — Caddy forwards
+  everything on it to the game container untouched, WebSockets included, and redirects
+  `FM_APEX` (the bare name) to it. **`SITE_HOST`** is the shared host: it serves Funny One
+  under `/funny1-game` (2c), forwards Funny Multi's former address `/funny37-game` to
+  `FM_HOST`, redirects `SITE_APEX` to itself and 404s everything else. A game has its own host
+  because an Android app wrapping it (a Trusted Web Activity) bakes the origin in. Certificates
+  live in the `caddy_data` volume. Self-hosting only Funny Multi: point `SITE_HOST`/`SITE_APEX`
+  at any name you control, or skip Caddy (see the variant below).
+- **`BASE_PATH`** (`.env`), the URL sub-path the game is served under — `/` (the default, or
+  unset) behind this Caddyfile, since the game owns its host. It must reach two places: the
+  image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO path)
+  and the running server (static prefix, `/health`, Socket.IO path). Compose feeds one value to
+  both; `ship.sh` refuses anything but `/`. A sub-path (any spelling is accepted) is for the
+  variant below, where your own proxy does the routing.
 
 ### 2a. Once, on the host: the `.env` file
 
@@ -125,7 +130,8 @@ mkdir -p ~/funny && cd ~/funny
 cat > .env <<'ENV'
 CLOUDFLARE_WORKER_URL=https://funny-multi-image.<your-subdomain>.workers.dev
 CLOUDFLARE_WORKER_SECRET=<the WORKER_SECRET from step 1>
-BASE_PATH=/funny37-game
+FM_HOST=www.funny37.example.com
+FM_APEX=funny37.example.com
 SITE_HOST=www.example.com
 SITE_APEX=example.com
 TRUSTED_PROXY_HOPS=1
@@ -165,8 +171,8 @@ DEPLOYER_DONATE_URL=https://example.com/donate
 
 The server reads these once at boot, so restart it after editing:
 `cd ~/funny && docker compose --profile caddy up -d` (without `--profile caddy` if you run
-your own proxy), or just re-run `ship.sh`. Then `curl https://<SITE_HOST><BASE_PATH>/config`
-shows what the screen will list, with `null` for each rail left unset.
+your own proxy), or just re-run `ship.sh`. Then `curl https://<FM_HOST>/config` shows what the
+screen will list, with `null` for each rail left unset.
 
 ### 2b. From your PC: ship it
 
@@ -177,12 +183,22 @@ image is built here and streamed across; no registry involved):
 deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
 ```
 
-`ship.sh` reads `BASE_PATH` and `SITE_HOST` from the host's `.env`, builds the image with it
-(tagged with the git commit), `docker save | gzip | ssh … docker load`s it (~80 MB), copies
-`docker-compose.yml` and the Caddyfile next to `.env`, runs
-`docker compose --profile caddy up -d`, and waits for `https://SITE_HOST/BASE_PATH/health`
-to answer through Caddy. The first run takes a minute longer while Caddy obtains its
-certificates. Re-run it to deploy a new commit; Caddy keeps its certificates across restarts.
+`ship.sh` reads `BASE_PATH` and the four hosts from the host's `.env` (and stops if one is
+missing), builds the image with `BASE_PATH` (tagged with the git commit),
+`docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml` and the
+Caddyfile next to `.env`, runs `docker compose --profile caddy up -d`, reloads Caddy, waits for
+`https://FM_HOST/health` to answer through Caddy and checks that
+`https://SITE_HOST/funny37-game/` forwards to `FM_HOST`. The first run takes a minute longer
+while Caddy obtains its certificates. Re-run it to deploy a new commit; Caddy keeps its
+certificates across restarts.
+
+**Moving a deployment from a sub-path to its own host** (production did this in B-1a): create
+the two new DNS records first; on the host edit `.env` — add `FM_HOST` and `FM_APEX`, set
+`BASE_PATH=/` — then run `ship.sh`. The old `/funny37-game` address then forwards, join links
+included. One container serves one mount point, so the old address cannot keep serving too
+(two containers would split the in-memory rooms), and an installed PWA cannot follow the
+forward — a service worker's script may not sit behind a redirect — so it is reinstalled from
+the new host.
 
 Verified 2026-09-15 on the production VM: the two-stage `node:20-alpine` image (251 MB), the
 container idles at ~50 MB with Caddy at ~20 MB, Let's Encrypt certificates for both names on
@@ -193,7 +209,8 @@ WebSockets through Caddy in under a second.
 
 Funny One («Одна Чепуха: по кругу», `apps/funny-one-client`) has no server — it is a static,
 fully offline PWA, so it needs no container, image or secret: the same Caddy serves its files
-under `/funny1-game`. It needs the host set up by 2a–2b first (only `SITE_HOST` is read).
+under `/funny1-game` of `SITE_HOST`. It needs the host set up by 2a–2b first (`SITE_HOST` is
+where it deploys; `FM_HOST` is read for the final health check).
 
 ```bash
 deploy/ship-funny-one.sh ubuntu@<host-ip>   # remote dir defaults to ~/funny
@@ -214,7 +231,7 @@ launch, and a year-long `immutable` for the content-hashed `assets/`.
 
 `ship.sh` always uses the Caddy profile. If you already terminate TLS elsewhere (nginx,
 Cloudflare Tunnel, …), clone the repo on a host big enough to build (2 GB is plenty), put the
-same `.env` at the repo root (`SITE_HOST`/`SITE_APEX` not needed) and run
+same `.env` at the repo root (the four hosts not needed) and run
 `docker compose up -d`: you get the game alone on plain HTTP `:3000`, mounted under
 `BASE_PATH`, for your proxy to forward to. PWA install and service-worker registration both
 require HTTPS, so something must terminate TLS. See the next section before choosing
@@ -237,9 +254,8 @@ trusted window).
 
 ## After both are deployed — a five-minute check
 
-1. `https://<SITE_HOST><BASE_PATH>/health` answers `{"ok":true}` (this is what `ship.sh`
-   waits for).
-2. Open `https://<SITE_HOST><BASE_PATH>/` on a phone: Chrome offers "Install app" (Android) or
+1. `https://<FM_HOST>/health` answers `{"ok":true}` (this is what `ship.sh` waits for).
+2. Open `https://<FM_HOST>/` on a phone: Chrome offers "Install app" (Android) or
    Safari's Share → Add to Home Screen (iPhone). No offer means the origin is not HTTPS or the
    service worker failed — check `BASE_PATH` matches what the client was built with.
 3. Create a room, join from two more devices (or browser tabs) via the QR code, play a round.

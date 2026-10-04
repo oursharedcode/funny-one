@@ -8,7 +8,8 @@
 #   deploy/ship-funny-one.sh ubuntu@152.69.166.212 /srv/funny
 #
 # Assumes the remote directory already holds the .env deploy/ship.sh uses
-# (only SITE_HOST is read here). What it does, in order:
+# (SITE_HOST — the host Funny One lives on — and FM_HOST, for the final
+# health check of Funny Multi, are read here). What it does, in order:
 #   1. builds apps/funny-one-client with BASE_PATH=/funny1-game — the path the
 #      Caddyfile hardcodes, baked into the bundle and its service worker;
 #   2. streams dist/ over SSH into static/funny-one.new, then swaps it in
@@ -35,7 +36,7 @@ echo "==> remote .env"
 REMOTE_ENV="$(ssh "$HOST" "cat '$REMOTE_DIR/.env'")"
 get() { printf '%s\n' "$REMOTE_ENV" | sed -n "s/^$1=//p" | tail -1; }
 SITE_HOST="$(get SITE_HOST)"
-MULTI_PATH="$(get BASE_PATH)"
+FM_HOST="$(get FM_HOST)"
 [ -n "$SITE_HOST" ] || { echo "SITE_HOST missing in $HOST:$REMOTE_DIR/.env" >&2; exit 1; }
 echo "    SITE_HOST=$SITE_HOST"
 
@@ -80,6 +81,6 @@ check "$ORIGIN$BASE_PATH/manifest.webmanifest" 200 || ok=0
 check "$ORIGIN$BASE_PATH" 301 || ok=0
 curl -fsS --max-time 10 "$ORIGIN$BASE_PATH/" | grep -q "$BASE_PATH/assets/" \
   || { echo "    index.html does not reference $BASE_PATH/assets/ — wrong build?" >&2; ok=0; }
-if [ -n "$MULTI_PATH" ]; then check "$ORIGIN$MULTI_PATH/health" 200 || ok=0; fi
+if [ -n "$FM_HOST" ]; then check "https://$FM_HOST/health" 200 || ok=0; fi
 [ "$ok" = 1 ] || { echo "verification failed — check: ssh $HOST 'cd $REMOTE_DIR && docker compose logs --tail 50 caddy'" >&2; exit 1; }
 echo "    live: $ORIGIN$BASE_PATH/"

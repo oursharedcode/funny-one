@@ -8,16 +8,18 @@
 #   deploy/ship.sh ubuntu@152.69.166.212 /srv/funny
 #
 # Assumes the remote directory already holds a filled-in .env (see
-# .env.example: CLOUDFLARE_WORKER_URL/SECRET, BASE_PATH, SITE_HOST, SITE_APEX,
-# TRUSTED_PROXY_HOPS=1 behind Caddy) — the secret never travels through this
-# script. What it does, in order:
+# .env.example: CLOUDFLARE_WORKER_URL/SECRET, BASE_PATH, FM_HOST, FM_APEX,
+# SITE_HOST, SITE_APEX, TRUSTED_PROXY_HOPS=1 behind Caddy) — the secret never
+# travels through this script. What it does, in order:
 #   1. reads BASE_PATH from the remote .env, so the client is built with the
 #      value the server will run under (they must agree — DEPLOYMENT.md);
 #   2. builds the image with that build-arg, tagged with the git commit;
 #   3. streams it over SSH (docker save | gzip | ssh docker load), ~80 MB;
 #   4. copies docker-compose.yml and deploy/caddy/Caddyfile alongside .env;
-#   5. `docker compose --profile caddy up -d` on the host, then checks
-#      BASE_PATH/health through Caddy.
+#   5. `docker compose --profile caddy up -d` on the host, reloads Caddy (a
+#      changed Caddyfile is not picked up by `up` alone), then checks
+#      FM_HOST/health through Caddy and that the old /funny37-game address
+#      on SITE_HOST forwards to FM_HOST.
 set -euo pipefail
 
 HOST="${1:?usage: deploy/ship.sh user@host [remote-dir]}"
@@ -35,9 +37,15 @@ echo "==> remote .env"
 REMOTE_ENV="$(ssh "$HOST" "cat '$REMOTE_DIR/.env'")"
 get() { printf '%s\n' "$REMOTE_ENV" | sed -n "s/^$1=//p" | tail -1; }
 BASE_PATH="$(get BASE_PATH)"
+FM_HOST="$(get FM_HOST)"
 SITE_HOST="$(get SITE_HOST)"
-[ -n "$SITE_HOST" ] || { echo "SITE_HOST missing in $HOST:$REMOTE_DIR/.env" >&2; exit 1; }
-echo "    BASE_PATH=${BASE_PATH:-/}  SITE_HOST=$SITE_HOST"
+for v in FM_HOST FM_APEX SITE_HOST SITE_APEX; do
+  [ -n "$(get "$v")" ] || { echo "$v missing in $HOST:$REMOTE_DIR/.env" >&2; exit 1; }
+done
+# The Caddyfile mounts the game at FM_HOST's root, so a sub-path here would
+# build a client Caddy cannot reach.
+case "${BASE_PATH:-/}" in /) ;; *) echo "BASE_PATH must be / (or unset) behind this Caddyfile, got $BASE_PATH" >&2; exit 1 ;; esac
+echo "    BASE_PATH=${BASE_PATH:-/}  FM_HOST=$FM_HOST  SITE_HOST=$SITE_HOST"
 
 echo "==> build $IMAGE:$COMMIT (BASE_PATH=${BASE_PATH:-/})"
 docker build --build-arg "BASE_PATH=${BASE_PATH:-/}" -t "$IMAGE:$COMMIT" -t "$IMAGE:latest" . >/dev/null
@@ -53,14 +61,37 @@ scp -q deploy/caddy/Caddyfile "$HOST:$REMOTE_DIR/deploy/caddy/Caddyfile"
 echo "==> compose up (profile caddy)"
 ssh "$HOST" "cd '$REMOTE_DIR' && docker compose --profile caddy up -d --no-build --remove-orphans && docker image prune -f >/dev/null"
 
+# `up` leaves a running Caddy on its old Caddyfile when only that file changed
+# (the bind mount is read at start); reloading is a no-op otherwise.
+echo "==> reload caddy"
+# Retried: when `up` has just recreated Caddy its admin API is not answering yet.
+ssh "$HOST" "cd '$REMOTE_DIR' && for i in 1 2 3 4 5; do
+  docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile && exit 0
+  sleep 2
+done; exit 1"
+
 echo "==> health via Caddy"
-URL="https://$SITE_HOST${BASE_PATH:-}/health"
+URL="https://$FM_HOST/health"
+healthy=0
 for i in $(seq 1 30); do
   if curl -fsS --max-time 5 "$URL" >/dev/null 2>&1; then
     echo "    $URL -> $(curl -s --max-time 5 "$URL")"
-    exit 0
+    healthy=1
+    break
   fi
   sleep 2
 done
-echo "    $URL not healthy after 60 s — check: ssh $HOST 'cd $REMOTE_DIR && docker compose logs --tail 50'" >&2
-exit 1
+[ "$healthy" = 1 ] || { echo "    $URL not healthy after 60 s — check: ssh $HOST 'cd $REMOTE_DIR && docker compose logs --tail 50'" >&2; exit 1; }
+
+# The old address must forward, not serve: one container, one room registry.
+OLD="https://$SITE_HOST/funny37-game/?room=CHECK"
+# Retried, and `|| true` so a failed curl cannot end the script silently under `set -e`:
+# right after a reload the old host can answer slowly for a moment.
+got=""
+for i in 1 2 3 4 5; do
+  got="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 10 "$OLD" || true)"
+  [ "$got" = "301 https://$FM_HOST/?room=CHECK" ] && break
+  sleep 2
+done
+echo "    $OLD -> $got"
+[ "$got" = "301 https://$FM_HOST/?room=CHECK" ] || { echo "    the old address does not forward to https://$FM_HOST/ — check the Caddyfile" >&2; exit 1; }

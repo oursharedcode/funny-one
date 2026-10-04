@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // The client's view of BASE_PATH (requirements D-5). Vite bakes the build's
-// `base` into `import.meta.env.BASE_URL` — `/` by default, `/funny37-game/`
-// on the owner's VM — always with a trailing slash. Every root-absolute URL
+// `base` into `import.meta.env.BASE_URL` — `/` by default and in production,
+// `/funny37-game/` on a sub-path deploy — always with a trailing slash. Every root-absolute URL
 // the app used to write by hand (`/flags/en.png`, `/deployer-logo.png`, the
 // `?room=` join link, the Socket.IO path) goes through here, so a sub-path
 // deploy changes one build argument rather than a grep.

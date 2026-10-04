@@ -1,7 +1,9 @@
 # Acceptance test — «Чепуха 37» on production
 
 The script for the owner's single device session (T-8.2 + Gate 7's device legs), run against
-**https://www.staging-oursharedcode.com/funny37-game/**. Adapted from SRC spec §19 (free-text
+**https://www.funny37.oursharedcode.com/** (until 2026-10 it was
+`https://www.staging-oursharedcode.com/funny37-game/`, now forwarded; the session records below
+name the address used at the time). Adapted from SRC spec §19 (free-text
 answers → combobox picks from the answer pools; base64 pictures → URL images served by the
 Worker's `/i/<hash>`; 7 rounds, unchanged). Extras from design §13: disconnect-mid-game → bot,
 the daily image cap, and a cache-hit replay.

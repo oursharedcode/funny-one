@@ -243,8 +243,8 @@ describe('socket.io', () => {
 // T-8.1 — BASE_PATH mount (requirements D-5)
 // ---------------------------------------------------------------------------
 //
-// Production sits behind Caddy at /funny37-game/, so every path the process
-// answers on must move with the base — and only there. The negative cases
+// A sub-path deploy (production's, at /funny37-game/, until B-1a) needs every
+// path the process answers on to move with the base — and only there. The negative cases
 // matter as much as the positive ones: a server that still answered at the
 // root would mask a client built with the wrong base until the first real
 // deploy, where the shell would load and the socket never connect.

@@ -1410,3 +1410,21 @@ unless they carry advisories:
   ended with a cartoon — a real prompt is a library hit with generation off. Support half:
   D1–D3 and D5(b) pass; D4 (Sponsors arrival) and D5(a) (QR from a second wallet) waived by the
   owner. The owner also cancelled the paid Workers AI plan the same day (back on free).
+
+## Post-v1 backlog — closed items
+
+- [x] **B-1a (M)** Origin move: Funny Multi to `https://www.funny37.oursharedcode.com/` (owner
+      decision 2026-10-03) — DNS at Cloudflare, a Caddy site block, production `BASE_PATH=/`. Must
+      land before B-1d: a TWA's origin is baked into the APK. → FM-APP-1
+      _Closed 2026-10-04 (Step 55)._ Owner confirmed the same day: the game sits at the host root
+      (`BASE_PATH=/`); the old `www.staging-oursharedcode.com/funny37-game` **forwards** (301,
+      join links kept) rather than serves — one container has one mount point and two would split
+      the in-memory rooms, so installed PWAs reinstall from the new host; Funny One stays on the
+      old host until Phase S-3, so the Caddyfile has `FM_HOST`/`FM_APEX` for the game beside
+      `SITE_HOST`/`SITE_APEX`. Done: Caddyfile, compose, both ship scripts, `.env.example` and
+      `DEPLOYMENT.md` (Caddyfile validated in a Caddy container first); DNS-only `A` records for
+      `www.funny37` and `funny37` (the PC's Cloudflare token extended to the zone by the owner);
+      VM `.env` updated and `deploy/ship.sh` run by the owner. Verified with curl: `/health` 200,
+      `/config` support rails, manifest scope `/`, apex and old path (with and without slash,
+      `?room=` kept) 301 to the new host, `/funny1-game/` 200; the owner's two-device round in a
+      browser passed.

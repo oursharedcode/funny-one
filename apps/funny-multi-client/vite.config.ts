@@ -16,8 +16,10 @@
 //     192/512 PNG pair, as in SRC; `icon.svg` is the favicon only — see the
 //     icons[] comment below for why Chrome will not take it as a manifest icon.
 //  4. BASE_PATH (T-8.1, requirements D-5). SRC was only ever served at `/`;
-//     production here is `https://…/funny37-game/` behind Caddy, one sub-path
-//     per game. The build reads BASE_PATH (a Docker build-arg; unset = `/`)
+//     production was `https://…/funny37-game/` behind Caddy (one sub-path per
+//     game) until B-1a gave each game its own host, so it now runs at `/`;
+//     the mechanism stays for any sub-path deploy. The build reads BASE_PATH
+//     (a Docker build-arg; unset = `/`)
 //     and threads it into Vite's `base`, the manifest's `start_url`/`scope`
 //     and the workbox denylist; `src/basePath.ts` reads the result back via
 //     `import.meta.env.BASE_URL` for the socket path and asset URLs. The

@@ -2550,20 +2550,102 @@ Gates: as Step 52.
 
 ---
 
-**RESUME HERE (2026-10-04, after Step 54).** ~~RESUME HERE (after Step 52)~~ — carried
-into this note. **B-1 (Android TWA + Play listing, Funny Multi) is started; no code yet.**
+~~**RESUME HERE (2026-10-04, after Step 54).** **B-1 (Android TWA + Play listing, Funny Multi) is started; no code yet.**
 Step 54 holds the decisions, `steering/tasks.md` the split into B-1a–B-1e. **Next step: B-1a**,
 the origin move to `https://www.funny37.oursharedcode.com/` — DNS at Cloudflare, a Caddy site
 block, production `BASE_PATH=/`. Then B-1b (origin-root `assetlinks.json` + privacy policy),
 B-1c (shell detection, Support hidden — closes T-9.4's FM-APP-3 clause) and B-1d (Bubblewrap
-build, check on the owner's Android phone). None of these waits for the Play account (B-1e).
+build, check on the owner's Android phone). None of these waits for the Play account (B-1e).~~
 
-Ask the owner before starting: (1) B-1a's two unconfirmed points — the game at the host root,
+~~Ask the owner before starting: (1) B-1a's two unconfirmed points — the game at the host root,
 the old origin still serving; (2) B-1c's two — both detection signals, Support hidden entirely;
 (3) the privacy policy's host — hub or each game's root; (4) the public-address decision for the
 Play account (Step 54, three options); (5) whether Equifax has replied about the D-U-N-S
 address — do not retry the Play signup before the record is fixed, Google limits the tries;
-(6) where Apple enrollment stands. Enrollment identifiers are not in this repo (Step 54).
+(6) where Apple enrollment stands. Enrollment identifiers are not in this repo (Step 54).~~ — B-1a landed, Step 55; what remains is in the note below.
+
+## Step 55 (task B-1a) — Funny Multi moves to its own host, deployed (2026-10-04)
+
+**Shipped:** Funny Multi now lives at `https://www.funny37.oursharedcode.com/` — the origin the
+Android app will bake in (B-1d). Owner confirmed ("agree to all recommended"): the game sits at
+the host's root (`BASE_PATH=/`); the old `www.staging-oursharedcode.com/funny37-game` forwards
+with a 301 rather than serves — one container has one mount point, and a second would split the
+in-memory rooms; Funny One stays on the old host until Phase S-3.
+
+_Code and docs._ `deploy/caddy/Caddyfile` has four site names, one variable each, all required
+(Caddy rejects an empty site name): `FM_HOST` (reverse proxy to the app), `FM_APEX` (301 to
+`FM_HOST`), `SITE_HOST` (Funny One's static files at `/funny1-game/`, plus a 301 for
+`/funny37-game` and below with `?room=` kept) and `SITE_APEX` (301 to `SITE_HOST`).
+`docker-compose.yml` passes them to Caddy and no longer passes `BASE_PATH`. `deploy/ship.sh`
+requires all four in the remote `.env`, refuses a `BASE_PATH` other than `/`, reloads Caddy
+(retried — a just-recreated Caddy is not answering yet), checks `/health` on `FM_HOST` and
+asserts that the old address answers `301` to the new one; `ship-funny-one.sh` reads `FM_HOST`.
+The sub-path plumbing stays (default `/`); the client, server, shared package and `Dockerfile`
+changes are comments only. `.env.example`, `DEPLOYMENT.md` (with a runbook for moving a
+deployment from a sub-path to its own host), `README.md`, `docs/ACCEPTANCE.md` (target URL),
+`steering/design.md` and `steering/requirements.md` (D-5 amended) follow the move. The Caddyfile
+was run in a `caddy:2` container before deploy: the redirect keeps the query, Funny One's block
+is unchanged, both apexes forward.
+
+_DNS._ The PC's Cloudflare token covered only `staging-oursharedcode.com`. The owner added
+`oursharedcode.com` to it in the dashboard (a token cannot edit itself — error 9109), and the
+agent created DNS-only `A` records for `www.funny37` and `funny37` pointing at the VM's reserved
+IP.
+
+_Deploy._ The owner set the VM's `.env` (`BASE_PATH=/`, `FM_HOST`, `FM_APEX`; backup
+`~/funny/.env.bak-b1a`) and ran `deploy/ship.sh` in Git Bash. The image is tagged
+`funny-multi:d22f484`, the previous commit, but was built from this step's working tree; the
+client and server changes are comments only, so the bundle differs from the old one by
+`BASE_PATH=/` alone. SSH had first timed out because the owner's home IP changed (a dynamic address); `deploy/oci/network.py` re-pointed the port-22 rule. The build's `npm ci`
+stalled for a few minutes on the owner's network and then completed on its own. Checked with
+curl afterwards: `/health` 200; `/config` lists the support rails; the manifest's scope and
+`start_url` are `/`; the apex and the old path (with and without the trailing slash, `?room=`
+kept) answer 301 to the new host; `/funny1-game/` still 200. The owner then ran the two-device
+round in a browser and reported it passed.
+
+_Found on the way._ `ship.sh` ended silently after the health line: its old-address check ran
+`got="$(curl …)"` under `set -e`, so one failed curl — probably Caddy answering slowly just after
+the reload — exited with no message. The check now retries five times and cannot exit silently.
+It is syntax-checked and its assertions were confirmed by hand with curl, but no full deploy has
+run it yet.
+
+**Owed:**
+
+- Installed PWAs at the old path must be reinstalled from the new host (a service worker cannot
+  follow a redirect); old links and QR codes keep working through the 301.
+- `ship.sh`'s retrying check awaits its first full run, at the next deploy.
+- CI green on the push — the sixth gate.
+- `docs/ACCEPTANCE.md`'s dated session records and Part D keep the old URL on purpose (history).
+- B-1b–B-1d (code and deploy work) and B-1e (the account and the listing); the open owner
+  questions are in the RESUME note.
+
+Gates: typecheck, lint, `format:check` and `npm audit` clean at close (`--omit=dev` 0; the full
+audit lists only GHSA-vfj7-8cjw-p6xm; `braces` is still 3.0.3, so Step 53's exception stands).
+`npm test` outside the sandbox: the full-suite run showed two lone timeouts under load —
+`RoundScreen.test.tsx` (round 6) in the Funny Multi client and `App.test.tsx` (full 1 human + 1
+virtual game) in the Funny One client — and both pass when run alone, as the Step 54 note
+expects of this machine; every other test passed. CI is the sixth gate and runs on the push.
+
+---
+
+**RESUME HERE (2026-10-04, after Step 55).** ~~RESUME HERE (after Step 54)~~ — carried into this
+note. **B-1a is closed: Funny Multi is live at `https://www.funny37.oursharedcode.com/`, and the
+old path forwards.** B-1 (Android TWA + Play listing) continues. **Next step: B-1b**, the
+origin-root files on the new host — the repo-authored privacy policy (at the game's own root,
+decided) and `/.well-known/assetlinks.json`. Both need a Caddy `handle` block ahead of the proxy
+in the `FM_HOST` site of `deploy/caddy/Caddyfile`, because the app's SPA fallback would answer
+either path with `index.html`. Note: `assetlinks.json` carries the SHA-256 fingerprint of the key
+that signs the app — a key B-1d creates, and Play's own signing key once Play App Signing is on —
+so B-1b can ship the route and the policy first while the file's final content waits for that
+key. Then B-1c (shell detection, Support hidden — closes T-9.4's FM-APP-3 clause) and B-1d
+(Bubblewrap build, check on the owner's Android phone). None of these waits for the Play account
+(B-1e).
+
+Ask the owner before starting: (1) the Play account's public address — an organization account
+shows its legal address on every listing (Step 54): the one on the Equifax request, or a separate
+business street address; (2) whether Equifax has replied about the D-U-N-S address — do not retry
+the Play signup before the record is fixed, Google limits the tries; (3) where Apple enrollment
+stands. Enrollment identifiers are not in this repo (Step 54).
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
 may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
@@ -2576,7 +2658,8 @@ production generation is off (`[ai]` commented out in `wrangler.toml`).
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` now holds the support rails; the
-backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM. The production Worker
+backup from before the change is `~/funny/.env.bak-2026-10-01` on the VM; since 2026-10-04 it also holds `BASE_PATH=/`,
+`FM_HOST` and `FM_APEX`, backed up before that change at `~/funny/.env.bak-b1a`. The production Worker
 secret is on this PC at `~/.cloudflare/worker-secret` (verified against `/stats`, not re-copied
 from the VM).
 
@@ -2587,15 +2670,16 @@ regression. Multi-line commit messages must go through `git commit -F <file>`. D
 `C:\Mark\Dev\machine\ports.md` before binding anything new. SSH to the VM is allowed only from
 the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
 `curl https://api.ipify.org`). Production deploys are run by the owner in a Git Bash terminal —
-the agent's auto mode refuses them, and also refused a headless browser run against production
-(Step 49). The local `.env`'s Worker secret is not production's: any live Worker call from this
+the agent's auto mode refuses them, and also refused a headless browser run against production (Step 49), an SSH edit of the VM's `.env` and
+an `nslookup` of the new hosts (Step 55); `deploy/oci/network.py` and the Cloudflare DNS calls
+were allowed. The local `.env`'s Worker secret is not production's: any live Worker call from this
 PC needs the production pair exported first.
 
 Still open, none blocking: making the repo public before any launch announcement; real Funny One
 icons before any announcement (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
 install leg (closes Gate 7, Funny Multi); B-8 (Play Protect warning on Android install, both
 games); the Arm VM retry; a cosmetic "Render" sweep in code comments; the stray T-4.2 comment in
-`apps/funny-multi-server/src/prompt.ts:72`; `deploy/ship.sh` lacks a `caddy reload` (Step 36); a
+`apps/funny-multi-server/src/prompt.ts:72`; a
 mid-game reload-on-update risk in both clients' `swReload.ts`; the exported story picture's
 Hebrew text rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
 native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);

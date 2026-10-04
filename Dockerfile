@@ -12,7 +12,8 @@
 # production dependencies and copies the three dist/ trees across.
 #
 # BASE_PATH (requirements D-5): the URL sub-path the app is served under —
-# unset/`/` on Render, `/funny37-game` behind the owner's Caddy. It must reach
+# unset/`/` in production (the game owns its host, B-1a), a sub-path such as
+# `/funny37-game` behind a proxy of your own. It must reach
 # BOTH stages: the client bakes it in at build time (Vite `base`, PWA scope,
 # Socket.IO path) and the server reads it at runtime (static prefix, /health,
 # Socket.IO path). docker-compose.yml passes one value to both places.

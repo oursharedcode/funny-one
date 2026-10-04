@@ -10,7 +10,7 @@ umbrella, which is planned to hold future games sharing this repo's rotation/poo
 
 ## Play it
 
-**https://www.staging-oursharedcode.com/funny37-game/** — the reference deployment: a $0
+**https://www.funny37.oursharedcode.com/** — the reference deployment: a $0
 Oracle Cloud _Always Free_ VM running this repo's Docker image behind Caddy. Open it on a
 phone, create a room, and share the QR code.
 
@@ -23,8 +23,7 @@ nothing beyond a Cloudflare account, a Linux host with Docker and a domain name.
 1. `cd cloudflare && npx wrangler deploy` (after creating the R2 bucket and the shared
    secret, and uncommenting `[ai]` in `wrangler.toml` so the Worker may generate) gives you
    the Worker URL.
-2. On the host, a six-line `.env` from `.env.example` (Worker URL + secret, `BASE_PATH`, site
-   name).
+2. On the host, a short `.env` from `.env.example` (Worker URL + secret, the host names).
 3. From your PC, `deploy/ship.sh user@host` builds the image, streams it over SSH and starts
    it with Caddy in front for automatic HTTPS.
 

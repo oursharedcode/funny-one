@@ -44,7 +44,11 @@ grace window then disconnect = bot (spec §7), no client-side AI calls, one Rend
 *(D-5, 2026-09-14: the one service is now the Docker image on an Oracle Always-Free VM behind
 Caddy, at `https://www.staging-oursharedcode.com/funny37-game` — served under a sub-path, so the
 client's Vite `base`, manifest `start_url`/`scope`, Socket.IO path and the server's static
-prefix all take one configurable `BASE_PATH`, default `/`, which keeps Render working unchanged.)*
+prefix all take one configurable `BASE_PATH`, default `/`, which keeps Render working unchanged.
+Amended 2026-10 (B-1a): the game moved to the root of its own host,
+`https://www.funny37.oursharedcode.com/` — an Android Trusted Web Activity bakes its origin in, so
+a game cannot share a name with another — and production runs `BASE_PATH=/`; the old sub-path
+address only forwards.)*
 
 Changed vs SRC (each detailed below): combobox answers with server-side validation (§4–§6),
 deterministic prompts from pool fragments (§7.1), R2-cached images delivered by URL (§7.2),

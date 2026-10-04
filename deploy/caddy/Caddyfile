@@ -1,16 +1,20 @@
 # Funny Family «Чепуха 37» — Caddy in front of the game container (T-8.1,
-# requirements D-5). Used by the `caddy` profile in docker-compose.yml:
+# requirements D-5; the dedicated host is B-1a). Used by the `caddy` profile
+# in docker-compose.yml:
 #
 #   docker compose --profile caddy up -d
 #
 # Caddy terminates TLS (certificates from Let's Encrypt, renewed by itself,
 # kept in the `caddy_data` volume), forwards WebSockets without any extra
 # directive, and appends the client address to X-Forwarded-For — which is
-# why TRUSTED_PROXY_HOPS=1 is right behind it. The three {$…} values come
-# from .env via the compose file: SITE_HOST (the name players use),
-# SITE_APEX (the bare domain, redirected to it) and BASE_PATH (the sub-path
-# the game lives under — write it WITHOUT a trailing slash here, e.g.
-# /funny37-game; the app itself accepts any spelling).
+# why TRUSTED_PROXY_HOPS=1 is right behind it. The four {$…} values come
+# from .env via the compose file:
+#   FM_HOST / FM_APEX     Funny Multi's own host and its bare name (redirected
+#                         to it). The game sits at that host's root, so the
+#                         container's BASE_PATH must be "/".
+#   SITE_HOST / SITE_APEX the older shared host: Funny One lives under
+#                         /funny1-game here, and Funny Multi's old address
+#                         /funny37-game forwards to FM_HOST.
 
 {
 	# HTTP/3 needs UDP 443, which the VM's cloud firewall does not open;
@@ -20,17 +24,32 @@
 	}
 }
 
+# Funny Multi, at the root of its own host — a Trusted Web Activity's origin
+# is baked into the Android app, so the game cannot share a name with another
+# game (B-1a). Everything is forwarded untouched: the container serves the
+# static bundle, /health, /config and Socket.IO itself.
+{$FM_HOST} {
+	encode zstd gzip
+
+	reverse_proxy funny-multi:3000
+}
+
+{$FM_APEX} {
+	redir https://{$FM_HOST}{uri} permanent
+}
+
 {$SITE_HOST} {
 	encode zstd gzip
 
-	# `/funny37-game` → `/funny37-game/`: the service worker's scope and the
-	# join link both carry the trailing slash, so land there.
-	redir {$BASE_PATH} {$BASE_PATH}/ permanent
-
-	# The path is forwarded untouched — the container mounts itself under
-	# BASE_PATH (static bundle, /health, Socket.IO), so nothing to rewrite.
-	handle {$BASE_PATH}/* {
-		reverse_proxy funny-multi:3000
+	# Funny Multi's former address. One container serves one mount point and
+	# two would split the in-memory rooms, so the old path only forwards —
+	# keeping the join link's `?room=` (`handle_path` strips the prefix, so
+	# {uri} is what follows it). An installed copy cannot follow this: a
+	# service worker's script may not sit behind a redirect, so it must be
+	# reinstalled from FM_HOST.
+	redir /funny37-game https://{$FM_HOST}/ permanent
+	handle_path /funny37-game/* {
+		redir https://{$FM_HOST}{uri} permanent
 	}
 
 	# Funny One «Одна Чепуха: по кругу» (T-FO-6.2) — no container, just the

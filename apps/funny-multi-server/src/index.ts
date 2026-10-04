@@ -79,9 +79,10 @@ const DEV_CLIENT_ORIGIN = 'http://localhost:5183';
 // sits in front of Render.
 const TRUSTED_PROXY_HOPS = Number(process.env.TRUSTED_PROXY_HOPS ?? 1);
 
-// URL sub-path this process is mounted under (requirements D-5): `/` on Render
-// and in dev, `/funny37-game/` behind the owner's Caddy, which routes one
-// sub-path per game to its own container. Everything path-shaped below hangs
+// URL sub-path this process is mounted under (requirements D-5): `/` in dev
+// and in production (the game owns its host since B-1a; it was `/funny37-game/`
+// behind the owner's Caddy before), or any sub-path a proxy of your own routes
+// to it. Everything path-shaped below hangs
 // off it — the static prefix, /health, the Socket.IO path — and the client
 // build bakes the same value in (vite.config.ts), so the two must be fed the
 // same BASE_PATH; docker-compose.yml does exactly that.

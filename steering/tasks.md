@@ -93,29 +93,31 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   **Started 2026-10-03 (Step 54)** — owner decisions and enrollment state are in that log entry;
   the work beyond this text is filed as B-1a–B-1e, to be done in that order (B-1e runs in
   parallel). Package id `com.oursharedcode.funny37` — permanent once published.
-- **B-1a (M)** Origin move: Funny Multi to `https://www.funny37.oursharedcode.com/` (owner
-  decision 2026-10-03) — DNS at Cloudflare, a Caddy site block, production `BASE_PATH=/`. Must
-  land before B-1d: a TWA's origin is baked into the APK. Two points are the agent's reading,
-  not yet confirmed by the owner — ask before starting: the game sits at the host root (no
-  sub-path), and the old `www.staging-oursharedcode.com/funny37-game` keeps serving for
-  installed PWAs.
+- **B-1a** — **closed 2026-10-04 (Step 55)**, block in `steering/tasks-done.md`. Funny Multi
+  is live at `https://www.funny37.oursharedcode.com/`; the old `/funny37-game` path forwards.
 - **B-1b (S)** Origin-root files on the new host: `/.well-known/assetlinks.json` (Digital Asset
   Links — exact host, origin root, no redirect) and a repo-authored privacy policy, which Play
-  requires and the repo does not have. Today's Caddyfile answers 404 outside the game paths.
+  requires and the repo does not have. Host decided 2026-10-04: **each game's own root** (a
+  redirect target from the hub once B-11 exists). Since B-1a, `FM_HOST` forwards every path to
+  the container — whose SPA fallback would answer `/.well-known/assetlinks.json` with
+  `index.html` — so B-1b adds Caddy `handle` blocks for these two paths ahead of the proxy.
 - **B-1c (S)** Store-shell detection, then the Support screen hidden entirely inside the shell —
   closes T-9.4's FM-APP-3 clause. Runtime detection (a TWA renders the deployed bundle, so a
   build-time flag cannot see it): a Bubblewrap launch-URL parameter persisted to
   `sessionStorage`, plus the `android-app://` referrer. Both choices (two signals; hide
-  entirely) were recommended 2026-10-03 and not objected to — confirm before starting.
+  entirely) **confirmed by the owner 2026-10-04**.
 - **B-1d (M)** Bubblewrap project under `deploy/android/`, signing key, local build; install on
   the owner's Android phone — opens with no URL bar and no support entries; note whether the TWA
   sidesteps B-8's Play Protect warning. Needs JDK 17 + Android build-tools (absent on this PC;
   Bubblewrap fetches them).
 - **B-1e (owner)** Play developer account — organization, under the ABN (owner decision
   2026-10-03). Stopped at the signup's "Payments profile" step: the D-U-N-S record's address is
-  incomplete, fix requested from Equifax 2026-10-03. Open owner decision first: an organization
-  account shows its legal address on every listing (Step 54). Then payments profile, contacts,
-  fee; then the listing (assets, content rating 12+, Data Safety, release).
+  incomplete, fix requested from Equifax 2026-10-03. **Owner decided 2026-10-04: stay with the
+  organization account** (not the personal one, so no 12-testers-for-14-days rule). An
+  organization account shows its legal address on every listing (Step 54); still open is which
+  address that is — the one on the Equifax request, or a different business street address (which
+  Equifax must put on the record first). Then payments profile, contacts, fee; then the listing
+  (assets, content rating 12+, Data Safety, release).
 - **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
   **Pulled forward 2026-09-20**, same note as B-1.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).

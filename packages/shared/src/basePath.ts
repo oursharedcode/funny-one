@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Where the app is mounted on its origin (requirements D-5). `/` on Render and
-// in dev; `/funny37-game/` on the owner's VM, where Caddy routes one sub-path
-// per game to its own container. Three places must agree on the value — the
+// Where the app is mounted on its origin (requirements D-5). `/` in dev and in
+// production (the game owns its host since B-1a); a sub-path such as
+// `/funny37-game/`, as the owner's VM served before, behind a proxy that routes
+// one sub-path per game. Three places must agree on the value — the
 // client build (Vite `base`, manifest `start_url`/`scope`, Socket.IO client
 // path), the server (static prefix, `/health`, Socket.IO server path) and the
 // deploy config that feeds both — and a mismatch fails silently: the shell

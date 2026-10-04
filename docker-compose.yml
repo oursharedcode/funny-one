@@ -5,7 +5,8 @@
 # BASE_PATH (requirements D-5) is the one value that has to reach two places:
 # the image build (the client bakes it in) and the running server. Compose
 # reads it from .env for the `${…}` substitutions below, so setting it once
-# there keeps both in step. Unset means "/" — served at the root.
+# there keeps both in step. Unset means "/" — served at the root, which is
+# what the Caddy profile below requires (the game owns its host, B-1a).
 #
 # Two ways to run this file:
 #   docker compose up -d                  the game only, plain HTTP on :3000;
@@ -13,8 +14,9 @@
 #   docker compose --profile caddy up -d  the game plus Caddy on :80/:443 with
 #                                         automatic HTTPS — what production
 #                                         runs (deploy/caddy/Caddyfile). Needs
-#                                         SITE_HOST and SITE_APEX in .env and
-#                                         DNS for both pointing at this host.
+#                                         FM_HOST, FM_APEX, SITE_HOST and
+#                                         SITE_APEX in .env and DNS for all
+#                                         four pointing at this host.
 services:
   funny-multi:
     build:
@@ -49,12 +51,14 @@ services:
       - caddy_config:/config
     # Plain `${VAR}` rather than the `:?` required form: Compose interpolates
     # the whole file before it applies profiles, so a hard requirement here
-    # would break the profile-less `docker compose up`. An empty SITE_HOST
-    # fails loudly anyway — Caddy refuses a Caddyfile with an empty site name.
+    # would break the profile-less `docker compose up`. An empty host fails
+    # loudly anyway — Caddy refuses a Caddyfile with an empty site name.
+    # BASE_PATH is not passed on: the Caddyfile no longer reads it.
     environment:
+      FM_HOST: ${FM_HOST:-}
+      FM_APEX: ${FM_APEX:-}
       SITE_HOST: ${SITE_HOST:-}
       SITE_APEX: ${SITE_APEX:-}
-      BASE_PATH: ${BASE_PATH:-}
     depends_on:
       - funny-multi
     restart: unless-stopped

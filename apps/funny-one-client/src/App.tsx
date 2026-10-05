@@ -15,6 +15,11 @@
 // instead of a placeholder. "Play again" re-runs `createGame` with the same
 // seats/language (owner decision 2026-09-23) — App.tsx is the only place
 // that holds both, so the handler lives here rather than in EndScreen.
+//
+// D-10 (2026-10-05) adds one more piece of setup carried from Home to the end
+// screen: where the gallery's pictures come from (pictureSource.ts). It is not
+// part of the game reducer — it changes nothing about a turn — so it sits
+// beside `game` here and survives "Play again" with the seats.
 
 import { useEffect, useState } from 'react';
 import HomeScreen from './screens/HomeScreen';
@@ -33,10 +38,12 @@ import {
   type GameState,
   type Seat,
 } from './game/roundRobin';
+import type { PictureSource } from './pictureSource';
 import type { AuthoredLanguage, OptionId } from '@funny/shared';
 
 export default function App() {
   const [game, setGame] = useState<GameState | null>(null);
+  const [pictures, setPictures] = useState<PictureSource>('builtin');
   // Gates the HandoffScreen for the seat currently up. Reset to true
   // whenever a new human turn begins (see the effect below); a "go" tap sets
   // it false so RoundScreen takes over for that same turn.
@@ -62,7 +69,12 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [game]);
 
-  function handleStart(seats: readonly Seat[], language: AuthoredLanguage): void {
+  function handleStart(
+    seats: readonly Seat[],
+    language: AuthoredLanguage,
+    pictureSource: PictureSource,
+  ): void {
+    setPictures(pictureSource);
     setGame(createGame(seats, language));
   }
 
@@ -82,7 +94,12 @@ export default function App() {
 
   if (isDone(game)) {
     return (
-      <EndScreen game={game} onPlayAgain={handlePlayAgain} onChangePlayers={() => setGame(null)} />
+      <EndScreen
+        game={game}
+        pictures={pictures}
+        onPlayAgain={handlePlayAgain}
+        onChangePlayers={() => setGame(null)}
+      />
     );
   }
 

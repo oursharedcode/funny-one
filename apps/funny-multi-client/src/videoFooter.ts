@@ -2,8 +2,9 @@
 //
 // Copied verbatim from SRC/client/src/videoFooter.ts (T-5.2). Pure canvas
 // layout + QR helpers — nothing here reads the picture, so URL-vs-base64
-// (design §8.3) doesn't touch it. Used by recordWobble.ts (CSS engine only;
-// SRC's Lottie-engine sibling isn't carried — ARC-3, T-1.6).
+// (design §8.3) doesn't touch it. Used by recordWobble.ts, the one recorder:
+// SRC's Lottie-engine sibling isn't carried as a recorder (ARC-3, T-1.6), only
+// its monkey is, since B-12 (videoMonkey.ts).
 //
 // Shared attribution footer for the share-as-video recorder. Mirrors the
 // footer baked into the downloadable still (downloadStory.ts):

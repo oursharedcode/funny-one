@@ -18,28 +18,39 @@
 // to an unseen story always gets a fresh `initial` mount; revisiting a seen
 // one mounts fresh too, but with `reveal={false}`, which renders already
 // settled (see `RigScene`'s doc comment on that mode).
+//
+// D-10 (2026-10-05): the picture itself is now `StoryPicture` — the rig as
+// before, or the picture library's cartoon when the player chose Internet
+// pictures on Home, falling back to the rig when it does not arrive. A story
+// whose library picture was shown is exported with that picture, so the file
+// matches the screen.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import RigScene from './RigScene';
+import StoryPicture from './StoryPicture';
 import ProseText from './ProseText';
 import ShareButton from './ShareButton';
 import { resolveStory } from '../game/resolveStory';
 import { buildStoryImageFile, downloadStoryImage } from '../rigExport';
 import { canShareFiles, downloadFile, shareFiles } from '../share';
 import type { Seat } from '../game/roundRobin';
+import type { PictureSource } from '../pictureSource';
 import type { AuthoredLanguage, Story } from '@funny/shared';
 
 interface Props {
   seats: readonly Seat[];
   stories: readonly Story[];
   language: AuthoredLanguage;
+  pictures?: PictureSource;
 }
 
-export default function StoryGallery({ seats, stories, language }: Props) {
+export default function StoryGallery({ seats, stories, language, pictures = 'builtin' }: Props) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [seen, setSeen] = useState<ReadonlySet<number>>(() => new Set());
+  // Library pictures that actually reached the screen, by story index — what
+  // Download/Share draw instead of the rig.
+  const [libraryUrls, setLibraryUrls] = useState<ReadonlyMap<number, string>>(() => new Map());
   const shareSupported = canShareFiles();
 
   // Marks the currently open story seen after its mount, once the reveal
@@ -56,6 +67,12 @@ export default function StoryGallery({ seats, stories, language }: Props) {
   const story = stories[safeIndex]!;
   const { answers, prose } = resolveStory(language, story);
   const reveal = !seen.has(safeIndex);
+  const exportOptions = {
+    name: seat.name,
+    prose,
+    story,
+    pictureUrl: libraryUrls.get(safeIndex) ?? null,
+  };
 
   function step(delta: number): void {
     setIndex((safeIndex + delta + stories.length) % stories.length);
@@ -64,7 +81,7 @@ export default function StoryGallery({ seats, stories, language }: Props) {
   // Native-share the still image; fall back to a download if the platform
   // declines the file (so the button is never a dead end).
   async function shareImage(): Promise<void> {
-    const file = await buildStoryImageFile({ name: seat.name, prose, story });
+    const file = await buildStoryImageFile(exportOptions);
     const meta = { title: t('home.title'), text: t('gallery.storyBy', { name: seat.name }) };
     if ((await shareFiles([file], meta)) === 'unsupported') downloadFile(file);
   }
@@ -76,7 +93,13 @@ export default function StoryGallery({ seats, stories, language }: Props) {
       <p className="text-sm text-gray-600">{t('gallery.storyBy', { name: seat.name })}</p>
 
       <div role="img" aria-label={t('gallery.pictureAlt', { name: seat.name })}>
-        <RigScene key={safeIndex} story={story} reveal={reveal} />
+        <StoryPicture
+          key={safeIndex}
+          story={story}
+          source={pictures}
+          reveal={reveal}
+          onLibraryPicture={(url) => setLibraryUrls((prev) => new Map(prev).set(safeIndex, url))}
+        />
       </div>
 
       <ProseText prose={prose} answers={answers} className="text-lg" />
@@ -107,7 +130,7 @@ export default function StoryGallery({ seats, stories, language }: Props) {
       <div className="flex gap-2">
         <button
           className="flex-1 rounded border border-amber-300 bg-white px-4 py-3 font-semibold text-pink-500"
-          onClick={() => void downloadStoryImage({ name: seat.name, prose, story })}
+          onClick={() => void downloadStoryImage(exportOptions)}
         >
           {t('gallery.download')}
         </button>

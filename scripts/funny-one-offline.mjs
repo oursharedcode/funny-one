@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// FO-IMG-2 check for apps/funny-one-client: zero runtime network calls, and a
-// full game playable with the network gone (T-FO-6.1). Per language:
+// FO-IMG-2 check for apps/funny-one-client: zero runtime network calls with
+// the built-in pictures — the default; pictures from the Internet are opt-in
+// (D-10) and never picked here — and a full game playable with the network
+// gone (T-FO-6.1). Per language:
 //
-//   1. builds the client for the deploy sub-path (BASE_PATH=/funny1-game) and
-//      serves it with `vite preview`;
+//   1. builds the client the way production serves it (BASE_PATH=/, the root
+//      of its own host since Step 60) and serves it with `vite preview`;
 //   2. online pass — loads it in a headless phone-sized Chromium, waits until
 //      the service worker controls the page (precache finished), plays a full
 //      game, and fails on any request to another origin;
@@ -28,7 +30,7 @@ import { playToEnd } from './funny-one-play.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '../..');
 const CLIENT = join(ROOT, 'apps/funny-one-client');
-const BASE_PATH = '/funny1-game';
+const BASE_PATH = '/';
 const OUT = join(ROOT, '.screens'); // gitignored; the exported picture lands here
 const langs = process.argv.length > 2 ? process.argv.slice(2) : ['en', 'he'];
 

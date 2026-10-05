@@ -12,6 +12,7 @@ import {
   __resetImageCounterStateForTests,
   generateImage,
   imagesGeneratedToday,
+  liveGeneration,
   maybeSyncImageCounter,
   releaseImageSlot,
   reserveImageSlot,
@@ -108,6 +109,56 @@ describe('image counter — KV persistence (ported from SRC, vol02 follow-up to 
     await syncImageCounterFromWorker();
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(imagesGeneratedToday()).toBe(0);
+  });
+});
+
+describe('liveGeneration — the Worker’s generation switch (B-13)', () => {
+  it('is false until a sync has heard from the Worker', () => {
+    expect(liveGeneration()).toBe(false);
+  });
+
+  it('follows the switch the Worker reports', async () => {
+    vi.stubGlobal('fetch', mockFetchOk({ date: todayKey, count: 0, generation: true }));
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(true);
+
+    vi.stubGlobal('fetch', mockFetchOk({ date: todayKey, count: 0, generation: false }));
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(false);
+  });
+
+  it('reads the switch even when the count belongs to another UTC day', async () => {
+    vi.stubGlobal('fetch', mockFetchOk({ date: '1999-12-31', count: 999, generation: true }));
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(true);
+    expect(imagesGeneratedToday()).toBe(0);
+  });
+
+  it('takes a Worker that predates the switch as generating — that Worker always does', async () => {
+    vi.stubGlobal('fetch', mockFetchOk({ date: todayKey, count: 3 }));
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(true);
+  });
+
+  it('keeps the last known answer through a failed sync', async () => {
+    vi.stubGlobal('fetch', mockFetchOk({ date: todayKey, count: 0, generation: true }));
+    await syncImageCounterFromWorker();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network down');
+      }),
+    );
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(true);
+  });
+
+  it('is false with no Worker configured — nothing can be generated at all', async () => {
+    vi.stubGlobal('fetch', mockFetchOk({ date: todayKey, count: 0, generation: true }));
+    await syncImageCounterFromWorker();
+    delete process.env.CLOUDFLARE_WORKER_URL;
+    await syncImageCounterFromWorker();
+    expect(liveGeneration()).toBe(false);
   });
 });
 

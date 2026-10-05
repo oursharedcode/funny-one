@@ -6,7 +6,7 @@
 | **Version** | 1.0 draft |
 | **Date** | 2026-08-15 |
 | **Status** | for review |
-| **Progress** | Phases 0–9 complete (Gate 9 closed 2026-10-03). Next: the store-app phases (B-1/B-2, pulled forward 2026-09-20; see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` for Funny One). Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
+| **Progress** | Phases 0–9 complete (Gate 9 closed 2026-10-03). Next: the Android store-app phase (B-1, pulled forward 2026-09-20; B-2, the iPhone app, was cancelled 2026-10-05 — an iPhone uses the web app, B-14; see `steering/funny-one-requirements.md`/`-design.md`/`-tasks.md` for Funny One). Closed task blocks live in `steering/tasks-done.md`. Current state and next step: the RESUME HERE note at the foot of `docs/IMPLEMENTATION_LOG.md`. |
 | **Build state** | Tracked per step in `docs/IMPLEMENTATION_LOG.md`. |
 
 Execution plan for `steering/requirements.md` (FM-*) per `steering/design.md` (§, DD-*).
@@ -73,7 +73,8 @@ Sizing: (S) ≤ half a day · (M) about a day · (L) multiple days.
   **Android install + maskable-icon + jank legs passed 2026-09-16** (device session, A2–A4;
   `docs/ACCEPTANCE.md`) — see T-7.1/T-7.3 notes above for detail.
   **Still open:** the iPhone install leg (A1), deferred for lack of a phone this session; Gate 7
-  closes once that runs.
+  closes once that runs. *(2026-10-05: with B-2 cancelled the web app is the only way an iPhone
+  plays, so the same borrowed-phone session also runs B-14's short device list.)*
 
 ## Phase 9 — Commercial: pre-generated library + support rails (CLOSED 2026-10-03, Gate 9)
 
@@ -110,13 +111,17 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   2026-10-04: the listing address is the one already on the Equifax request.** Equifax had not
   replied as of 2026-10-04; nothing more here until it does. Then payments profile, contacts,
   fee; then the listing (assets, content rating 12+, Data Safety, release).
-- **B-2** IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review — FM-APP-2.
-  **Pulled forward 2026-09-20**, same note as B-1. **Apple enrollment starts now, in parallel
-  with B-1** (owner decision 2026-10-04). Apple does not take sole traders as organizations:
-  a sole trader enrolls as an **Individual**, the seller shown is the personal legal name, and no
-  D-U-N-S is needed. Apple will move the account to an Organization later, on request, if a
-  company is ever formed. US $99/year. Findings in Step 58. Open (owner): enroll as an
-  Individual now, or form a company first.
+- **B-2** ~~IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review~~ —
+  **cancelled 2026-10-05 (owner decision): too costly** (the Apple Developer Program alone is
+  US $99 every year). No native iPhone app, for either game (Funny One's iOS half of Phase S-3
+  goes with it). An iPhone plays the web app in Safari and can add it to the Home Screen
+  (FM-NFR-1); what that relies on is checked under **B-14**. Apple enrollment was still waiting
+  on the Individual-or-company question, which is now closed with nothing to enroll for.
+  FM-APP-2 is cancelled to match; B-1 (Android) is unaffected.
+  *For the record, the plan was:* pulled forward 2026-09-20 with B-1; Apple enrollment in
+  parallel with B-1 (owner decision 2026-10-04), as an **Individual** — Apple does not take sole
+  traders as organizations, shows the personal legal name as seller, needs no D-U-N-S, and moves
+  the account to an Organization later on request. Findings in Step 58.
 - **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared
@@ -132,6 +137,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-9** Version 2 animated cartoon: animate the still client-side and export WebM via
   `MediaRecorder` (SRC's `VIDEO_GENERATION_ANALYSIS.md` option 2). Zero AI cost. Note DD-9
   dropped SRC's Lottie engine — reinstating it is a v2 decision, not a revert.
+  *(2026-10-05: B-12 put that engine's monkey back into the share video as plain canvas
+  drawing — no Lottie library, no engine choice — so DD-9 stands and this item is unchanged.)*
 - **B-10** Further income options under D-6(e), each chargeback-free or platform-as-MoR:
   seasonal word packs (Christmas, Halloween, birthday) as free pre-generated content; Sponsors
   monthly tier → "Family Pass" badge (the only safe recurring rail); print-on-demand of a room's
@@ -143,6 +150,56 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-11** Hub site at `https://www.funny.oursharedcode.com/` — the common page for both games:
   history and links (owner decision 2026-10-03). Candidate host for the shared privacy policy
   (open: hub or each game's own root — B-1b).
+- **B-12** The laughing monkey back in the 5-second share video (owner request 2026-10-05): it
+  walks in, points and laughs ("ha-ha"), then falls on its back — SRC's act, here on the
+  cartoon's top edge (design §8.3, amended). Plain canvas drawing of SRC's four sprites
+  (`public/monkey/`, `videoMonkey.ts`) inside the one recorder, which also takes that SRC
+  recorder's two Android fixes. No Lottie, no engine choice (DD-9 stands). **Code done
+  2026-10-05**; checked on a real headless-Chromium recording, frames viewed.
+  **Deployed 2026-10-05** (the four sprites answer 200 on the live host). *Open:* one recording
+  on the owner's Android phone.
+- **B-13** — **closed 2026-10-05 (Step 61)**, block in `steering/tasks-done.md`. Home leaves
+  out the "Up to N cartoons per day" line where nothing new is generated; live on production.
+  Reopens if the owner still sees the line in the Android app after closing and opening it.
+- **B-14** iPhone = the web app (B-2 cancelled): compatibility check, 2026-10-05.
+  **Found so far: nothing that stops play; three things to settle on a real iPhone.**
+  - *Checked.* Every browser feature the two clients use, against Safari — the build's floor
+    is iOS 16.4 (Vite's default target). Then both production builds played in Playwright's
+    WebKit 26.6 at iPhone 14 size: Funny Multi, three players, start to shared gallery, cartoons
+    served from another origin by the real `worker.js` (run locally), story picture downloaded;
+    Funny One in English and Hebrew, online and again with its server gone, picture exported.
+    No page error, console error or failed request in any run; no sideways scroll.
+  - *Not checkable without a device.* That WebKit build is Safari's engine on Windows, not iOS:
+    it has no video recorder, no share sheet, no Home Screen install, no lock screen. The
+    A1 iPhone leg has still never been run (Gate 7).
+  - *Risk 1 — the share video's file type.* The recorder asks for WebM first. Safari 18.4+
+    can record WebM, so an up-to-date iPhone would save a `.webm`, which iOS Photos does not
+    take; older ones (16.4–18.3) fall through to `.mp4`. Proposed: MP4 first on Apple devices.
+  - *Risk 2 — where the video goes.* It is a download only: on an iPhone that means the Files
+    app, not Photos, and the download link is released the instant it is clicked, which Safari
+    is known to mishandle. Proposed: release it later; optionally a second "Share" tap after
+    recording, so the clip can go to Photos or a chat (one tap cannot do both — Safari drops
+    the tap's permission during the 5 s recording).
+  - *Risk 3 — auto-lock.* A phone locked for more than about a minute is dropped from its room
+    (server recovery window 60 s; an iPhone locks after 30 s idle by default). Android has the
+    same rule. Proposed, optional: keep the screen awake during a game (Screen Wake Lock,
+    Safari 16.4+).
+  - *Small.* Screens use `min-h-screen`, a little taller than Safari's visible area with its
+    toolbar showing (`min-h-dvh` fixes it). No install prompt on iOS — Share → Add to Home
+    Screen by hand. The Support screen shows, as on any web visit.
+  - *Found on the way, any browser:* in Funny One, after a bot's turn, the next person's answer
+    list shows for an instant before the "pass the phone" screen (`App.tsx` resets the handoff
+    one paint late). Nothing private is shown; proposed fix is small.
+  - **Deferred 2026-10-05 (owner decision: "Defer on the three iPhone fixes and the Funny One
+    flash fix").** Risks 1–3 and the Funny One answer-list flash stay as described; none of the
+    proposed fixes is made. Take them up again when the owner asks, or after the
+    borrowed-iPhone session below shows which of them a real device needs.
+  - *Device list, for the borrowed-iPhone session (with A1):* note the iOS version; install to
+    the Home Screen; play one Funny Multi game with two other devices and see the cartoon;
+    download and share the story picture; make the 5 s video and note its file type, where it
+    lands, whether it plays and whether Photos or a chat app takes it; lock the phone mid-round
+    for 30 s, then for 90 s, and see whether it is still in the room; play Funny One in
+    airplane mode and export its picture.
 
 ## Dependency notes
 

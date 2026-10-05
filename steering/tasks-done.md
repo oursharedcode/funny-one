@@ -1480,3 +1480,17 @@ unless they carry advisories:
       bar, and no ♥ on Home from either signal — the launch URL, and (the one leg Step 58 could
       not reach) a cold-started app opening a plain link sent through another app, proving the
       `android-app://` referrer for real.
+- [x] **B-13 (S)** Home's "Up to N cartoons per day. Resets daily…" line left out where nothing
+      new is generated (owner request 2026-10-05). → FM-CORE-12, design §10.1, ACCEPTANCE B1
+      _Closed 2026-10-05 (Step 61)._ The server reads the Worker's generation switch from
+      `/stats` and sends it as `StatsPayload.liveGeneration`; the client shows the line only
+      when it is on. Library-only production shows _Open rooms_ alone, in the browser and in the
+      Android app (one client); a self-host that generates keeps the line. Seen in a browser
+      against the real Worker code run locally with the switch off. The owner still saw the line
+      in the Android app the same day — the app shows the live site, which had not yet been
+      deployed. Deployed 2026-10-05: the live server answers `stats:get` with
+      `liveGeneration: false`, and the live bundle carries the condition. The mock of
+      `./image.js` in `game.picture.socket.test.ts` gained the exports `stats.ts` reads, which
+      also ends Step 58's `npm test` flake. Not seen by the agent in a browser on production;
+      the owner's look at Home in the app is the confirmation, and the task reopens if the line
+      is still there.

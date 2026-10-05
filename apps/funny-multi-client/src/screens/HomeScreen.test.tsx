@@ -345,8 +345,43 @@ describe('stats', () => {
 
   it('renders the counter once a stats payload arrives', () => {
     renderHome();
-    socketMock.ackFor('stats:get')({ openRooms: 4, imagesGeneratedToday: 2, imagesLimit: 50 });
+    socketMock.ackFor('stats:get')({
+      openRooms: 4,
+      imagesGeneratedToday: 2,
+      imagesLimit: 50,
+      liveGeneration: true,
+    });
     expect(screen.getByText('Open rooms: 4')).toBeTruthy();
+    expect(screen.getByText(/Up to 50 cartoons per day/)).toBeTruthy();
+  });
+
+  it('leaves the daily cap out on a library-only server, which has nothing to cap (B-13)', () => {
+    renderHome();
+    socketMock.ackFor('stats:get')({
+      openRooms: 4,
+      imagesGeneratedToday: 0,
+      imagesLimit: 50,
+      liveGeneration: false,
+    });
+    expect(screen.getByText('Open rooms: 4')).toBeTruthy();
+    expect(screen.queryByText(/cartoons per day/)).toBeNull();
+  });
+
+  it('brings the daily cap back when a live update reports generation switched on', () => {
+    renderHome();
+    socketMock.ackFor('stats:get')({
+      openRooms: 4,
+      imagesGeneratedToday: 0,
+      imagesLimit: 50,
+      liveGeneration: false,
+    });
+    socketMock.fire('stats:update', {
+      openRooms: 4,
+      imagesGeneratedToday: 0,
+      imagesLimit: 50,
+      liveGeneration: true,
+    });
+    expect(screen.getByText(/Up to 50 cartoons per day/)).toBeTruthy();
   });
 
   it('does not ask for stats in join mode', () => {

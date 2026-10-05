@@ -36,11 +36,22 @@ function makeContextStub(): Canvas2DStub {
     translate: record('translate'),
     rotate: record('rotate'),
     scale: record('scale'),
+    // Path calls — the share video's speech balloon (videoMonkey.ts).
+    beginPath: record('beginPath'),
+    moveTo: record('moveTo'),
+    lineTo: record('lineTo'),
+    quadraticCurveTo: record('quadraticCurveTo'),
+    closePath: record('closePath'),
+    fill: record('fill'),
+    stroke: record('stroke'),
     // Naive fixed-width measurement — good enough for wrap-point assertions
     // without depending on real font metrics jsdom can't provide anyway.
     measureText: (text: string) => ({ width: text.length * 8 }) as TextMetrics,
     // Settable properties every draw call touches; plain values, no tracking.
     fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    lineJoin: 'miter',
     font: '',
     textAlign: 'start',
     textBaseline: 'alphabetic',

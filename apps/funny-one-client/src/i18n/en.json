@@ -14,7 +14,12 @@
     "virtualBadge": "Bot",
     "removeSeat": "Remove player",
     "addPlayer": "+ Add player",
-    "addVirtual": "+ Add virtual"
+    "addVirtual": "+ Add virtual",
+    "pictures": "Pictures",
+    "picturesBuiltIn": "Built in",
+    "picturesOnline": "From the Internet",
+    "picturesBuiltInHint": "Drawn on this device. No Internet needed.",
+    "picturesOnlineHint": "Cartoons from the picture library. Needs the Internet; without it you get the built-in pictures."
   },
   "thinking": {
     "title": "{{name}} is thinking…"
@@ -51,6 +56,7 @@
   "footer": {
     "gameLink": "Link to this game",
     "playYourself": "Play it yourself",
-    "contentNotice": "This game runs entirely on your device. Nothing you type ever leaves it."
+    "contentNotice": "This game runs entirely on your device. Nothing you type ever leaves it.",
+    "contentNoticeOnline": "Nothing you type ever leaves this device. With Internet pictures on, each story's cartoon is downloaded from the picture library."
   }
 }

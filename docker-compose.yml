@@ -14,9 +14,9 @@
 #   docker compose --profile caddy up -d  the game plus Caddy on :80/:443 with
 #                                         automatic HTTPS — what production
 #                                         runs (deploy/caddy/Caddyfile). Needs
-#                                         FM_HOST, FM_APEX, SITE_HOST and
-#                                         SITE_APEX in .env and DNS for all
-#                                         four pointing at this host.
+#                                         FM_HOST, FM_APEX, FO_HOST, FO_APEX,
+#                                         SITE_HOST and SITE_APEX in .env and
+#                                         DNS for all six pointing at this host.
 services:
   funny-multi:
     build:
@@ -42,8 +42,11 @@ services:
     volumes:
       - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Static files served straight by Caddy — Funny One's bundle lands in
-      # ./static/funny-one (deploy/ship-funny-one.sh), Funny Multi's privacy
-      # policy and assetlinks.json in ./static/funny37-root (deploy/ship.sh).
+      # ./static/funny-one, its privacy policy and assetlinks.json in
+      # ./static/funny1-root and the service worker its former address answers
+      # with in ./static/funny1-retired (all deploy/ship-funny-one.sh); Funny
+      # Multi's privacy policy and assetlinks.json in ./static/funny37-root
+      # (deploy/ship.sh).
       # The parent directory is mounted, not each subdirectory, so the
       # scripts' swap of a directory is visible here without restarting
       # Caddy: a bind mount pins the inode it started with.
@@ -58,6 +61,8 @@ services:
     environment:
       FM_HOST: ${FM_HOST:-}
       FM_APEX: ${FM_APEX:-}
+      FO_HOST: ${FO_HOST:-}
+      FO_APEX: ${FO_APEX:-}
       SITE_HOST: ${SITE_HOST:-}
       SITE_APEX: ${SITE_APEX:-}
     depends_on:

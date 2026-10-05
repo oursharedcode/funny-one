@@ -11,6 +11,14 @@
 // composites them with `ctx.drawImage`, reading the same `RIG_LAYERS`
 // geometry that drives the on-screen `RigScene` so the exported PNG never
 // drifts from what the player actually saw.
+//
+// D-10 (2026-10-05): when the gallery showed the story's picture from the
+// picture library instead (pictureSource.ts), the caller passes that
+// `pictureUrl` and the export draws it in the rig's place — `fetch` → blob →
+// `createImageBitmap`, as downloadStory.ts does, because the library is
+// another origin and an `<img>` drawn into the canvas would taint it. If the
+// picture cannot be fetched or decoded any more, the rig is drawn after all:
+// an export never fails for want of a network.
 
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -51,6 +59,9 @@ const SOURCE_LABEL_HEIGHT = 16;
 const URL_FONT = '12px ui-monospace, "SF Mono", Consolas, monospace';
 const URL_LINE_HEIGHT = 16;
 const NOTICE_SOURCE_GAP = 10;
+
+/** How long the export waits for the library picture before drawing the rig. */
+const LIBRARY_FETCH_TIMEOUT_MS = 8000;
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
@@ -150,14 +161,43 @@ async function drawRigScene(ctx: CanvasRenderingContext2D, story: Story): Promis
   }
 }
 
-export async function buildStoryImageFile(opts: {
+// The library picture's bitmap, or `null` for "draw the rig": no URL given, or
+// the fetch/decode failed or outlasted the timeout.
+async function loadLibraryPicture(
+  pictureUrl: string | null | undefined,
+): Promise<ImageBitmap | null> {
+  if (!pictureUrl) return null;
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), LIBRARY_FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(pictureUrl, { signal: abort.signal });
+    if (!res.ok) return null;
+    const bitmap = await createImageBitmap(await res.blob());
+    return bitmap.width > 0 && bitmap.height > 0 ? bitmap : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export interface StoryImageOptions {
   name: string;
   prose: string;
   story: Story;
-}): Promise<File> {
+  /** The library picture the gallery showed for this story, if it did (D-10). */
+  pictureUrl?: string | null;
+}
+
+export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File> {
   const { name, prose, story } = opts;
 
-  const notice = i18n.t('footer.contentNotice');
+  // Loaded first so its drawn height is known. Scaled to the export's width
+  // at its own aspect ratio; the rig keeps its fixed 4:3 stage.
+  const picture = await loadLibraryPicture(opts.pictureUrl);
+  const pictureHeight = picture ? Math.round((WIDTH * picture.height) / picture.width) : RIG_H;
+
+  const notice = i18n.t(picture ? 'footer.contentNoticeOnline' : 'footer.contentNotice');
   const sourceLabel = i18n.t('footer.playYourself');
   const url = gameUrl();
 
@@ -177,7 +217,7 @@ export async function buildStoryImageFile(opts: {
   const footerRowHeight = Math.max(QR_SIZE, sourceLabelTop + URL_LINE_HEIGHT + 4 + URL_LINE_HEIGHT);
 
   const height =
-    RIG_H +
+    pictureHeight +
     PAD +
     proseLines.length * PROSE_LINE_HEIGHT +
     PAD +
@@ -193,12 +233,17 @@ export async function buildStoryImageFile(opts: {
 
   ctx.fillStyle = CREAM;
   ctx.fillRect(0, 0, WIDTH, height);
-  await drawRigScene(ctx, story);
+  if (picture) {
+    ctx.drawImage(picture, 0, 0, WIDTH, pictureHeight);
+    picture.close();
+  } else {
+    await drawRigScene(ctx, story);
+  }
 
   ctx.textBaseline = 'top';
   ctx.fillStyle = INK;
   ctx.font = PROSE_FONT;
-  let y = RIG_H + PAD;
+  let y = pictureHeight + PAD;
   for (const line of proseLines) {
     ctx.fillText(line, PAD, y);
     y += PROSE_LINE_HEIGHT;
@@ -239,10 +284,6 @@ export async function buildStoryImageFile(opts: {
 // Composites the story into a PNG and triggers a browser download. Thin
 // wrapper over buildStoryImageFile so the same composite can instead be
 // handed to the native share sheet (see share.ts).
-export async function downloadStoryImage(opts: {
-  name: string;
-  prose: string;
-  story: Story;
-}): Promise<void> {
+export async function downloadStoryImage(opts: StoryImageOptions): Promise<void> {
   downloadFile(await buildStoryImageFile(opts));
 }

@@ -15,7 +15,12 @@
     "virtualBadge": "机器人",
     "removeSeat": "移除玩家",
     "addPlayer": "+ 添加玩家",
-    "addVirtual": "+ 添加虚拟玩家"
+    "addVirtual": "+ 添加虚拟玩家",
+    "pictures": "图片",
+    "picturesBuiltIn": "内置",
+    "picturesOnline": "来自互联网",
+    "picturesBuiltInHint": "在本设备上绘制，无需联网。",
+    "picturesOnlineHint": "使用图片库里的卡通图。需要联网；没有网络时使用内置图片。"
   },
   "thinking": {
     "title": "{{name}} 正在思考…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "本游戏链接",
     "playYourself": "你也来玩吧",
-    "contentNotice": "这个游戏完全在你的设备上运行。你输入的任何内容都不会离开设备。"
+    "contentNotice": "这个游戏完全在你的设备上运行。你输入的任何内容都不会离开设备。",
+    "contentNoticeOnline": "你输入的任何内容都不会离开本设备。开启互联网图片后，每个故事的卡通图会从图片库下载。"
   }
 }

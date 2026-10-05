@@ -15,7 +15,12 @@
     "virtualBadge": "Bot",
     "removeSeat": "Quitar jugador",
     "addPlayer": "+ Agregar jugador",
-    "addVirtual": "+ Agregar virtual"
+    "addVirtual": "+ Agregar virtual",
+    "pictures": "Dibujos",
+    "picturesBuiltIn": "Incluidos",
+    "picturesOnline": "De internet",
+    "picturesBuiltInHint": "Se dibujan en este dispositivo. No hace falta internet.",
+    "picturesOnlineHint": "Caricaturas de la biblioteca de dibujos. Necesita internet; sin conexión se usan los incluidos."
   },
   "thinking": {
     "title": "{{name}} está pensando…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "Enlace a este juego",
     "playYourself": "Jugá vos también",
-    "contentNotice": "Este juego funciona enteramente en tu dispositivo. Lo que escribís nunca sale de ahí."
+    "contentNotice": "Este juego funciona enteramente en tu dispositivo. Lo que escribís nunca sale de ahí.",
+    "contentNoticeOnline": "Lo que escribís nunca sale de este dispositivo. Con los dibujos de internet activados, la caricatura de cada historia se descarga de la biblioteca de dibujos."
   }
 }

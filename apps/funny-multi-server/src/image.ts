@@ -58,6 +58,12 @@ let workerCount = 0;
 let lastWorkerSyncMs = 0;
 const WORKER_SYNC_TTL_MS = 30_000;
 
+// The Worker's generation switch (T-9.2a) as `/stats` last reported it. False
+// until a sync has heard from the Worker. Once it has, only an explicit `false`
+// means off: a Worker that predates the switch sends no such field, and that
+// Worker always generates.
+let workerGenerates = false;
+
 function utcDayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -78,11 +84,16 @@ function rolloverIfNewDay(): void {
 // response reports today's UTC day. Network failures are silently absorbed —
 // the local counter remains a safe fallback. The stamp on `lastWorkerSyncMs`
 // is set on completion (success or failure) to bound retry frequency.
+//
+// The same response carries the generation switch (B-13). It is not a per-day
+// figure, so it is taken whatever day the Worker reports, and a failed sync
+// leaves the last known answer standing.
 export async function syncImageCounterFromWorker(): Promise<void> {
   rolloverIfNewDay();
   const workerUrl = process.env.CLOUDFLARE_WORKER_URL;
   const secret = process.env.CLOUDFLARE_WORKER_SECRET;
   if (!workerUrl || !secret) {
+    workerGenerates = false;
     lastWorkerSyncMs = Date.now();
     return;
   }
@@ -95,10 +106,11 @@ export async function syncImageCounterFromWorker(): Promise<void> {
       signal: controller.signal,
     });
     if (!res.ok) return;
-    const data = (await res.json()) as { date?: unknown; count?: unknown };
+    const data = (await res.json()) as { date?: unknown; count?: unknown; generation?: unknown };
     if (data?.date === utcDayKey() && typeof data.count === 'number' && data.count >= 0) {
       workerCount = Math.floor(data.count);
     }
+    workerGenerates = data?.generation !== false;
   } catch {
     // Intentionally ignored — see header comment.
   } finally {
@@ -151,11 +163,22 @@ export function imagesGeneratedToday(): number {
   return Math.max(imagesToday, workerCount);
 }
 
+/**
+ * Whether this deployment can still make a new picture — the Worker's
+ * generation switch, as last synced. False for a library-only deployment (D-7:
+ * every picture pre-generated, the switch off), where the daily cap above
+ * limits nothing; the Home screen leaves its cap caption out then (B-13).
+ */
+export function liveGeneration(): boolean {
+  return workerGenerates;
+}
+
 // Test-only — lets tests reset module state between cases. Not part of the
 // public API; production code has no reason to call this.
 export function __resetImageCounterStateForTests(): void {
   imagesToday = 0;
   workerCount = 0;
+  workerGenerates = false;
   lastWorkerSyncMs = 0;
   dayKey = utcDayKey();
 }

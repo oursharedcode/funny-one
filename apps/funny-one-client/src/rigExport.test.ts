@@ -3,7 +3,9 @@
 // Funny One's picture has no fetchable URL (see rigExport.ts's header) — the
 // picture-loading assertions here lock in that each rig layer is rasterized
 // via `HTMLImageElement.decode()` off a serialized-SVG data: URI, rather than
-// downloadStory.ts's `fetch`/`createImageBitmap` path.
+// downloadStory.ts's `fetch`/`createImageBitmap` path. Since D-10 that second
+// path exists here too, for a story shown from the picture library — its own
+// `describe` below.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Story } from '@funny/shared';
@@ -85,6 +87,103 @@ describe('buildStoryImageFile', () => {
   it('sanitizes the name into a safe filename, falling back to "story"', async () => {
     const file = await buildStoryImageFile({ name: '  ***  ', prose: 'x', story: fullStory() });
     expect(file.name).toBe('funny-story-story.png');
+  });
+});
+
+// D-10: a story the gallery showed from the picture library is exported with
+// that picture — fetched as a blob, never an <img>, so the canvas stays clean.
+describe('buildStoryImageFile with a library picture (D-10)', () => {
+  const PICTURE_URL = 'https://pictures.example/i/abc.png';
+  // A string body: jsdom's Blob is not one Node's Response accepts.
+  const JPEG = 'jpeg-bytes';
+  let ctx: Canvas2DStub;
+  let decode: ReturnType<typeof vi.fn>;
+  let bitmap: { width: number; height: number; close: ReturnType<typeof vi.fn> };
+
+  function stubLibrary(response: () => Promise<Response>, width = 1024, height = 1024): void {
+    bitmap = { width, height, close: vi.fn() };
+    vi.stubGlobal('fetch', vi.fn(response));
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(() => Promise.resolve(bitmap)),
+    );
+  }
+
+  const options = () => ({ name: 'Ann', prose: 'x', story: fullStory(), pictureUrl: PICTURE_URL });
+  const drawn = () => ctx.calls.filter((c) => c.method === 'drawImage');
+  const notices = () => ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
+
+  beforeEach(() => {
+    ctx = installCanvasStub();
+    const d = vi.fn(() => Promise.resolve());
+    HTMLImageElement.prototype.decode = d;
+    decode = d;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('draws the library picture in the rig’s place, at the export width', async () => {
+    stubLibrary(() => Promise.resolve(new Response(JPEG)));
+
+    const file = await buildStoryImageFile(options());
+
+    expect(fetch).toHaveBeenCalledExactlyOnceWith(PICTURE_URL, expect.anything());
+    expect(decode).not.toHaveBeenCalled();
+    // The picture + the QR; none of the seven rig layers.
+    expect(drawn()).toHaveLength(2);
+    expect(drawn()[0]?.args).toEqual([bitmap, 0, 0, 800, 800]);
+    expect(bitmap.close).toHaveBeenCalledTimes(1);
+    expect(file.name).toBe('funny-story-Ann.png');
+  });
+
+  it('keeps the picture’s own aspect ratio', async () => {
+    stubLibrary(() => Promise.resolve(new Response(JPEG)), 1024, 768);
+    await buildStoryImageFile(options());
+    expect(drawn()[0]?.args).toEqual([bitmap, 0, 0, 800, 600]);
+  });
+
+  it('says in the footer that the cartoon came from the library', async () => {
+    stubLibrary(() => Promise.resolve(new Response(JPEG)));
+    await buildStoryImageFile(options());
+    expect(notices().join(' ')).toContain('picture library');
+  });
+
+  it.each([
+    ['the request fails', () => Promise.reject(new TypeError('offline'))],
+    ['the library answers 404', () => Promise.resolve(new Response('', { status: 404 }))],
+  ])('draws the rig after all when %s', async (_case, response) => {
+    stubLibrary(response);
+
+    await buildStoryImageFile(options());
+
+    expect(decode).toHaveBeenCalledTimes(7);
+    expect(drawn()).toHaveLength(8);
+    expect(notices().join(' ')).not.toContain('picture library');
+  });
+
+  it('draws the rig when the bytes do not decode', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response('not a picture'))),
+    );
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(() => Promise.reject(new Error('undecodable'))),
+    );
+
+    await buildStoryImageFile(options());
+
+    expect(decode).toHaveBeenCalledTimes(7);
+    expect(drawn()).toHaveLength(8);
+  });
+
+  it('asks for nothing when the gallery showed the rig', async () => {
+    stubLibrary(() => Promise.resolve(new Response(JPEG)));
+    await buildStoryImageFile({ ...options(), pictureUrl: null });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(decode).toHaveBeenCalledTimes(7);
   });
 });
 

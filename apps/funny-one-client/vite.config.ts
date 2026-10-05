@@ -4,9 +4,14 @@
 // product identity:
 //
 //  1. No workbox runtime-caching rule is needed for a socket/API origin —
-//     Funny One makes zero runtime network calls of any kind (FO-IMG-2,
-//     D-8): the navigateFallbackDenylist for `socket.io|health` has no
-//     equivalent here because there is no server to deny-list.
+//     Funny One has no server (FO-IMG-2, D-8): the navigateFallbackDenylist
+//     for `socket.io|health` has no equivalent here because there is
+//     nothing to deny-list. The one request it can make at run time is
+//     opt-in (D-10): a story's cartoon from the picture library named by
+//     VITE_PICTURES_URL, when the player picked Internet pictures. Those are
+//     deliberately not cached by the service worker — the library serves
+//     them `immutable`, so the browser's own cache keeps them, and a 10⁴-
+//     picture library has no business in a precache.
 //  2. Everything is precached, not just the app shell — gameplay must work
 //     with the network off. The rig art (T-FO-4.1) is TSX inlined in the JS
 //     bundle and the i18n catalogs are eager imports, so `globPatterns`
@@ -43,7 +48,7 @@ export default defineConfig({
       manifest: {
         name: 'Funny One «Семейная Чепуха»',
         short_name: 'Funny One',
-        description: 'Pass-and-play absurd stories, one device, no network, no ads.',
+        description: 'Pass-and-play absurd stories, one device, no network needed, no ads.',
         display: 'standalone',
         orientation: 'portrait',
         theme_color: '#fef3c7',

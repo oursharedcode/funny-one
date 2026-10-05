@@ -15,7 +15,12 @@
     "virtualBadge": "ボット",
     "removeSeat": "プレイヤーを削除",
     "addPlayer": "+ プレイヤーを追加",
-    "addVirtual": "+ 仮想プレイヤーを追加"
+    "addVirtual": "+ 仮想プレイヤーを追加",
+    "pictures": "絵",
+    "picturesBuiltIn": "内蔵",
+    "picturesOnline": "インターネットから",
+    "picturesBuiltInHint": "この端末で描きます。インターネット不要。",
+    "picturesOnlineHint": "絵のライブラリのイラストを使います。インターネットが必要です。つながらないときは内蔵の絵になります。"
   },
   "thinking": {
     "title": "{{name}}が考え中…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "このゲームへのリンク",
     "playYourself": "あなたも遊んでみよう",
-    "contentNotice": "このゲームは端末上だけで動作します。入力した内容が外部に送られることはありません。"
+    "contentNotice": "このゲームは端末上だけで動作します。入力した内容が外部に送られることはありません。",
+    "contentNoticeOnline": "入力した内容がこの端末の外に送られることはありません。インターネットの絵をオンにすると、各物語のイラストを絵のライブラリからダウンロードします。"
   }
 }

@@ -11,7 +11,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StatsPayload } from '@funny/shared';
 import { buildStats, broadcastStats } from './stats.js';
 import { __resetRoomsForTest, createRoom } from './rooms.js';
-import { __resetImageCounterStateForTests, reserveImageSlot } from './image.js';
+import {
+  __resetImageCounterStateForTests,
+  reserveImageSlot,
+  syncImageCounterFromWorker,
+} from './image.js';
 
 beforeEach(() => {
   __resetRoomsForTest();
@@ -21,7 +25,10 @@ beforeEach(() => {
 afterEach(() => {
   __resetRoomsForTest();
   __resetImageCounterStateForTests();
+  vi.unstubAllGlobals();
   delete process.env.MAX_IMAGES_PER_DAY;
+  delete process.env.CLOUDFLARE_WORKER_URL;
+  delete process.env.CLOUDFLARE_WORKER_SECRET;
 });
 
 describe('buildStats', () => {
@@ -30,6 +37,7 @@ describe('buildStats', () => {
       openRooms: 0,
       imagesGeneratedToday: 0,
       imagesLimit: 25,
+      liveGeneration: false,
     });
   });
 
@@ -47,7 +55,19 @@ describe('buildStats', () => {
       openRooms: 0,
       imagesGeneratedToday: 2,
       imagesLimit: 10,
+      liveGeneration: false,
     });
+  });
+
+  it('reports live generation once the Worker says its switch is on (B-13)', async () => {
+    process.env.CLOUDFLARE_WORKER_URL = 'https://worker.example.com';
+    process.env.CLOUDFLARE_WORKER_SECRET = 'shh';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json({ date: '2026-10-05', count: 0, generation: true })),
+    );
+    await syncImageCounterFromWorker();
+    expect(buildStats().liveGeneration).toBe(true);
   });
 });
 

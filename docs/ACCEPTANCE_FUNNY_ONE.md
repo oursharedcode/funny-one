@@ -1,15 +1,17 @@
 # Acceptance test — «Одна Чепуха: по кругу» on production
 
 The script for the owner's device session (T-FO-7.1, Gate FO), run against
-**https://www.staging-oursharedcode.com/funny1-game/**. Modelled on `docs/ACCEPTANCE.md`
-(Funny Multi's session). Funny One has no server, so no agent is needed on the call.
+**https://www.funny1.oursharedcode.com/** (its own host since Step 60, 2026-10-05; the former
+address `https://www.staging-oursharedcode.com/funny1-game/` forwards there). Modelled on
+`docs/ACCEPTANCE.md` (Funny Multi's session). Funny One has no server, so no agent is needed
+on the call.
 
 **Devices:** one Android phone. No iPhone is available, so the iPhone install leg (A1) is
 recorded as _deferred_, not failed.
 
 **Headless pre-check (Step 39, 2026-09-27):** all 15 languages played a full game against the
-live URL in a 360 px phone-sized Chromium —
-`node scripts/funny-one-screens.mjs <15 langs> --url https://www.staging-oursharedcode.com/funny1-game/ --out .screens/live`
+then-live URL (the former address) in a 360 px phone-sized Chromium —
+`node scripts/funny-one-screens.mjs <15 langs> --url <live URL> --out .screens/live`
 — 0 overflow, 0 console errors, `he` reports `dir=rtl`. The phone pass below only confirms what
 a real device changes: system fonts, touch, install, airplane mode.
 
@@ -21,8 +23,8 @@ Record the version shown in the page footer (e.g. `v0.1.0 · 2026-09-26`).
 
 | #   | Check                                                                                  | Pass when                                                                                                   |
 | --- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| A1  | **iPhone install** (Safari → Share → Add to Home Screen).                              | Icon on the home screen, opens full-screen at `/funny1-game/`. _Deferred — no iPhone._                       |
-| A2  | **Android install** (Chrome → ⋮ → Install app / the install banner).                   | Installs; the launcher icon opens the app standalone (no browser chrome) at `/funny1-game/`. A Play Protect warning is known (B-8) — note it, tap _Install anyway_. |
+| A1  | **iPhone install** (Safari → Share → Add to Home Screen).                              | Icon on the home screen, opens full-screen at the host's root. _Deferred — no iPhone._                        |
+| A2  | **Android install** (Chrome → ⋮ → Install app / the install banner).                   | Installs; the launcher icon opens the app standalone (no browser chrome) at the host's root. A Play Protect warning is known (B-8) — note it, tap _Install anyway_. |
 | A3  | **Maskable-icon clip check**: the launcher icon and the app-switcher tile.             | _Deferred until real icons_ — the current icons are placeholders (owner decision 2026-09-27).               |
 | A4  | **Jank check** during Part B's game: handoff screen, the rig picture's reveal, the gallery arrows. | Smooth to the eye — no stutter or layout jumps.                                                    |
 
@@ -45,6 +47,19 @@ Use the installed app from A2.
 | --- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | C1  | **Full game in airplane mode.**                                                                                        | **Pass, 2026-09-26 (Step 38)** — Samsung phone, Russian, full game to the end screen, story exported. Counted for Gate FO (owner decision 2026-09-27). |
 | C2  | Re-confirm: airplane mode on, **force-close** the app, open it from the launcher, play one game in any other language. | Opens with no network error, plays to the end screen, pictures render.                                |
+
+## Part E — pictures from the Internet (D-10, added 2026-10-05)
+
+The start screen now offers **Pictures: Built in / From the Internet**. Built in is the
+default and is what Parts B–D exercise. Do Part E online, in any language.
+
+| #   | Check                                                                                                              | Pass when                                                                                                                             |
+| --- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| E1  | On home, look at the **Pictures** choice.                                                                          | Two options; _Built in_ is selected on a first visit; the hint under them says no Internet is needed.                                 |
+| E2  | Pick **From the Internet**, play one game to the end screen.                                                       | Each story shows a full cartoon (a square picture, not the layered built-in drawing) after a short placeholder; the footer note names the picture library. |
+| E3  | Tap **download** on a story whose cartoon is showing.                                                              | The saved picture carries that cartoon, the story text and the QR code.                                                               |
+| E4  | Still on _From the Internet_: turn on airplane mode, tap **play again**, play to the end.                          | No error: every story shows the built-in drawing instead.                                                                             |
+| E5  | Airplane mode off. Close the app and open it again.                                                                | Home opens with _From the Internet_ still selected. Switch back to _Built in_ if you prefer it — that is remembered too.              |
 
 ## Part D — languages on the phone
 
@@ -90,6 +105,11 @@ review.
 | B6  |                                 |                           |
 | C1  | pass                            | Step 38, 2026-09-26       |
 | C2  |                                 |                           |
+| E1  |                                 |                           |
+| E2  |                                 |                           |
+| E3  |                                 |                           |
+| E4  |                                 |                           |
+| E5  |                                 |                           |
 | D1  |                                 |                           |
 | D2  |                                 |                           |
 | D3  |                                 |                           |
@@ -97,7 +117,7 @@ review.
 | D5  |                                 |                           |
 | D6  |                                 |                           |
 
-**Sign-off:** T-FO-7.1 passes when A2, A4 and every B, C and D row is _pass_. Gate FO then
+**Sign-off:** T-FO-7.1 passes when A2, A4 and every B, C, D and E row is _pass_. Gate FO then
 closes once the six gates are clean on the commit that records the results. Deferred, not
 blocking Gate FO (owner decision 2026-09-27): A1 (iPhone), A3 (real icons, still required
 before any announcement), the Hebrew export's LTR text, and native review of the `home.title`s.

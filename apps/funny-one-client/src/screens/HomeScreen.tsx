@@ -10,6 +10,12 @@
 // T-FO-5.1a — the same picker also drives the UI language: Funny One has no
 // UI-vs-content split (i18n/index.ts), so a pick switches every screen via
 // i18n.changeLanguage and is remembered for the next launch (uiLanguage.ts).
+//
+// D-10 (2026-10-05) — the picture choice: built-in pictures (the rig, no
+// Internet) or the picture library's cartoons from the Internet
+// (pictureSource.ts). Offered only when this build names a library; built-in
+// is the default, so nothing is fetched until a player asks for it, and the
+// pick is remembered like the language. The footer's notice follows the pick.
 
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +27,12 @@ import { LANGUAGES, isLanguage } from '@funny/shared';
 import type { AuthoredLanguage } from '@funny/shared';
 import { MAX_SEATS, MIN_SEATS, type Seat } from '../game/roundRobin';
 import { storeLanguage } from '../i18n/uiLanguage';
+import {
+  loadPictureSource,
+  onlinePicturesAvailable,
+  storePictureSource,
+  type PictureSource,
+} from '../pictureSource';
 
 // Room-content languages: every registry entry is authored (D-2/T-6.3), so
 // this is presently the same 15 as LANGUAGES — filtered from the registry
@@ -28,8 +40,14 @@ import { storeLanguage } from '../i18n/uiLanguage';
 // same pattern as Funny Multi's HomeScreen.
 const CONTENT_LANGUAGES = LANGUAGES;
 
+// Built-in first: it is the default and the one that always works.
+const PICTURE_SOURCES = [
+  { source: 'builtin', label: 'home.picturesBuiltIn', hint: 'home.picturesBuiltInHint' },
+  { source: 'online', label: 'home.picturesOnline', hint: 'home.picturesOnlineHint' },
+] as const;
+
 interface Props {
-  onStart: (seats: readonly Seat[], language: AuthoredLanguage) => void;
+  onStart: (seats: readonly Seat[], language: AuthoredLanguage, pictures: PictureSource) => void;
 }
 
 function defaultName(kind: Seat['kind'], ordinal: number): string {
@@ -54,6 +72,9 @@ export default function HomeScreen({ onStart }: Props) {
   const [language, setLanguage] = useState<AuthoredLanguage>(() =>
     isLanguage(i18n.language) ? i18n.language : 'en',
   );
+
+  const [pictures, setPictures] = useState<PictureSource>(loadPictureSource);
+  const picturesOffered = onlinePicturesAvailable();
 
   const humanCount = seats.filter((s) => s.kind === 'human').length;
   const virtualCount = seats.filter((s) => s.kind === 'virtual').length;
@@ -82,9 +103,14 @@ export default function HomeScreen({ onStart }: Props) {
     void i18n.changeLanguage(code);
   }
 
+  function pickPictures(source: PictureSource): void {
+    setPictures(source);
+    storePictureSource(source);
+  }
+
   function start(): void {
     const trimmed = seats.map((s) => ({ ...s, name: s.name.trim() }));
-    onStart(trimmed, language);
+    onStart(trimmed, language, pictures);
   }
 
   return (
@@ -185,6 +211,35 @@ export default function HomeScreen({ onStart }: Props) {
         </div>
       </div>
 
+      {picturesOffered && (
+        <div className="w-full">
+          <p id="home-pictures-label" className="mb-2 text-center text-sm text-gray-600">
+            {t('home.pictures')}
+          </p>
+          <div role="radiogroup" aria-labelledby="home-pictures-label" className="flex gap-2">
+            {PICTURE_SOURCES.map(({ source, label }) => (
+              <button
+                key={source}
+                type="button"
+                role="radio"
+                aria-checked={pictures === source}
+                className={`flex-1 rounded px-2 py-2 font-semibold ${
+                  pictures === source
+                    ? 'bg-pink-500 text-white'
+                    : 'border border-amber-300 bg-white text-gray-800'
+                }`}
+                onClick={() => pickPictures(source)}
+              >
+                {t(label)}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-center text-xs text-gray-500">
+            {t(PICTURE_SOURCES.find((option) => option.source === pictures)!.hint)}
+          </p>
+        </div>
+      )}
+
       <button
         className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:bg-gray-300 disabled:text-gray-500"
         disabled={!canStart}
@@ -193,7 +248,7 @@ export default function HomeScreen({ onStart }: Props) {
         {t('home.start')}
       </button>
 
-      <SourceFooter />
+      <SourceFooter pictures={pictures} />
     </div>
   );
 }

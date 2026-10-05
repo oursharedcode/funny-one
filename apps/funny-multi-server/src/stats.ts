@@ -4,11 +4,12 @@
 // change — `roomCount`, `imagesGeneratedToday` and `maxImagesPerDay` are the
 // same process-global counters T-2.2/T-4.3 already ported, so this module is
 // just the shape that wraps them plus the broadcast helper. → FM-CORE-12
+// One field is this repo's, not SRC's: `liveGeneration` (B-13).
 
 import type { Server as SocketIOServer } from 'socket.io';
 import type { ClientToServerEvents, ServerToClientEvents, StatsPayload } from './types.js';
 import { roomCount } from './rooms.js';
-import { imagesGeneratedToday, maxImagesPerDay } from './image.js';
+import { imagesGeneratedToday, liveGeneration, maxImagesPerDay } from './image.js';
 
 type IO = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 
@@ -20,6 +21,7 @@ export function buildStats(): StatsPayload {
     openRooms: roomCount(),
     imagesGeneratedToday: imagesGeneratedToday(),
     imagesLimit: maxImagesPerDay(),
+    liveGeneration: liveGeneration(),
   };
 }
 

@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 // Records a 5-second 9:16 wobble of the AI cartoon to WebM via MediaRecorder.
-// Copied from SRC/client/src/recordWobble.ts (T-5.2, design §8.3) with no
-// picture-loading change needed: `loadImage` already sets `img.crossOrigin =
-// 'anonymous'` before loading `pictureUrl`, which is exactly what a
-// cross-origin `PictureRef.url` needs to land on the canvas untainted —
-// paired with the Worker route's `Access-Control-Allow-Origin: *` (design
-// §7.2), `canvas.captureStream()` never throws. SRC's Lottie-engine sibling
-// (`recordWobbleLottie.ts`) isn't carried — ARC-3/DD-9 (T-1.6) dropped the
-// wire-level `WobbleEngine` choice entirely, so there is nothing left to pick
-// between; this is the CSS engine, unconditionally.
+// Copied from SRC/client/src/recordWobble.ts (T-5.2, design §8.3). `loadImage`
+// sets `img.crossOrigin = 'anonymous'` for a cross-origin `pictureUrl`, which
+// is what a `PictureRef.url` needs to land on the canvas untainted — paired
+// with the Worker route's `Access-Control-Allow-Origin: *` (design §7.2),
+// `canvas.captureStream()` never throws.
+//
+// ARC-3/DD-9 (T-1.6) dropped SRC's wire-level `WobbleEngine` choice, so there
+// is one recorder. Since B-12 (2026-10-05) it also carries what SRC's second
+// recorder (`recordWobbleLottie.ts`) added on top of this one — the laughing
+// monkey, see videoMonkey.ts — and that file's two Android fixes, marked
+// below.
 //
 // Sibling to downloadStory.ts: same idea (composite + download), but the
 // composite is animated. The easing math mirrors the CSS keyframes in
@@ -33,6 +35,7 @@ import {
   measureAttributionHeight,
   renderQrCanvas,
 } from './videoFooter';
+import { drawMonkey, loadMonkeySprites, type MonkeySprites } from './videoMonkey';
 
 const W = 720;
 const H = 1280;
@@ -95,7 +98,13 @@ function safeFileName(nickname: string, ext: string): string {
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   const img = new Image();
-  img.crossOrigin = 'anonymous';
+  // Only for a true cross-origin URL (SRC's first Android fix). On a
+  // same-origin image it makes Android browsers treat the Workbox-cached
+  // response as CORS-restricted, since that response carries no CORS headers:
+  // `decode()` still resolves, but `drawImage` paints nothing.
+  if (/^https?:/.test(src) && !src.startsWith(window.location.origin)) {
+    img.crossOrigin = 'anonymous';
+  }
   img.src = src;
   await img.decode();
   return img;
@@ -127,14 +136,30 @@ export async function buildWobbleVideoFile(opts: {
   } catch {
     logo = null;
   }
+  // The monkey is best-effort too: without its sprites the clip is the plain
+  // wobble it was before B-12.
+  let monkey: MonkeySprites | null = null;
+  try {
+    monkey = await loadMonkeySprites(loadImage);
+  } catch {
+    monkey = null;
+  }
   // QR code rendered once, then blitted onto every recorded frame.
   const qrCanvas = await renderQrCanvas(SOURCE_URL);
 
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
+  // In the page but out of sight (SRC's second Android fix): Android Chrome
+  // throttles the frame loop of a canvas that is never in the DOM, which left
+  // the monkey frozen or missing. Not `display:none` — that pauses it too.
+  canvas.style.cssText = 'position:fixed;left:-99999px;top:0;pointer-events:none;opacity:0;';
+  document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas 2D context unavailable');
+  if (!ctx) {
+    canvas.remove();
+    throw new Error('Canvas 2D context unavailable');
+  }
 
   // The picture is square (Flux Schnell default); fit it into the 9:16 frame
   // with a margin and let the wobble play on top.
@@ -192,6 +217,16 @@ export async function buildWobbleVideoFile(opts: {
     }
     ctx!.restore();
 
+    // The monkey, on top of the cartoon. Its ground is the cartoon's top edge
+    // under the same four-axis transform, so it rides the wobble.
+    if (monkey) {
+      drawMonkey(ctx!, elapsed, monkey, {
+        width: W,
+        groundAt: (x) =>
+          cy + w.dy + (x - cx - w.dx) * Math.sin(w.rot) - (picSize / 2) * w.scale * Math.cos(w.rot),
+      });
+    }
+
     // Pulsing nickname badge — the "speech bubble pulse" element. URL was
     // moved out of the pulse into the static attribution block below; the
     // pulse now carries just the nickname to avoid duplicating the URL.
@@ -231,6 +266,7 @@ export async function buildWobbleVideoFile(opts: {
     return await done;
   } finally {
     cancelAnimationFrame(raf);
+    canvas.remove();
   }
 }
 

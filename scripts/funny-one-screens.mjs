@@ -12,8 +12,8 @@
 //
 // It starts its own Vite dev server in-process, so nothing else needs to run.
 // With --url it drives that deployed build instead (e.g. the live
-// /funny1-game/); selectors still come from the local catalogs, so the
-// deploy must match the checked-out commit.
+// https://www.funny1.oursharedcode.com/); selectors still come from the local
+// catalogs, so the deploy must match the checked-out commit.
 // The game itself is driven by funny-one-play.mjs, shared with the offline
 // check (funny-one-offline.mjs).
 

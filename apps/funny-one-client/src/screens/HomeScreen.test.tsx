@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HomeScreen from './HomeScreen';
 import i18n from '../i18n';
 import { MAX_SEATS, MIN_SEATS } from '../game/roundRobin';
@@ -87,11 +87,58 @@ describe('HomeScreen (T-FO-3.1)', () => {
     fireEvent.click(start);
 
     expect(onStart).toHaveBeenCalledTimes(1);
-    const [seats, language] = onStart.mock.calls[0]!;
+    const [seats, language, pictures] = onStart.mock.calls[0]!;
     expect(language).toBe('ru');
+    expect(pictures).toBe('builtin');
     expect(seats).toHaveLength(2);
     expect(seats[0]).toMatchObject({ name: 'Alice', kind: 'human' });
     expect(seats[1]).toMatchObject({ name: 'Bot 1', kind: 'virtual' });
+  });
+});
+
+describe('HomeScreen picture choice (D-10)', () => {
+  const radio = (name: string) => screen.getByRole('radio', { name });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('is not offered by a build that names no picture library', () => {
+    render(<HomeScreen onStart={vi.fn()} />);
+    expect(screen.queryByRole('radiogroup')).toBeNull();
+    expect(screen.getByText(/runs entirely on your device/i)).toBeTruthy();
+  });
+
+  it('offers both sources, built-in first and selected', () => {
+    vi.stubEnv('VITE_PICTURES_URL', 'https://pictures.example');
+    render(<HomeScreen onStart={vi.fn()} />);
+
+    expect(screen.getByRole('radiogroup', { name: 'Pictures' })).toBeTruthy();
+    expect(radio('Built in').getAttribute('aria-checked')).toBe('true');
+    expect(radio('From the Internet').getAttribute('aria-checked')).toBe('false');
+    expect(screen.getByText('Drawn on this device. No Internet needed.')).toBeTruthy();
+  });
+
+  it('a pick of Internet pictures is passed to onStart, remembered, and named in the notice', () => {
+    vi.stubEnv('VITE_PICTURES_URL', 'https://pictures.example');
+    const onStart = vi.fn();
+    render(<HomeScreen onStart={onStart} />);
+
+    fireEvent.click(radio('From the Internet'));
+    expect(radio('From the Internet').getAttribute('aria-checked')).toBe('true');
+    expect(radio('Built in').getAttribute('aria-checked')).toBe('false');
+    expect(localStorage.getItem('funny-one.pictures')).toBe('online');
+    expect(screen.getByText(/downloaded from the picture library/)).toBeTruthy();
+
+    fireEvent.click(startButton());
+    expect(onStart.mock.calls[0]![2]).toBe('online');
+  });
+
+  it('opens on the source picked last time', () => {
+    vi.stubEnv('VITE_PICTURES_URL', 'https://pictures.example');
+    localStorage.setItem('funny-one.pictures', 'online');
+    render(<HomeScreen onStart={vi.fn()} />);
+    expect(radio('From the Internet').getAttribute('aria-checked')).toBe('true');
   });
 });
 

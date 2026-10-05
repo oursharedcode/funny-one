@@ -17,11 +17,15 @@ coverage/
 *.jks
 *.keystore
 
-# Android store app (B-1d): Bubblewrap regenerates the Gradle project and the
-# build outputs from twa-manifest.json, so only these two files are tracked.
+# Android store apps (B-1d, S-3b): Bubblewrap regenerates the Gradle project and
+# the build outputs from twa-manifest.json, so only these two files are tracked
+# in each directory.
 /deploy/android/*
 !/deploy/android/twa-manifest.json
 !/deploy/android/README.md
+/deploy/android-funny1/*
+!/deploy/android-funny1/twa-manifest.json
+!/deploy/android-funny1/README.md
 
 # Tooling / OS
 .claude/settings.local.json

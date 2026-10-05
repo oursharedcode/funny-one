@@ -15,7 +15,12 @@
     "virtualBadge": "Bot",
     "removeSeat": "Spieler entfernen",
     "addPlayer": "+ Spieler hinzufügen",
-    "addVirtual": "+ Virtuell hinzufügen"
+    "addVirtual": "+ Virtuell hinzufügen",
+    "pictures": "Bilder",
+    "picturesBuiltIn": "Eingebaut",
+    "picturesOnline": "Aus dem Internet",
+    "picturesBuiltInHint": "Werden auf diesem Gerät gezeichnet. Kein Internet nötig.",
+    "picturesOnlineHint": "Cartoons aus der Bildbibliothek. Braucht Internet; ohne gibt es die eingebauten Bilder."
   },
   "thinking": {
     "title": "{{name}} überlegt…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "Link zu diesem Spiel",
     "playYourself": "Spiel selbst mit",
-    "contentNotice": "Dieses Spiel läuft komplett auf deinem Gerät. Nichts, was du eingibst, verlässt es jemals."
+    "contentNotice": "Dieses Spiel läuft komplett auf deinem Gerät. Nichts, was du eingibst, verlässt es jemals.",
+    "contentNoticeOnline": "Nichts, was du eingibst, verlässt dieses Gerät. Mit Internet-Bildern wird der Cartoon zu jeder Geschichte aus der Bildbibliothek geladen."
   }
 }

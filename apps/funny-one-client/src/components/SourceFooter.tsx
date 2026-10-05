@@ -8,12 +8,21 @@
 // (D-8). Since T-FO-6.2 the link points at the game itself (gameUrl.ts), not
 // the GitHub repo, which stays private until launch — so a plain link icon
 // replaces the GitHub mark.
+//
+// D-10 (2026-10-05): with Internet pictures chosen the notice is the
+// `contentNoticeOnline` one — "runs entirely on your device" would no longer
+// be the whole truth once a story's cartoon is fetched from the library.
 
 import { useTranslation } from 'react-i18next';
 import { gameUrl } from '../gameUrl';
+import type { PictureSource } from '../pictureSource';
 import { APP_VERSION, BUILD_DATE } from '../version';
 
-export default function SourceFooter() {
+interface Props {
+  pictures?: PictureSource;
+}
+
+export default function SourceFooter({ pictures = 'builtin' }: Props) {
   const { t } = useTranslation();
   return (
     <footer className="mt-6 flex w-full flex-col items-center gap-1 text-center text-xs text-gray-500">
@@ -34,7 +43,9 @@ export default function SourceFooter() {
         </svg>
         <span>{t('footer.gameLink')}</span>
       </a>
-      <p className="px-2">{t('footer.contentNotice')}</p>
+      <p className="px-2">
+        {t(pictures === 'online' ? 'footer.contentNoticeOnline' : 'footer.contentNotice')}
+      </p>
       <p className="text-gray-400">
         v{APP_VERSION} · {BUILD_DATE}
       </p>

@@ -16,3 +16,4 @@ LICENSE
 
 # Owned by Bubblewrap, which rewrites it with JSON.stringify on a version bump
 deploy/android/twa-manifest.json
+deploy/android-funny1/twa-manifest.json

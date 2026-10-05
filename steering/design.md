@@ -128,7 +128,7 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/main.tsx` | adapt | SRC's `?test=` harness branch dropped with the Test* screens |
 | `client/index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js` | adapt | product identity + this project's precached assets; PWA/workbox strategy carried verbatim |
 | `client/public/flags/*.png` | copy | language picker |
-| `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists |
+| `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists. *(2026-10-05, B-12: `monkey/` — the four sprites of the share video's monkey — is carried after all, to `public/monkey/`.)* |
 | `client/src/screens/HomeScreen.tsx` | adapt | create-mode language picker gated to `AUTHORED_LANGUAGES` — it sets the room's *content* language, which the server narrowed at T-2.3; join-mode picker stays at all 15 (interface only). `wobbleEngine` dropped from `LobbyState`. Busy flag released on `error`, since a rejected `room:create` reports by event and never acks (T-3.2) |
 | `client/src/screens/LobbyScreen.tsx` | adapt | `game:start` emitted with no arguments — T-1.6 dropped the payload type with its only field |
 | `client/src/screens/WaitingScreen.tsx` | copy | T-3.4. Only change: SRC's local `WaitingData` interface dropped for the `RoundWaitingPayload` already on the contract |
@@ -141,8 +141,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/styles/*` | adapt | tokens + the three motion presets copied. `motion.ts` gains `screenSlide` (T-3.4): the §17 phase transition, lifted out of App.tsx so the forward-only lock — direction never varies — is a named value a test can hold rather than four inline literals |
 | `client/src/App.test.tsx` | **new** | T-3.4. The phase machine had no coverage: screen suites render their screen directly, so nothing checked that an event reaches the right screen with the right state. Also holds the §17 transition assertions, which are behavioural — framer-motion writes real transforms under jsdom |
 | `client/src/prose.ts`, `downloadStory.ts`, `share.ts` | adapt | fetch image URL → blob (CORS) instead of base64 (§8.3) |
-| `client/src/recordWobble.ts` | copy | CSS engine only |
-| `client/src/recordWobbleLottie.ts` | **drop** | ARC-3: no Lottie |
+| `client/src/recordWobble.ts` | copy → adapt | CSS engine only. Since B-12 (2026-10-05) it also draws the monkey (`videoMonkey.ts`) and carries the two Android fixes SRC made only in the Lottie sibling: the app's own images load without CORS mode, and the canvas is attached off-screen while recording |
+| `client/src/recordWobbleLottie.ts` | **drop**, monkey carried | ARC-3: no Lottie — the second recorder and the engine choice stay dropped (DD-9). Carried 2026-10-05 (B-12) as `videoMonkey.ts`: the monkey's rig and timeline only. Despite its name the SRC file uses no Lottie library — plain canvas calls and four PNG sprites — so ARC-3 holds |
 | `client/src/capReset.ts`, `videoFooter.ts` | copy | cap UX helpers, share footer |
 | `client/src/screens/Test*` | drop v1 | dev-only harnesses; re-add on demand |
 | `client/src/screens/PlaceholderScreen.tsx` | **new** | T-3.1 scaffold. A phase router needs six destinations; the screens land across five later tasks, so each file renders this until its task replaces it wholesale |
@@ -427,6 +427,15 @@ Adapted: `fetch(picture.url)` → blob → `createImageBitmap` (Worker route sen
 §7.2). Wobble video recording keeps only the CSS engine (`recordWobble.ts`); the
 engine-selection UI and Lottie path are removed.
 
+**Amended 2026-10-05 (B-12, owner request):** the one recorder also draws SRC's laughing
+monkey (`videoMonkey.ts`). Timeline, as in SRC: off-screen until 1.5 s, walks in from the right
+until 3 s, points with a "ha-ha" balloon until 4 s, then falls on its back. Placement is new:
+SRC stood it on bare background below the cartoon, where this layout has the story text and
+the QR footer, so it walks on the cartoon's top edge (in the empty band above) and rides the
+wobble. Plain canvas 2D and four PNG sprites (`public/monkey/`) — no animation library, still
+one engine, no selection UI. The sprites are best-effort: if they fail to load the clip records
+without the monkey.
+
 ## 9. i18n (D-2, FM-POOL-2/3/5)
 
 - UI catalogs: all 15 SRC `client/src/i18n/*.json` copied; keys added for the combobox
@@ -477,6 +486,11 @@ retired by D-6; nothing of it was built.*
 - The batch needs the Worker's `AI` binding; once `--dry-run` reports 0 missing the binding
   comes out again (§7.2's generation switch). Production: off since 2026-10-03, so the §7.3
   backstop there is a `503` → `reveal:pictureError` until the binding returns for a re-run.
+- The server reads the switch from the same `/stats` call that syncs the day counter and passes
+  it on as `StatsPayload.liveGeneration`. With it off, the Home screen leaves out the "Up to N
+  cartoons per day" caption — nothing is generated, so nothing is capped (B-13, 2026-10-05). A
+  Worker that predates the switch sends no such field and is taken as generating; no answer
+  from the Worker yet is taken as not generating.
 - Version 2 (backlog B-9): animate the still client-side (SRC's Lottie/`MediaRecorder` idea);
   no server or Worker change.
 
@@ -508,8 +522,9 @@ retired by D-6; nothing of it was built.*
   link the app opened). Only that package counts — other Android apps send `android-app://`
   referrers of their own. Either signal is kept in `sessionStorage`, since "new room" and
   "start over" drop both. `hasAnyRail()` returns false inside the shell, which removes the
-  Home ♥, the end-screen entry and the screen itself together. The iOS shell (B-2) adds its
-  own signal when it exists. *(Rewritten 2026-10-04, B-1c; owner decision the same day: two
+  Home ♥, the end-screen entry and the screen itself together. No iOS signal exists or is
+  planned: B-2 was cancelled 2026-10-05, and Safari on an iPhone is an ordinary web visit, so
+  the screen shows there. *(Rewritten 2026-10-04, B-1c; owner decision the same day: two
   signals, hide entirely.)*
 - Not built: any card checkout, key redemption, entitlement token, premium room flag.
 
@@ -533,6 +548,11 @@ TWA (Bubblewrap) over the deployed origin for Android; Capacitor shell bundling 
 for iOS with the socket pointed at the production server. Both online-only; both reuse the
 web PWA unmodified (FM-APP-4 keeps the client wrapper-safe). Detailed design deferred to the
 post-v1 phase; nothing in v1 may preclude it.
+
+**Amended 2026-10-05 (owner decision):** the iOS half is cancelled — too costly (FM-APP-2,
+`tasks.md` B-2). Android stays a TWA (built, B-1d). An iPhone runs the same web client in
+Safari, optionally from the Home Screen; what that relies on, and what is unproven without a
+device, is under `tasks.md` B-14.
 
 ## 13. Testing strategy
 
@@ -600,7 +620,7 @@ post-v1 phase; nothing in v1 may preclude it.
 | DD-6 | Cache-exists check + reservation refund instead of reserve-always | Cache hits must not consume the daily cap (FM-TIER-1) while keeping SRC's no-overshoot guarantee |
 | DD-7 | Combobox = tap-card radio list, no dropdown, no search | Phone-first tap targets; typing anywhere would reintroduce a free-text affordance |
 | DD-8 | Filter/translate stack deleted rather than disabled | Dead code invites re-enabling half of it; FM-CPL-4 guards the future instead |
-| DD-9 | Lottie recording engine dropped, `wobbleEngine` field removed from protocol | ARC-3 locks the stack (no Lottie); removing the field is the honest protocol |
+| DD-9 | Lottie recording engine dropped, `wobbleEngine` field removed from protocol. *(2026-10-05, B-12: the monkey that engine drew is back, inside the one recorder — no engine choice, no field, no Lottie library; DD-9 stands.)* | ARC-3 locks the stack (no Lottie); removing the field is the honest protocol |
 | DD-10 | ~~Premium as cap-bypass on the existing free path~~ Retired 2026-09-16 by D-6/D-7 — no premium tier; nothing was built | — |
 | DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $21 once (measured 2026-10-02; estimated ≈ $10); keys match because the same function makes them; free egress means no per-view cost |
 | DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |

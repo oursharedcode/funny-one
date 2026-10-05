@@ -13,8 +13,9 @@ describe('gameUrl', () => {
     expect(gameUrl()).toBe(`${window.location.origin}/`);
   });
 
-  // The owner's VM serves the build under /funny1-game (T-FO-6.2) — the QR
-  // code on an exported picture must land there, not at the host's root.
+  // A build served under a sub-path, as the owner's VM did until Step 60
+  // (T-FO-6.2) — the QR code on an exported picture must land there, not at
+  // the host's root.
   it('keeps the sub-path the build is served under', () => {
     vi.stubEnv('BASE_URL', '/funny1-game/');
     expect(gameUrl()).toBe(`${window.location.origin}/funny1-game/`);

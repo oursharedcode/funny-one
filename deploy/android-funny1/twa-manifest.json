@@ -1,0 +1,43 @@
+{
+  "packageId": "com.oursharedcode.funny1",
+  "host": "www.funny1.oursharedcode.com",
+  "name": "Одна Чепуха: по кругу",
+  "launcherName": "Одна Чепуха",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#FEF3C7",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#FEF3C7",
+  "enableNotifications": false,
+  "startUrl": "/?shell=android",
+  "fullScopeUrl": "https://www.funny1.oursharedcode.com/",
+  "webManifestUrl": "https://www.funny1.oursharedcode.com/manifest.webmanifest",
+  "iconUrl": "https://www.funny1.oursharedcode.com/icon-512.png",
+  "maskableIconUrl": "https://www.funny1.oursharedcode.com/icon-512-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "C:/Users/Misha/.android-keys/funny37-upload.jks",
+    "alias": "funny37"
+  },
+  "appVersionCode": 1,
+  "appVersion": "1",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "displayOverride": []
+}

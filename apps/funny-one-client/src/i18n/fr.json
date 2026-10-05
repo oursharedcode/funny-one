@@ -15,7 +15,12 @@
     "virtualBadge": "Bot",
     "removeSeat": "Retirer ce joueur",
     "addPlayer": "+ Ajouter un joueur",
-    "addVirtual": "+ Ajouter un virtuel"
+    "addVirtual": "+ Ajouter un virtuel",
+    "pictures": "Images",
+    "picturesBuiltIn": "Intégrées",
+    "picturesOnline": "Depuis Internet",
+    "picturesBuiltInHint": "Dessinées sur cet appareil. Pas besoin d'Internet.",
+    "picturesOnlineHint": "Dessins de la bibliothèque d'images. Internet requis ; sans connexion, les images intégrées sont utilisées."
   },
   "thinking": {
     "title": "{{name}} réfléchit…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "Lien vers ce jeu",
     "playYourself": "À toi de jouer",
-    "contentNotice": "Ce jeu fonctionne entièrement sur ton appareil. Rien de ce que tu tapes n'en sort jamais."
+    "contentNotice": "Ce jeu fonctionne entièrement sur ton appareil. Rien de ce que tu tapes n'en sort jamais.",
+    "contentNoticeOnline": "Rien de ce que tu tapes ne quitte cet appareil. Avec les images Internet activées, le dessin de chaque histoire est téléchargé depuis la bibliothèque d'images."
   }
 }

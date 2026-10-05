@@ -15,7 +15,12 @@
     "virtualBadge": "Bot",
     "removeSeat": "Hapus pemain",
     "addPlayer": "+ Tambah pemain",
-    "addVirtual": "+ Tambah virtual"
+    "addVirtual": "+ Tambah virtual",
+    "pictures": "Gambar",
+    "picturesBuiltIn": "Bawaan",
+    "picturesOnline": "Dari internet",
+    "picturesBuiltInHint": "Digambar di perangkat ini. Tidak perlu internet.",
+    "picturesOnlineHint": "Kartun dari pustaka gambar. Perlu internet; tanpa internet, gambar bawaan yang dipakai."
   },
   "thinking": {
     "title": "{{name}} sedang berpikir…"
@@ -52,6 +57,7 @@
   "footer": {
     "gameLink": "Tautan ke permainan ini",
     "playYourself": "Ayo main sendiri",
-    "contentNotice": "Permainan ini berjalan sepenuhnya di perangkatmu. Apa pun yang kamu ketik tidak pernah keluar dari sana."
+    "contentNotice": "Permainan ini berjalan sepenuhnya di perangkatmu. Apa pun yang kamu ketik tidak pernah keluar dari sana.",
+    "contentNoticeOnline": "Apa pun yang kamu ketik tidak pernah keluar dari perangkat ini. Jika gambar dari internet aktif, kartun setiap cerita diunduh dari pustaka gambar."
   }
 }

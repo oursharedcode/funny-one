@@ -1,20 +1,22 @@
 # Funny Family «Чепуха 37» — Caddy in front of the game container (T-8.1,
-# requirements D-5; the dedicated host is B-1a). Used by the `caddy` profile
-# in docker-compose.yml:
+# requirements D-5; the dedicated hosts are B-1a and Step 60). Used by the
+# `caddy` profile in docker-compose.yml:
 #
 #   docker compose --profile caddy up -d
 #
 # Caddy terminates TLS (certificates from Let's Encrypt, renewed by itself,
 # kept in the `caddy_data` volume), forwards WebSockets without any extra
 # directive, and appends the client address to X-Forwarded-For — which is
-# why TRUSTED_PROXY_HOPS=1 is right behind it. The four {$…} values come
+# why TRUSTED_PROXY_HOPS=1 is right behind it. The six {$…} values come
 # from .env via the compose file:
 #   FM_HOST / FM_APEX     Funny Multi's own host and its bare name (redirected
 #                         to it). The game sits at that host's root, so the
 #                         container's BASE_PATH must be "/".
-#   SITE_HOST / SITE_APEX the older shared host: Funny One lives under
-#                         /funny1-game here, and Funny Multi's old address
-#                         /funny37-game forwards to FM_HOST.
+#   FO_HOST / FO_APEX     Funny One's own host and its bare name (redirected
+#                         to it). Static files at that host's root.
+#   SITE_HOST / SITE_APEX the older shared host: both games' former addresses
+#                         /funny37-game and /funny1-game forward from here to
+#                         FM_HOST and FO_HOST.
 
 {
 	# HTTP/3 needs UDP 443, which the VM's cloud firewall does not open;
@@ -67,6 +69,51 @@
 	redir https://{$FM_HOST}{uri} permanent
 }
 
+# Funny One «Одна Чепуха: по кругу», at the root of its own host (Step 60) —
+# for the same reason Funny Multi has one: an Android app's origin is baked
+# into it. No container: Caddy serves the static bundle
+# deploy/ship-funny-one.sh copies to ./static/funny-one, mounted read-only at
+# /srv/static. The script builds with BASE_PATH=/ to match.
+{$FO_HOST} {
+	encode zstd gzip
+
+	# Origin-root files, from deploy/origin-root/funny1 in the repo — the
+	# script copies them to ./static/funny1-root. The same two as on Funny
+	# Multi's host above, for the same reason: without these blocks the SPA
+	# fallback below would answer either path with index.html.
+	handle /.well-known/assetlinks.json {
+		header Cache-Control "no-cache"
+		root * /srv/static/funny1-root
+		file_server
+	}
+
+	@privacy path /privacy /privacy/ /privacy.html
+	handle @privacy {
+		header Cache-Control "no-cache"
+		rewrite * /privacy.html
+		root * /srv/static/funny1-root
+		file_server
+	}
+
+	handle {
+		# The service worker and the entry files must revalidate on every load
+		# or an installed copy can stay pinned to an old build; everything
+		# under assets/ is content-hashed and never changes under a given name.
+		@fo_entry path / /index.html /sw.js /registerSW.js /manifest.webmanifest
+		header @fo_entry Cache-Control "no-cache"
+		@fo_hashed path /assets/*
+		header @fo_hashed Cache-Control "public, max-age=31536000, immutable"
+
+		root * /srv/static/funny-one
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+{$FO_APEX} {
+	redir https://{$FO_HOST}{uri} permanent
+}
+
 {$SITE_HOST} {
 	encode zstd gzip
 
@@ -81,28 +128,26 @@
 		redir https://{$FM_HOST}{uri} permanent
 	}
 
-	# Funny One «Одна Чепуха: по кругу» (T-FO-6.2) — no container, just the
-	# static bundle deploy/ship-funny-one.sh copies to ./static/funny-one,
-	# mounted read-only at /srv/static. The path is hardcoded rather than an
-	# .env value: it is baked into that bundle at build time, and the script
-	# builds with this same /funny1-game.
-	redir /funny1-game /funny1-game/ permanent
-
-	handle /funny1-game/* {
-		# `header` runs before `uri` in Caddy's directive order, so these
-		# matchers see the full, unstripped path. The service worker and the
-		# entry files must revalidate on every load or an installed copy can
-		# stay pinned to an old build; everything under assets/ is
-		# content-hashed and never changes under a given name.
-		@fo_entry path /funny1-game/ /funny1-game/index.html /funny1-game/sw.js /funny1-game/registerSW.js /funny1-game/manifest.webmanifest
-		header @fo_entry Cache-Control "no-cache"
-		@fo_hashed path /funny1-game/assets/*
-		header @fo_hashed Cache-Control "public, max-age=31536000, immutable"
-
-		uri strip_prefix /funny1-game
-		root * /srv/static/funny-one
-		try_files {path} /index.html
+	# Funny One's former address (T-FO-6.2, until Step 60). For it a forward
+	# alone is not enough: Funny One precaches everything, so a browser that
+	# has been here answers the old address from its own cache and never asks
+	# this server for the page — it would stay on the old build for good.
+	# What it does ask for is the service worker's script (the update check,
+	# which may not follow a redirect), so that one path answers with a
+	# retiring worker instead: it unregisters itself, drops the caches and
+	# reloads the open pages, which then meet the forward below. The file is
+	# deploy/origin-root/funny1-retired/sw.js, copied by
+	# deploy/ship-funny-one.sh to ./static/funny1-retired. `handle` blocks are
+	# tried most specific path first, so this one wins over the forward.
+	redir /funny1-game https://{$FO_HOST}/ permanent
+	handle /funny1-game/sw.js {
+		header Cache-Control "no-cache"
+		rewrite * /sw.js
+		root * /srv/static/funny1-retired
 		file_server
+	}
+	handle_path /funny1-game/* {
+		redir https://{$FO_HOST}{uri} permanent
 	}
 
 	# Anything else on this name is not a game.

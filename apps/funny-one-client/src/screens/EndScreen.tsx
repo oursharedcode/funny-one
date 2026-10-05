@@ -17,14 +17,22 @@ import EndMascots from '../components/art/EndMascots';
 import StoryGallery from '../components/StoryGallery';
 import SourceFooter from '../components/SourceFooter';
 import type { GameState } from '../game/roundRobin';
+import type { PictureSource } from '../pictureSource';
 
 interface Props {
   game: GameState;
+  /** Where the gallery's pictures come from (D-10); the rig when omitted. */
+  pictures?: PictureSource;
   onPlayAgain: () => void;
   onChangePlayers: () => void;
 }
 
-export default function EndScreen({ game, onPlayAgain, onChangePlayers }: Props) {
+export default function EndScreen({
+  game,
+  pictures = 'builtin',
+  onPlayAgain,
+  onChangePlayers,
+}: Props) {
   const { t } = useTranslation();
 
   return (
@@ -33,7 +41,12 @@ export default function EndScreen({ game, onPlayAgain, onChangePlayers }: Props)
 
       <h2 className="font-display text-3xl font-bold text-pink-500">{t('end.title')}</h2>
 
-      <StoryGallery seats={game.seats} stories={game.stories} language={game.language} />
+      <StoryGallery
+        seats={game.seats}
+        stories={game.stories}
+        language={game.language}
+        pictures={pictures}
+      />
 
       <button
         className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white"
@@ -48,7 +61,7 @@ export default function EndScreen({ game, onPlayAgain, onChangePlayers }: Props)
         {t('end.changePlayers')}
       </button>
 
-      <SourceFooter />
+      <SourceFooter pictures={pictures} />
     </div>
   );
 }

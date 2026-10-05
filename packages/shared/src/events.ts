@@ -265,6 +265,11 @@ export interface StatsPayload {
   // Daily image cap (`MAX_IMAGES_PER_DAY`); the host can derive "remaining"
   // as imagesLimit - imagesGeneratedToday.
   imagesLimit: number;
+  // True when the server can still make a new picture (the Worker's generation
+  // switch, T-9.2a). False for a library-only deployment (D-7), where every
+  // picture is pre-generated and the cap limits nothing — the Home screen
+  // leaves its cap caption out then (B-13).
+  liveGeneration: boolean;
 }
 
 // One story + its generated picture, for the shared room gallery (spec §24).

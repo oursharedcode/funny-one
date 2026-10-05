@@ -441,10 +441,14 @@ describe('stats:get', () => {
       openRooms: number;
       imagesGeneratedToday: number;
       imagesLimit: number;
+      liveGeneration: boolean;
     }>((resolve) => host.emit('stats:get', resolve));
     expect(stats.openRooms).toBe(1);
     expect(stats.imagesGeneratedToday).toBe(0);
     expect(stats.imagesLimit).toBeGreaterThan(0);
+    // Its value is the Worker's to say (a developer's .env may point at a real
+    // one); that it travels at all is what this checks.
+    expect(typeof stats.liveGeneration).toBe('boolean');
   });
 });
 

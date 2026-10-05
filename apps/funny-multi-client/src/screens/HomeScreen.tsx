@@ -292,11 +292,16 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
           {stats && (
             <div className="text-center text-sm text-gray-600">
               <p>{t('home.openRooms', { count: stats.openRooms })}</p>
-              <p>
-                {t('home.imagesToday', {
-                  total: stats.imagesLimit,
-                })}
-              </p>
+              {/* The daily cap limits live generation only. A library-only
+                  server (D-7) makes no new pictures, so it has nothing to cap
+                  and the caption is left out (B-13). */}
+              {stats.liveGeneration && (
+                <p>
+                  {t('home.imagesToday', {
+                    total: stats.imagesLimit,
+                  })}
+                </p>
+              )}
             </div>
           )}
         </>

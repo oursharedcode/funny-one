@@ -33,6 +33,11 @@ vi.mock('./image.js', () => {
   return {
     ImageCapReachedError,
     generateImage: vi.fn(() => produce()),
+    // What stats.ts reads: this file runs a real server, so a stats read can
+    // land on the mock (seen under load, Step 58).
+    imagesGeneratedToday: () => 0,
+    liveGeneration: () => false,
+    maxImagesPerDay: () => 25,
     __setImageResult: (fn: typeof produce) => {
       produce = fn;
     },

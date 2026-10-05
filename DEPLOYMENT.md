@@ -17,10 +17,11 @@ Deploy the Worker first: the game server needs its URL and shared secret before 
 - A **Linux host with Docker** (Compose v2 included) that can be reached on ports 80 and 443,
   and SSH access to it. Production is an Oracle Cloud _Always Free_ VM — any VPS works.
 - A **domain name** you control, with DNS `A` records for the game's host (e.g.
-  `www.funny37.example.com`), its bare name (`funny37.example.com`) and the shared host and its
-  bare name (`www.example.com`, `example.com` — see `SITE_HOST` below) pointing at the host.
-  Caddy fetches its certificates on first boot, so the records must resolve before the first
-  start.
+  `www.funny37.example.com`), its bare name (`funny37.example.com`), the same pair for Funny
+  One (`www.funny1.example.com`, `funny1.example.com`) and the older shared host and its
+  bare name (`www.example.com`, `example.com` — see `SITE_HOST` below), all pointing at the
+  host. Caddy fetches its certificates on first boot, so the records must resolve before the
+  first start.
 - On the machine you deploy _from_ (your PC is fine): Node 20, git, Docker, `ssh`/`scp` and
   `curl`. On Windows use Git Bash — `deploy/ship.sh` is a bash script and already handles
   Git Bash's path rewriting.
@@ -104,16 +105,19 @@ in `~/.oci/config`). Those scripts are optional: any host from the list above wi
 Two files make it production rather than "a container on :3000":
 
 - `docker-compose.yml`'s **`caddy` profile** adds Caddy on 80/443 with automatic HTTPS
-  (`deploy/caddy/Caddyfile`). Two hosts: **`FM_HOST`** is the game's own — Caddy forwards
+  (`deploy/caddy/Caddyfile`). Three hosts: **`FM_HOST`** is the game's own — Caddy forwards
   everything on it to the game container untouched, WebSockets included, except two files it
   serves itself from `deploy/origin-root/funny37` (B-1b): the privacy policy at `/privacy`
   and `/.well-known/assetlinks.json` for the Android app. It redirects `FM_APEX` (the bare
-  name) to `FM_HOST`. **`SITE_HOST`** is the shared host: it serves Funny One
-  under `/funny1-game` (2c), forwards Funny Multi's former address `/funny37-game` to
-  `FM_HOST`, redirects `SITE_APEX` to itself and 404s everything else. A game has its own host
-  because an Android app wrapping it (a Trusted Web Activity) bakes the origin in. Certificates
-  live in the `caddy_data` volume. Self-hosting only Funny Multi: point `SITE_HOST`/`SITE_APEX`
-  at any name you control, or skip Caddy (see the variant below).
+  name) to `FM_HOST`. **`FO_HOST`** is Funny One's own (2c): static files, served by Caddy
+  itself, with `FO_APEX` redirected to it. **`SITE_HOST`** is the older shared host, where
+  both games used to live: it forwards their former addresses `/funny37-game` and
+  `/funny1-game` to `FM_HOST` and `FO_HOST`, redirects `SITE_APEX` to itself and 404s
+  everything else. A game has its own host because an Android app wrapping it (a Trusted Web
+  Activity) bakes the origin in. Certificates live in the `caddy_data` volume. Caddy refuses a
+  Caddyfile with an empty site name, so all six names must be set even when you self-host only
+  Funny Multi: point the other four at any names you control, or skip Caddy (see the variant
+  below).
 - **`BASE_PATH`** (`.env`), the URL sub-path the game is served under — `/` (the default, or
   unset) behind this Caddyfile, since the game owns its host. It must reach two places: the
   image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO path)
@@ -134,6 +138,8 @@ CLOUDFLARE_WORKER_URL=https://funny-multi-image.<your-subdomain>.workers.dev
 CLOUDFLARE_WORKER_SECRET=<the WORKER_SECRET from step 1>
 FM_HOST=www.funny37.example.com
 FM_APEX=funny37.example.com
+FO_HOST=www.funny1.example.com
+FO_APEX=funny1.example.com
 SITE_HOST=www.example.com
 SITE_APEX=example.com
 TRUSTED_PROXY_HOPS=1
@@ -185,7 +191,7 @@ image is built here and streamed across; no registry involved):
 deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
 ```
 
-`ship.sh` reads `BASE_PATH` and the four hosts from the host's `.env` (and stops if one is
+`ship.sh` reads `BASE_PATH` and the six hosts from the host's `.env` (and stops if one is
 missing), builds the image with `BASE_PATH` (tagged with the git commit),
 `docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml` and the
 Caddyfile next to `.env`, streams `deploy/origin-root/funny37` into `static/funny37-root`
@@ -209,33 +215,63 @@ container idles at ~50 MB with Caddy at ~20 MB, Let's Encrypt certificates for b
 first boot, HTTP→HTTPS and apex→`www` redirects, and a scripted 3-player room over TLS
 WebSockets through Caddy in under a second.
 
-### 2c. Funny One on the same host (optional)
+### 2c. Funny One on its own host (optional)
 
-Funny One («Одна Чепуха: по кругу», `apps/funny-one-client`) has no server — it is a static,
-fully offline PWA, so it needs no container, image or secret: the same Caddy serves its files
-under `/funny1-game` of `SITE_HOST`. It needs the host set up by 2a–2b first (`SITE_HOST` is
-where it deploys; `FM_HOST` is read for the final health check).
+Funny One («Одна Чепуха: по кругу», `apps/funny-one-client`) has no server — it is a static
+PWA that plays fully offline, so it needs no container, image or secret: the same Caddy serves
+its files at the root of `FO_HOST` (production: `https://www.funny1.oursharedcode.com/`). It
+needs the host set up by 2a–2b first, with `FO_HOST` and `FO_APEX` in its `.env`.
 
 ```bash
 deploy/ship-funny-one.sh ubuntu@<host-ip>   # remote dir defaults to ~/funny
 ```
 
-The script builds the client with `BASE_PATH=/funny1-game` — the path the Caddyfile hardcodes,
-since it is baked into the bundle and its service-worker scope — streams `dist/` into
-`~/funny/static/funny-one` (swapped in whole, never half-copied), copies the compose file and
-Caddyfile, reloads Caddy, and checks `/funny1-game/`, `sw.js`, the manifest, the
-`/funny1-game` → `/funny1-game/` redirect and that Funny Multi's `/health` still answers.
-Compose mounts `./static` (the parent directory, so the swap is visible without restarting
-Caddy); the first run recreates the Caddy container to add that mount, which drops Funny
-Multi's open sockets for a moment — clients reconnect on their own. Caddy sends `no-cache` for
-the entry files and the service worker, so an installed copy picks up a new deploy on its next
-launch, and a year-long `immutable` for the content-hashed `assets/`.
+The script builds the client at the root (`BASE_PATH` unset), streams `dist/` into
+`~/funny/static/funny-one` (swapped in whole, never half-copied), streams
+`deploy/origin-root/funny1` (the privacy policy at `/privacy` and
+`/.well-known/assetlinks.json` for an Android app) into `static/funny1-root` and
+`deploy/origin-root/funny1-retired` into `static/funny1-retired`, copies the compose file and
+Caddyfile, reloads Caddy, and checks the game, `sw.js`, the manifest, the two origin-root
+files, the bare-name redirect, the former address (below) and that Funny Multi's `/health`
+still answers. Compose mounts `./static` (the parent directory, so the swap is visible
+without restarting Caddy); a run that changes the Caddy service's configuration recreates its
+container, which drops Funny Multi's open sockets for a moment — clients reconnect on their
+own. Caddy sends `no-cache` for the entry files and the service worker, so an installed copy
+picks up a new deploy on its next launch, and a year-long `immutable` for the content-hashed
+`assets/`.
+
+**Pictures from the Internet (D-10).** The start screen offers a choice between the built-in
+pictures (the default; nothing is downloaded) and the cartoons of Funny Multi's pre-generated
+library (step 1, "pre-generate the whole picture library"). The choice appears only in a
+build that knows where the library is: the script reads `CLOUDFLARE_WORKER_URL` from the
+host's `.env` and bakes it in as `VITE_PICTURES_URL`. That address is public either way —
+Funny Multi's players already load their pictures from it; the secret is never read. Set
+`VITE_PICTURES_URL` yourself to name another library, or set it empty
+(`VITE_PICTURES_URL= deploy/ship-funny-one.sh …`) to build without the option. The game
+only ever issues `GET <library>/i/<hash>.png`, and draws the built-in picture whenever that
+fails.
+
+**The former address** (production moved in Step 60). Until then Funny One lived at
+`https://SITE_HOST/funny1-game/`. Every path under it now answers `301` to `FO_HOST` —
+except `/funny1-game/sw.js`. Funny One precaches itself completely, so a browser that has
+been there answers the old address from its own cache and never asks the server for the page;
+the one thing it does ask for is its service worker's script, and a redirect there is ignored.
+That path therefore answers with a small retiring worker
+(`deploy/origin-root/funny1-retired/sw.js`): it deletes the caches, unregisters itself and
+reloads the open pages, which then meet the forward. A copy installed to a home screen from
+the old address still has to be reinstalled from the new one — its start address is fixed at
+install time.
+
+When a deployment gains Funny One's host, do it in this order: the two DNS records, then
+`FO_HOST`/`FO_APEX` in the host's `.env`, then `ship-funny-one.sh`, and only then
+`ship.sh` — both scripts copy the same Caddyfile, and they stop before copying it if a name
+is missing, because an empty one would keep Caddy from starting for both games.
 
 ### Variant: your own TLS proxy instead of Caddy
 
 `ship.sh` always uses the Caddy profile. If you already terminate TLS elsewhere (nginx,
 Cloudflare Tunnel, …), clone the repo on a host big enough to build (2 GB is plenty), put the
-same `.env` at the repo root (the four hosts not needed) and run
+same `.env` at the repo root (the six hosts not needed) and run
 `docker compose up -d`: you get the game alone on plain HTTP `:3000`, mounted under
 `BASE_PATH`, for your proxy to forward to. PWA install and service-worker registration both
 require HTTPS, so something must terminate TLS. See the next section before choosing

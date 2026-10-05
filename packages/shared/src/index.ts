@@ -48,6 +48,11 @@ export { POOL_TEXTS } from './pools/text/index.js';
 export { QUESTIONS, PROSE_TEMPLATES, renderProse, requireAuthoredLanguage } from './i18n/index.js';
 export { polishProse, polishRussianProse } from './i18n/grammar.js';
 
+// T-4.1 / D-10 — the image-prompt builder, promoted from
+// `apps/funny-multi-server/src/prompt.ts` so Funny One can address the same
+// picture library by the same cache keys.
+export { MAX_PROMPT_LENGTH, SKELETON, STYLE_SUFFIX, buildPrompt } from './prompt.js';
+
 // T-1.6 — socket contract (design §5). Types only: the protocol carries no
 // runtime values, so this whole module erases at build time.
 export type {

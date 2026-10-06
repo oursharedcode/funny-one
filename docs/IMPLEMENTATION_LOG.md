@@ -3130,18 +3130,62 @@ and runs on the push.
 
 ---
 
-~~RESUME HERE (after Step 59)~~ — carried into this note.
+## Step 66 (task S-3b) — Funny One's Android app signed, installed, tested (2026-10-05/06)
 
-**RESUME HERE (2026-10-05, after Step 65).** **Both games are live on hosts of their own:**
+**Shipped:** the owner ran the signed build — the one command left open by Step 65, with the
+key password typed by the owner — on 2026-10-05 at 18:20. It wrote `app-release-signed.apk`
+(with its `.idsig`) and `app-release-bundle.aab` into `deploy/android-funny1/`, which is
+ignored by git. The agent read the bundle's signer with `keytool -printcert -jarfile`:
+`CN=oursharedcode`, SHA-256 `6B:BF:A7:3A:E8:64:A2:56:EE:05:B9:5F:92:1C:71:F8:FF:53:0D:2F:0D:F4:9B:EE:73:26:9F:48:8D:AF:44:0B`
+— the fingerprint in the live `assetlinks.json` for `com.oursharedcode.funny1`, so an app signed
+with this key can pass the asset-link check. The owner then moved the signed APK to the phone by
+hand, installed it and reported on 2026-10-06: "installed and tested ok."
+
+**Not verified by the agent:** the APK itself. It had left the PC before the agent looked
+(Funny Multi's APK, by contrast, is still in `deploy/android/`), so Step 59's `apksigner verify`
+and `aapt2 dump badging` were not run on it; the bundle's signer stands in for them. The owner's
+report was not itemized: whether the app showed a URL bar, whether Play Protect warned, and
+whether it starts in airplane mode after one start online were each not separately stated.
+
+S-3b is closed (`steering/funny-one-tasks.md`). What it still listed — real icons, the FO-ID-1
+decision, the Play listing itself — is filed as the new task **S-3c** instead of being absorbed.
+
+**Owed:**
+
+- The itemized install result, above all whether Play Protect warned (B-8 for Funny One's app).
+  Either the owner says so, or T-FO-7.1's phone pass records it; until then B-8 stays open for
+  that app.
+- S-3c: waits on B-1e (the Play account, Equifax), the FO-ID-1 decision (Step 64) and real
+  icons — the app carries the web game's placeholders.
+- The signed APK now exists only on the phone. `app-release-bundle.aab` (for Play) and the
+  `.idsig` stay in the ignored folder; losing them costs a rebuild and the key password, nothing
+  else. Once Play App Signing is on, add Google's fingerprint beside this one in
+  `deploy/origin-root/funny1/.well-known/assetlinks.json`, and uninstall this sideloaded copy
+  before the Play-delivered one replaces it (as for Funny Multi, Step 59).
+
+Gates: no code changed in this step. The tree was clean at `e27bb50` (Steps 60–65), whose gates
+had run: typecheck, lint, `format:check` clean; `npm test` outside the sandbox 879 passed;
+`npm audit --omit=dev` 0, full audit only GHSA-vfj7-8cjw-p6xm (`braces`); CI on `e27bb50` green,
+checked again 2026-10-06. This step changes only log and steering text, which prettier ignores.
+
+---
+
+~~RESUME HERE (after Step 65)~~ — carried into this note.
+
+**RESUME HERE (2026-10-06, after Step 66).** **Both games are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/` (now with B-13's caption fix and B-12's
 monkey), Funny One at `https://www.funny1.oursharedcode.com/` (Step 60, with D-10's picture
-choice). The former `/funny37-game` and `/funny1-game` addresses only forward.
+choice). The former `/funny37-game` and `/funny1-game` addresses only forward. **Funny One's
+Android app (`com.oursharedcode.funny1`) is signed and installed on the owner's phone, and the
+owner reports it tested OK (Step 66).**
 
-**Next step is the owner's: the signed build of Funny One's Android app (S-3b).** In PowerShell:
-`cd C:\Mark\Dev\funnyone\deploy\android-funny1; npx.cmd -y "@bubblewrap/cli@1.25.0" build` —
-it asks for the key password twice and writes `app-release-signed.apk`. The agent then checks
-the signature as in Step 59, the owner installs the file by hand and reports: URL bar or not,
-any Play Protect warning (B-8), and whether it starts in airplane mode after one start online.
+**Next step is the owner's: T-FO-7.1, the Funny One phone pass that closes Gate FO**
+(`docs/ACCEPTANCE_FUNNY_ONE.md`, with Part E from Step 64). The signed app of Step 66 is the
+natural thing to run it in: one start online, then a full game in airplane mode, and Part E
+(**From the Internet**) while online. The owner reports which steps passed and the agent writes
+them into the log and the sheet. The same pass settles what Step 66 could not record — URL bar
+or not, and any Play Protect warning (B-8). Nothing agent-only is waiting: every other open item
+below is the owner's decision or look, or waits on Equifax (B-1e).
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (close and open the app, perhaps twice) — B-13 is closed on
@@ -3155,8 +3199,9 @@ Phase FO-8 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them
 
 Open owner decisions: **FO-ID-1** — Funny One aims at Play's Families program, and the Internet
 pictures come from a library made for a 12+ product: leave the choice out of the store app, or
-review the library (Step 64); nothing is listed on Play before that. Whether Funny One's app
-keeps Funny Multi's upload key or gets its own (Step 65). **B-2 (Apple) is cancelled** — do not
+review the library (Step 64); nothing is listed on Play before that (task S-3c, which also waits
+on B-1e and real icons). Whether Funny One's app keeps Funny Multi's upload key or gets its own
+(Step 65; the installed app was signed with the shared one). **B-2 (Apple) is cancelled** — do not
 raise the Individual-or-company question again; an iPhone plays the web app (B-14), and the
 four fixes found there are deferred until the owner asks.
 
@@ -3177,8 +3222,8 @@ what, wait for "done", automate first). Production's `.env` holds the support ra
 `BASE_PATH=/` and six host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX` and, since
 Step 60, `FO_HOST`, `FO_APEX`; both ship scripts stop if one is missing. Backups on the VM:
 `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`. The image now running is
-tagged `funny-multi:e9ad269` but was built from this session's working tree before its commit;
-the next `deploy/ship.sh` tags it properly. The production Worker secret is on this PC at
+tagged `funny-multi:e9ad269` but was built from the Steps 60–65 working tree before its commit
+(`e27bb50`); the next `deploy/ship.sh` tags it properly. The production Worker secret is on this PC at
 `~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
 added by the owner by hand (Step 57) — the stored token cannot manage it. The Android signing
 key (Step 59, used for both apps) is `~/.android-keys/funny37-upload.jks`, alias `funny37`; a
@@ -3213,7 +3258,8 @@ policy outside English are machine drafts; real Funny One icons before any annou
 listing (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any
 launch announcement; T-7.1's iPhone install leg (closes Gate 7), now run together with B-14's
 device list on a borrowed iPhone; B-8 — answered for Funny Multi's TWA (no warning, Step 59),
-open for a direct PWA/WebAPK install and, until S-3b's install, for Funny One's app; whether to
+open for a direct PWA/WebAPK install and for Funny One's app (installed and "tested ok", Step 66,
+but no Play Protect result was itemized); whether to
 delete the unused 32-bit JDK at `~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it
 until the owner brings it up); the Arm VM retry; Caddy's "Caddyfile input is not formatted"
 warning (`caddy fmt` would settle it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at

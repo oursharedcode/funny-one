@@ -132,8 +132,9 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-8** Google Play Protect shows "Unsafe app blocked — built for an older version of
   Android" on install, requiring "Install anyway" (seen 2026-09-16, A2, on the plain PWA/WebAPK
   install). **Answered 2026-10-05 (Step 59): a TWA does sidestep it** — no warning on the
-  Bubblewrap-built, signed install. Still open for a direct PWA install and for Funny One's own
-  store app, once built.
+  Bubblewrap-built, signed install. Funny One's own app was built, installed and reported "tested ok"
+  on 2026-10-06 (Step 66), but the owner did not itemize a Play Protect result — still open until
+  they say, or until T-FO-7.1's pass records it. Still open for a direct PWA install.
 - **B-9** Version 2 animated cartoon: animate the still client-side and export WebM via
   `MediaRecorder` (SRC's `VIDEO_GENERATION_ANALYSIS.md` option 2). Zero AI cost. Note DD-9
   dropped SRC's Lottie engine — reinstating it is a v2 decision, not a revert.

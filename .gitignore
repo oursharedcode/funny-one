@@ -43,3 +43,7 @@ Thumbs.db
 # Phone screenshots and other device-session evidence the owner drops here; the
 # acceptance docs record the results, so the images themselves stay local.
 local_docs/tests/
+
+# Picture-library review (T-FO-8.2): venv, thumbnails, embeddings — regenerable, never committed
+.picture-review/
+__pycache__/

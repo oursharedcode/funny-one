@@ -3170,104 +3170,221 @@ checked again 2026-10-06. This step changes only log and steering text, which pr
 
 ---
 
-~~RESUME HERE (after Step 65)~~ — carried into this note.
+## Step 67 — `shell-quote`, `source-map-js` bumps; `postcss-selector-parser` accepted by ID: `npm audit` clean again (2026-10-08)
 
-**RESUME HERE (2026-10-06, after Step 66).** **Both games are live on hosts of their own:**
-Funny Multi at `https://www.funny37.oursharedcode.com/` (now with B-13's caption fix and B-12's
-monkey), Funny One at `https://www.funny1.oursharedcode.com/` (Step 60, with D-10's picture
-choice). The former `/funny37-game` and `/funny1-game` addresses only forward. **Funny One's
-Android app (`com.oursharedcode.funny1`) is signed and installed on the owner's phone, and the
-owner reports it tested OK (Step 66).**
+**Shipped:** lockfile only. Three dev-only advisories turned up on 2026-10-07 while running
+Step 68's gates, none caused by it; the owner approved the three recommended options on
+2026-10-08. `npm audit fix` took the two inside their declared ranges — `shell-quote`
+1.10.0 → 1.12.0 (GHSA-pqg4-j6r4-53mv, critical, via `concurrently`) and `source-map-js`
+1.2.1 → 1.2.2 (GHSA-68fv-2mgg-jv7q, high, via `postcss` and jsdom → css-tree); no
+`package.json` changed. The third, `postcss-selector-parser` 6.1.4 GHSA-rj75-hqrm-r3gf
+(moderate, quadratic selector parsing; via `postcss-nested` inside `tailwindcss@3.4.19`), is
+**accepted by ID** the way Step 53 accepted `braces`: its only fix is Tailwind 4 (a major
+migration that raises the browser floor — a product decision on the open list), it runs only
+in the CSS build on this PC and in CI, and nothing it parses comes from a player. The allow-list
+in the RESUME HERE note is now two IDs; the exception goes when Tailwind 4 is taken up.
 
-**Next step is the owner's: T-FO-7.1, the Funny One phone pass that closes Gate FO**
-(`docs/ACCEPTANCE_FUNNY_ONE.md`, with Part E from Step 64). The signed app of Step 66 is the
-natural thing to run it in: one start online, then a full game in airplane mode, and Part E
-(**From the Internet**) while online. The owner reports which steps passed and the agent writes
-them into the log and the sheet. The same pass settles what Step 66 could not record — URL bar
-or not, and any Play Protect warning (B-8). Nothing agent-only is waiting: every other open item
-below is the owner's decision or look, or waits on Equifax (B-1e).
+Production was not exposed by any of the three: all are devDependencies, `npm audit --omit=dev`
+was 0 throughout.
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox after the
+bump: 884 passed, exit 0; `npm audit --omit=dev` 0; full `npm audit` lists only
+GHSA-vfj7-8cjw-p6xm and GHSA-rj75-hqrm-r3gf (13 entries, all the `braces` chain plus this
+one); `npm view braces version` 3.0.3. CI: after the push.
+
+---
+
+## Step 68 (task T-FO-8.2) — Picture library reviewed for a Families audience; 10 of 10,000 blocked (2026-10-06/08)
+
+**Owner decisions 2026-10-06 (morning plan):** (1) T-FO-7.1's phone pass runs in the signed
+Step 66 app; (2) **FO-ID-1: review the whole library, with a free automated method**, rather
+than leave D-10's *From the Internet* out of the store app; (3) Funny One's app keeps the shared
+upload key — Step 65's question is closed; (4) B-2 stays cancelled, B-1e stays frozen on Equifax.
+Then "go, 1–3 all recommended": the agent fetches every picture from the public route, looks at
+the contact sheets itself, and shows the owner only the borderline ones.
+
+**Shipped:**
+
+- `docs/PICTURE_REVIEW.md` — the criteria (Play's Families policy and the content-rating
+  questionnaire, reduced to Fail / Watch / Pass), the method, the results. This is the evidence
+  behind the owner's questionnaire answers; it certifies nothing by itself.
+- `scripts/picture-review/` — `manifest.mjs` (the 10⁴ keys, computed offline the way
+  `libraryPictureUrl` does), `fetch.py` (each public `/i/<hash>.png`, kept as a 384 px
+  thumbnail), `score.py` (CLIP ViT-B/32 embeddings, one text query per criterion,
+  `Falconsai/nsfw_image_detection`, picture-to-own-prompt similarity), `analyze.py` (per-option
+  statistics, contact sheets). CPU only, no paid service. The venv, thumbnails, embeddings and
+  sheets live in `.picture-review/` (now in `.gitignore`); the Python files are outside the
+  repo's lint and prettier — there is no Python tooling here, and they are a tool, not product.
+- `apps/funny-one-client/src/pictureBlocklist.ts` — `BLOCKED_PICTURES` (library key, the four
+  option ids, why) and `isBlockedPicture`; `libraryPictureUrl` returns `null` for a blocked key
+  before the address is built, so the story draws the rig and the device makes no request.
+  `pictureBlocklist.test.ts` holds each entry to the key `buildPrompt` gives its options (real
+  option ids in slot order, no duplicates), so a prompt or pool change that moves a key fails
+  the test rather than silently un-blocking the picture; `pictureSource.test.ts` gained the
+  blocked-story-is-null case with its neighbour one option away still served.
+
+**Numbers.** 10,000 of 10,000 fetched, 0 failed, 7,083,381,392 bytes (≈ 7.08 GB of Worker
+egress — the pictures are ≈ 700 KB each; the re-encoding noted below would cut that tenfold).
+At or above 0.5 per CLIP criterion: weapon 241, blood/gore 116, nudity 13, drugs 3, gambling 3,
+scary 3, body horror 1, flag 1, photoreal 0, text 0, hate 0; NSFW classifier 147 (68 above 0.9)
+— all 147 viewed, all false positives, driven by `where.gloomy-birthday`'s grey rooms; the
+weapon score is almost entirely `who.muddy-knight`'s costume sword. 44 contact sheets, 1,491
+tiles, **1,245 distinct pictures looked at by the agent**, plus a random 10-per-option sample
+of 398 with **0 fails** to bound what the classifiers missed. OCR was skipped (no tesseract);
+the text query's top was read by eye — all gibberish. Ten borderline pictures (A–J) went onto
+one sheet for the owner, `.picture-review/sheets/borderline.png`. The agent recommended
+blocking three — A (retired-superhero · haunted-toaster · gloomy-birthday · staring-contest: an
+unexplained red puddle), B (muddy-knight · professor-goat · snowy-mountain · stacking-chairs: a
+dark cross-in-circle emblem on a red banner), J (muddy-knight · giant-snail · gloomy-birthday ·
+baking-giant-cake: a dark-red splash under the cake) — and keeping C–I (a Spain-like flag, one
+title-like gibberish caption, five knight props pointed at the partner with no contact).
+**Owner's verdict 2026-10-07: block all ten.** The stricter line — anything a store reviewer
+could pause on goes, the rig costs nothing. Nothing is regenerated: the ten stay in the
+library for Funny Multi (12+), the block is Funny One's; regenerating would need the cancelled
+Workers AI plan and the same prompt through `/generate`, after which the entry comes off.
+The table of all ten with reasons is in `docs/PICTURE_REVIEW.md`.
+
+**Verified:** the two test files, 21 passed; and a phone-sized Chromium run
+(`.screens/fo-blocklist-check.mjs`, ignored) against the real `worker.js` served locally on
+5185 over an in-memory store of the 10⁴ real keys: a seven-seat game steered so story 2 was
+picture A and story 3 its neighbour one option away — 10/10 checks, 42 submissions, A drew the
+rig and its key was never requested, the other six stories showed library pictures, all six
+requests 200, no console errors.
+
+**T-FO-7.1 phone pass, started in the same session:** op 1 done 2026-10-06 — the home-screen
+copy of Funny One installed from the old address (Step 38) is removed, 0 icons left. Op 2 (search
+the app list for "Funny" / "Чепуха", report the entries and any Chrome badge) is asked and
+unanswered.
+
+**Not done — owed, in the owner's order:**
+
+- **The deploy.** The agent ran `bash deploy/ship-funny-one.sh ubuntu@152.69.166.212` and the
+  permission mode refused it as a production deploy (2026-10-07; the same script was allowed
+  on 2026-10-05). Not routed around. The owner runs it in Git Bash (`bind 'set
+  enable-bracketed-paste off'` first) or grants it when asked again; **until then production
+  serves the library un-blocked** and the ten pictures are reachable. The script builds from
+  the working tree, so no push is needed first, and the Android app needs no rebuild — it loads
+  the site.
+- T-FO-8.3, the same review for the rig (filed 2026-10-07 on the owner's "file it") — the
+  next agent-only step.
+
+Gates: typecheck 0, lint 0, `format:check` clean (the Python files and the docs are outside
+both); `npm test` outside the sandbox **884 passed** (250 + 227 + 164 + 190 + 53), exit 0, run
+again after the owner's verdict put all ten on the list and once more after Step 67's lockfile
+bump; `npm audit --omit=dev` 0. The full `npm audit` was **red on 2026-10-07** against the
+Step 53 rule — 15 entries, three new dev-only advisories — so the agent stopped and asked;
+the owner's answer became Step 67, which landed first, and the full audit now lists only the
+two accepted IDs. `npm view braces version` 3.0.3. CI: after the push.
+
+---
+
+~~RESUME HERE (after Step 66)~~ — carried into this note.
+
+**RESUME HERE (2026-10-08, after Step 68).** **Both games are live on hosts of their own:**
+Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
+`https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
+only forward). Funny One's Android app (`com.oursharedcode.funny1`) is signed and installed on
+the owner's phone (Step 66). **FO-ID-1 is decided and done (Step 68): the picture library was
+reviewed for a Families audience and the ten pictures the owner saw are blocklisted in the
+client — committed, not yet deployed.**
+
+**Next, in order, the owner's:** (1) the deploy — `deploy/ship-funny-one.sh
+ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
+owner runs it in Git Bash or grants it when asked; production serves the library un-blocked
+until then; (2) the T-FO-7.1 phone pass in the signed app, one op per message: op 1 done
+(old-address icon removed), op 2 asked (app-list search), then the 18 checks of
+`docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL bar and Play Protect
+(B-8) for Funny One's app and signs off Gate FO.
+
+**Next agent-only step: T-FO-8.3 (S), Step 69** — the same Families review for the rig, Funny
+One's own art (filed 2026-10-07 on the owner's "file it"): 109 hand-drawn SVG layers, so by eye
+only — every layer alone on contact sheets, plus ~200 random composited stories through
+`rigExport.ts` for accidental overlaps; a section in `docs/PICTURE_REVIEW.md`; any fix is an
+SVG edit. It can run while the owner's two items wait.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
-without the cartoons-per-day line (close and open the app, perhaps twice) — B-13 is closed on
-the server's own answer and reopens if the line is still there; one 5-second video recorded on
-the Android phone, which closes B-12; Funny One at the new address with **From the Internet**
-picked (acceptance Part E); and the home-screen copy of Funny One installed from the old
-address (Step 38), which has to be removed and installed again from the new one. The Funny One
-phone pass that closes Gate FO (T-FO-7.1) now runs at the new address and includes Part E.
-Phase FO-8 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them
-(`funny-one-tasks.md`, dependency notes); the gate itself is unchanged and still open.
+without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
+recorded on the Android phone (closes B-12). Phase FO-8 and S-3a/S-3b ran ahead of Gate FO
+because the owner asked for them; the gate itself is unchanged and still open.
 
-Open owner decisions: **FO-ID-1** — Funny One aims at Play's Families program, and the Internet
-pictures come from a library made for a 12+ product: leave the choice out of the store app, or
-review the library (Step 64); nothing is listed on Play before that (task S-3c, which also waits
-on B-1e and real icons). Whether Funny One's app keeps Funny Multi's upload key or gets its own
-(Step 65; the installed app was signed with the shared one). **B-2 (Apple) is cancelled** — do not
-raise the Individual-or-company question again; an iPhone plays the web app (B-14), and the
-four fixes found there are deferred until the owner asks.
+Open owner decisions: none new. **B-2 (Apple) is cancelled** — do not raise the
+Individual-or-company question again; an iPhone plays the web app (B-14), and the four fixes
+found there are deferred until the owner asks. The shared upload key stays (decision 3 of
+2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e and real icons.
 
 B-1e (Play account) is waiting on Equifax: the listing address is the one on the Equifax request
 (owner decision 2026-10-04). Do not retry the Play signup before the D-U-N-S record is fixed;
 Google limits the tries. Enrollment identifiers are not in this repo (Step 54).
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
-may list only GHSA-vfj7-8cjw-p6xm (`braces`; it shows as 11 high). Anything else fails the
-gate — stop and ask. Each session run `npm view braces version`: above 3.0.3 means a fix is
-out — take it in range as its own lockfile commit and delete the exception.
+may list only **two IDs** — GHSA-vfj7-8cjw-p6xm (`braces`, Step 53) and GHSA-rj75-hqrm-r3gf
+(`postcss-selector-parser` via Tailwind 3, Step 67). Anything else fails the gate — stop and
+ask. Each session run `npm view braces version`: above 3.0.3 means a fix is out — take it in
+range as its own lockfile commit and delete that exception. The second exception goes when
+Tailwind 4 is taken up (its only fix). An in-range fix that npm offers (`npm audit fix` without
+`--force`) is taken as its own lockfile step once the owner says so, as Step 67 did.
 
 The paid Workers AI plan is cancelled; production generation is off (`[ai]` commented out in
-`wrangler.toml`), which is what B-13's `liveGeneration: false` reports.
+`wrangler.toml`), which is what B-13's `liveGeneration: false` reports. The picture library's
+10⁴ keys are all served (Step 68 fetched every one); the ten blocked ones stay in R2 — the
+block is in Funny One's client, Funny Multi still shows them.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` holds the support rails,
-`BASE_PATH=/` and six host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX` and, since
-Step 60, `FO_HOST`, `FO_APEX`; both ship scripts stop if one is missing. Backups on the VM:
-`~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`. The image now running is
-tagged `funny-multi:e9ad269` but was built from the Steps 60–65 working tree before its commit
-(`e27bb50`); the next `deploy/ship.sh` tags it properly. The production Worker secret is on this PC at
-`~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
+`BASE_PATH=/` and six host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
+`FO_APEX`; both ship scripts stop if one is missing. Backups on the VM:
+`~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`. The image running is tagged
+`funny-multi:e9ad269` but was built from the Steps 60–65 working tree before its commit
+(`e27bb50`); the next `deploy/ship.sh` tags it properly. The production Worker secret is on this
+PC at `~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
 added by the owner by hand (Step 57) — the stored token cannot manage it. The Android signing
 key (Step 59, used for both apps) is `~/.android-keys/funny37-upload.jks`, alias `funny37`; a
 hash-verified copy is on the external drive at `F:\Mark\android-keys\`. Losing both means the
 installed apps can never be updated.
 
-Who deploys: on 2026-10-05 the owner asked for the deploys in the request, and the agent ran
-both ship scripts, the two DNS records and the two-line `.env` addition itself — auto mode
-allowed each, so the older "the owner runs deploys in Git Bash" no longer holds as a rule.
-Still refused earlier, and not to be routed around — stop and hand the step to the owner: a
-headless browser run against production (Step 49), a local run with the production Worker
-secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). The local `.env`'s
-Worker secret is not production's, so pictures are tested against the real `worker.js` run
-locally (port 5185), never against the live Worker. SSH to the VM is allowed only from the
-owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
+Who deploys: auto mode allowed both ship scripts on 2026-10-05 and refused
+`deploy/ship-funny-one.sh` on 2026-10-07 — so try once when the owner asks for the deploy, and
+if it is refused, hand it to the owner without trying another route. Still refused earlier, and
+not to be routed around: a headless browser run against production (Step 49), a local run with
+the production Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55).
+The local `.env`'s Worker secret is not production's, so pictures are tested against the real
+`worker.js` run locally (port 5185), never against the live Worker — the public `/i/<hash>.png`
+route needs no secret and is what Step 68 read. SSH to the VM is allowed only from the owner's
+home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
 `curl https://api.ipify.org`).
 
-Notes for whoever runs things here: `npm test` wants the machine to itself — the mock flake of
-Step 58 is fixed (Step 61), but re-run any lone timing failure in isolation before treating it
-as a regression. Multi-line commit messages go through `git commit -F <file>`. In a script
-under `set -o pipefail`, never pipe a large page into `grep -q` (Step 60). The agent's shell
-cannot start Bubblewrap's Gradle step (Step 65) — compile checks use `gradlew.bat` by path;
-signed builds are the owner's anyway. Ports: 5183 (Funny Multi client), 5184 (Funny One
-client), 3000 (server), 5185 and 5186 for the two ad-hoc checks above; read
-`C:\Mark\Dev\machine\ports.md` before binding anything new. Pasting a command into the owner's
-Git Bash can prepend `[200~`: `bind 'set enable-bracketed-paste off'` first.
+Notes for whoever runs things here: `npm test` wants the machine to itself — re-run any lone
+timing failure in isolation before treating it as a regression. Multi-line commit messages go
+through `git commit -F <file>`. In a script under `set -o pipefail`, never pipe a large page
+into `grep -q` (Step 60). The agent's shell cannot start Bubblewrap's Gradle step (Step 65) —
+compile checks use `gradlew.bat` by path; signed builds are the owner's anyway. Glob under
+`apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
+(`.picture-review/venv`, open_clip, transformers) is on this PC only; `scripts/picture-review/`
+rebuilds it from scratch, and `score.py` plus the sheets take longer than a 10-minute tool call
+— run them in the background. Ports: 5183 (Funny Multi client), 5184 (Funny One client), 3000
+(server), 5185 and 5186 for the ad-hoc checks; read `C:\Mark\Dev\machine\ports.md` before
+binding anything new. Pasting a command into the owner's Git Bash can prepend `[200~`:
+`bind 'set enable-bracketed-paste off'` first.
 
 Still open, none blocking: the move from Funny One's old address is unchecked in Safari and
 Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` name — worth
-re-encoding now that Funny One downloads them too; Funny One's six new strings and its privacy
-policy outside English are machine drafts; real Funny One icons before any announcement or
-listing (also blocks A3 in `docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any
-launch announcement; T-7.1's iPhone install leg (closes Gate 7), now run together with B-14's
-device list on a borrowed iPhone; B-8 — answered for Funny Multi's TWA (no warning, Step 59),
-open for a direct PWA/WebAPK install and for Funny One's app (installed and "tested ok", Step 66,
-but no Play Protect result was itemized); whether to
-delete the unused 32-bit JDK at `~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it
-until the owner brings it up); the Arm VM retry; Caddy's "Caddyfile input is not formatted"
-warning (`caddy fmt` would settle it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
-`packages/shared/src/prompt.ts:81`; a mid-game
-reload-on-update risk in both clients' `swReload.ts`; the exported story picture's Hebrew text
-rendering LTR instead of RTL; all non-`en`/`ru` `home.title`s in both clients await
-native-speaker review; whether CI should run `npm audit` (owner decision — a local gate today);
-a script enforcing Step 53's audit rule (optional, not approved); Tailwind 4 and
-typescript-eslint 8 as tasks of their own (Tailwind 4 raises the browser floor — a product
-decision); B-11 (hub site, and whether it should host the privacy policy instead of each game's
-own root); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47).
+re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
+Funny One's six new strings and its privacy policy outside English are machine drafts; real
+Funny One icons before any announcement or listing (also blocks A3 in
+`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement;
+T-7.1's iPhone install leg (closes Gate 7), now run together with B-14's device list on a
+borrowed iPhone; B-8 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct
+PWA/WebAPK install and for Funny One's app (T-FO-7.1 records it); whether to delete the unused
+32-bit JDK at `~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it until the owner
+brings it up); the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt`
+would settle it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
+`packages/shared/src/prompt.ts:81`; a mid-game reload-on-update risk in both clients'
+`swReload.ts`; the exported story picture's Hebrew text rendering LTR instead of RTL; all
+non-`en`/`ru` `home.title`s in both clients await native-speaker review; whether CI should run
+`npm audit` (owner decision — a local gate today); a script enforcing Step 53's audit rule
+(optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of their own (Tailwind 4
+raises the browser floor — a product decision; it is also the only fix for
+GHSA-rj75-hqrm-r3gf); B-11 (hub site, and whether it should host the privacy policy instead of
+each game's own root); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); a player's
+report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68).
+

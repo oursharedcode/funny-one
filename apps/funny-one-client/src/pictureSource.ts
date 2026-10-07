@@ -20,6 +20,7 @@
 
 import { buildPrompt } from '@funny/shared';
 import type { Story } from '@funny/shared';
+import { isBlockedPicture } from './pictureBlocklist';
 
 export type PictureSource = 'builtin' | 'online';
 
@@ -65,8 +66,9 @@ export function storePictureSource(source: PictureSource): void {
 /**
  * The library address of `story`'s picture, or `null` when there is none to
  * ask for: no library in this build, a story with an unfilled visual slot
- * (`buildPrompt` throws), or no `crypto.subtle` (a page not served over
- * HTTPS). `null` always means "draw the rig".
+ * (`buildPrompt` throws), no `crypto.subtle` (a page not served over HTTPS),
+ * or a picture the review blocklisted (`pictureBlocklist.ts`). `null` always
+ * means "draw the rig".
  *
  * The key must match `cloudflare/worker.js`'s `imageKey` to the character —
  * sha256 of the UTF-8 prompt, lower-case hex — and the prompt must be the one
@@ -79,6 +81,7 @@ export async function libraryPictureUrl(story: Story): Promise<string | null> {
     const bytes = new TextEncoder().encode(buildPrompt(story));
     const digest = await crypto.subtle.digest('SHA-256', bytes);
     const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (isBlockedPicture(hex)) return null;
     return `${base}/i/${hex}.png`;
   } catch {
     return null;

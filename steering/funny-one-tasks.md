@@ -174,7 +174,35 @@ external wait time, elapsed time rather than effort).
       remembered choice, library down, device offline). **Deployed 2026-10-05**; the production
       library answered 200 at three keys computed the client's way. *Open:* acceptance Part E
       on the owner's phone (now part of T-FO-7.1's sign-off); the FO-ID-1 decision before any
-      Play listing.
+      Play listing — *taken 2026-10-06, see T-FO-8.2.*
+- [x] **T-FO-8.2 (M)** *Filed 2026-10-06 (owner decision: review the whole library for a
+      Families audience with free automated tools, rather than leave D-10's option out of the
+      store app) — closes FO-ID-1.* `docs/PICTURE_REVIEW.md` (criteria from Play's Families
+      policy and the content-rating questionnaire, method, results); `scripts/picture-review/`
+      (manifest of the 10⁴ keys, fetch, CLIP + NSFW scoring, contact sheets — CPU only, free);
+      `apps/funny-one-client/src/pictureBlocklist.ts` — the client draws the rig for a
+      blocklisted key and never requests it, each entry held to its key by a unit test.
+      *Step 68 (2026-10-07/08):* all 10,000 pictures fetched and scored, 1,245 looked at by the
+      agent (every classifier's top of the list plus a random 398 with 0 fails); 10 borderline
+      pictures (A–J) put to the owner on one sheet — the agent recommended blocking 3 (two red
+      splashes that read as blood, one ambiguous emblem), **the owner blocked all 10**
+      (2026-10-07: a Spain-like flag, a title-like gibberish caption, five knight props pointed
+      at the partner, besides the three). Checked in a phone-sized Chromium against the real
+      `worker.js` run locally: the blocked story draws the rig with no request, its neighbour
+      shows the library picture. *Open:* the deploy — `deploy/ship-funny-one.sh` was refused by
+      the agent's permission mode on 2026-10-07, so the owner runs it (no TWA rebuild needed:
+      the app loads the site).
+- [ ] **T-FO-8.3 (S)** *Filed 2026-10-07 (owner: "file it") — the same Families-audience
+      review for Funny One's own art, the rig.* The rig is 109 hand-drawn SVG layers in
+      `apps/funny-one-client/src/components/art/rig/` (`RIG_ART.md`), composited by fixed
+      geometry — nothing a model drew, so no classifiers: a look by eye at (1) every layer
+      alone on contact sheets and (2) a random sample of ~200 composited stories rendered
+      through `rigExport.ts`, for accidental reads where a `did` prop or `why` bubble lands over
+      a character. A grep already finds only the pirate's skull-and-crossbones hat badge and a
+      fork-and-knife cutlery bubble. Recorded as a section of `docs/PICTURE_REVIEW.md` — the
+      rig is the store app's default and offline picture, so it is part of the content-rating
+      evidence. Any fix is an SVG edit, not a blocklist entry. Agent-only, free, one short
+      session; waits on Step 68's commit (own scope, own step).
 
 ## Phase S — store apps AND37/IOS37 (both products; see `steering/tasks.md` B-1/B-2)
 
@@ -217,10 +245,12 @@ the web app in Safari (`steering/tasks.md` B-14).*
         `assetlinks.json`; the owner installed the signed APK on the phone and reported it
         tested OK. *Not itemized by the owner:* URL bar, Play Protect warning (B-8),
         airplane-mode start — recorded when T-FO-7.1's pass runs, or when the owner says.
-  - [ ] **S-3c (M)** Funny One's Play listing. Waits on three things: the Play account (B-1e,
-        Equifax); the FO-ID-1 decision (leave D-10's Internet pictures out of the store app via
-        `?shell=android`, or review the library for a Families audience); real icons — the app
-        carries the web game's placeholders. Then the store assets, content rating, Data
+  - [ ] **S-3c (M)** Funny One's Play listing. Waits on two things: the Play account (B-1e,
+        Equifax); real icons — the app carries the web game's placeholders. ~~The FO-ID-1
+        decision~~ taken 2026-10-06: the library was reviewed for a Families audience
+        (T-FO-8.2, `docs/PICTURE_REVIEW.md`), so the store app keeps D-10's Internet pictures.
+        Then the store assets, content rating (the review is the evidence behind the
+        questionnaire's violence/blood/fear answers), Data
         Safety form and release, as B-1e does for Funny Multi. With Play App Signing on, add
         Google's fingerprint to `deploy/origin-root/funny1/.well-known/assetlinks.json` and
         uninstall the sideloaded copy before the Play one replaces it (Step 59).

@@ -121,3 +121,43 @@ all six requests answered 200, no console errors (`.screens/fo-blocklist-check.m
 agent's reading of 1,245 pictures, the classifiers' reading of 10,000 and the owner's of the ten; the content-rating
 questionnaire is still the owner's to answer, and anything a player reports goes on the blocklist
 the same way.
+
+## Rig art (T-FO-8.3)
+
+**Why.** The rig — Funny One's own hand-drawn art — is the store app's default and offline
+picture: shown whenever a player has no network, *From the Internet* is off, or a story's picture
+is blocklisted (above). It is content-rating evidence the same way the library is. Filed
+2026-10-07 (owner: "file it").
+
+**Scope.** All 109 SVG files under `apps/funny-one-client/src/components/art/rig/`: 106 pool-id
+art components (40 scene assets — `who`/`with`/`where`/`did`, 10 each — plus 66 overlay icons —
+`when`/`why`/`end`, 22 each) and the 3 shared decoration shapes they draw on (`when/Plate.tsx`,
+`why/Bubble.tsx`, `end/Seal.tsx`). Nothing here was model-drawn, so the Criteria table above still
+applies but no classifier does — every judgement is by eye.
+
+**Method.** `scripts/picture-review/rig-sheets.mjs` — no new rendering path: it starts the real
+app's Vite dev server and drives it with headless Chromium, then
+
+1. rasterizes every one of the 109 files alone (the real `renderToStaticMarkup` + the
+   already-exported `sizedSvgDataUri` from `rigExport.ts`), tiled with labels into 2 contact
+   sheets;
+2. builds 200 random stories and composites each through the actual `buildStoryImageFile` (the
+   same function the app's share/download button calls), cropped to the rig's own 800×600 before
+   the prose/QR footer, tiled into 5 more sheets — the pass that could catch a `when` badge,
+   `why` bubble or `end` stamp landing over a character in a way that reads wrong.
+
+Output lives in the ignored `.picture-review/rig/` (`layers-01/02.png`, `composites-01..05.png`,
+`composites.json` — the 200 stories' answer ids, for tracing a flag back to its combination).
+
+**Results.** All 109 layers viewed at full sheet resolution; all 200 composites viewed the same
+way. Two files were worth a second look going in — a source grep for weapon-adjacent words turned
+up "skull-and-crossbones" (`who/GrumpyPirate.tsx`) and "fork" (`did/EatingSpaghetti.tsx`,
+`when/AfterBreakfast.tsx`, `why/SimplyHungry.tsx`) — both read clean on inspection: the pirate's
+"skull-and-crossbones badge" is a single unmarked cream circle (no skull or crossbones actually
+drawn), and every "fork" is an ordinary breakfast/spaghetti utensil, not a weapon. No overlay in
+any of the 200 composites lands over a character's face or body; the badge/bubble/stamp corners
+(top-left/top-middle/top-right) and the centred `did` prop never collide with `who`/`with` in a
+way that reads as anything but the intended goofy scene.
+
+**Verdict.** The rig is fit for a Families audience as drawn — **0 fails, 0 watches, no SVG edit
+needed.** T-FO-8.3 is closed with no remediation; `RIG_ART.md` is unchanged.

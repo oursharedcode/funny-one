@@ -3278,15 +3278,56 @@ two accepted IDs. `npm view braces version` 3.0.3. CI: after the push.
 
 ---
 
+## Step 69 (task T-FO-8.3) — Funny One's rig art reviewed for a Families audience; 0 fails, 0 watches (2026-10-09)
+
+**Owner instruction 2026-10-09 (morning plan):** "No decisions yet, start step 69" — the three
+decisions raised in the morning plan (deploy Step 68's blocklist; the pirate/cutlery grep hits;
+where a hypothetical rig fix would land) stayed open; the agent-only review itself did not wait
+on them.
+
+**Shipped:**
+
+- `scripts/picture-review/rig-sheets.mjs` — no new rendering path: starts the real app's Vite
+  dev server and drives it with headless Chromium, then (1) rasterizes all 109 SVG files alone
+  (`renderToStaticMarkup` + the already-exported `sizedSvgDataUri` from `rigExport.ts`, behind a
+  temporary `src/__reviewHarness.ts` written for the run and deleted after) onto 2 labelled
+  contact sheets, and (2) composites 200 random stories through the real `buildStoryImageFile`
+  — the same function the app's share/download button calls — cropped to the rig's own 800×600
+  before the prose/QR footer, onto 5 more sheets. Output lives in the ignored
+  `.picture-review/rig/` (`composites.json` keeps the 200 stories' answer ids for tracing a flag
+  back to its combination).
+- `docs/PICTURE_REVIEW.md` — a `## Rig art (T-FO-8.3)` section: why, scope (all 109 files),
+  method, results, verdict.
+
+**Results.** All 109 layers viewed at full sheet resolution, all 200 composites the same way.
+Two files were worth a second look going in — a source grep for weapon-adjacent words had found
+"skull-and-crossbones" (`who/GrumpyPirate.tsx`) and "fork" (`did/EatingSpaghetti.tsx` and two
+others) — both read clean: the pirate's badge is a single unmarked circle, no skull or
+crossbones actually drawn; every "fork" is an ordinary breakfast/spaghetti utensil. No overlay
+in any of the 200 composites lands over a character's face or body in a way that reads as
+anything but the intended goofy scene. **0 fails, 0 watches — no SVG edit needed.** T-FO-8.3 is
+closed with no remediation; `RIG_ART.md` is unchanged.
+
+Gates: typecheck 0, lint 0; `format:check` needed one `prettier --write` on the new script,
+then clean; `npm test` outside the sandbox — one lone failure
+(`funny-multi-server`'s `room:join > broadcasts lobby:update to players already in the room`,
+a real-socket timing test untouched by this step) re-run alone, 30/30 passed, so machine
+contention, not a regression; full suite otherwise green; `npm audit --omit=dev` 0, full audit
+still only the two accepted IDs (`braces`, `postcss-selector-parser`). CI: after the push.
+
+---
+
 ~~RESUME HERE (after Step 66)~~ — carried into this note.
 
-**RESUME HERE (2026-10-08, after Step 68).** **Both games are live on hosts of their own:**
+**RESUME HERE (2026-10-09, after Step 69).** **Both games are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward). Funny One's Android app (`com.oursharedcode.funny1`) is signed and installed on
 the owner's phone (Step 66). **FO-ID-1 is decided and done (Step 68): the picture library was
 reviewed for a Families audience and the ten pictures the owner saw are blocklisted in the
-client — committed, not yet deployed.**
+client — committed, not yet deployed. T-FO-8.3 is also done (Step 69): the rig — Funny One's
+own art, its default/offline picture — was reviewed the same way, 0 fails and 0 watches in 109
+layers and 200 composites; no SVG edit needed.**
 
 **Next, in order, the owner's:** (1) the deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -3296,11 +3337,7 @@ until then; (2) the T-FO-7.1 phone pass in the signed app, one op per message: o
 `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL bar and Play Protect
 (B-8) for Funny One's app and signs off Gate FO.
 
-**Next agent-only step: T-FO-8.3 (S), Step 69** — the same Families review for the rig, Funny
-One's own art (filed 2026-10-07 on the owner's "file it"): 109 hand-drawn SVG layers, so by eye
-only — every layer alone on contact sheets, plus ~200 random composited stories through
-`rigExport.ts` for accidental overlaps; a section in `docs/PICTURE_REVIEW.md`; any fix is an
-SVG edit. It can run while the owner's two items wait.
+No agent-only step is queued. The next one waits on whichever owner item above lands first.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video

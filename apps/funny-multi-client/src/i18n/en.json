@@ -22,7 +22,9 @@
     "openRooms": "Open rooms: {{count}}",
     "imagesToday": "Up to {{total}} cartoons per day. Resets daily at 00:00 UTC.",
     "uiLanguage": "Tap to change the interface language",
-    "unsupportedLanguage": "This room is in a language this app version cannot play yet. Try updating the page, or create a new room."
+    "unsupportedLanguage": "This room is in a language this app version cannot play yet. Try updating the page, or create a new room.",
+    "multiLanguage": "Multi-language room",
+    "multiLanguageHint": "Each player plays in the language picked with the flags above."
   },
   "lobby": {
     "roomCodeLabel": "Room code",

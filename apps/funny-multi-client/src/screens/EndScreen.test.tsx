@@ -8,9 +8,11 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { POOLS, SLOT_COUNT } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
-import type { GalleryReadyPayload, Player, SupportConfig } from '@funny/shared';
+import { renderStory } from '../storyLanguage';
+import type { GalleryReadyPayload, Player, SlotIndex, SupportConfig } from '@funny/shared';
 import type { LobbyState } from '../App';
 
 const NO_RAILS: SupportConfig = {
@@ -36,10 +38,16 @@ function lobby(overrides: Partial<LobbyState> = {}): LobbyState {
     socketId: 's0',
     hostId: 's0',
     language: 'en',
+    multiLanguage: false,
+    myLanguage: 'en',
     players: players({ id: 's0' }, { id: 's1' }, { id: 's2' }),
     ...overrides,
   };
 }
+
+// Real option ids, so a story can be retold in another language (B-15); the
+// answers and prose beside them are the room-language texts, shortened.
+const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0]!.id);
 
 const GALLERY: GalleryReadyPayload = {
   entries: [
@@ -48,6 +56,7 @@ const GALLERY: GalleryReadyPayload = {
       isBot: false,
       answers: ['a pirate'],
       prose: 'a pirate did stuff.',
+      optionIds: IDS,
       picture: null,
     },
   ],
@@ -60,6 +69,7 @@ const GALLERY_TWO: GalleryReadyPayload = {
       isBot: false,
       answers: ['a pirate'],
       prose: 'a pirate did stuff.',
+      optionIds: IDS,
       picture: { url: 'https://worker.example.com/i/p0.png', width: 1024, height: 768 },
     },
     {
@@ -67,6 +77,7 @@ const GALLERY_TWO: GalleryReadyPayload = {
       isBot: true,
       answers: ['a robot'],
       prose: 'a robot did other stuff.',
+      optionIds: IDS,
       picture: null,
     },
   ],
@@ -176,6 +187,18 @@ describe('room gallery display (RoomGallery)', () => {
     fireEvent.click(screen.getByLabelText('Previous story'));
     expect(screen.getByText("p1's story")).toBeTruthy();
     expect(screen.getByText('2 / 2')).toBeTruthy();
+  });
+
+  it("opens the stories in the player's own language in a multi-language room (B-15)", () => {
+    const { container } = renderEnd({
+      lobby: lobby({ language: 'en', multiLanguage: true, myLanguage: 'ru' }),
+      gallery: GALLERY_TWO,
+    });
+    const block = container.querySelector('div[lang]');
+    expect(block?.getAttribute('lang')).toBe('ru');
+    expect(block?.textContent).toBe(renderStory('ru', IDS).prose);
+    // The interface stays in its own language.
+    expect(screen.getByText('Room gallery')).toBeTruthy();
   });
 });
 

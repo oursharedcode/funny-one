@@ -59,8 +59,18 @@ void i18n.use(initReactI18next).init({
 // flex/grid layouts mirror automatically. Registered after init so it also
 // fires for the initial language.
 const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he']);
+
+/**
+ * Text direction of a language. Exported for B-15: a story shown in a
+ * language other than the interface's gets its own `dir`, so a Hebrew story
+ * reads right-to-left on an English screen and the other way round.
+ */
+export function textDirection(lng: string): 'rtl' | 'ltr' {
+  return RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
+}
+
 function applyDirection(lng: string): void {
-  document.documentElement.dir = RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
+  document.documentElement.dir = textDirection(lng);
 }
 i18n.on('languageChanged', applyDirection);
 applyDirection(i18n.language);

@@ -23,7 +23,9 @@
     "openRooms": "Offene Räume: {{count}}",
     "imagesToday": "Bis zu {{total}} Bilder pro Tag. Zurücksetzung täglich um 00:00 UTC.",
     "uiLanguage": "Tippen, um die Sprache der Oberfläche zu ändern",
-    "unsupportedLanguage": "Dieser Raum ist in einer Sprache, die diese App-Version noch nicht abspielen kann. Aktualisiere die Seite oder erstelle einen neuen Raum."
+    "unsupportedLanguage": "Dieser Raum ist in einer Sprache, die diese App-Version noch nicht abspielen kann. Aktualisiere die Seite oder erstelle einen neuen Raum.",
+    "multiLanguage": "Mehrsprachiger Raum",
+    "multiLanguageHint": "Jeder spielt in der oben per Flagge gewählten Sprache."
   },
   "lobby": {
     "roomCodeLabel": "Raumcode",

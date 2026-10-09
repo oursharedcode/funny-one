@@ -16,16 +16,24 @@
 //     either, only on the dev-only Test* screens this repo doesn't carry
 //     (design §3) — so it's received and otherwise unused here, same as SRC.
 //
+// B-15: the story opens in the player's own language (`defaultLanguage`) and
+// a switch beside the title retells it in any other; the picture stays as it
+// is, since it never carried text.
+//
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import ProseText from '../components/ProseText';
 import LogoStamp from '../components/LogoStamp';
+import StoryLanguageSwitch from '../components/StoryLanguageSwitch';
 import PictureFlourish from '../components/art/PictureFlourish';
 import WaitingMascot from '../components/art/WaitingMascot';
 import ErrorMascot from '../components/art/ErrorMascot';
 import { hoursUntilUtcMidnight } from '../capReset';
+import { textDirection } from '../i18n';
+import { storyIn } from '../storyLanguage';
 import type {
+  AuthoredLanguage,
   PictureRef,
   RevealPictureErrorCode,
   RevealPictureErrorPayload,
@@ -35,6 +43,10 @@ import type {
 
 interface Props {
   reveal: RevealStartPayload;
+  /** The language the server wrote `reveal.prose` in. */
+  roomLanguage: AuthoredLanguage;
+  /** The language the story opens in: App.tsx `myLanguage`. */
+  defaultLanguage: AuthoredLanguage;
   // Self-paced navigation to the end screen (spec §16 step 10).
   onContinue: () => void;
 }
@@ -46,8 +58,9 @@ type PictureStatus = 'loading' | 'ready' | 'error';
 // fast result never flashes a spinner.
 const WAIT_CONTROL_DELAY_MS = 3000;
 
-export default function RevealScreen({ reveal, onContinue }: Props) {
+export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, onContinue }: Props) {
   const { t } = useTranslation();
+  const [language, setLanguage] = useState<AuthoredLanguage>(defaultLanguage);
   const [status, setStatus] = useState<PictureStatus>('loading');
   const [picture, setPicture] = useState<PictureRef | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -100,11 +113,19 @@ export default function RevealScreen({ reveal, onContinue }: Props) {
       ? t('reveal.capReached', { hours: hoursUntilUtcMidnight() })
       : errorMsg || t('reveal.error');
 
+  const story = storyIn(reveal, roomLanguage, language);
+
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col gap-6 p-6">
-      <h2 className="font-display text-2xl font-semibold text-pink-500">{t('reveal.title')}</h2>
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="font-display text-2xl font-semibold text-pink-500">{t('reveal.title')}</h2>
+        <StoryLanguageSwitch value={language} onChange={setLanguage} />
+      </div>
 
-      <ProseText prose={reveal.prose} answers={reveal.answers} className="text-xl" />
+      {/* The story's own lang and dir, which can differ from the interface's. */}
+      <div lang={language} dir={textDirection(language)}>
+        <ProseText prose={story.prose} answers={story.answers} className="text-xl" />
+      </div>
 
       {status === 'ready' && picture ? (
         <div className="relative">

@@ -94,7 +94,12 @@ export function isValidLanguage(value: unknown): value is AuthoredLanguage {
   return typeof value === 'string' && (AUTHORED_LANGUAGES as readonly string[]).includes(value);
 }
 
-export function createRoom(nickname: string, language: Language, hostSocketId: string): Room {
+export function createRoom(
+  nickname: string,
+  language: Language,
+  hostSocketId: string,
+  multiLanguage = false,
+): Room {
   if (rooms.size >= getMaxRooms()) {
     throw new RoomError('SERVER_BUSY', 'Server at capacity. Please try again later.');
   }
@@ -106,6 +111,7 @@ export function createRoom(nickname: string, language: Language, hostSocketId: s
     code,
     hostId: hostSocketId,
     language,
+    multiLanguage,
     players: [player],
     phase: 'lobby',
     currentRound: 0,

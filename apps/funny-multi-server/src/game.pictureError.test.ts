@@ -62,6 +62,7 @@ function makeRoom(players: Player[], stories: Story[]): Room {
     code: 'ABCDEF',
     hostId: players[0]!.id,
     language: 'en',
+    multiLanguage: false,
     players,
     phase: 'reveal',
     currentRound: 7,

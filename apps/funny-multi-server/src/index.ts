@@ -300,7 +300,13 @@ export async function buildServer({
         return;
       }
       try {
-        const room = createRoom(v.nickname, payload.language, socket.id);
+        // Anything but a literal true is an ordinary room (B-15).
+        const room = createRoom(
+          v.nickname,
+          payload.language,
+          socket.id,
+          payload.multiLanguage === true,
+        );
         socket.join(room.code);
         ack({ roomCode: room.code, socketId: socket.id });
         broadcastLobby(room);
@@ -338,6 +344,7 @@ export async function buildServer({
           players: room.players,
           language: room.language,
           hostId: room.hostId,
+          multiLanguage: room.multiLanguage,
         });
         broadcastLobby(room);
       } catch (err) {

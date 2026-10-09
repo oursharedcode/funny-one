@@ -30,6 +30,8 @@ function lobbyState(over: Partial<LobbyState> = {}): LobbyState {
     socketId: 's0',
     hostId: 's0',
     language: 'en',
+    multiLanguage: false,
+    myLanguage: 'en',
     players: players(3),
     ...over,
   };
@@ -108,9 +110,29 @@ describe('invite link', () => {
     const url = new URL(writeText.mock.calls[0][0] as string);
     expect(url.searchParams.get('room')).toBe('WXYZ');
     expect(url.searchParams.get('lang')).toBe('ru');
+    expect(url.searchParams.has('multi')).toBe(false);
 
     // The flash confirms the success branch ran, not just the call.
     expect(await screen.findByText('Copied!')).toBeTruthy();
+  });
+
+  it('marks a multi-language room in the link and under the room code (B-15)', () => {
+    // `&multi=1` lets the join screen ask the invitee to pick their own
+    // language first; the join ack stays the authority on the room itself.
+    const writeText = stubClipboard();
+    renderLobby({ roomCode: 'WXYZ', language: 'ru', multiLanguage: true });
+
+    fireEvent.click(screen.getByText('Copy link'));
+
+    const url = new URL(writeText.mock.calls[0][0] as string);
+    expect(url.searchParams.get('lang')).toBe('ru');
+    expect(url.searchParams.get('multi')).toBe('1');
+    expect(screen.getByText('Multi-language room')).toBeTruthy();
+  });
+
+  it('shows no multi-language badge in an ordinary room', () => {
+    renderLobby();
+    expect(screen.queryByText('Multi-language room')).toBeNull();
   });
 
   it('encodes the same link in the QR code', () => {

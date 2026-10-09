@@ -8,24 +8,66 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, fireEvent } from '@testing-library/react';
+import { POOLS, SLOT_COUNT } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
-import type { RevealStartPayload } from '@funny/shared';
+import { renderStory } from '../storyLanguage';
+import type { AuthoredLanguage, RevealStartPayload, SlotIndex } from '@funny/shared';
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
 
 const { default: RevealScreen } = await import('./RevealScreen');
 
+// Real option ids, one per slot, so the story can be retold in any language
+// (B-15). The answers and prose beside them are the room-language texts the
+// server sent, shortened for readability; the screen shows them as they are
+// whenever the story is in the room language.
+const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0]!.id);
+
 const REVEAL: RevealStartPayload = {
   answers: ['a grumpy pirate', 'a battered toaster'],
   prose: 'Once upon a time, a grumpy pirate met a battered toaster.',
+  optionIds: IDS,
 };
 
 const PICTURE = { url: 'https://worker.example.com/i/abc.png', width: 1024, height: 1024 };
 
-function renderReveal(reveal: RevealStartPayload = REVEAL, onContinue = vi.fn()) {
-  return { onContinue, ...render(<RevealScreen reveal={reveal} onContinue={onContinue} />) };
+function renderReveal(
+  reveal: RevealStartPayload = REVEAL,
+  onContinue = vi.fn(),
+  defaultLanguage: AuthoredLanguage = 'en',
+) {
+  return {
+    onContinue,
+    ...render(
+      <RevealScreen
+        reveal={reveal}
+        roomLanguage="en"
+        defaultLanguage={defaultLanguage}
+        onContinue={onContinue}
+      />,
+    ),
+  };
+}
+
+/** The deployer logo over the picture. Found by its file, since the language switch's flag is an `alt=""` image too. */
+function logoStamp(): HTMLImageElement | undefined {
+  return (screen.queryAllByAltText('') as HTMLImageElement[]).find((img) =>
+    img.src.includes('/deployer-logo.png'),
+  );
+}
+
+/** The element holding the story's text, with its own lang and dir. */
+function storyBlock(container: HTMLElement): HTMLElement {
+  const block = container.querySelector<HTMLElement>('div[lang]');
+  if (!block) throw new Error('no story block');
+  return block;
+}
+
+function switchStoryTo(languageName: string): void {
+  fireEvent.click(screen.getByRole('button', { name: /^Story language/ }));
+  fireEvent.click(screen.getByTitle(languageName));
 }
 
 beforeEach(async () => {
@@ -97,14 +139,13 @@ describe('reveal:pictureReady', () => {
 
     const img = screen.getByAltText('AI-generated cartoon of your story');
     expect(img.className).toContain('opacity-0');
-    expect(screen.queryByAltText('')).toBeNull();
+    expect(logoStamp()).toBeUndefined();
 
     act(() => {
       fireEvent.load(img);
     });
     expect(img.className).toContain('opacity-100');
-    const stamp = screen.getByAltText('') as HTMLImageElement;
-    expect(stamp.src).toContain('/deployer-logo.png');
+    expect(logoStamp()).toBeDefined();
   });
 
   it('clears any prior waiting/error state once a picture lands', () => {
@@ -172,5 +213,48 @@ describe('continue', () => {
     const { onContinue } = renderReveal();
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('story language (B-15)', () => {
+  it("shows the server's own texts when the story is in the room language", () => {
+    const { container } = renderReveal();
+    const block = storyBlock(container);
+    expect(block.getAttribute('lang')).toBe('en');
+    expect(block.textContent).toBe(REVEAL.prose);
+    expect(
+      screen.getByRole('button', { name: 'Story language: English (United Kingdom)' }),
+    ).toBeTruthy();
+  });
+
+  it("opens the story in the player's own language in a multi-language room", () => {
+    const { container } = renderReveal(REVEAL, vi.fn(), 'ru');
+    const block = storyBlock(container);
+    expect(block.getAttribute('lang')).toBe('ru');
+    expect(block.textContent).toBe(renderStory('ru', IDS).prose);
+    // The interface stays in its own language.
+    expect(screen.getByText("Here's your story")).toBeTruthy();
+  });
+
+  it('retells the story in the language picked on the switch, and back', () => {
+    const { container } = renderReveal();
+
+    switchStoryTo('Français (France)');
+    expect(storyBlock(container).getAttribute('lang')).toBe('fr');
+    expect(storyBlock(container).textContent).toBe(renderStory('fr', IDS).prose);
+    // Picking closes the list.
+    expect(screen.queryByTitle('Deutsch (Deutschland)')).toBeNull();
+
+    switchStoryTo('English (United Kingdom)');
+    expect(storyBlock(container).textContent).toBe(REVEAL.prose);
+  });
+
+  it('gives a Hebrew story its own right-to-left direction on a left-to-right screen', () => {
+    const { container } = renderReveal();
+    expect(storyBlock(container).getAttribute('dir')).toBe('ltr');
+
+    switchStoryTo('עברית (ישראל)');
+    expect(storyBlock(container).getAttribute('dir')).toBe('rtl');
+    expect(document.documentElement.dir).toBe('ltr');
   });
 });

@@ -31,13 +31,24 @@ import ScrollBox from '../components/ScrollBox';
 import SubmitConfirm from '../components/art/SubmitConfirm';
 import { socket } from '../socket';
 import { snappy } from '../styles/motion';
-import { LANGUAGES, POOLS, POOL_TEXTS, isVisualSlot } from '@funny/shared';
+import { LANGUAGES, POOLS, POOL_TEXTS, QUESTIONS, isVisualSlot } from '@funny/shared';
 import type { AuthoredLanguage, OptionId, RoundStartPayload, SlotIndex } from '@funny/shared';
 
 interface Props {
   round: RoundStartPayload;
-  /** Room content language; `AuthoredLanguage` because every room has pools (App.tsx). */
+  /**
+   * The language the options come in: the room's content language, or this
+   * player's own in a multi-language room (App.tsx `myLanguage`).
+   * `AuthoredLanguage` because every language has pools.
+   */
   language: AuthoredLanguage;
+  /**
+   * B-15: the room is multi-language, so the question comes in `language` as
+   * well — from the same shared table the server reads (`QUESTIONS`), since
+   * `round.question` is in the room's language. The wire still carries only
+   * option ids, so answers picked in different languages make one story.
+   */
+  multiLanguage?: boolean;
   isHost: boolean;
 }
 
@@ -62,7 +73,7 @@ function shuffled<T>(items: readonly T[]): T[] {
   return out;
 }
 
-export default function RoundScreen({ round, language, isHost }: Props) {
+export default function RoundScreen({ round, language, multiLanguage = false, isHost }: Props) {
   const { t, i18n } = useTranslation();
   const slot = round.roundNumber as SlotIndex;
 
@@ -156,6 +167,9 @@ export default function RoundScreen({ round, language, isHost }: Props) {
     string[] | undefined;
   const questionGloss =
     i18n.language !== language ? glossQuestions?.[round.roundNumber] : undefined;
+  const question = multiLanguage
+    ? (QUESTIONS[language][round.roundNumber] ?? round.question)
+    : round.question;
 
   const storyLang = LANGUAGES.find((opt) => opt.code === language);
   // Prose slots carry 20–30 options and need their own scroll region; the
@@ -209,12 +223,13 @@ export default function RoundScreen({ round, language, isHost }: Props) {
       <p className="text-xs text-gray-600">
         {t('round.progress', { current: round.roundNumber + 1, total: TOTAL_ROUNDS })}
       </p>
-      <h2 className="font-display text-3xl font-semibold">{round.question}</h2>
+      <h2 className="font-display text-3xl font-semibold">{question}</h2>
       {questionGloss && <p className="text-base italic text-gray-500">{questionGloss}</p>}
 
       {/* Constant story-language indicator, joiners only (spec §8). The host
-          picked this language so they already know it. */}
-      {!isHost && storyLang && (
+          picked this language so they already know it, and so did every
+          player of a multi-language room (B-15). */}
+      {!isHost && !multiLanguage && storyLang && (
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="text-lg" aria-hidden="true">
             {storyLang.flag}

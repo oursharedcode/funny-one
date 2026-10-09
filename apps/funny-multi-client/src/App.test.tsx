@@ -16,9 +16,11 @@
 
 import { describe, expect, it, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
-import type { RevealStartPayload } from '@funny/shared';
+import { POOLS, POOL_TEXTS, QUESTIONS, SLOT_COUNT } from '@funny/shared';
+import type { RevealStartPayload, SlotIndex } from '@funny/shared';
 import { createSocketMock, setUrl } from './testutils/socketMock';
 import { screenSlide } from './styles/motion';
+import { renderStory } from './storyLanguage';
 import i18n from './i18n';
 
 const socketMock = createSocketMock();
@@ -26,9 +28,13 @@ vi.mock('./socket', () => ({ socket: socketMock }));
 
 const { default: App } = await import('./App');
 
+// Real option ids, so the story can be retold in another language (B-15).
+const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0]!.id);
+
 const REVEAL: RevealStartPayload = {
   answers: ['a grumpy pirate'],
   prose: 'A grumpy pirate and a haunted toaster were in a lighthouse.',
+  optionIds: IDS,
 };
 
 /** Render App and take it as far as the lobby, which most phases require. */
@@ -193,6 +199,40 @@ describe('phase routing', () => {
     expect(
       screen.getAllByRole('radio').filter((r) => r.getAttribute('aria-checked') === 'true'),
     ).toHaveLength(0);
+  });
+});
+
+describe('multi-language room (B-15)', () => {
+  it("plays a joiner's round and story in their own language, not the room's", async () => {
+    setUrl('?room=WXYZ&lang=ru&multi=1');
+    const { container } = render(<App />);
+    // The link paints the join screen in Russian; this joiner taps English.
+    await act(async () => {});
+    await act(async () => {
+      fireEvent.click(screen.getByTitle('English (United Kingdom)'));
+    });
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'joiner' } });
+    fireEvent.click(screen.getByText('Join room'));
+    socketMock.ackFor('room:join')({
+      socketId: 's2',
+      hostId: 's1',
+      language: 'ru',
+      multiLanguage: true,
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+    });
+
+    // The server asks in the room's language.
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Кто?', deadline: Date.now() });
+    expect(screen.getByRole('heading', { name: QUESTIONS.en[0] })).toBeTruthy();
+    expect(screen.getAllByRole('radio').map((r) => r.textContent)).toContain(
+      POOL_TEXTS.en[IDS[0]!],
+    );
+
+    // And tells the story in it too.
+    socketMock.fire('reveal:start', REVEAL);
+    const story = container.querySelector('div[lang]');
+    expect(story?.getAttribute('lang')).toBe('en');
+    expect(story?.textContent).toBe(renderStory('en', IDS).prose);
   });
 });
 

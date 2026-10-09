@@ -19,6 +19,7 @@ import {
   prepareRestart,
   resolveAnswers,
   startGame,
+  storyOptionIds,
   submitAnswer,
 } from './game.js';
 import type { Room } from './types.js';
@@ -291,10 +292,17 @@ describe('full simulated games', () => {
       const reveals = eventsFor('reveal:start');
       expect(reveals).toHaveLength(playerCount);
       for (const reveal of reveals) {
-        const payload = reveal.payload as { answers: string[]; prose: string };
+        const payload = reveal.payload as {
+          answers: string[];
+          prose: string;
+          optionIds: (OptionId | null)[];
+        };
         expect(payload.answers).toHaveLength(7);
         expect(payload.answers.every((a) => a.length > 0)).toBe(true);
         expect(payload.prose.length).toBeGreaterThan(0);
+        // B-15: the player's own story's ids travel with its texts.
+        const own = Number(reveal.target.slice(1));
+        expect(payload.optionIds).toEqual(room.stories[own]!.answers);
       }
     });
   }
@@ -360,6 +368,21 @@ describe('reveal resolution (DD-1)', () => {
     const { io } = makeIo();
     startGame(room, io);
     expect(resolveAnswers(room, room.stories[0])).toEqual(['', '', '', '', '', '', '']);
+  });
+
+  it('copies the ids for the wire, null for an unfilled slot (B-15)', () => {
+    const room = makeRoom(3);
+    const { io } = makeIo();
+    startGame(room, io);
+    const story = room.stories[0]!;
+    story.answers[0] = optionAt(0, 0);
+
+    const ids = storyOptionIds(story);
+    expect(ids).toEqual([optionAt(0, 0), null, null, null, null, null, null]);
+    // A copy: a later write to the room's story does not reach a sent payload.
+    story.answers[1] = optionAt(1, 0);
+    expect(ids[1]).toBeNull();
+    expect(storyOptionIds(undefined)).toEqual([null, null, null, null, null, null, null]);
   });
 });
 

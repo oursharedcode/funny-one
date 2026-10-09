@@ -129,6 +129,8 @@ Everything in this section is inherited from the source spec v4 unless marked **
 ### Rounds and rotation
 - **FM-CORE-5 (MUST)** 7 questions in the source order (Who? / And who else? / Where? / When? /
   What did they do? / What for? / What happened in the end?), localized per room language.
+  *Note (B-15, 2026-10-09): in a multi-language room — a box the host ticks — each player gets
+  the questions, options and stories in their own language instead (design DD-13).*
 - **FM-CORE-6 (MUST)** Story rotation formula `storyIndex(P, R, N) = (P − R + N) mod N`,
   identical to the source implementation, covered by unit tests before UI work starts.
 - **FM-CORE-7 (MUST)** 60-second round timer (env-tunable `ROUND_DURATION_MS`), timer bar UI,

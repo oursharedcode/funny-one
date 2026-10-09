@@ -46,8 +46,12 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
   }, []);
 
   // Carry the room language so the invitee's join screen renders in it from the
-  // first paint (HomeScreen reads `?lang=`). The QR code encodes the same URL.
-  const joinUrl = `${homeUrl()}?room=${lobby.roomCode}&lang=${lobby.language}`;
+  // first paint (HomeScreen reads `?lang=`), and `&multi=1` for a
+  // multi-language room (B-15) so that screen can tell the invitee to pick
+  // their own language first. The QR code encodes the same URL.
+  const joinUrl = `${homeUrl()}?room=${lobby.roomCode}&lang=${lobby.language}${
+    lobby.multiLanguage ? '&multi=1' : ''
+  }`;
   const isHost = lobby.socketId === lobby.hostId;
   const canStart = lobby.players.length >= 3;
   const capReached = isCapReached(stats);
@@ -91,6 +95,9 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
         <p className="font-display text-5xl font-bold tracking-widest text-pink-500">
           {lobby.roomCode}
         </p>
+        {lobby.multiLanguage && (
+          <p className="text-sm font-semibold text-pink-600">{t('home.multiLanguage')}</p>
+        )}
       </div>
 
       <div className="flex flex-col items-center gap-2 rounded bg-white p-4">

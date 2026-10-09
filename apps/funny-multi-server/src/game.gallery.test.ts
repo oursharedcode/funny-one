@@ -129,6 +129,18 @@ describe('buildGallery', () => {
       expect(gallery.entries[i]!.prose).toBe(revealProse(room, answers));
     });
   });
+
+  it("carries each story's option ids, for a client reading in another language (B-15)", () => {
+    const room = makeRoom(3);
+    room.players[2] = { ...room.players[2]!, isBot: true };
+    const { io } = makeIo();
+    playToReveal(room, io);
+
+    const gallery = buildGallery(room);
+    room.stories.forEach((story, i) => {
+      expect(gallery.entries[i]!.optionIds).toEqual(story.answers);
+    });
+  });
 });
 
 describe('shareGallery', () => {

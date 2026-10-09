@@ -136,6 +136,18 @@ describe('language validation', () => {
   });
 });
 
+describe('multi-language room (B-15)', () => {
+  it('is off unless the host asks for it', () => {
+    expect(createRoom('Ada', 'en', 'a').multiLanguage).toBe(false);
+    expect(createRoom('Bob', 'en', 'b', true).multiLanguage).toBe(true);
+  });
+
+  it('keeps its content language for the server-rendered texts', () => {
+    const room = createRoom('Ada', 'ru', 'a', true);
+    expect(room.language).toBe('ru');
+  });
+});
+
 describe('join guards', () => {
   it('rejects an unknown code', () => {
     expect(() => joinRoom('ZZZZZZ', 'Bob', 'bob')).toThrow(RoomError);

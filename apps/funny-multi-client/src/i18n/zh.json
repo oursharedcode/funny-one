@@ -23,7 +23,9 @@
     "openRooms": "开放房间: {{count}}",
     "imagesToday": "每天最多 {{total}} 张漫画。每天 00:00 UTC 重置。",
     "uiLanguage": "点击切换界面语言",
-    "unsupportedLanguage": "这个房间使用的语言是当前版本应用还不能显示的。请尝试刷新页面，或创建一个新房间。"
+    "unsupportedLanguage": "这个房间使用的语言是当前版本应用还不能显示的。请尝试刷新页面，或创建一个新房间。",
+    "multiLanguage": "多语言房间",
+    "multiLanguageHint": "每位玩家都使用上方旗帜所选的语言进行游戏。"
   },
   "lobby": {
     "roomCodeLabel": "房间代码",

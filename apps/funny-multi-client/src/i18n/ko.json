@@ -23,7 +23,9 @@
     "openRooms": "열린 방: {{count}}",
     "imagesToday": "하루 최대 {{total}}개의 이미지. 매일 00:00 UTC에 초기화됩니다.",
     "uiLanguage": "탭하여 인터페이스 언어 변경",
-    "unsupportedLanguage": "이 방은 이 앱 버전에서 아직 지원하지 않는 언어로 되어 있습니다. 페이지를 새로고침하거나 새 방을 만들어 보세요."
+    "unsupportedLanguage": "이 방은 이 앱 버전에서 아직 지원하지 않는 언어로 되어 있습니다. 페이지를 새로고침하거나 새 방을 만들어 보세요.",
+    "multiLanguage": "다국어 방",
+    "multiLanguageHint": "각 플레이어는 위의 국기로 고른 언어로 플레이합니다."
   },
   "lobby": {
     "roomCodeLabel": "방 코드",

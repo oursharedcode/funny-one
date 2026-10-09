@@ -3317,9 +3317,95 @@ still only the two accepted IDs (`braces`, `postcss-selector-parser`). CI: after
 
 ---
 
-~~RESUME HERE (after Step 66)~~ — carried into this note.
+## Step 70 (task B-15) — Funny Multi: multi-language room and a story-language switch (2026-10-09)
 
-**RESUME HERE (2026-10-09, after Step 69).** **Both games are live on hosts of their own:**
+**Owner request 2026-10-09:** "For Funny Multi only, In The start window, add check box "multi
+language room". When the checkbox checked, every player in the game has user interface and the
+story questions /answers in his preselected language. At the end of the game each player has all
+stories in his preselected language by default. To the all stories page, to individual story,
+add a small control to switch the story to a language selected just on the page from the list of
+all languages (the same list we have at start window)". Filed as **B-15** in `steering/tasks.md`.
+The open points, read this way without asking back:
+
+- A player's "preselected language": the host's flag on the create screen; a joiner's interface
+  language on screen when they tap Join (the invite link's `&lang=`, or the flag they tapped).
+- "Individual story": each story in the room gallery, and also the player's own story on the
+  reveal screen, which comes first. The switch is in every Funny Multi room, box ticked or not —
+  the request put it on the stories page without tying it to the box.
+- The picture stays as it is in every language: it never carried text (DD-4).
+
+**Shipped:**
+
+- *Protocol and server* (`events.ts`, `rooms.ts`, `index.ts`, `game.ts`): `room:create` takes
+  `multiLanguage` (only a literal `true` counts, so an older client's room is an ordinary one);
+  the room keeps it and the `room:join` ack returns it; `reveal:start` and every gallery entry
+  now carry `optionIds`, the story's seven picks as ids (`storyOptionIds`). The server still asks,
+  resolves and tells everything in the room's one language — design §5, DD-13.
+- `apps/funny-multi-client/src/storyLanguage.ts` — `renderStory(language, optionIds)` takes the
+  server's steps (`POOL_TEXTS` → `renderProse` → `polishProse`) from the shared build, with an
+  unanswered slot as an empty answer; `storyIn` shows the server's texts as sent in the room's
+  language and renders any other. `CONTENT_LANGUAGES` and `isAuthoredLanguage` moved here from
+  Home.
+- `components/LanguageList.tsx` — Home's two flag lists were the same markup written twice; now
+  one component, also the one inside the switch.
+- `components/StoryLanguageSwitch.tsx` — a small button with the story's current flag; a tap
+  opens the 15 flags in a popover under it. Focus starts on the pressed flag; a pick or Escape
+  closes the list and hands focus back to the button; a tap outside closes it.
+- Home: the checkbox with a one-line hint, between the nickname and Create. The join screen shows
+  the same two lines when the link carries `&multi=1`, and its QR keeps it. A joiner of a
+  multi-language room keeps the interface language on screen (it is not switched to the room's),
+  and that becomes their language for the game (`LobbyState.myLanguage`). Lobby: the invite link
+  and its QR add `&multi=1`; "Multi-language room" under the code. The link only explains — the
+  join ack decides.
+- Round: in a multi-language room the question comes from `QUESTIONS[myLanguage]` and the options
+  in `myLanguage`; the joiner's story-language reminder is hidden.
+- Reveal and gallery open each story in `myLanguage`, with the switch beside the title and beside
+  "Story by …"; the story text carries its own `lang` and `dir`. The gallery remembers each
+  story's choice while it is open; download, share and the video take the language on screen.
+- Two new strings in all 15 catalogs (`home.multiLanguage`, `home.multiLanguageHint`); the switch
+  reuses `round.storyLanguage`. The 13 outside en/ru are machine drafts.
+- Tests: `storyLanguage.test.ts` (every language tells a whole story with no placeholder left; an
+  unanswered slot; room language against any other), `StoryLanguageSwitch.test.tsx`, and new
+  cases in the Home, Lobby, Round, Reveal, End, gallery, App and server tests.
+- Steering: B-15 in `tasks.md`; design §5, §8.1, §8.2 and §9 amended, DD-13 added; a note on
+  FM-CORE-5.
+
+**Verified in a browser:** `.screens/fm-multilang-check.mjs` (ignored) — the production build in
+Playwright's WebKit 26.6 at iPhone 14 size, the real server, pictures from the real `worker.js`
+run locally on 5185 (its row in the machine's port register now names this script). Anna hosts in
+English and ticks the box; Boris and Clara open the invite link and tap Русский and עברית. Round 1:
+"Who?", "Кто?" and "מי?", each with options in that language, the Hebrew page right-to-left.
+Reveal and gallery: every story in its reader's language, with matching `lang` and `dir`. The
+switch: Anna retold her story in 日本語; Clara, on her Hebrew screen, closed the list with a tap
+outside, then picked English — left-to-right text inside a right-to-left page; Boris switched
+gallery story 1 to French, downloaded its picture (a 72 KB PNG), stepped to story 2 (Russian, his
+default) and back (still French). Every open list fit the 390×664 screen, no flag covered, focus
+on the pressed flag, no sideways scroll. **0 problems**, no page or console error.
+
+**Seen on the way — older than B-15, not fixed, noted under B-15 in `tasks.md`:**
+
+- The French prose template prints "a/ont" literally (`packages/shared/src/i18n/fr.ts:19`, a
+  machine draft — B-3). Any player can now reach it by switching a story to French; the check
+  above did.
+- A downloaded story picture keeps its footer in the interface language when the story is in
+  another. Mixed cards were already possible: a joiner whose interface differs from the room's.
+- On a Hebrew round screen the timer's mascot sits over the start of "Round 1 of 7".
+- The client bundle's over-500 kB build warning predates B-15, which adds at most ≈ 16 KB
+  (unminified) of shared i18n modules to it.
+
+**Owed:** the deploy (`deploy/ship.sh`, on the owner's go); native review of the 13
+machine-drafted strings (with B-3); one real game on three phones in three languages.
+
+Gates: typecheck 0, lint 0, `format:check` clean after one `prettier --write` over five files;
+`npm test` outside the sandbox **958 passed** (318 + 233 + 164 + 190 + 53), exit 0; `npm audit
+--omit=dev` 0; full `npm audit` only GHSA-vfj7-8cjw-p6xm and GHSA-rj75-hqrm-r3gf (13 entries);
+`npm view braces version` 3.0.3. CI: after the push.
+
+---
+
+~~RESUME HERE (after Step 69)~~ — carried into this note.
+
+**RESUME HERE (2026-10-09, after Step 70).** **Both games are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward). Funny One's Android app (`com.oursharedcode.funny1`) is signed and installed on
@@ -3327,7 +3413,8 @@ the owner's phone (Step 66). **FO-ID-1 is decided and done (Step 68): the pictur
 reviewed for a Families audience and the ten pictures the owner saw are blocklisted in the
 client — committed, not yet deployed. T-FO-8.3 is also done (Step 69): the rig — Funny One's
 own art, its default/offline picture — was reviewed the same way, 0 fails and 0 watches in 109
-layers and 200 composites; no SVG edit needed.**
+layers and 200 composites; no SVG edit needed. B-15 is done too (Step 70): Funny Multi's
+multi-language room and its story-language switch — committed, not deployed.**
 
 **Next, in order, the owner's:** (1) the deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -3335,7 +3422,9 @@ owner runs it in Git Bash or grants it when asked; production serves the library
 until then; (2) the T-FO-7.1 phone pass in the signed app, one op per message: op 1 done
 (old-address icon removed), op 2 asked (app-list search), then the 18 checks of
 `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL bar and Play Protect
-(B-8) for Funny One's app and signs off Gate FO.
+(B-8) for Funny One's app and signs off Gate FO; (3) B-15's deploy, independent of (1) — Funny
+Multi's own `deploy/ship.sh ubuntu@152.69.166.212`, which ends any game in progress (rooms live
+in memory) — then one real game on three phones in three languages.
 
 No agent-only step is queued. The next one waits on whichever owner item above lands first.
 
@@ -3406,7 +3495,8 @@ binding anything new. Pasting a command into the owner's Git Bash can prepend `[
 Still open, none blocking: the move from Funny One's old address is unchecked in Safari and
 Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` name — worth
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
-Funny One's six new strings and its privacy policy outside English are machine drafts; real
+Funny One's six new strings and its privacy policy outside English, and Funny Multi's two B-15
+strings outside en/ru, are machine drafts; real
 Funny One icons before any announcement or listing (also blocks A3 in
 `docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement;
 T-7.1's iPhone install leg (closes Gate 7), now run together with B-14's device list on a
@@ -3423,5 +3513,9 @@ non-`en`/`ru` `home.title`s in both clients await native-speaker review; whether
 raises the browser floor — a product decision; it is also the only fix for
 GHSA-rj75-hqrm-r3gf); B-11 (hub site, and whether it should host the privacy policy instead of
 each game's own root); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); a player's
-report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68).
+report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68); three
+older flaws Step 70 brought into view — the French prose template's literal "a/ont"
+(`packages/shared/src/i18n/fr.ts:19`, B-3), a downloaded story picture's footer in the interface
+language under a story in another, and the timer's mascot over "Round 1 of 7" on a Hebrew round
+screen.
 

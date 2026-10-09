@@ -57,6 +57,15 @@ export interface LobbyState {
    * HomeScreen does the narrowing where the value enters the client (T-3.3).
    */
   language: AuthoredLanguage;
+  /** Whether the host ticked "multi-language room" (B-15); from the join ack for joiners. */
+  multiLanguage: boolean;
+  /**
+   * The language this player reads the questions, the options and the stories
+   * in by default: their own in a multi-language room (B-15), the room's in
+   * any other. The story-language switch on the reveal screen and in the
+   * gallery can still show a story in any language.
+   */
+  myLanguage: AuthoredLanguage;
   players: Player[];
 }
 
@@ -191,13 +200,21 @@ export default function App() {
         onOpenSupport={() => setSupportOpen(true)}
       />
     );
-  } else if (phase === 'reveal' && reveal) {
-    body = <RevealScreen reveal={reveal} onContinue={() => setPhase('end')} />;
+  } else if (phase === 'reveal' && reveal && lobby) {
+    body = (
+      <RevealScreen
+        reveal={reveal}
+        roomLanguage={lobby.language}
+        defaultLanguage={lobby.myLanguage}
+        onContinue={() => setPhase('end')}
+      />
+    );
   } else if (phase === 'writing' && round && lobby) {
     body = (
       <RoundScreen
         round={round}
-        language={lobby.language}
+        language={lobby.myLanguage}
+        multiLanguage={lobby.multiLanguage}
         isHost={lobby.socketId === lobby.hostId}
       />
     );

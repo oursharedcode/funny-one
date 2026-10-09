@@ -23,7 +23,9 @@
     "openRooms": "Salles ouvertes : {{count}}",
     "imagesToday": "Jusqu'à {{total}} images par jour. Réinitialisation chaque jour à 00h00 UTC.",
     "uiLanguage": "Touche pour changer la langue de l'interface",
-    "unsupportedLanguage": "Cette salle est dans une langue que cette version de l'application ne peut pas encore afficher. Essaie de recharger la page, ou crée une nouvelle salle."
+    "unsupportedLanguage": "Cette salle est dans une langue que cette version de l'application ne peut pas encore afficher. Essaie de recharger la page, ou crée une nouvelle salle.",
+    "multiLanguage": "Salle multilingue",
+    "multiLanguageHint": "Chaque joueur joue dans la langue choisie avec les drapeaux ci-dessus."
   },
   "lobby": {
     "roomCodeLabel": "Code de la salle",

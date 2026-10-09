@@ -10,8 +10,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { POOLS, SLOT_COUNT } from '@funny/shared';
 import i18n from '../i18n';
-import type { GalleryEntry } from '@funny/shared';
+import { renderStory } from '../storyLanguage';
+import type { AuthoredLanguage, GalleryEntry, SlotIndex } from '@funny/shared';
 
 const buildStoryImageFile = vi.fn();
 const downloadStoryImage = vi.fn();
@@ -28,11 +30,18 @@ vi.mock('../share', () => ({ canShareFiles, downloadFile, shareFiles }));
 
 const { default: RoomGallery } = await import('./RoomGallery');
 
+// Real option ids, one per slot, so a story can be retold in any language
+// (B-15); the answers and prose beside them are the room-language texts the
+// server sent, shortened for readability.
+const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0]!.id);
+const OTHER_IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][1]!.id);
+
 const WITH_PICTURE: GalleryEntry = {
   nickname: 'Mika',
   isBot: false,
   answers: ['a pirate'],
   prose: 'a pirate did stuff.',
+  optionIds: IDS,
   picture: { url: 'https://img.example/i/abc.png', width: 1024, height: 1024 },
 };
 
@@ -41,8 +50,34 @@ const NO_PICTURE: GalleryEntry = {
   isBot: true,
   answers: ['a robot'],
   prose: 'a robot did stuff.',
+  optionIds: OTHER_IDS,
   picture: null,
 };
+
+function renderGallery(entries: GalleryEntry[], defaultLanguage: AuthoredLanguage = 'en') {
+  return render(
+    <RoomGallery entries={entries} roomLanguage="en" defaultLanguage={defaultLanguage} />,
+  );
+}
+
+/** The deployer logo over the picture. Found by its file, since the language switch's flag is an `alt=""` image too. */
+function logoStamp(): HTMLImageElement | undefined {
+  return (screen.queryAllByAltText('') as HTMLImageElement[]).find((img) =>
+    img.src.includes('/deployer-logo.png'),
+  );
+}
+
+/** The element holding the story's text, with its own lang and dir. */
+function storyBlock(container: HTMLElement): HTMLElement {
+  const block = container.querySelector<HTMLElement>('div[lang]');
+  if (!block) throw new Error('no story block');
+  return block;
+}
+
+function switchStoryTo(languageName: string): void {
+  fireEvent.click(screen.getByRole('button', { name: /^Story language/ }));
+  fireEvent.click(screen.getByTitle(languageName));
+}
 
 beforeEach(async () => {
   await i18n.changeLanguage('en');
@@ -57,37 +92,36 @@ beforeEach(async () => {
 
 describe('empty gallery', () => {
   it('renders nothing for zero entries', () => {
-    const { container } = render(<RoomGallery entries={[]} />);
+    const { container } = renderGallery([]);
     expect(container.innerHTML).toBe('');
   });
 });
 
 describe('logo stamp', () => {
   it('overlays the deployer logo on a picture entry', () => {
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
-    const stamp = screen.getByAltText('') as HTMLImageElement;
-    expect(stamp.src).toContain('/deployer-logo.png');
+    renderGallery([WITH_PICTURE]);
+    expect(logoStamp()).toBeDefined();
   });
 
   it('is absent when the entry has no picture', () => {
-    render(<RoomGallery entries={[NO_PICTURE]} />);
-    expect(screen.queryByAltText('')).toBeNull();
+    renderGallery([NO_PICTURE]);
+    expect(logoStamp()).toBeUndefined();
   });
 });
 
 describe('download button', () => {
   it('offers the picture download label when a picture exists', () => {
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
     expect(screen.getByRole('button', { name: 'Download story and still picture' })).toBeTruthy();
   });
 
   it('falls back to a story-only label when there is no picture', () => {
-    render(<RoomGallery entries={[NO_PICTURE]} />);
+    renderGallery([NO_PICTURE]);
     expect(screen.getByRole('button', { name: 'Download story' })).toBeTruthy();
   });
 
   it('calls downloadStoryImage with the resolved picture URL', async () => {
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
     fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
     await waitFor(() => expect(downloadStoryImage).toHaveBeenCalledTimes(1));
     expect(downloadStoryImage).toHaveBeenCalledWith({
@@ -98,7 +132,7 @@ describe('download button', () => {
   });
 
   it('passes a null pictureUrl when the entry has no picture', async () => {
-    render(<RoomGallery entries={[NO_PICTURE]} />);
+    renderGallery([NO_PICTURE]);
     fireEvent.click(screen.getByRole('button', { name: 'Download story' }));
     await waitFor(() => expect(downloadStoryImage).toHaveBeenCalledTimes(1));
     expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ pictureUrl: null });
@@ -108,7 +142,7 @@ describe('download button', () => {
 describe('share button', () => {
   it('is absent when the platform cannot share files', () => {
     canShareFiles.mockReturnValue(false);
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
     expect(screen.queryByRole('button', { name: 'Share' })).toBeNull();
   });
 
@@ -116,7 +150,7 @@ describe('share button', () => {
     canShareFiles.mockReturnValue(true);
     const file = new File(['x'], 'x.png');
     buildStoryImageFile.mockResolvedValue(file);
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
 
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
 
@@ -138,7 +172,7 @@ describe('share button', () => {
     shareFiles.mockResolvedValue('unsupported');
     const file = new File(['x'], 'x.png');
     buildStoryImageFile.mockResolvedValue(file);
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
 
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
 
@@ -149,13 +183,13 @@ describe('share button', () => {
 describe('video button', () => {
   it('is absent without a picture even when video recording is supported', () => {
     isVideoRecordingSupported.mockReturnValue(true);
-    render(<RoomGallery entries={[NO_PICTURE]} />);
+    renderGallery([NO_PICTURE]);
     expect(screen.queryByRole('button', { name: 'Download 5s video' })).toBeNull();
   });
 
   it('is absent when video recording is unsupported even with a picture', () => {
     isVideoRecordingSupported.mockReturnValue(false);
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
     expect(screen.queryByRole('button', { name: 'Download 5s video' })).toBeNull();
   });
 
@@ -163,7 +197,7 @@ describe('video button', () => {
     isVideoRecordingSupported.mockReturnValue(true);
     const file = new File(['x'], 'x.webm');
     buildWobbleVideoFile.mockResolvedValue(file);
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
 
     fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
 
@@ -183,7 +217,7 @@ describe('video button', () => {
         resolveRecording = resolve;
       }),
     );
-    render(<RoomGallery entries={[WITH_PICTURE]} />);
+    renderGallery([WITH_PICTURE]);
 
     fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
 
@@ -203,9 +237,58 @@ describe('video button', () => {
 
 describe('prev/next navigation', () => {
   it('cycles through entries and updates the counter', () => {
-    render(<RoomGallery entries={[WITH_PICTURE, NO_PICTURE]} />);
+    renderGallery([WITH_PICTURE, NO_PICTURE]);
     expect(screen.getByText('1 / 2')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
     expect(screen.getByText('2 / 2')).toBeTruthy();
+  });
+});
+
+describe('story language (B-15)', () => {
+  it("shows the server's own texts while a story is in the room language", () => {
+    const { container } = renderGallery([WITH_PICTURE]);
+    expect(storyBlock(container).getAttribute('lang')).toBe('en');
+    expect(storyBlock(container).textContent).toBe(WITH_PICTURE.prose);
+  });
+
+  it("opens every story in the player's own language", () => {
+    const { container } = renderGallery([WITH_PICTURE, NO_PICTURE], 'ru');
+    expect(storyBlock(container).getAttribute('lang')).toBe('ru');
+    expect(storyBlock(container).textContent).toBe(renderStory('ru', IDS).prose);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(storyBlock(container).textContent).toBe(renderStory('ru', OTHER_IDS).prose);
+  });
+
+  it('switches one story only, and remembers it while the player browses', () => {
+    const { container } = renderGallery([WITH_PICTURE, NO_PICTURE]);
+
+    switchStoryTo('Deutsch (Deutschland)');
+    expect(storyBlock(container).textContent).toBe(renderStory('de', IDS).prose);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(storyBlock(container).getAttribute('lang')).toBe('en');
+    expect(storyBlock(container).textContent).toBe(NO_PICTURE.prose);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Previous story' }));
+    expect(storyBlock(container).getAttribute('lang')).toBe('de');
+    expect(storyBlock(container).textContent).toBe(renderStory('de', IDS).prose);
+  });
+
+  it('downloads, shares and records the story in the language on screen', async () => {
+    canShareFiles.mockReturnValue(true);
+    isVideoRecordingSupported.mockReturnValue(true);
+    renderGallery([WITH_PICTURE]);
+    switchStoryTo('Italiano (Italia)');
+    const prose = renderStory('it', IDS).prose;
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+
+    await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
+    expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ prose });
+    expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject({ prose });
+    expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({ prose });
   });
 });

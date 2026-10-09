@@ -89,7 +89,11 @@ export default function EndScreen({
       </h2>
 
       {gallery ? (
-        <RoomGallery entries={gallery.entries} />
+        <RoomGallery
+          entries={gallery.entries}
+          roomLanguage={lobby.language}
+          defaultLanguage={lobby.myLanguage}
+        />
       ) : isHost && !gameOver ? (
         <button
           className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white"

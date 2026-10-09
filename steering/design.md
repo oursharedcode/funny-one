@@ -246,6 +246,14 @@ the combobox for `(roundNumber, room.language)` locally. Client and server alway
 pool content because both import the same `packages/shared` build, deployed as one unit
 (server serves the client bundle, spec §14).
 
+**Amended 2026-10-09 (B-15, owner request — multi-language room, DD-13):** three fields, no new
+event. `RoomCreatePayload.multiLanguage?` (absent or anything but `true` = an ordinary room);
+`Room.multiLanguage`, returned in the `room:join` ack; and `optionIds: (OptionId | null)[]` —
+the story's seven picks as ids — on `reveal:start` and on every `GalleryEntry`, beside the
+room-language `answers`/`prose`, which are unchanged. `round:start` is still unchanged: in a
+multi-language room the client takes the question from the shared `QUESTIONS` table in its own
+player's language and ignores `question` (§8.1).
+
 ## 6. Server design — `apps/funny-multi-server`
 
 `game.ts` deltas (everything else per SRC):
@@ -414,11 +422,26 @@ reintroduce a free-text affordance).
 - 20–30-option prose slots scroll inside the list (ScrollBox component reused); visual slots
   (9–12) mostly fit one screen.
 
+**Amended 2026-10-09 (B-15, owner request):** in a multi-language room the question and the
+options come in the player's own language — App.tsx `myLanguage`: the host's create-mode flag,
+a joiner's interface language when they tap Join — and the joiner's story-language reminder is
+not shown (everyone picked their own). Picks made in different languages still build one story:
+the wire carries ids (DD-1). In an ordinary room `myLanguage` is the room's language.
+
 ### 8.2 RevealScreen / RoomGallery: URL images
 
 `reveal:pictureReady` now carries `PictureRef`. `<img src={url} width height>` with the SRC
 fade-in flourish; explicit dimensions prevent layout shift. Retry flow, CAP_REACHED caption,
 and error mascot unchanged. Gallery entries likewise.
+
+**Amended 2026-10-09 (B-15, owner request):** the reveal screen (beside the title) and every
+gallery story (beside its "story by" line) carry a small story-language switch in every Funny
+Multi room: a button showing the current flag that opens the start window's 15-flag list
+(`LanguageList`, shared with Home) in a popover; outside tap or Escape closes it. It retells
+the story on that device only and opens on `myLanguage`; the gallery remembers each story's
+choice while it is open. The story text carries its own `lang` and `dir`, so a Hebrew story
+reads right-to-left on an English screen and the other way round. Download, share and the video
+(§8.3) take the language on screen; the picture never carried text, so it does not change.
 
 ### 8.3 Download / share
 
@@ -457,6 +480,11 @@ without the monkey.
   exactly those authoring rules (`EN_WHY_CONNECTIVE`, `RU_WITH_PREPOSITION`,
   `RU_ENDING_MIN_WORDS`). `game.test.ts` re-derives SRC's own predicates and asserts no shipped
   text would trigger one, so the removal is a checked claim rather than an assumption.
+  **Amended 2026-10-09 (B-15):** the client renders prose too, for any language other than the
+  room's — `storyLanguage.ts` `renderStory` takes the server's steps (`POOL_TEXTS` →
+  `renderProse` → `polishProse`, as `resolveAnswers`/`revealProse` in `game.ts`) from the same
+  shared build, so both sides tell a story identically; in the room's language the server's
+  texts are shown as sent.
 - **Capitalisation is language-neutral** (T-2.3, carried over from T-1.5). SRC only polished
   Russian, so its English reveal opened lowercase. `polishProse(language, prose)` gives every
   language the opening capital, terminal period and space collapse; Russian additionally gets
@@ -624,3 +652,4 @@ device, is under `tasks.md` B-14.
 | DD-10 | ~~Premium as cap-bypass on the existing free path~~ Retired 2026-09-16 by D-6/D-7 — no premium tier; nothing was built | — |
 | DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $21 once (measured 2026-10-02; estimated ≈ $10); keys match because the same function makes them; free egress means no per-view cost |
 | DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |
+| DD-13 | Multi-language room (B-15): each client renders questions, options and stories in its player's language from option ids; the server keeps one language per room (§5, §8.1, §8.2, §9) | DD-1's ids already make a story language-free, so the server needs no per-player language and no new event, and a chain written in three languages is still one story; client and server ship as one build (DD-2), so they render a story identically |

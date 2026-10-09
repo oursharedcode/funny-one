@@ -23,7 +23,9 @@
     "openRooms": "Ruangan terbuka: {{count}}",
     "imagesToday": "Hingga {{total}} gambar per hari. Disetel ulang setiap hari pukul 00:00 UTC.",
     "uiLanguage": "Ketuk untuk mengganti bahasa antarmuka",
-    "unsupportedLanguage": "Ruangan ini menggunakan bahasa yang belum bisa dimainkan oleh versi aplikasi ini. Coba perbarui halaman, atau buat ruangan baru."
+    "unsupportedLanguage": "Ruangan ini menggunakan bahasa yang belum bisa dimainkan oleh versi aplikasi ini. Coba perbarui halaman, atau buat ruangan baru.",
+    "multiLanguage": "Ruangan multibahasa",
+    "multiLanguageHint": "Setiap pemain bermain dalam bahasa yang dipilih dengan bendera di atas."
   },
   "lobby": {
     "roomCodeLabel": "Kode ruangan",

@@ -63,9 +63,10 @@ export interface Story {
    * These are **option ids** (`who.grumpy-pirate`), not display text — the
    * language-neutral wire format from DD-1, which is what lets a room's content
    * language differ from any player's UI language. Ids resolve to text only at
-   * reveal, against the room language. Note that `RevealStartPayload.answers`
-   * and `GalleryEntry.answers` use the same field name for the *resolved texts*;
-   * see the warning on those types.
+   * reveal, against the room language — and, since B-15, on each client in a
+   * language of its own (`RevealStartPayload.optionIds`). Note that
+   * `RevealStartPayload.answers` and `GalleryEntry.answers` use the same field
+   * name for the *resolved texts*; see the warning on those types.
    */
   answers: (OptionId | null)[];
   // Set once, never overwritten.
@@ -84,6 +85,12 @@ export interface Room {
   // Content language: questions, pool texts and prose. Independent of the
   // language any individual player reads the UI in.
   language: Language;
+  // Multi-language room (B-15): every client plays and reads in its own
+  // player's language instead of `language`. Server-side nothing else changes —
+  // the wire already carries option ids (DD-1), so each client renders them in
+  // its own language from the same shared build; the server still renders
+  // `round:start.question` and the reveal/gallery texts in `language`.
+  multiLanguage: boolean;
   // Locked at game:start; order drives rotation.
   players: Player[];
   phase: RoomPhase;
@@ -135,6 +142,8 @@ export interface ErrorPayload {
 export interface RoomCreatePayload {
   nickname: string;
   language: Language;
+  // B-15. Absent (an older client) means false.
+  multiLanguage?: boolean;
 }
 
 export interface RoomCreateAck {
@@ -155,6 +164,8 @@ export type RoomJoinAck =
       players: Player[];
       language: Language;
       hostId: string;
+      // B-15: the joiner keeps its own language instead of taking `language`.
+      multiLanguage: boolean;
     };
 
 export interface RoundSubmitPayload {
@@ -204,7 +215,9 @@ export interface RoundStartPayload {
 // NOT on this payload. The client bundles the same @funny/shared build as the
 // server and renders the combobox for (roundNumber, room.language) locally, so
 // the protocol does not grow with pool size and the two sides cannot disagree
-// about pool content — they ship as one unit.
+// about pool content — they ship as one unit. The same holds for the question
+// in a multi-language room (B-15): each client shows `QUESTIONS[its own
+// language][roundNumber]` and ignores `question`.
 
 export interface RoundWaitingPayload {
   submitted: number;
@@ -222,6 +235,13 @@ export interface RevealStartPayload {
   answers: string[];
   // Rendered story in the room's language.
   prose: string;
+  /**
+   * The same 7 answers as **option ids** (`Story.answers`), so the client can
+   * re-render the story in any language from the shared build (B-15): the
+   * player's own language in a multi-language room, or whichever the
+   * on-page language switch picks.
+   */
+  optionIds: (OptionId | null)[];
 }
 
 export interface RevealPictureReadyPayload {
@@ -281,6 +301,9 @@ export interface GalleryEntry {
   answers: string[];
   // Rendered story in the room's language.
   prose: string;
+  // The answers as option ids, for re-rendering in another language — same
+  // contract as RevealStartPayload.optionIds above (B-15).
+  optionIds: (OptionId | null)[];
   // null when no picture exists — a bot slot, or a human whose generation was
   // skipped or failed.
   picture: PictureRef | null;

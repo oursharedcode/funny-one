@@ -10,7 +10,7 @@
 
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { POOLS, POOL_TEXTS, SLOT_COUNT, isVisualSlot } from '@funny/shared';
+import { POOLS, POOL_TEXTS, QUESTIONS, SLOT_COUNT, isVisualSlot } from '@funny/shared';
 import type { AuthoredLanguage, RoundStartPayload, SlotIndex } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
@@ -31,12 +31,13 @@ function roundPayload(over: Partial<RoundStartPayload> = {}): RoundStartPayload 
 
 function renderRound(
   over: Partial<RoundStartPayload> = {},
-  opts: { language?: AuthoredLanguage; isHost?: boolean } = {},
+  opts: { language?: AuthoredLanguage; multiLanguage?: boolean; isHost?: boolean } = {},
 ) {
   return render(
     <RoundScreen
       round={roundPayload(over)}
       language={opts.language ?? 'en'}
+      multiLanguage={opts.multiLanguage}
       isHost={opts.isHost ?? true}
     />,
   );
@@ -368,5 +369,29 @@ describe('joiner-only affordances (spec §8/§9)', () => {
 
     renderRound({ roundNumber: 0 }, { language: 'en', isHost: true });
     expect(screen.queryByText(/Story language/)).toBeNull();
+  });
+});
+
+describe('multi-language room (B-15)', () => {
+  it("asks the question and offers the options in the player's own language", async () => {
+    await i18n.changeLanguage('fr');
+    // The server's question is in the room's language, Russian here.
+    renderRound(
+      { roundNumber: 0, question: 'Кто?' },
+      { language: 'fr', multiLanguage: true, isHost: false },
+    );
+
+    expect(screen.getByRole('heading', { name: QUESTIONS.fr[0] })).toBeTruthy();
+    expect(screen.queryByText('Кто?')).toBeNull();
+    const expected = POOLS[0].map((o) => POOL_TEXTS.fr[o.id]);
+    expect(optionTexts().sort()).toEqual([...expected].sort());
+    // Every player picked their own language, so there is nothing to remind them of.
+    expect(screen.queryByText(/Français \(France\)/)).toBeNull();
+  });
+
+  it("keeps the server's question in an ordinary room", () => {
+    // Not a QUESTIONS entry, so only the payload can have put it there.
+    renderRound({ roundNumber: 0, question: 'Asked by the server' }, { language: 'ru' });
+    expect(screen.getByRole('heading', { name: 'Asked by the server' })).toBeTruthy();
   });
 });

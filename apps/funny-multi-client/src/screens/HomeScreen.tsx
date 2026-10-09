@@ -23,17 +23,27 @@
 // 4. The stats block was copied but inert at T-3.2 (`stats:get` had no server
 //    handler yet, so `stats` stayed null and the counter never rendered).
 //    T-5.3 wired the handler; no client change was needed to light it up.
+//
+// B-15 added the multi-language room: a create-mode checkbox, sent as
+// `multiLanguage` on `room:create`. In such a room each player reads the
+// interface, the questions, the options and the stories in their own language
+// — the host's is the flag picked here, a joiner's is the interface language
+// on screen when they tap Join — so a joiner's interface is not switched to the
+// room language on join. Both flag lists are `LanguageList`, the same list the
+// story-language switch opens on the reveal screen and in the gallery.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
-import { homeUrl, withBase } from '../basePath';
+import { homeUrl } from '../basePath';
 import Wordmark from '../components/art/Wordmark';
 import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
+import LanguageList from '../components/LanguageList';
 import { hasAnyRail } from '../support';
-import { AUTHORED_LANGUAGES, LANGUAGES, isLanguage } from '@funny/shared';
+import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
+import { LANGUAGES, isLanguage } from '@funny/shared';
 import type { LobbyState } from '../App';
 import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
 
@@ -45,24 +55,16 @@ interface Props {
   onOpenSupport?: () => void;
 }
 
-// Room-content languages: the subset of the registry whose answer pools are
-// authored. Derived from `LANGUAGES` rather than rebuilt from
-// `AUTHORED_LANGUAGES` so flag artwork, display order and country labels stay
-// in one place.
-const CONTENT_LANGUAGES = LANGUAGES.filter((opt) =>
-  (AUTHORED_LANGUAGES as readonly string[]).includes(opt.code),
-);
-
-function isAuthoredLanguage(value: string | null | undefined): value is AuthoredLanguage {
-  return typeof value === 'string' && (AUTHORED_LANGUAGES as readonly string[]).includes(value);
-}
-
 export default function HomeScreen({ onJoined, support = null, onOpenSupport = () => {} }: Props) {
   const { t, i18n } = useTranslation();
 
   const params = new URLSearchParams(window.location.search);
   const urlRoom = params.get('room')?.toUpperCase() ?? '';
   const urlLang = params.get('lang');
+  // The invite link of a multi-language room carries `&multi=1` (B-15), so the
+  // join screen can say so before the join. It only explains: whether the room
+  // is multi-language is the join ack's answer, not the link's.
+  const urlMulti = params.get('multi') === '1';
 
   const [mode, setMode] = useState<'create' | 'join'>(urlRoom ? 'join' : 'create');
   const [nickname, setNickname] = useState('');
@@ -72,6 +74,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   const [language, setLanguage] = useState<AuthoredLanguage>(
     isAuthoredLanguage(urlLang) ? urlLang : 'en',
   );
+  const [multiLanguage, setMultiLanguage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [roomGone, setRoomGone] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -139,13 +142,15 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   function create(): void {
     setError(null);
     setBusy(true);
-    socket.emit('room:create', { nickname: nickname.trim(), language }, (ack) => {
+    socket.emit('room:create', { nickname: nickname.trim(), language, multiLanguage }, (ack) => {
       setBusy(false);
       onJoined({
         roomCode: ack.roomCode,
         socketId: ack.socketId,
         hostId: ack.socketId,
         language,
+        multiLanguage,
+        myLanguage: language,
         players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
       });
     });
@@ -181,14 +186,23 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
         return;
       }
       const roomLanguage = ack.language;
-      // Default the joiner's UI to the room's content language — unless they
-      // explicitly cycled to a different one on this screen, which we preserve.
-      if (!uiLangTouched) void i18n.changeLanguage(roomLanguage);
+      const multi = ack.multiLanguage === true;
+      // In a multi-language room (B-15) the joiner plays in the language on
+      // screen now — the link's `&lang=` or the flag they tapped — so it is kept
+      // and becomes their story language too. Every language is authored since
+      // T-6.3; the guard only keeps the narrowing honest.
+      const myLanguage = multi && isAuthoredLanguage(i18n.language) ? i18n.language : roomLanguage;
+      // Otherwise default the joiner's UI to the room's content language —
+      // unless they explicitly cycled to a different one on this screen, which
+      // we preserve.
+      if (!multi && !uiLangTouched) void i18n.changeLanguage(roomLanguage);
       onJoined({
         roomCode: urlRoom,
         socketId: ack.socketId,
         hostId: ack.hostId,
         language: roomLanguage,
+        multiLanguage: multi,
+        myLanguage,
         players: ack.players,
       });
     });
@@ -239,38 +253,13 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               </ScrollBox>
             </div>
 
-            {/* Scrollable language list — right, narrower. Each row is a PNG
-                flag (works on every device, unlike emoji flags) followed by a
-                two-letter label. The static list ran the page off-screen on a
-                phone; clamp to h-40 so it scrolls within the same slot. */}
-            <ScrollBox
-              className="h-40 w-28"
-              contentClassName="flex flex-col gap-2 pe-2"
-              role="group"
-              aria-label="Language"
-            >
-              {CONTENT_LANGUAGES.map((opt) => (
-                <button
-                  key={opt.code}
-                  aria-pressed={language === opt.code}
-                  title={opt.name}
-                  className={`flex flex-shrink-0 items-center gap-2 rounded px-3 py-3 font-semibold ${
-                    language === opt.code
-                      ? 'bg-pink-500 text-white'
-                      : 'border border-amber-300 bg-white text-gray-800'
-                  }`}
-                  onClick={() => switchLanguage(opt.code as AuthoredLanguage)}
-                >
-                  <img
-                    src={withBase(`flags/${opt.code}.png`)}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-6 w-6 flex-shrink-0 object-contain"
-                  />
-                  <span>{opt.country}</span>
-                </button>
-              ))}
-            </ScrollBox>
+            {/* Scrollable language list — right, narrower (LanguageList). */}
+            <LanguageList
+              languages={CONTENT_LANGUAGES}
+              selected={language}
+              onSelect={switchLanguage}
+              label="Language"
+            />
           </div>
 
           <input
@@ -280,6 +269,21 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
             maxLength={20}
             onChange={(e) => setNickname(e.target.value)}
           />
+
+          {/* B-15: a multi-language room. The hint stays visible so the host
+              knows what ticking it does before they do. */}
+          <label className="flex w-full items-start gap-3 text-gray-800">
+            <input
+              type="checkbox"
+              className="mt-1 h-5 w-5 flex-shrink-0 accent-pink-500"
+              checked={multiLanguage}
+              onChange={(e) => setMultiLanguage(e.target.checked)}
+            />
+            <span>
+              <span className="font-semibold">{t('home.multiLanguage')}</span>
+              <span className="block text-sm text-gray-600">{t('home.multiLanguageHint')}</span>
+            </span>
+          </label>
 
           <button
             className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:bg-gray-300 disabled:text-gray-500"
@@ -325,7 +329,9 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               the left (centered title above a scrollable blurb), language picker
               on the right. Here the flags switch the interface language only
               (spec §8) — the room's content language is fixed by the host, so
-              this list stays at the full 15 registry entries. */}
+              this list stays at the full 15 registry entries. In a
+              multi-language room the language picked here is also the one this
+              player's questions, options and stories come in (B-15). */}
           <div className="flex w-full items-start gap-3">
             <div className="flex h-40 flex-1 flex-col overflow-hidden rounded border border-amber-300 bg-white text-gray-800">
               <div className="border-b border-amber-200 py-2 text-center font-semibold">
@@ -336,35 +342,22 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               </ScrollBox>
             </div>
 
-            <ScrollBox
-              className="h-40 w-28"
-              contentClassName="flex flex-col gap-2 pe-2"
-              role="group"
-              aria-label={t('home.uiLanguage')}
-            >
-              {LANGUAGES.map((opt) => (
-                <button
-                  key={opt.code}
-                  aria-pressed={i18n.language === opt.code}
-                  title={opt.name}
-                  className={`flex flex-shrink-0 items-center gap-2 rounded px-3 py-3 font-semibold ${
-                    i18n.language === opt.code
-                      ? 'bg-pink-500 text-white'
-                      : 'border border-amber-300 bg-white text-gray-800'
-                  }`}
-                  onClick={() => selectUiLanguage(opt.code)}
-                >
-                  <img
-                    src={withBase(`flags/${opt.code}.png`)}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-6 w-6 flex-shrink-0 object-contain"
-                  />
-                  <span>{opt.country}</span>
-                </button>
-              ))}
-            </ScrollBox>
+            <LanguageList
+              languages={LANGUAGES}
+              selected={i18n.language}
+              onSelect={selectUiLanguage}
+              label={t('home.uiLanguage')}
+            />
           </div>
+
+          {/* B-15: in a multi-language room the flags above also pick the
+              language this player's questions, options and stories come in. */}
+          {urlMulti && (
+            <div className="w-full text-center">
+              <p className="text-sm font-semibold text-pink-600">{t('home.multiLanguage')}</p>
+              <p className="text-sm text-gray-600">{t('home.multiLanguageHint')}</p>
+            </div>
+          )}
 
           <div className="w-full text-center">
             <p className="text-sm text-gray-600">{t('home.joining')}</p>
@@ -376,10 +369,13 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
           {/* Mirror the lobby's QR pattern: show the same join link as a QR
               so a joiner can pass their phone to nearby friends instead of
               re-typing the room code or chasing a fresh link. The encoded
-              URL preserves `?lang=` when present, matching LobbyScreen. */}
+              URL preserves `?lang=` and `&multi=1` when present, matching
+              LobbyScreen. */}
           <div className="flex flex-col items-center gap-2 rounded bg-white p-4">
             <QRCode
-              value={`${homeUrl()}?room=${urlRoom}${urlLang ? `&lang=${urlLang}` : ''}`}
+              value={`${homeUrl()}?room=${urlRoom}${urlLang ? `&lang=${urlLang}` : ''}${
+                urlMulti ? '&multi=1' : ''
+              }`}
               size={160}
             />
             <p className="text-xs text-gray-600">{t('lobby.qrCaption')}</p>

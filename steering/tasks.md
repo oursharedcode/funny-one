@@ -201,6 +201,28 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     lands, whether it plays and whether Photos or a chat app takes it; lock the phone mid-round
     for 30 s, then for 90 s, and see whether it is still in the room; play Funny One in
     airplane mode and export its picture.
+- **B-15** Multi-language room — Funny Multi only (owner request 2026-10-09). A "Multi-language
+  room" checkbox on the host's create screen. In such a room each player reads the interface,
+  each round's question and its options, and the stories at the end in their own language. Every
+  story — on the reveal screen and in the gallery, in any Funny Multi room — gets a small
+  story-language switch: it opens the start window's 15 flags and retells that story in the
+  language picked, on that phone only. **Code done 2026-10-09 (Step 70)**; played in WebKit at
+  iPhone size by three players in English, Russian and Hebrew. **Not deployed.**
+  - *A player's language:* the host's is the flag picked on the create screen; a joiner's is the
+    interface language on screen when they tap Join (the invite link's `&lang=`, or the flag they
+    tapped). In an ordinary room it stays the room's language, so nothing changes there.
+  - *How:* the server keeps one language per room and only records the box (`multiLanguage`,
+    returned in the join reply). Answers already travel as language-free option ids (DD-1), so
+    each phone retells a story in its own language from the shared pools and prose templates;
+    reveal and gallery now send each story's ids too. Design §5, §8.1, §8.2 and §9 amended,
+    DD-13 added; FM-CORE-5 noted.
+  - *Owed:* the deploy (`deploy/ship.sh`); the checkbox's two new strings are machine drafts in
+    13 languages (with B-3); one real game on three phones in three languages.
+  - *Seen on the way, older than B-15, not fixed:* the French prose template prints "a/ont"
+    literally (`packages/shared/src/i18n/fr.ts:19`, a machine draft — B-3), and any player can
+    now reach it by switching a story to French; a downloaded story picture keeps its footer in
+    the interface language when the story is in another; on a Hebrew round screen the timer's
+    mascot sits over the start of "Round 1 of 7".
 
 ## Dependency notes
 

@@ -357,11 +357,51 @@ describe('room:join', () => {
       players: { nickname: string }[];
       language: string;
       hostId: string;
+      multiLanguage: boolean;
     }>(joiner, 'room:join', { roomCode, nickname: 'Bob' });
 
     expect(ack.players.map((p) => p.nickname)).toEqual(['Ada', 'Bob']);
     expect(ack.language).toBe('ru');
     expect(ack.hostId).toBe(host.id);
+    expect(ack.multiLanguage).toBe(false);
+  });
+
+  it('tells the joiner when the host made a multi-language room (B-15)', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
+      nickname: 'Ada',
+      language: 'ru',
+      multiLanguage: true,
+    });
+
+    const joiner = await connect(h);
+    const ack = await emitWithAck<{ language: string; multiLanguage: boolean }>(
+      joiner,
+      'room:join',
+      { roomCode, nickname: 'Bob' },
+    );
+
+    expect(ack.multiLanguage).toBe(true);
+    expect(ack.language).toBe('ru');
+  });
+
+  it('treats a non-boolean multiLanguage as an ordinary room', async () => {
+    const h = await listen();
+    const host = await connect(h);
+    const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
+      nickname: 'Ada',
+      language: 'en',
+      multiLanguage: 'yes',
+    });
+
+    const joiner = await connect(h);
+    const ack = await emitWithAck<{ multiLanguage: boolean }>(joiner, 'room:join', {
+      roomCode,
+      nickname: 'Bob',
+    });
+
+    expect(ack.multiLanguage).toBe(false);
   });
 
   it('broadcasts lobby:update to players already in the room', async () => {

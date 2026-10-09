@@ -155,7 +155,49 @@ describe('room:create payload', () => {
 
     const [payload] = socketMock.onlyEmitOf('room:create').args;
     expect(payload).not.toHaveProperty('wobbleEngine');
-    expect(Object.keys(payload as object).sort()).toEqual(['language', 'nickname']);
+    expect(Object.keys(payload as object).sort()).toEqual([
+      'language',
+      'multiLanguage',
+      'nickname',
+    ]);
+  });
+
+  it('sends an ordinary room unless the host ticks the multi-language box (B-15)', () => {
+    const { onJoined } = renderHome();
+    expect(
+      (screen.getByRole('checkbox', { name: /Multi-language room/ }) as HTMLInputElement).checked,
+    ).toBe(false);
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+
+    expect(socketMock.onlyEmitOf('room:create').args[0]).toMatchObject({ multiLanguage: false });
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({
+      language: 'en',
+      multiLanguage: false,
+      myLanguage: 'en',
+    });
+  });
+
+  it("creates a multi-language room in which the host's own language is the flag picked here", async () => {
+    const { onJoined } = renderHome();
+    await chooseContentLanguage('fr');
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: new RegExp(i18n.t('home.multiLanguage')) }),
+    );
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText(i18n.t('home.create')));
+
+    expect(socketMock.onlyEmitOf('room:create').args[0]).toMatchObject({
+      language: 'fr',
+      multiLanguage: true,
+    });
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({
+      language: 'fr',
+      multiLanguage: true,
+      myLanguage: 'fr',
+    });
   });
 
   it('hands App a lobby state with no wobbleEngine and the created language', async () => {
@@ -230,10 +272,77 @@ describe('join flow', () => {
       hostId: 's1',
       // The host's choice wins over anything this screen had selected.
       language: 'ru',
+      multiLanguage: false,
       players: [{ id: 's1', nickname: 'hostie', isBot: false }],
     });
 
-    expect(onJoined.mock.calls[0][0]).toMatchObject({ roomCode: 'ABCD', language: 'ru' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({
+      roomCode: 'ABCD',
+      language: 'ru',
+      multiLanguage: false,
+      // An ordinary room: this player plays in the room language too.
+      myLanguage: 'ru',
+    });
+  });
+
+  it("keeps the joiner's own language in a multi-language room (B-15)", async () => {
+    setUrl('?room=abcd&lang=ru&multi=1');
+    const { onJoined } = renderHome();
+    // The link's language paints first; the joiner then taps their own flag.
+    await act(async () => {});
+    expect(i18n.language).toBe('ru');
+    await act(async () => {
+      fireEvent.click(screen.getByTitle('English (United Kingdom)'));
+    });
+    typeNickname('joiner');
+    fireEvent.click(screen.getByText('Join room'));
+
+    socketMock.ackFor('room:join')({
+      socketId: 's2',
+      hostId: 's1',
+      language: 'ru',
+      multiLanguage: true,
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+    });
+
+    expect(onJoined.mock.calls[0][0]).toMatchObject({
+      language: 'ru',
+      multiLanguage: true,
+      myLanguage: 'en',
+    });
+    // Not switched to the room language, as an ordinary room would be.
+    expect(i18n.language).toBe('en');
+  });
+
+  it("takes the link's language as the joiner's own when they tap no flag (B-15)", async () => {
+    setUrl('?room=abcd&lang=de&multi=1');
+    const { onJoined } = renderHome();
+    await act(async () => {});
+    typeNickname('joiner');
+    fireEvent.click(screen.getByText(i18n.t('home.join')));
+    socketMock.ackFor('room:join')({
+      socketId: 's2',
+      hostId: 's1',
+      language: 'de',
+      multiLanguage: true,
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+    });
+
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ language: 'de', myLanguage: 'de' });
+  });
+
+  it('tells the invitee of a multi-language room to pick their language first (B-15)', () => {
+    setUrl('?room=abcd&multi=1');
+    renderHome();
+    expect(screen.getByText('Multi-language room')).toBeTruthy();
+    expect(
+      screen.getByText('Each player plays in the language picked with the flags above.'),
+    ).toBeTruthy();
+  });
+
+  it('says nothing about languages to the invitee of an ordinary room', () => {
+    renderHome();
+    expect(screen.queryByText('Multi-language room')).toBeNull();
   });
 
   it('offers the escape hatch rather than a raw error when the room is gone', () => {

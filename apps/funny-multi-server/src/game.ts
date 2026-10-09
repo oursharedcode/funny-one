@@ -28,7 +28,9 @@
 //
 //  4. **Reveal resolves ids to display texts** in the room language before
 //     rendering prose. `Story.answers` holds ids; `RevealStartPayload.answers`
-//     holds the resolved texts the client highlights inside the prose.
+//     holds the resolved texts the client highlights inside the prose, and
+//     its `optionIds` the ids again, for a client that reads the story in
+//     another language (B-15).
 //
 //  5. **Picture generation goes through `image.ts`'s `generateImage`**, which
 //     owns the whole exists→reserve→generate→refund flow (design §7.3, T-4.3)
@@ -264,6 +266,13 @@ export function resolveAnswers(room: Room, story: Story | undefined): string[] {
   });
 }
 
+// The same story as option ids, always ROUNDS long, for the client to render
+// in a language of its own (B-15). A copy, so a payload never aliases the
+// room's live story.
+export function storyOptionIds(story: Story | undefined): (OptionId | null)[] {
+  return Array.from({ length: ROUNDS }, (_, i) => story?.answers[i] ?? null);
+}
+
 // Renders a story's prose and runs the offline polish pass: Russian gets its
 // clause commas, and every language gets the opening capital and terminal
 // period (see `@funny/shared`'s `i18n/grammar.ts` — the T-1.5 carry-over,
@@ -290,6 +299,7 @@ export function enterRevealPhase(room: Room, io: IO): void {
     io.to(player.id).emit('reveal:start', {
       answers,
       prose: revealProse(room, answers),
+      optionIds: storyOptionIds(room.stories[i]),
     });
   });
 }
@@ -449,6 +459,7 @@ export function buildGallery(room: Room): GalleryReadyPayload {
         // downloadable image and video (T-5.2) embed the story with the same
         // punctuation the player already saw.
         prose: revealProse(room, answers),
+        optionIds: storyOptionIds(room.stories[i]),
         picture: room.stories[i]?.picture ?? null,
       };
     }),

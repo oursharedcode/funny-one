@@ -23,7 +23,9 @@
     "openRooms": "Stanze aperte: {{count}}",
     "imagesToday": "Fino a {{total}} immagini al giorno. Si azzera ogni giorno alle 00:00 UTC.",
     "uiLanguage": "Tocca per cambiare la lingua dell'interfaccia",
-    "unsupportedLanguage": "Questa stanza è in una lingua che questa versione dell'app non può ancora usare. Prova ad aggiornare la pagina, oppure crea una nuova stanza."
+    "unsupportedLanguage": "Questa stanza è in una lingua che questa versione dell'app non può ancora usare. Prova ad aggiornare la pagina, oppure crea una nuova stanza.",
+    "multiLanguage": "Stanza multilingue",
+    "multiLanguageHint": "Ogni giocatore gioca nella lingua scelta con le bandiere qui sopra."
   },
   "lobby": {
     "roomCodeLabel": "Codice stanza",

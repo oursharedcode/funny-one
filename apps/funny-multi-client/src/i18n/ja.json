@@ -23,7 +23,9 @@
     "openRooms": "公開中のルーム: {{count}}",
     "imagesToday": "1日あたり最大{{total}}枚の画像。毎日00:00 UTCにリセットされます。",
     "uiLanguage": "タップして表示言語を変更",
-    "unsupportedLanguage": "この部屋はこのバージョンのアプリではまだ再生できない言語です。ページを更新するか、新しい部屋を作成してください。"
+    "unsupportedLanguage": "この部屋はこのバージョンのアプリではまだ再生できない言語です。ページを更新するか、新しい部屋を作成してください。",
+    "multiLanguage": "多言語ルーム",
+    "multiLanguageHint": "各プレイヤーは上の旗で選んだ言語で遊びます。"
   },
   "lobby": {
     "roomCodeLabel": "ルームコード",

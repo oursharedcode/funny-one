@@ -15,3 +15,15 @@ coverage
 
 # Cloud provisioning scripts are not part of the image
 deploy
+
+# Nor these: the landing page is static files Caddy serves itself
+# (deploy/ship-funny-family.sh), and local_docs holds the owner's working
+# files, the trailer's source among them.
+apps/funny-family-site
+local_docs
+
+# Local scratch, gitignored: screenshots and the picture review's working set
+# (2.5 GB of models and thumbnails), which every build would otherwise send
+# to Docker as context.
+.screens
+.picture-review

@@ -368,7 +368,7 @@ describe('support (T-9.4)', () => {
     resolveConfig({});
     render(<App />);
     await act(async () => {});
-    expect(screen.queryByLabelText('Support this game')).toBeNull();
+    expect(screen.queryByLabelText('Support Author')).toBeNull();
   });
 
   it('shows no ♥ on Home when /config answers with something unparseable', async () => {
@@ -377,7 +377,7 @@ describe('support (T-9.4)', () => {
     fetchMock.mockResolvedValueOnce({ json: () => Promise.reject(new SyntaxError('not json')) });
     render(<App />);
     await act(async () => {});
-    expect(screen.queryByLabelText('Support this game')).toBeNull();
+    expect(screen.queryByLabelText('Support Author')).toBeNull();
   });
 
   it('shows a ♥ on Home once the config has a rail, and opens the support screen from it', async () => {
@@ -385,7 +385,7 @@ describe('support (T-9.4)', () => {
     render(<App />);
     await act(async () => {});
 
-    const heart = screen.getByLabelText('Support this game');
+    const heart = screen.getByLabelText('Support Author');
     fireEvent.click(heart);
     expect(screen.getByText('me@bank')).toBeTruthy();
 
@@ -419,7 +419,7 @@ describe('support (T-9.4)', () => {
     resolveConfig({ payId: 'me@bank', payIdName: 'Me' });
     render(<App />);
     await act(async () => {});
-    expect(screen.queryByLabelText('Support this game')).toBeNull();
+    expect(screen.queryByLabelText('Support Author')).toBeNull();
   });
 });
 

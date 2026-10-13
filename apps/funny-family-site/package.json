@@ -1,0 +1,23 @@
+{
+  "name": "funny-family-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@funny/shared": "*"
+  },
+  "devDependencies": {
+    "jsdom": "^28.1.0",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  }
+}

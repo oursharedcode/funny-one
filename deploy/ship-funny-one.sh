@@ -48,9 +48,9 @@ FO_HOST="$(get FO_HOST)"
 FO_APEX="$(get FO_APEX)"
 SITE_HOST="$(get SITE_HOST)"
 FM_HOST="$(get FM_HOST)"
-# All of them before anything is copied: Caddy refuses a Caddyfile with an
+# All eight before anything is copied: Caddy refuses a Caddyfile with an
 # empty site name, and it is the same Caddy that serves Funny Multi.
-for v in FO_HOST FO_APEX SITE_HOST; do
+for v in FM_HOST FM_APEX FO_HOST FO_APEX SITE_HOST SITE_APEX HUB_HOST HUB_APEX; do
   [ -n "$(get "$v")" ] || { echo "$v missing in $HOST:$REMOTE_DIR/.env" >&2; exit 1; }
 done
 PICTURES_URL="${VITE_PICTURES_URL-$(get CLOUDFLARE_WORKER_URL)}"

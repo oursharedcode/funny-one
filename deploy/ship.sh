@@ -9,8 +9,9 @@
 #
 # Assumes the remote directory already holds a filled-in .env (see
 # .env.example: CLOUDFLARE_WORKER_URL/SECRET, BASE_PATH, FM_HOST, FM_APEX,
-# FO_HOST, FO_APEX, SITE_HOST, SITE_APEX, TRUSTED_PROXY_HOPS=1 behind Caddy) —
-# the secret never travels through this script. What it does, in order:
+# FO_HOST, FO_APEX, SITE_HOST, SITE_APEX, HUB_HOST, HUB_APEX,
+# TRUSTED_PROXY_HOPS=1 behind Caddy) — the secret never travels through this
+# script. What it does, in order:
 #   1. reads BASE_PATH from the remote .env, so the client is built with the
 #      value the server will run under (they must agree — DEPLOYMENT.md);
 #   2. builds the image with that build-arg, tagged with the git commit;
@@ -43,9 +44,9 @@ get() { printf '%s\n' "$REMOTE_ENV" | sed -n "s/^$1=//p" | tail -1; }
 BASE_PATH="$(get BASE_PATH)"
 FM_HOST="$(get FM_HOST)"
 SITE_HOST="$(get SITE_HOST)"
-# Funny One's two names as well: the Caddyfile copied below names all six, and
-# Caddy refuses to load it with any of them empty.
-for v in FM_HOST FM_APEX FO_HOST FO_APEX SITE_HOST SITE_APEX; do
+# Funny One's and the landing page's names as well: the Caddyfile copied
+# below names all eight, and Caddy refuses to load it with any of them empty.
+for v in FM_HOST FM_APEX FO_HOST FO_APEX SITE_HOST SITE_APEX HUB_HOST HUB_APEX; do
   [ -n "$(get "$v")" ] || { echo "$v missing in $HOST:$REMOTE_DIR/.env" >&2; exit 1; }
 done
 # The Caddyfile mounts the game at FM_HOST's root, so a sub-path here would

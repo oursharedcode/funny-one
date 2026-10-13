@@ -21,6 +21,7 @@ import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
 import SupportScreen from './components/SupportScreen';
 import { hasAnyRail } from './support';
+import { trackSupportOpen } from './funnel';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { baseUrl, withBase, serverOrigin } from './basePath';
@@ -88,6 +89,13 @@ export default function App() {
   // or fails — either way that means "no rails, no ♥" (see hasAnyRail).
   const [support, setSupport] = useState<SupportConfig | null>(null);
   const [supportOpen, setSupportOpen] = useState(false);
+
+  // Both entry points (Home's ♥, the end screen) open the sheet through here,
+  // so the funnel counts an opening once, wherever it came from (Step 72).
+  function openSupport(): void {
+    trackSupportOpen();
+    setSupportOpen(true);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -197,7 +205,7 @@ export default function App() {
         gameOver={gameOver}
         gallery={gallery}
         support={support}
-        onOpenSupport={() => setSupportOpen(true)}
+        onOpenSupport={openSupport}
       />
     );
   } else if (phase === 'reveal' && reveal && lobby) {
@@ -238,7 +246,7 @@ export default function App() {
           setPhase('lobby');
         }}
         support={support}
-        onOpenSupport={() => setSupportOpen(true)}
+        onOpenSupport={openSupport}
       />
     );
   }

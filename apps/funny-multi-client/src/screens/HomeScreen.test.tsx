@@ -421,12 +421,12 @@ describe('failures reported as an error event, not an ack', () => {
 describe('support entry point (T-9.4)', () => {
   it('shows no ♥ when the deployer set no rail', () => {
     render(<HomeScreen onJoined={vi.fn()} support={NO_RAILS} />);
-    expect(screen.queryByLabelText('Support this game')).toBeNull();
+    expect(screen.queryByLabelText('Support Author')).toBeNull();
   });
 
   it('shows no ♥ when App has not fetched a config yet', () => {
     render(<HomeScreen onJoined={vi.fn()} />);
-    expect(screen.queryByLabelText('Support this game')).toBeNull();
+    expect(screen.queryByLabelText('Support Author')).toBeNull();
   });
 
   it('shows the ♥ once at least one rail is set, and opens the support screen', () => {
@@ -438,7 +438,7 @@ describe('support entry point (T-9.4)', () => {
         onOpenSupport={onOpenSupport}
       />,
     );
-    fireEvent.click(screen.getByLabelText('Support this game'));
+    fireEvent.click(screen.getByLabelText('Support Author'));
     expect(onOpenSupport).toHaveBeenCalledTimes(1);
   });
 });

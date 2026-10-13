@@ -15,8 +15,9 @@
 #                                         automatic HTTPS — what production
 #                                         runs (deploy/caddy/Caddyfile). Needs
 #                                         FM_HOST, FM_APEX, FO_HOST, FO_APEX,
-#                                         SITE_HOST and SITE_APEX in .env and
-#                                         DNS for all six pointing at this host.
+#                                         SITE_HOST, SITE_APEX, HUB_HOST and
+#                                         HUB_APEX in .env and DNS for all
+#                                         eight pointing at this host.
 services:
   funny-multi:
     build:
@@ -31,6 +32,11 @@ services:
     environment:
       NODE_ENV: production
       BASE_PATH: ${BASE_PATH:-/}
+      # The landing page's and the game's visit counts (Step 72, the server's
+      # analytics.ts): kept in a volume, so a deploy does not reset them.
+      STATS_FILE: /data/stats.json
+    volumes:
+      - stats_data:/data
     restart: unless-stopped
 
   caddy:
@@ -46,7 +52,8 @@ services:
       # ./static/funny1-root and the service worker its former address answers
       # with in ./static/funny1-retired (all deploy/ship-funny-one.sh); Funny
       # Multi's privacy policy and assetlinks.json in ./static/funny37-root
-      # (deploy/ship.sh).
+      # (deploy/ship.sh); the landing page in ./static/funny-family
+      # (deploy/ship-funny-family.sh).
       # The parent directory is mounted, not each subdirectory, so the
       # scripts' swap of a directory is visible here without restarting
       # Caddy: a bind mount pins the inode it started with.
@@ -65,6 +72,8 @@ services:
       FO_APEX: ${FO_APEX:-}
       SITE_HOST: ${SITE_HOST:-}
       SITE_APEX: ${SITE_APEX:-}
+      HUB_HOST: ${HUB_HOST:-}
+      HUB_APEX: ${HUB_APEX:-}
     depends_on:
       - funny-multi
     restart: unless-stopped
@@ -72,3 +81,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  stats_data:

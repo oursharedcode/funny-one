@@ -3448,6 +3448,152 @@ GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3. CI: after the
 
 ---
 
+## Step 72 (task B-11) — Funny Family landing page, visit counts, gift funnel; "Support Author" by the ♥ (2026-10-14)
+
+**Owner request 2026-10-14:** "Desing and implement the page
+https://www.funny-family.oursharedcode.com/ this is a landing page. It has desciptions and links
+to: funny one, funny multy, to github repository, it has a short youtube video integration or
+backgroud running video (make two variants of the landing page), the
+video:local_docs\tests\video_148514.mp4 make the page multi lingual, exactly all the languages
+that the app has. run the session and make decision on your common sense, do not ask me, make
+smart decisions: list options, compare the options and select one decision and implement. Insert
+the statistic page for the visitors of the page and how the funnel goes to the gift page
+https://www.funny37.oursharedcode.com/ add the link "https://www.funny-family.oursharedcode.com/"
+and the description to the page https://www.oursharedcode.com/, add to the screen (attached), the
+nicely designed jumping words "Support Author" next/below to the red heart". Filed as **B-11**
+(the address replaces 2026-10-03's `www.funny.…`); the screenshot was Funny Multi's Home.
+
+**Decisions, made without asking, as the request said** (options → the one taken, and why):
+
+1. *Where the page lives:* GitHub Pages, Cloudflare Pages, or the VM's Caddy → **Caddy**. It
+   already serves both games and renews their certificates; on the same host the page posts its
+   counts to its own origin (no CORS, no third party); nothing new to sign up for (DD-14).
+2. *How it is built:* a React SPA like the games, Astro, or pre-rendered vanilla TypeScript with
+   Vite → **vanilla TypeScript, pre-rendered**. One screen of text needs no framework: ≈ 5 kB of
+   script, every language's text in its HTML for search engines and link previews, and the page
+   works without JavaScript; Astro would be a third framework in the repo.
+3. *Languages:* one page swapping strings in the browser, `?lang=`, or a page per language →
+   **`/<code>/` per language, English at `/`**, and a first visit to `/` sent on to the
+   browser's language before anything is drawn (a language picked on the page wins next time).
+   Indexable with hreflang, shareable in a language, no script needed to read it.
+4. *The video:* a YouTube embed or self-hosted files → **self-hosted**. The trailer is 6 s and
+   came as a file, not a YouTube upload; an embed would bring a third party onto the page and
+   into the privacy policy. `client/video.ts` keeps a `YOUTUBE_ID` switch (youtube-nocookie,
+   loaded on click).
+5. *The two designs:* **A** — the trailer as a card that plays in place with sound on a click;
+   **B** — a silent loop behind the top of the page, with a pause button, not played under
+   reduced motion or Save-Data. Split per visitor with a cookie, by two URLs, or **50/50 per
+   tab** with `?v=a` / `?v=b` forcing one → per tab: no cookie, so no consent banner; one URL,
+   so links and search ranking are not split.
+6. *Counting:* Plausible, Cloudflare Web Analytics or Google Analytics, a Worker with KV, or
+   **first-party in Funny Multi's server** → the server. A third party means a consent banner or
+   a weaker privacy statement and sees only the page, never the game's own steps; a Worker would
+   be a second store. Daily sums of allowlisted labels only — no IP address, cookie, identifier
+   or URL kept; bots get a quiet 204; 60 events a minute per address; nothing from the Android
+   app or under Do Not Track / Global Privacy Control (DD-15).
+7. *The statistics page:* password-protected, owner-only, or **public at `/stats/`,
+   `noindex`** → public: the numbers are anonymous totals, and a password needs the accounts the
+   project rules out. A/B verdict: a two-proportion z-test, given once each design has 100 visits.
+8. *The funnel's gift step:* every gift option used, or **the first per page load** → the first:
+   counting each option let the last step outgrow the one before it (200 % in the check).
+9. *"Support Author":* a new string beside the ♥'s unchanged name, or **the ♥'s own name,
+   `support.openLabel`, renamed in all 15 languages** → renamed: the words on screen are then
+   the button's name (WCAG 2.5.3), one button, one tap target.
+10. *Their place:* under the heart, or **beside it on one line**, with Home's top kept clear
+    (`pt-14`) → beside: under it, Russian and Tamil wrapped to two lines and ran into the title.
+11. *The GitHub link:* left out until the repository is public, the author's profile, or **the
+    repository** → the repository, as asked; it answers 404 until it is made public (already an
+    owner item before any launch).
+12. *oursharedcode.com:* a "Games" heading and one card at the foot of its home page, nothing
+    above changed — that page's own rule for additions.
+13. *What ships with it:* Funny Multi's deploy carries B-15 and Step 71 (owner decision
+    2026-10-13: one combined deploy); Funny One's pending deploy stays its own owner item.
+
+**Shipped:**
+
+- *`apps/funny-family-site`* (new workspace). `src/prerender/site.ts`, a Vite plugin, writes every
+  page around the two hashed script entries: 15 landing pages, `/stats/`, `404.html` (all
+  languages, `noindex`), `sitemap.xml` with hreflang; the dev server renders the same pages from
+  source (port 5187, in the machine's register). `render/` — the page, its inline head script
+  (the design and the root's language choice, before first paint), BCP-47 tags. `strings.ts` —
+  the text in 15 languages: English the master, Russian reviewed with the binding names
+  («Семейная Чепуха», «Чепуха 37», «Одна Чепуха: по кругу»), 13 machine drafts; each game's name
+  is copied from its own catalog and a test fails if the two drift. `client/` — the trailer in
+  place, the loop, the picker closing like a menu, the counts (`track.ts`). `stats/` — the
+  summary turned into rows (`data.ts`), drawn with DOM calls only (`view.ts`), the z-test.
+  `public/` — flags, Fredoka subsets (OFL), icons, and the media `scripts/encode-media.sh` made
+  from the trailer: `clip.mp4` (H.264 + AAC, sound lifted 16 dB — the source sits near −34 LUFS),
+  `loop.webm` (VP9) and `loop.mp4`, `poster.webp`, `og.jpg`; 1.6 MB in all.
+- *Funny Multi's server:* `analytics.ts` — events `hub_view`, `hub_click` (fm, fo, gh, video,
+  root), `fm_view`, `fm_support`, `fm_gift` (payid, sponsors, lightning, donate), every label
+  allowlisted, at most 780 keys a day, kept 400 days in `STATS_FILE` (written atomically, and
+  on SIGTERM — `main()` now closes cleanly on a deploy); `POST /api/stats` (sendBeacon's
+  text/plain, 1 KB limit, bots 204, 60/min per address) and `GET /api/stats/summary?days=N`.
+- *Funny Multi's client:* `funnel.ts` — the game opened (from the landing page, its "Play"
+  link's `from=hub&hv=a|b`, taken off the address bar before the first render), the gift sheet
+  opened, the first gift option used, each at most once per page load; nothing sent under
+  DNT/GPC, in the store shell, or without `sendBeacon`. `SupportHeart.tsx` — the ♥ and
+  "Support Author" in a pill beside it, one button; the words hop one after another after each
+  beat (`index.css`) and stand still under reduced motion; Chinese and Japanese hop by
+  character (grapheme clusters).
+- *Deploy:* the Caddyfile's `HUB_HOST` block (static files from `./static/funny-family`, only
+  `/api/stats` and `/api/stats/summary` proxied to the game, cache headers, the 404 page with
+  its status) and `HUB_APEX` redirect; compose's `stats_data` volume and the two names;
+  `deploy/ship-funny-family.sh` (build, swap the directory in, reload Caddy, check the live
+  pages); `ship.sh` and `ship-funny-one.sh` stop unless all eight names are set;
+  `.dockerignore` leaves out the page, `local_docs`, `.screens` and `.picture-review`;
+  `.env.example`; DEPLOYMENT.md §2d.
+- *Privacy:* Funny Multi's policy gains "Visit counts (website only)" in all 15 languages;
+  README and MODERATION.md say the same; FM-CPL-2 and the non-goals amended ("no third-party
+  analytics or per-visitor tracking"); DD-14 and DD-15 added.
+- Tests: the page (pages, head script, strings, picker, video, counts, stats data and view,
+  z-test — 204), the server's `analytics.test.ts`, the client's `funnel.test.ts` and
+  `SupportHeart.test.tsx`, and new cases in the App and Home tests.
+
+**Verified:**
+
+- *Caddy's routing,* before any deploy: a throwaway `caddy:2` (v2.11.4, production's) on
+  127.0.0.1:5186 with the real Caddyfile, the game's image and the built page — 40 of 40: each
+  kind of file with its type and cache header, the 404 page with its status and `noindex`, range
+  requests on the video, only the two API paths proxied, a visit counted through Caddy and a
+  bot's not, the apex redirect, the game's own host and its old address unchanged, and the
+  counts kept across a SIGTERM restart (exit 0).
+- *In a browser:* `.screens/ff-hub-check.mjs` (ignored) against production builds — the game
+  server on 3000 with made-up gift rails, the page's `vite preview` on 5187 — **all checks
+  passed, 0 problems**: (1) the funnel in Chrome at phone size — a landing-page visit and click,
+  Funny Multi opened from it, the ♥ sheet, a gift option, each counted once with the right
+  labels; a second option counts nothing; nothing sent under DNT, under GPC, in the store app or
+  from a headless agent; (2) `/stats/` shows them, phone and desktop; (3) "Support Author" in all
+  15 languages at 390 and 320 px: one line, inside the screen, nothing over it or under it,
+  hopping — and motionless under reduced motion; (4) 15 languages × 2 designs × phone and
+  desktop, 60 pages: `lang`, `dir`, design, fonts, no sideways scroll, no broken image, no
+  script error, the counts' labels; (5) the root's language redirect and the picker; (6) WebKit
+  at iPhone size, English and Hebrew: design A's trailer plays in place with sound. Design B's
+  loop could not be watched in WebKit — Playwright's Windows build stops answering on that
+  page's video (its media stack, not the page) — so it was checked in Chrome: the loop plays
+  and pauses.
+
+**Seen on the way — older than B-11, not fixed:** Funny Multi's Tamil home title «வேடிக்கையான
+கதைகள்» is wider than any phone (≈ 440 px at the title's 48 px; cut at 320, 360 and 390 px)
+since 2026-08-16; the 14 other languages fit at all three widths. With the review of the home
+titles (B-3), or a smaller size for a long title.
+
+**Owed:** the deploy (owner's request; this step's next entry); the page's 13 machine-drafted
+languages (with B-3); the GitHub link 404s while the repository is private; design B on a real
+iPhone.
+
+*Caught while staging:* the plugin was first written in `src/build/`, which the root
+`.gitignore`'s `build/` hides — tests and builds passed locally, but the commit would have left
+it out and CI would have failed. Moved to `src/prerender/`; Prettier, which also skips ignored
+files, then reformatted four statements in its two files (layout only).
+
+Gates (after the move): typecheck 0, lint 0, `format:check` clean; `npm test` outside the
+sandbox **1216 passed** (204 + 335 + 270 + 164 + 190 + 53), exit 0; `npm audit --omit=dev` 0;
+full `npm audit` only GHSA-vfj7-8cjw-p6xm and GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces
+version` 3.0.3. CI: after the push.
+
+---
+
 ~~RESUME HERE (2026-10-09, after Step 70)~~ — carried into this note.
 
 **RESUME HERE (2026-10-13, after Step 71).** **Both games are live on hosts of their own:**

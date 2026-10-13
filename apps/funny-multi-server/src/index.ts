@@ -46,6 +46,7 @@ import {
 } from './rateLimit.js';
 import { maybeSyncImageCounter, syncImageCounterFromWorker } from './image.js';
 import { buildStats, broadcastStats } from './stats.js';
+import { createStatsStore, isBotAgent, summaryDays } from './analytics.js';
 
 // ---------------------------------------------------------------------------
 // T-2.1 — bootstrap only (design §3). This is SRC/server/src/index.ts reduced
@@ -94,6 +95,15 @@ const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
 // unchanged, so only the sibling name moves.
 const CLIENT_DIST = fileURLToPath(new URL('../../funny-multi-client/dist/', import.meta.url));
 
+// Step 72: where the visit and funnel counts persist (analytics.ts). Unset
+// keeps them in memory only; docker-compose.yml points it into a volume.
+const STATS_FILE = process.env.STATS_FILE || null;
+
+// Visit and funnel events per IP per minute. A hub visit sends one or two and
+// a game one a handful, so this only stops a script, while a family or a
+// school behind one address stays far below it.
+const STATS_EVENTS_PER_MINUTE = 60;
+
 // Bounded disconnect grace window (spec §7). A client that returns within
 // RECOVERY_WINDOW_MS keeps its slot via Socket.IO connection-state recovery;
 // the removal timer is a touch longer so recovery always wins the race. Both
@@ -124,12 +134,15 @@ export interface BuildServerOptions {
   disconnectGraceMs?: number;
   /** Overrides the BASE_PATH env var; tests use it to mount under a sub-path. */
   basePath?: string;
+  /** Overrides the STATS_FILE env var; null keeps the counts in memory. */
+  statsFile?: string | null;
 }
 
 export async function buildServer({
   logger = true,
   disconnectGraceMs = DISCONNECT_GRACE_MS,
   basePath = BASE_PATH,
+  statsFile = STATS_FILE,
 }: BuildServerOptions = {}): Promise<BuiltServer> {
   const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
@@ -152,6 +165,52 @@ export async function buildServer({
     donateUrl: process.env.DEPLOYER_DONATE_URL || null,
   };
   fastify.get(`${base}config`, async () => ({ support }));
+
+  // Step 72: visit and funnel counts (analytics.ts). The landing page posts
+  // here through its own host's proxy (deploy/caddy/Caddyfile) and so does
+  // this game's client (funnel.ts); the landing page's /stats/ reads the
+  // summary. Beacons arrive as text/plain JSON — sendBeacon's own type, which
+  // needs no CORS preflight — so a string body is parsed here.
+  const visits = createStatsStore({
+    file: statsFile,
+    onError: (err) => fastify.log.error(err, 'visit counts'),
+  });
+  const statsLimiter = createRateLimiter({
+    capacity: STATS_EVENTS_PER_MINUTE,
+    intervalMs: RATE_WINDOW_MS,
+  });
+  fastify.addHook('onClose', async () => {
+    statsLimiter.stop();
+    visits.stop();
+  });
+
+  fastify.post(`${base}api/stats`, { bodyLimit: 1024 }, async (request, reply) => {
+    // A crawler's or a script's visit is dropped quietly, not refused: there
+    // is nothing for it to fix.
+    if (isBotAgent(request.headers['user-agent'])) return reply.code(204).send();
+    const ip = clientIp(
+      { headers: request.headers, address: request.socket.remoteAddress },
+      TRUSTED_PROXY_HOPS,
+    );
+    if (!statsLimiter.take(ip)) return reply.code(429).send();
+    let event: unknown = request.body;
+    if (typeof event === 'string') {
+      try {
+        event = JSON.parse(event);
+      } catch {
+        return reply.code(400).send();
+      }
+    }
+    return reply.code(visits.record(event) ? 204 : 400).send();
+  });
+
+  fastify.get<{ Querystring: { days?: string } }>(
+    `${base}api/stats/summary`,
+    async (request, reply) => {
+      reply.header('cache-control', 'no-store').header('x-robots-tag', 'noindex');
+      return visits.summary(summaryDays(request.query.days));
+    },
+  );
 
   // Production: this same Fastify process serves the built client bundle —
   // one process, no nginx sidecar (spec §14). Unmatched routes fall back to
@@ -483,9 +542,25 @@ export async function buildServer({
 }
 
 async function main(): Promise<void> {
-  const { fastify } = await buildServer();
+  const { fastify, io } = await buildServer();
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
   fastify.log.info(`mounted under ${BASE_PATH}`);
+
+  // Docker stops a container with SIGTERM and kills it 10 s later. Closing
+  // runs the onClose hooks, among them the one that writes the visit counts
+  // (analytics.ts) — without it a deploy would lose the counts since the last
+  // periodic write. The timer bounds a close that hangs on a stuck socket.
+  const shutdown = (signal: NodeJS.Signals): void => {
+    fastify.log.info(`${signal}: closing`);
+    setTimeout(() => process.exit(0), 5_000).unref();
+    void io
+      .close()
+      .catch(() => {})
+      .then(() => fastify.close())
+      .finally(() => process.exit(0));
+  };
+  process.once('SIGTERM', shutdown);
+  process.once('SIGINT', shutdown);
 
   // Eager initial sync of the Worker-side daily counter. Fire-and-forget: a
   // Worker that's unreachable at startup must not block the server from

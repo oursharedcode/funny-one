@@ -41,6 +41,7 @@ import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
 import LanguageList from '../components/LanguageList';
+import SupportHeart from '../components/SupportHeart';
 import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
 import { LANGUAGES, isLanguage } from '@funny/shared';
@@ -220,17 +221,10 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   const nicknameValid = nickname.trim().length >= 3 && nickname.trim().length <= 20;
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6">
-      {hasAnyRail(support) && (
-        <button
-          type="button"
-          aria-label={t('support.openLabel')}
-          className="fixed right-3 top-3 z-30 text-2xl leading-none text-pink-500"
-          onClick={onOpenSupport}
-        >
-          ♥
-        </button>
-      )}
+    <div
+      className={`mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6 ${hasAnyRail(support) ? 'pt-14' : ''}`}
+    >
+      {hasAnyRail(support) && <SupportHeart onOpen={onOpenSupport} />}
       <Wordmark />
       <p className="text-center text-gray-700">{t('home.subtitle')}</p>
 

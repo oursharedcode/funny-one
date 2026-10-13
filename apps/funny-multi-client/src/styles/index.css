@@ -218,6 +218,51 @@ body {
   animation: picture-wobble-pulse 0.6s ease-in-out infinite;
 }
 
+/* ── Home's support label (Step 72, SupportHeart.tsx) ────────────────────
+   The heart beats twice and the label's words hop after it one by one (each
+   word's delay is set inline), then everything rests until the next cycle.
+   One duration for both keeps them in step. */
+
+@keyframes support-beat {
+  0%,
+  28%,
+  100% {
+    transform: scale(1);
+  }
+  7% {
+    transform: scale(1.22);
+  }
+  14% {
+    transform: scale(1);
+  }
+  21% {
+    transform: scale(1.12);
+  }
+}
+@keyframes support-hop {
+  0%,
+  30%,
+  100% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(-6px);
+  }
+  19% {
+    transform: translateY(0);
+  }
+  24% {
+    transform: translateY(-2px);
+  }
+}
+.support-beat {
+  display: inline-block;
+  animation: support-beat 3s ease-in-out infinite;
+}
+.support-hop {
+  animation: support-hop 3s ease-in-out infinite;
+}
+
 /* Reduced motion: idle loops stop; color cues stay (DESIGN_SYSTEM §4). */
 @media (prefers-reduced-motion: reduce) {
   .bot-blink,
@@ -229,7 +274,9 @@ body {
   .picture-wobble-zoom,
   .picture-wobble-drift,
   .picture-wobble-jiggle,
-  .picture-wobble-pulse {
+  .picture-wobble-pulse,
+  .support-beat,
+  .support-hop {
     animation: none;
   }
 }

@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from './QRCode';
+import { trackGift, type GiftRail } from '../funnel';
 import type { SupportConfig } from '@funny/shared';
 
 interface Props {
@@ -18,6 +19,9 @@ interface Props {
 
 type CopyField = 'payId' | 'lightning';
 
+// The funnel's name for each copied field (funnel.ts, Step 72).
+const GIFT_RAIL: Record<CopyField, GiftRail> = { payId: 'payid', lightning: 'lightning' };
+
 export default function SupportScreen({ support, onClose }: Props) {
   const { t } = useTranslation();
   // Which row currently shows "Copied!" — at most one at a time, same pattern
@@ -25,6 +29,7 @@ export default function SupportScreen({ support, onClose }: Props) {
   const [copiedField, setCopiedField] = useState<CopyField | null>(null);
 
   function copy(field: CopyField, value: string): void {
+    trackGift(GIFT_RAIL[field]);
     const flash = (): void => {
       setCopiedField(field);
       window.setTimeout(() => setCopiedField((f) => (f === field ? null : f)), 1500);
@@ -93,6 +98,7 @@ export default function SupportScreen({ support, onClose }: Props) {
               target="_blank"
               rel="noopener noreferrer"
               className="mt-1 block break-all text-pink-500 underline"
+              onClick={() => trackGift('sponsors')}
             >
               {support.sponsorsUrl}
             </a>
@@ -107,6 +113,7 @@ export default function SupportScreen({ support, onClose }: Props) {
               <a
                 href={`lightning:${support.lightningAddress}`}
                 className="flex-1 break-all text-pink-500 underline"
+                onClick={() => trackGift('lightning')}
               >
                 {support.lightningAddress}
               </a>
@@ -130,6 +137,7 @@ export default function SupportScreen({ support, onClose }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             className="rounded border border-amber-300 bg-white p-3 text-center font-semibold text-pink-500 underline"
+            onClick={() => trackGift('donate')}
           >
             {t('support.donate')}
           </a>

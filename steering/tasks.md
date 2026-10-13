@@ -148,9 +148,26 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   affiliate links in README/HUB only; the v2 animation export as the gift thank-you;
   grants/credits (Screen Australia games fund, Cloudflare/Oracle startup credits, Open
   Collective for language packs); ad network on «Чепуха 37» only — separate decision.
-- **B-11** Hub site at `https://www.funny.oursharedcode.com/` — the common page for both games:
-  history and links (owner decision 2026-10-03). Candidate host for the shared privacy policy
-  (open: hub or each game's own root — B-1b).
+- **B-11** The landing page «Семейная Чепуха» at `https://www.funny-family.oursharedcode.com/`
+  (owner request 2026-10-14; the address replaces 2026-10-03's `www.funny.…`) — the common page
+  for both games: what each one is, links to both and to the GitHub repository, and the trailer
+  (`local_docs/tests/video_148514.mp4`), in the games' 15 languages. Two designs, split 50/50
+  per tab (`?v=a` or `?v=b` forces one): A shows the trailer as a card that plays with sound, B
+  runs it as a silent loop behind the top of the page. A public `/stats/` page shows the daily
+  visits per design, language, referrer and device, and the funnel from the landing page to
+  «Чепуха 37»'s gift screen, with a test of the two designs' click rates (DD-15). Static pages
+  pre-rendered by `apps/funny-family-site`, served by Caddy (DD-14), shipped by
+  `deploy/ship-funny-family.sh`; the counts are kept by Funny Multi's server. Same step, same
+  request: the jumping words "Support Author" beside the heart on «Чепуха 37»'s home screen
+  (under it, a long label wrapped and ran into the title). **Code done 2026-10-14 (Step 72).**
+  - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); the GitHub link
+    answers 404 while the repository is private; the card on `https://www.oursharedcode.com/`;
+    design B's loop on a real iPhone (Playwright's Windows WebKit hangs on it).
+  - *Seen on the way, older than B-11, not fixed:* Funny Multi's Tamil home title «வேடிக்கையான
+    கதைகள்» is wider than a phone (≈ 440 px at 48 px; cut at 320–390 px) since 2026-08-16 — with
+    B-3's review of the home titles, or a smaller size for a long title.
+  - Still a candidate host for the shared privacy policy (open: hub or each game's own root —
+    B-1b).
 - **B-12** The laughing monkey back in the 5-second share video (owner request 2026-10-05): it
   walks in, points and laughs ("ha-ha"), then falls on its back — SRC's act, here on the
   cartoon's top edge (design §8.3, amended). Plain canvas drawing of SRC's four sprites

@@ -18,8 +18,9 @@ Deploy the Worker first: the game server needs its URL and shared secret before 
   and SSH access to it. Production is an Oracle Cloud _Always Free_ VM — any VPS works.
 - A **domain name** you control, with DNS `A` records for the game's host (e.g.
   `www.funny37.example.com`), its bare name (`funny37.example.com`), the same pair for Funny
-  One (`www.funny1.example.com`, `funny1.example.com`) and the older shared host and its
-  bare name (`www.example.com`, `example.com` — see `SITE_HOST` below), all pointing at the
+  One (`www.funny1.example.com`, `funny1.example.com`) and for the landing page
+  (`www.funny-family.example.com`, `funny-family.example.com`), and the older shared host and
+  its bare name (`www.example.com`, `example.com` — see `SITE_HOST` below), all pointing at the
   host. Caddy fetches its certificates on first boot, so the records must resolve before the
   first start.
 - On the machine you deploy _from_ (your PC is fine): Node 20, git, Docker, `ssh`/`scp` and
@@ -105,7 +106,7 @@ in `~/.oci/config`). Those scripts are optional: any host from the list above wi
 Two files make it production rather than "a container on :3000":
 
 - `docker-compose.yml`'s **`caddy` profile** adds Caddy on 80/443 with automatic HTTPS
-  (`deploy/caddy/Caddyfile`). Three hosts: **`FM_HOST`** is the game's own — Caddy forwards
+  (`deploy/caddy/Caddyfile`). Four hosts: **`FM_HOST`** is the game's own — Caddy forwards
   everything on it to the game container untouched, WebSockets included, except two files it
   serves itself from `deploy/origin-root/funny37` (B-1b): the privacy policy at `/privacy`
   and `/.well-known/assetlinks.json` for the Android app. It redirects `FM_APEX` (the bare
@@ -113,11 +114,12 @@ Two files make it production rather than "a container on :3000":
   itself, with `FO_APEX` redirected to it. **`SITE_HOST`** is the older shared host, where
   both games used to live: it forwards their former addresses `/funny37-game` and
   `/funny1-game` to `FM_HOST` and `FO_HOST`, redirects `SITE_APEX` to itself and 404s
-  everything else. A game has its own host because an Android app wrapping it (a Trusted Web
-  Activity) bakes the origin in. Certificates live in the `caddy_data` volume. Caddy refuses a
-  Caddyfile with an empty site name, so all six names must be set even when you self-host only
-  Funny Multi: point the other four at any names you control, or skip Caddy (see the variant
-  below).
+  everything else. **`HUB_HOST`** is the landing page's (2d): static files again, with
+  `HUB_APEX` redirected to it. A game has its own host because an Android app wrapping it (a
+  Trusted Web Activity) bakes the origin in. Certificates live in the `caddy_data` volume.
+  Caddy refuses a Caddyfile with an empty site name, so all eight names must be set even when
+  you self-host only Funny Multi: point the other six at any names you control, or skip Caddy
+  (see the variant below).
 - **`BASE_PATH`** (`.env`), the URL sub-path the game is served under — `/` (the default, or
   unset) behind this Caddyfile, since the game owns its host. It must reach two places: the
   image build (the client bakes it into Vite's `base`, the PWA scope and the Socket.IO path)
@@ -142,6 +144,8 @@ FO_HOST=www.funny1.example.com
 FO_APEX=funny1.example.com
 SITE_HOST=www.example.com
 SITE_APEX=example.com
+HUB_HOST=www.funny-family.example.com
+HUB_APEX=funny-family.example.com
 TRUSTED_PROXY_HOPS=1
 ENV
 chmod 600 .env
@@ -191,7 +195,7 @@ image is built here and streamed across; no registry involved):
 deploy/ship.sh ubuntu@<host-ip>          # remote dir defaults to ~/funny
 ```
 
-`ship.sh` reads `BASE_PATH` and the six hosts from the host's `.env` (and stops if one is
+`ship.sh` reads `BASE_PATH` and the eight hosts from the host's `.env` (and stops if one is
 missing), builds the image with `BASE_PATH` (tagged with the git commit),
 `docker save | gzip | ssh … docker load`s it (~80 MB), copies `docker-compose.yml` and the
 Caddyfile next to `.env`, streams `deploy/origin-root/funny37` into `static/funny37-root`
@@ -264,14 +268,54 @@ install time.
 
 When a deployment gains Funny One's host, do it in this order: the two DNS records, then
 `FO_HOST`/`FO_APEX` in the host's `.env`, then `ship-funny-one.sh`, and only then
-`ship.sh` — both scripts copy the same Caddyfile, and they stop before copying it if a name
-is missing, because an empty one would keep Caddy from starting for both games.
+`ship.sh` — all three scripts (these two and 2d's) copy the same Caddyfile, and they stop
+before copying it if a name is missing, because an empty one would keep Caddy from starting
+for both games.
+
+### 2d. The Funny Family landing page (optional)
+
+The landing page «Семейная Чепуха» (`apps/funny-family-site`; production:
+`https://www.funny-family.oursharedcode.com/`) introduces both games, links to them and to
+this repository, and shows a short trailer, in the games' 15 languages. Like Funny One it is
+static files: the same Caddy serves them at the root of `HUB_HOST`, with `HUB_APEX` redirected
+to it — no container, image or secret.
+
+```bash
+deploy/ship-funny-family.sh ubuntu@<host-ip>   # remote dir defaults to ~/funny
+```
+
+The script builds one page per language (English at `/`, the others at `/<code>/`, e.g.
+`/ru/`), `/stats/`, a `404.html` and `sitemap.xml`; streams them into
+`~/funny/static/funny-family` (swapped in whole); copies the compose file and Caddyfile,
+reloads Caddy, and checks the English and Russian pages, `/stats/`, a missing path, the
+trailer, the counts (below), the bare-name redirect and that Funny Multi's `/health` still
+answers. Pages are sent with `no-cache`, the content-hashed `assets/` with a year-long
+`immutable`, the video, flags and fonts with a day.
+
+**Two designs.** Each new tab gets design A (the trailer as a card that plays with sound) or
+design B (a silent loop of it behind the top of the page), half and half at random; `?v=a` or
+`?v=b` in the address forces one.
+
+**Visit counts** (design DD-15). The page counts its visits and clicks, and Funny Multi counts
+the visits that arrive from it and how many of them go on to open the Support screen and pick
+a way to give. Each count is a daily total per a few fixed labels — the design, the language,
+where the visit came from, a phone or not — with no IP address, cookie or identifier stored,
+and nothing is counted when the browser sends Do Not Track or Global Privacy Control, or inside
+the Android app. Funny Multi's server keeps the counts: Caddy forwards the page's two count
+addresses on `HUB_HOST` (`/api/stats` and `/api/stats/summary`) to it, and compose keeps the
+file in the `stats_data` volume, 400 days of it. `https://<HUB_HOST>/stats/` shows them, with
+a test of whether one design sends more of its visitors on to Funny Multi than the other; it
+is public and kept out of search engines.
+
+Because of the counts the page needs a game server from Step 72 or later, so a deployment
+that gains the landing page goes in this order: the two DNS records, then `HUB_HOST`/`HUB_APEX`
+in the host's `.env`, then `ship.sh`, and only then `ship-funny-family.sh`.
 
 ### Variant: your own TLS proxy instead of Caddy
 
 `ship.sh` always uses the Caddy profile. If you already terminate TLS elsewhere (nginx,
 Cloudflare Tunnel, …), clone the repo on a host big enough to build (2 GB is plenty), put the
-same `.env` at the repo root (the six hosts not needed) and run
+same `.env` at the repo root (the eight hosts not needed) and run
 `docker compose up -d`: you get the game alone on plain HTTP `:3000`, mounted under
 `BASE_PATH`, for your proxy to forward to. PWA install and service-worker registration both
 require HTTPS, so something must terminate TLS. See the next section before choosing
@@ -308,4 +352,7 @@ trusted window).
 5. If you set any `DEPLOYER_*` rail: the Home screen has a ♥ in its corner that opens the
    Support screen with exactly those rails. No ♥: `curl` the `/config` route — all `null`
    means the server has not restarted since the `.env` edit, or a variable name is misspelt.
-6. Logs, when something is off: `ssh ubuntu@<host-ip> 'cd ~/funny && docker compose logs --tail 50'`.
+6. With the landing page (2d): open `https://<HUB_HOST>/` in a browser that sends neither Do
+   Not Track nor Global Privacy Control, then `https://<HUB_HOST>/stats/` — today's visits
+   include yours.
+7. Logs, when something is off: `ssh ubuntu@<host-ip> 'cd ~/funny && docker compose logs --tail 50'`.

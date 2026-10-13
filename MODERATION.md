@@ -23,8 +23,9 @@ construction**, not by filtering.
   be edited per-deployment.
 - **No user-generated text ever reaches storage, an AI model, or another room** (FM-CPL-2).
   The only durable artifacts this game produces are AI images derived entirely from
-  pre-authored pool content, plus anonymous usage counters. No accounts, no analytics, no
-  third-party requests from the client.
+  pre-authored pool content, plus anonymous usage counters and the website's anonymous daily
+  visit counts. No accounts, no third-party analytics or per-visitor tracking, no third-party
+  requests from the client.
 
 ## What operators are still responsible for
 

@@ -9,10 +9,14 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { installSwReloadListener } from './swReload';
+import { initFunnel } from './funnel';
 import './i18n';
 import './styles/index.css';
 
 installSwReloadListener();
+// Before the first render: it takes the landing page's parameters off the
+// address bar, and HomeScreen reads the address bar as it renders.
+initFunnel();
 
 const root = document.getElementById('root');
 if (!root) throw new Error('No #root element');

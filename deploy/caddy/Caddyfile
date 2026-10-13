@@ -7,7 +7,7 @@
 # Caddy terminates TLS (certificates from Let's Encrypt, renewed by itself,
 # kept in the `caddy_data` volume), forwards WebSockets without any extra
 # directive, and appends the client address to X-Forwarded-For — which is
-# why TRUSTED_PROXY_HOPS=1 is right behind it. The six {$…} values come
+# why TRUSTED_PROXY_HOPS=1 is right behind it. The eight {$…} values come
 # from .env via the compose file:
 #   FM_HOST / FM_APEX     Funny Multi's own host and its bare name (redirected
 #                         to it). The game sits at that host's root, so the
@@ -17,6 +17,9 @@
 #   SITE_HOST / SITE_APEX the older shared host: both games' former addresses
 #                         /funny37-game and /funny1-game forward from here to
 #                         FM_HOST and FO_HOST.
+#   HUB_HOST / HUB_APEX   the Funny Family landing page «Семейная Чепуха» and
+#                         its bare name (redirected to it). Static files, plus
+#                         the visit counts, which the game's server keeps.
 
 {
 	# HTTP/3 needs UDP 443, which the VM's cloud firewall does not open;
@@ -158,4 +161,48 @@
 
 {$SITE_APEX} {
 	redir https://{$SITE_HOST}{uri} permanent
+}
+
+# The Funny Family landing page (Step 72): one page per language the games
+# ship — English at /, the others at /<code>/ — plus /stats/ and 404.html,
+# all pre-rendered by apps/funny-family-site. No container: Caddy serves the
+# files deploy/ship-funny-family.sh copies to ./static/funny-family.
+{$HUB_HOST} {
+	encode zstd gzip
+
+	# The page's visit counts and the summary /stats/ reads live in the game's
+	# server (analytics.ts), one store for this page and Funny Multi alike.
+	# Same origin, so the page needs no CORS; only these two paths, so nothing
+	# else of the game's answers on this host.
+	@hub_stats path /api/stats /api/stats/summary
+	handle @hub_stats {
+		reverse_proxy funny-multi:3000
+	}
+
+	handle {
+		# Pages revalidate on every load, so a deploy shows at once; assets/
+		# is content-hashed and never changes under a given name. The media,
+		# flags and fonts are not hashed, so a day.
+		@hub_pages path */ *.html
+		header @hub_pages Cache-Control "no-cache"
+		@hub_hashed path /assets/*
+		header @hub_hashed Cache-Control "public, max-age=31536000, immutable"
+		@hub_daily path /media/* /flags/* /fonts/*
+		header @hub_daily Cache-Control "public, max-age=86400"
+
+		root * /srv/static/funny-family
+		file_server
+	}
+
+	# A path with no file gets the page that says so, in all its languages,
+	# with the 404 status kept.
+	handle_errors 404 {
+		root * /srv/static/funny-family
+		rewrite * /404.html
+		file_server
+	}
+}
+
+{$HUB_APEX} {
+	redir https://{$HUB_HOST}{uri} permanent
 }

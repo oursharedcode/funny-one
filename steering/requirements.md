@@ -261,8 +261,11 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-CPL-2 (MUST)** Privacy statement (CMP-6, strengthened by the combobox change): room
   state is transient in-memory processing only and dies with the room; **no user-generated text
   ever reaches storage, AI models, or other rooms**. The only durable artifacts are AI images
-  derived entirely from pre-authored pool content (FM-IMG-4) and anonymous usage counters.
-  No accounts, no analytics, no third-party requests from the client, self-hosted fonts.
+  derived entirely from pre-authored pool content (FM-IMG-4) and anonymous usage counters —
+  among them the daily visit and funnel counts of the website and the landing page (Step 72,
+  DD-15): totals per day and label, no IP address, cookie or identifier stored, none in the
+  Android app or under Do Not Track / Global Privacy Control. No accounts, no third-party
+  analytics or per-visitor tracking, no third-party requests from the client, self-hosted fonts.
 - **FM-CPL-3 (MUST)** Moderation posture (replaces most of source `MODERATION.md`): safety is
   achieved **by construction** — curated pools, server-validated picks (FM-ANS-2), locked style
   suffix steering output away from photorealism. The operator-responsibility model and the
@@ -295,7 +298,8 @@ Everything in this section is inherited from the source spec v4 unless marked **
 
 No free-text answers (defining change). No accounts, auth, database, ORM, Redis, or job queue.
 No reconnect (disconnect = bot). No sound. No Lottie/Rive/video/WebGL. No ad network in the v1
-build (D-6). No analytics.
+build (D-6). No third-party analytics and no per-visitor tracking (anonymous daily counts
+only, FM-CPL-2).
 No translation at runtime (neither answers nor prompts). No deploy automation. No Turnstile /
 fingerprinting / quota layers beyond the caps in §7. No RuStore (post-launch investigation).
 No Funny One, no HUB site, no store apps in the v1 build (D-1, D-3). *(The former non-goal

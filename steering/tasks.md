@@ -159,10 +159,11 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   pre-rendered by `apps/funny-family-site`, served by Caddy (DD-14), shipped by
   `deploy/ship-funny-family.sh`; the counts are kept by Funny Multi's server. Same step, same
   request: the jumping words "Support Author" beside the heart on «Чепуха 37»'s home screen
-  (under it, a long label wrapped and ran into the title). **Code done 2026-10-14 (Step 72).**
+  (under it, a long label wrapped and ran into the title). **Code done and deployed 2026-10-14
+  (Step 72)**; `https://www.oursharedcode.com/` links to the page from a "Games" card.
   - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); the GitHub link
-    answers 404 while the repository is private; the card on `https://www.oursharedcode.com/`;
-    design B's loop on a real iPhone (Playwright's Windows WebKit hangs on it).
+    answers 404 while the repository is private; design B's loop on a real iPhone (Playwright's
+    Windows WebKit hangs on it).
   - *Seen on the way, older than B-11, not fixed:* Funny Multi's Tamil home title «வேடிக்கையான
     கதைகள்» is wider than a phone (≈ 440 px at 48 px; cut at 320–390 px) since 2026-08-16 — with
     B-3's review of the home titles, or a smaller size for a long title.
@@ -224,7 +225,9 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   story — on the reveal screen and in the gallery, in any Funny Multi room — gets a small
   story-language switch: it opens the start window's 15 flags and retells that story in the
   language picked, on that phone only. **Code done 2026-10-09 (Step 70)**; played in WebKit at
-  iPhone size by three players in English, Russian and Hebrew. **Not deployed.**
+  iPhone size by three players in English, Russian and Hebrew. **Deployed 2026-10-09**
+  (`funny-multi:8036211`; not logged then, found on the VM 2026-10-14); Step 71's fixes went out
+  with Step 72 on 2026-10-14.
   - *A player's language:* the host's is the flag picked on the create screen; a joiner's is the
     interface language on screen when they tap Join (the invite link's `&lang=`, or the flag they
     tapped). In an ordinary room it stays the room's language, so nothing changes there.
@@ -233,9 +236,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     each phone retells a story in its own language from the shared pools and prose templates;
     reveal and gallery now send each story's ids too. Design §5, §8.1, §8.2 and §9 amended,
     DD-13 added; FM-CORE-5 noted.
-  - *Owed:* the deploy (`deploy/ship.sh`, now also carrying Step 71's fixes below — owner
-    decision 2026-10-13: one combined deploy); the checkbox's two new strings are machine drafts
-    in 13 languages (with B-3); one real game on three phones in three languages.
+  - *Owed:* the checkbox's two new strings are machine drafts in 13 languages (with B-3); one
+    real game on three phones in three languages.
   - *Seen on the way, older than B-15, fixed in Step 71:* the French prose template's literal
     "a/ont" (`packages/shared/src/i18n/fr.ts`, a machine draft — B-3; any player could reach it
     by switching a story to French); a downloaded or shared story picture's footer following the

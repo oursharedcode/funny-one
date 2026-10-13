@@ -3448,7 +3448,7 @@ GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3. CI: after the
 
 ---
 
-## Step 72 (task B-11) — Funny Family landing page, visit counts, gift funnel; "Support Author" by the ♥ (2026-10-14)
+## Step 72 (task B-11) — Funny Family landing page, visit counts, gift funnel; "Support Author" by the ♥, deployed (2026-10-14)
 
 **Owner request 2026-10-14:** "Desing and implement the page
 https://www.funny-family.oursharedcode.com/ this is a landing page. It has desciptions and links
@@ -3573,14 +3573,42 @@ nicely designed jumping words "Support Author" next/below to the red heart". Fil
   page's video (its media stack, not the page) — so it was checked in Chrome: the loop plays
   and pauses.
 
+**Deployed 2026-10-14, in the order `DEPLOYMENT.md` gives** (the request was the owner's go; the
+agent ran each step and auto mode allowed it): two DNS-only `A` records (`www.funny-family` and
+`funny-family`, Cloudflare API, comment "Funny Family landing page (Step 72)"); `HUB_HOST` and
+`HUB_APEX` appended to the VM's `.env` (backup `~/funny/.env.bak-step72`); `deploy/ship.sh` —
+`funny-multi:2bd01ab` built from the clean commit, the `funny_stats_data` volume created, both
+containers recreated once, its four checks passed (`/health`, `assetlinks.json`, `/privacy` the
+policy, the old address's 301), exit 0; then `deploy/ship-funny-family.sh` — the page swapped in
+(2.2 MB on the VM), Caddy reloaded, its eight checks passed (`/`, `/ru/` and `/stats/` 200, an
+unknown path 404, the trailer `video/mp4`, the summary 200, the bare name's 301, the game's
+`/health`), exit 0 — Caddy had both new certificates by then. Then by curl: `http://`
+on both names 308 to `https://`; `/he/`, `sitemap.xml`, the loop, the poster and the share
+image with their types, `og.jpg` and the trailer at the repo's sizes; pages `no-cache`, hashed
+scripts a year `immutable`, media a day; the summary empty (`"days":{}`) until the first real
+visit; the game's server (root in its container) can write `/data`; the live game bundle says
+"Support Author"; the GitHub link 404, the repository being private.
+`https://www.oursharedcode.com/` serves the "Games" card and its sitemap's new date (commit
+`7d16ed0` in `oursharedcode.github.io`, pushed; GitHub Pages publishes on push). Funny One's
+files on the VM were not touched (still 2026-10-05's).
+
+**Found on the VM: B-15 had been live for five days.** The container `ship.sh` replaced ran
+`funny-multi:8036211` — Step 70's commit, built and started on 2026-10-09 at about 05:09 UTC
+(16:09 local). That deploy was never logged, so Step 71's note and `tasks.md` still called B-15
+undeployed. What went out today on top of it: Step 71's fixes and this step. `tasks.md` now
+says so.
+
+*Harmless, left as is:* a `GET /api/stats` on the page's host answers 200 with Funny Multi's
+`index.html` — Caddy forwards that path for the counts' POST, and the game's server answers any
+unknown GET with its app. Nothing is counted or shown by it.
+
 **Seen on the way — older than B-11, not fixed:** Funny Multi's Tamil home title «வேடிக்கையான
 கதைகள்» is wider than any phone (≈ 440 px at the title's 48 px; cut at 320, 360 and 390 px)
 since 2026-08-16; the 14 other languages fit at all three widths. With the review of the home
 titles (B-3), or a smaller size for a long title.
 
-**Owed:** the deploy (owner's request; this step's next entry); the page's 13 machine-drafted
-languages (with B-3); the GitHub link 404s while the repository is private; design B on a real
-iPhone.
+**Owed:** the page's 13 machine-drafted languages (with B-3); the GitHub link 404s while the
+repository is private; design B on a real iPhone.
 
 *Caught while staging:* the plugin was first written in `src/build/`, which the root
 `.gitignore`'s `build/` hides — tests and builds passed locally, but the commit would have left
@@ -3594,43 +3622,50 @@ version` 3.0.3. CI: after the push.
 
 ---
 
-~~RESUME HERE (2026-10-09, after Step 70)~~ — carried into this note.
+~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
 
-**RESUME HERE (2026-10-13, after Step 71).** **Both games are live on hosts of their own:**
+**RESUME HERE (2026-10-14, after Step 72).** **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
-only forward). Funny One's Android app (`com.oursharedcode.funny1`) is signed and installed on
-the owner's phone (Step 66). **FO-ID-1 is decided and done (Step 68): the picture library was
-reviewed for a Families audience and the ten pictures the owner saw are blocklisted in the
-client — committed, not yet deployed. T-FO-8.3 is also done (Step 69): the rig — Funny One's
-own art, its default/offline picture — was reviewed the same way, 0 fails and 0 watches in 109
-layers and 200 composites; no SVG edit needed. B-15 is done (Step 70): Funny Multi's
-multi-language room and its story-language switch. Step 71 closes the three flaws Step 70
-surfaced on the way, plus a sibling bug found in the video export — all committed. None of this
-is deployed yet; Step 71 rides along with B-15's own deploy (owner decision 2026-10-13).**
+only forward), and since Step 72 the landing page «Семейная Чепуха» at
+`https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
+15 languages, designs A and B split per tab, with its visit counts and the funnel to Funny
+Multi's gift sheet on the public `/stats/` page; `https://www.oursharedcode.com/` links to it
+from a "Games" card. Funny Multi runs `funny-multi:2bd01ab`: B-15's multi-language room (Step
+70), Step 71's fixes, the visit counts and "Support Author" beside the ♥ (Step 72). B-15 itself
+had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
+— found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
+and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
+blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, nothing to change)
+are committed; **Funny One's deploy is still the owner's — production serves its library
+un-blocked until then.**
 
-**Next, in order, the owner's:** (1) the deploy — `deploy/ship-funny-one.sh
+**Next, in order, the owner's:** (1) confirm the push — Step 72's two commits are here but not
+pushed, so CI has not run on them (Step 71's passed on 2026-10-13; production was built from
+Step 72's first commit); (2) Funny One's deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
-owner runs it in Git Bash or grants it when asked; production serves the library un-blocked
-until then; (2) the T-FO-7.1 phone pass in the signed app, one op per message: op 1 done
-(old-address icon removed), op 2 asked (app-list search), then the 18 checks of
-`docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL bar and Play Protect
-(B-8) for Funny One's app and signs off Gate FO; (3) B-15's deploy, independent of (1) — Funny
-Multi's own `deploy/ship.sh ubuntu@152.69.166.212`, which ends any game in progress (rooms live
-in memory) and now also ships Step 71's fixes (owner decision 2026-10-13: one combined deploy,
-not a separate one) — then one real game on three phones in three languages.
+owner runs it in Git Bash or grants it when asked; (3) the T-FO-7.1 phone pass in the signed
+app, one op per message: op 1 done (old-address icon removed), op 2 asked (app-list search),
+then the 18 checks of `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL
+bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (4) one real Funny Multi
+game on three phones in three languages (B-15), and the landing page's design B on a real
+iPhone (`?v=b`; Playwright's Windows WebKit hangs on its loop, Chrome plays it).
 
 No agent-only step is queued. The next one waits on whichever owner item above lands first.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
-recorded on the Android phone (closes B-12). Phase FO-8 and S-3a/S-3b ran ahead of Gate FO
-because the owner asked for them; the gate itself is unchanged and still open.
+recorded on the Android phone (closes B-12); the landing page's two designs — `/stats/` gives a
+verdict once each has 100 visits, and keeping one of them is then the owner's call. Phase FO-8
+and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
+unchanged and still open.
 
-Open owner decisions: none new. **B-2 (Apple) is cancelled** — do not raise the
-Individual-or-company question again; an iPhone plays the web app (B-14), and the four fixes
-found there are deferred until the owner asks. The shared upload key stays (decision 3 of
-2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e and real icons.
+Open owner decisions: none new. Step 72's thirteen decisions were the agent's, as the request
+asked — each is in that entry with its options, and any of them can be reversed. **B-2 (Apple)
+is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
+app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
+key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e
+and real icons.
 
 B-1e (Play account) is waiting on Equifax: the listing address is the one on the Equifax request
 (owner decision 2026-10-04). Do not retry the Play signup before the D-U-N-S record is fixed;
@@ -3651,61 +3686,73 @@ block is in Funny One's client, Funny Multi still shows them.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` holds the support rails,
-`BASE_PATH=/` and six host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
-`FO_APEX`; both ship scripts stop if one is missing. Backups on the VM:
-`~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`. The image running is tagged
-`funny-multi:e9ad269` but was built from the Steps 60–65 working tree before its commit
-(`e27bb50`); the next `deploy/ship.sh` tags it properly. The production Worker secret is on this
-PC at `~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
+`BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
+`FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Backups on the
+VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`. The
+visit counts live in the volume `funny_stats_data` (`/data/stats.json` in the game's container,
+written every 15 s when something changed and on shutdown), so a deploy keeps them; removing
+the volume loses them. The production Worker secret is on this PC at
+`~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
 added by the owner by hand (Step 57) — the stored token cannot manage it. The Android signing
 key (Step 59, used for both apps) is `~/.android-keys/funny37-upload.jks`, alias `funny37`; a
 hash-verified copy is on the external drive at `F:\Mark\android-keys\`. Losing both means the
 installed apps can never be updated.
 
-Who deploys: auto mode allowed both ship scripts on 2026-10-05 and refused
-`deploy/ship-funny-one.sh` on 2026-10-07 — so try once when the owner asks for the deploy, and
-if it is refused, hand it to the owner without trying another route. Still refused earlier, and
-not to be routed around: a headless browser run against production (Step 49), a local run with
-the production Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55).
-The local `.env`'s Worker secret is not production's, so pictures are tested against the real
-`worker.js` run locally (port 5185), never against the live Worker — the public `/i/<hash>.png`
-route needs no secret and is what Step 68 read. SSH to the VM is allowed only from the owner's
-home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP from
-`curl https://api.ipify.org`).
+Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
+`deploy/ship-funny-one.sh` on 2026-10-07, and on 2026-10-14 allowed `deploy/ship.sh`,
+`deploy/ship-funny-family.sh`, two DNS records and two `.env` lines, the owner having asked for
+the deploy (Step 72) — so try once when the owner asks for a deploy, and if it is refused, hand
+it to the owner without trying another route. Still refused earlier, and not to be routed
+around: a headless browser run against production (Step 49), a local run with the production
+Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run
+`docker compose config` either: it prints the `.env` it reads, secrets and all (Step 72 ran it
+once, locally — it showed the local `.env`'s stale Worker secret, not production's). The local
+`.env`'s Worker secret is not production's, so pictures are tested against the real
+`worker.js` run locally (port 5185), never against the live Worker — the public
+`/i/<hash>.png` route needs no secret and is what Step 68 read. SSH to the VM is allowed only
+from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>` (current IP
+from `curl https://api.ipify.org`).
 
 Notes for whoever runs things here: `npm test` wants the machine to itself — re-run any lone
 timing failure in isolation before treating it as a regression. Multi-line commit messages go
 through `git commit -F <file>`. In a script under `set -o pipefail`, never pipe a large page
-into `grep -q` (Step 60). The agent's shell cannot start Bubblewrap's Gradle step (Step 65) —
-compile checks use `gradlew.bat` by path; signed builds are the owner's anyway. Glob under
+into `grep -q` (Step 60). Never name a source folder `build`: the root `.gitignore` and
+`.prettierignore` skip every `build/`, so its files pass every local check and never reach a
+commit (Step 72). With `MSYS_NO_PATHCONV=1`, `curl -o /dev/null` exits 23 and stops the
+download early — its status code holds, its size does not; read sizes from `curl -sI` (Step
+72). The agent's shell cannot start Bubblewrap's Gradle step (Step 65) — compile checks use
+`gradlew.bat` by path; signed builds are the owner's anyway. Glob under
 `apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
 (`.picture-review/venv`, open_clip, transformers) is on this PC only; `scripts/picture-review/`
 rebuilds it from scratch, and `score.py` plus the sheets take longer than a 10-minute tool call
-— run them in the background. Ports: 5183 (Funny Multi client), 5184 (Funny One client), 3000
-(server), 5185 and 5186 for the ad-hoc checks; read `C:\Mark\Dev\machine\ports.md` before
-binding anything new. Pasting a command into the owner's Git Bash can prepend `[200~`:
-`bind 'set enable-bracketed-paste off'` first.
+— run them in the background. Ports: 5183 (Funny Multi client), 5184 (Funny One client), 5187
+(the landing page), 3000 (server), 5185 and 5186 for the ad-hoc checks; read
+`C:\Mark\Dev\machine\ports.md` before binding anything new. Pasting a command into the owner's
+Git Bash can prepend `[200~`: `bind 'set enable-bracketed-paste off'` first.
 
 Still open, none blocking: the move from Funny One's old address is unchecked in Safari and
 Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` name — worth
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
-Funny One's six new strings and its privacy policy outside English, and Funny Multi's two B-15
-strings outside en/ru, are machine drafts; real
+Funny One's six new strings and its privacy policy outside English, Funny Multi's two B-15
+strings outside en/ru, and the landing page's text outside en/ru are machine drafts; Funny
+Multi's Tamil home title is wider than a phone (seen in Step 72, there since 2026-08-16); real
 Funny One icons before any announcement or listing (also blocks A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement;
-T-7.1's iPhone install leg (closes Gate 7), now run together with B-14's device list on a
-borrowed iPhone; B-8 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct
-PWA/WebAPK install and for Funny One's app (T-FO-7.1 records it); whether to delete the unused
-32-bit JDK at `~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it until the owner
-brings it up); the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt`
-would settle it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
+`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement — until
+then the landing page's GitHub link and Funny Multi's source link answer 404; T-7.1's iPhone
+install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
+— answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
+and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at
+`~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it until the owner brings it up);
+the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt` would settle
+it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
 `packages/shared/src/prompt.ts:81`; a mid-game reload-on-update risk in both clients'
 `swReload.ts`; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
-whether CI should run
-`npm audit` (owner decision — a local gate today); a script enforcing Step 53's audit rule
-(optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of their own (Tailwind 4
-raises the browser floor — a product decision; it is also the only fix for
-GHSA-rj75-hqrm-r3gf); B-11 (hub site, and whether it should host the privacy policy instead of
-each game's own root); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); a player's
-report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68).
+whether CI should run `npm audit` (owner decision — a local gate today); a script enforcing
+Step 53's audit rule (optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of
+their own (Tailwind 4 raises the browser floor — a product decision; it is also the only fix
+for GHSA-rj75-hqrm-r3gf); B-1b — whether the landing page should host one privacy policy
+instead of each game's own root; a `GET /api/stats` on the landing page's host answers with
+Funny Multi's app (harmless, Step 72); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step
+47); a player's report of an unfit library picture goes on `BLOCKED_PICTURES` the same way
+(Step 68).
 

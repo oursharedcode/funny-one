@@ -74,7 +74,12 @@ function installRecorderEnv(opts: { failing?: string[] } = {}): RecorderEnv {
   return { decode, crossOriginBySrc };
 }
 
-const story = { nickname: 'Mika', prose: 'x', pictureUrl: 'https://img.example/i/abc.png' };
+const story = {
+  nickname: 'Mika',
+  prose: 'x',
+  pictureUrl: 'https://img.example/i/abc.png',
+  language: 'en' as const,
+};
 
 /** The `drawImage` calls whose source is one of the monkey's four sprites. */
 function monkeyDraws(ctx: Canvas2DStub): unknown[][] {
@@ -122,6 +127,7 @@ describe('buildWobbleVideoFile', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
     expect(file.name).toBe('funny-stories-Mika.webm');
     expect(file.type).toBe('video/webm;codecs=vp9');
@@ -132,6 +138,7 @@ describe('buildWobbleVideoFile', () => {
       nickname: 'Mika',
       prose: 'x',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
     // Called at least twice: the picture, then the best-effort deployer logo.
     expect(recorderEnv.decode.mock.calls.length).toBeGreaterThanOrEqual(2);
@@ -176,6 +183,7 @@ describe('buildWobbleVideoFile', () => {
         nickname: 'Mika',
         prose: 'x',
         pictureUrl: 'https://img.example/i/a.png',
+        language: 'en',
       }),
     ).rejects.toThrow('MediaRecorder not supported');
   });
@@ -224,6 +232,7 @@ describe('recordWobbleVideo', () => {
       nickname: 'Mika',
       prose: 'x',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
     expect(downloadFile).toHaveBeenCalledTimes(1);
     expect(downloadFile.mock.calls[0]?.[0]).toBeInstanceOf(File);

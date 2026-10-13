@@ -83,6 +83,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
       nickname: entry.nickname,
       prose: story.prose,
       pictureUrl: entry.picture?.url ?? null,
+      language,
     });
     if ((await shareFiles([file], shareMeta())) === 'unsupported') downloadFile(file);
   }
@@ -95,6 +96,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
         nickname: entry.nickname,
         prose: story.prose,
         pictureUrl: entry.picture.url,
+        language,
       });
       downloadFile(file);
     } finally {
@@ -156,6 +158,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
               nickname: entry.nickname,
               prose: story.prose,
               pictureUrl: entry.picture?.url ?? null,
+              language,
             })
           }
         >

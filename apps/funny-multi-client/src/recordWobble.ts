@@ -36,6 +36,7 @@ import {
   renderQrCanvas,
 } from './videoFooter';
 import { drawMonkey, loadMonkeySprites, type MonkeySprites } from './videoMonkey';
+import type { AuthoredLanguage } from '@funny/shared';
 
 const W = 720;
 const H = 1280;
@@ -122,8 +123,12 @@ export async function buildWobbleVideoFile(opts: {
   nickname: string;
   prose: string;
   pictureUrl: string;
+  /** The language the prose is in — a switched story (B-15) can differ
+   *  from the interface's. The footer notice follows it, not the active
+   *  UI locale. */
+  language: AuthoredLanguage;
 }): Promise<File> {
-  const { nickname, prose, pictureUrl } = opts;
+  const { nickname, prose, pictureUrl, language } = opts;
   const mime = pickMime();
   if (!mime) throw new Error('MediaRecorder not supported in this browser');
 
@@ -175,7 +180,7 @@ export async function buildWobbleVideoFile(opts: {
   const BOTTOM_MARGIN = 40;
   const badgeY = picY + picSize + 50;
   const storyTop = badgeY + 40;
-  const attributionHeight = measureAttributionHeight(ctx, W);
+  const attributionHeight = measureAttributionHeight(ctx, W, language);
   const maxStoryHeight = H - BOTTOM_MARGIN - attributionHeight - STORY_GAP - storyTop;
 
   const stream = canvas.captureStream(FPS);
@@ -251,7 +256,7 @@ export async function buildWobbleVideoFile(opts: {
 
     // Static attribution footer matching the downloadable PNG's footer:
     // wrapped content-responsibility notice + QR + source label + URL.
-    drawAttribution(ctx!, qrCanvas, { topY: storyBottom + STORY_GAP, canvasWidth: W });
+    drawAttribution(ctx!, qrCanvas, { topY: storyBottom + STORY_GAP, canvasWidth: W, language });
 
     if (elapsed >= DURATION_MS) {
       recorder.stop();
@@ -277,6 +282,7 @@ export async function recordWobbleVideo(opts: {
   nickname: string;
   prose: string;
   pictureUrl: string;
+  language: AuthoredLanguage;
 }): Promise<void> {
   downloadFile(await buildWobbleVideoFile(opts));
 }

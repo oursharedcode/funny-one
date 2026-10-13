@@ -216,13 +216,16 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     each phone retells a story in its own language from the shared pools and prose templates;
     reveal and gallery now send each story's ids too. Design §5, §8.1, §8.2 and §9 amended,
     DD-13 added; FM-CORE-5 noted.
-  - *Owed:* the deploy (`deploy/ship.sh`); the checkbox's two new strings are machine drafts in
-    13 languages (with B-3); one real game on three phones in three languages.
-  - *Seen on the way, older than B-15, not fixed:* the French prose template prints "a/ont"
-    literally (`packages/shared/src/i18n/fr.ts:19`, a machine draft — B-3), and any player can
-    now reach it by switching a story to French; a downloaded story picture keeps its footer in
-    the interface language when the story is in another; on a Hebrew round screen the timer's
-    mascot sits over the start of "Round 1 of 7".
+  - *Owed:* the deploy (`deploy/ship.sh`, now also carrying Step 71's fixes below — owner
+    decision 2026-10-13: one combined deploy); the checkbox's two new strings are machine drafts
+    in 13 languages (with B-3); one real game on three phones in three languages.
+  - *Seen on the way, older than B-15, fixed in Step 71:* the French prose template's literal
+    "a/ont" (`packages/shared/src/i18n/fr.ts`, a machine draft — B-3; any player could reach it
+    by switching a story to French); a downloaded or shared story picture's footer following the
+    interface language instead of the story's own (also fixed in the 5 s video export, a sibling
+    bug found while verifying this one); the Hebrew round screen's timer mascot over "Round 1 of
+    7"; the exported still's Hebrew text rendering LTR instead of RTL. Still open, unrelated: the
+    client bundle's over-500 kB build warning.
 
 ## Dependency notes
 

@@ -218,7 +218,12 @@ export default function RoundScreen({ round, language, multiLanguage = false, is
   );
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-6 pt-6">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-6 pt-12">
+      {/* pt-12 (not pt-6): clears TimerBar's mascot, which sits top-2..top-10
+          (8px-40px) and at round start is pinned to the far *physical* right
+          edge (left: 100%) regardless of text direction — under RTL (Hebrew)
+          the "Round N of M" line below also starts from the right edge, so
+          without this clearance the two collide at the start of every round. */}
       <TimerBar deadline={round.deadline} duration={ROUND_DURATION_MS} />
       <p className="text-xs text-gray-600">
         {t('round.progress', { current: round.roundNumber + 1, total: TOTAL_ROUNDS })}

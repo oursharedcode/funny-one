@@ -16,5 +16,5 @@ export const fr: ServerI18n = {
     'Pourquoi ?',
     "Comment ça s'est terminé ?",
   ],
-  prose: "{0} avec {1} {3} {2} a/ont {4} {5}. Finalement, ça s'est terminé par {6}.",
+  prose: "{0} avec {1} {3} {2} a {4} {5}. Finalement, ça s'est terminé par {6}.",
 };

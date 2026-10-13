@@ -8,6 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
+import i18n from './i18n/index';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -40,6 +41,7 @@ describe('buildStoryImageFile', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: null,
+      language: 'en',
     });
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -58,6 +60,7 @@ describe('buildStoryImageFile', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
 
     expect(fetchMock).toHaveBeenCalledWith('https://img.example/i/abc.png');
@@ -76,6 +79,7 @@ describe('buildStoryImageFile', () => {
       nickname: '  ***  ',
       prose: 'x',
       pictureUrl: null,
+      language: 'en',
     });
     expect(file.name).toBe('funny-stories-story.png');
   });
@@ -87,8 +91,48 @@ describe('buildStoryImageFile', () => {
         nickname: 'Mika',
         prose: 'x',
         pictureUrl: 'https://img.example/i/abc.png',
+        language: 'en',
       }),
     ).rejects.toThrow('network down');
+  });
+
+  describe('footer language and direction (B-15 / Hebrew export)', () => {
+    afterEach(async () => {
+      await i18n.changeLanguage('en');
+    });
+
+    it('writes the footer in the language passed, not the active UI locale', async () => {
+      await i18n.changeLanguage('he');
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'a pirate did stuff.',
+        pictureUrl: null,
+        language: 'en',
+      });
+      expect(
+        ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'Source on GitHub'),
+      ).toBeDefined();
+    });
+
+    it('right-anchors the prose/nickname for a right-to-left story, resetting left for the footer', async () => {
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'story',
+        pictureUrl: null,
+        language: 'he',
+      });
+      const RIGHT_EDGE = 512 - 28; // WIDTH - PAD
+      const proseCall = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'story');
+      expect(proseCall?.args[1]).toBe(RIGHT_EDGE);
+      const nameCall = ctx.calls.find(
+        (c) => c.method === 'fillText' && (c.args[0] as string) === '— Mika',
+      );
+      expect(nameCall?.args[1]).toBe(RIGHT_EDGE);
+      const sourceLabelCall = ctx.calls.find(
+        (c) => c.method === 'fillText' && c.args[0] === 'קוד המקור ב-GitHub',
+      );
+      expect(sourceLabelCall?.args[1]).not.toBe(RIGHT_EDGE);
+    });
   });
 });
 
@@ -105,7 +149,7 @@ describe('downloadStoryImage', () => {
   });
 
   it('hands the built file to downloadFile', async () => {
-    await downloadStoryImage({ nickname: 'Mika', prose: 'x', pictureUrl: null });
+    await downloadStoryImage({ nickname: 'Mika', prose: 'x', pictureUrl: null, language: 'en' });
     expect(downloadFile).toHaveBeenCalledTimes(1);
     expect(downloadFile.mock.calls[0]?.[0]).toBeInstanceOf(File);
   });

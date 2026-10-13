@@ -19,9 +19,10 @@
 // travel with the image because the downloaded asset moves out of the
 // in-app context where the source footer would otherwise carry it.
 
-import i18n from './i18n/index';
+import i18n, { textDirection } from './i18n/index';
 import { SOURCE_URL } from './sourceUrl';
 import { downloadFile } from './share';
+import type { AuthoredLanguage } from '@funny/shared';
 
 const WIDTH = 512;
 const PAD = 28;
@@ -102,15 +103,22 @@ export async function buildStoryImageFile(opts: {
   nickname: string;
   prose: string;
   pictureUrl: string | null;
+  /** The language the prose is in — a switched story (B-15) can differ
+   *  from the interface's. The footer notice and the prose/nickname
+   *  direction both follow it, not the active UI locale. */
+  language: AuthoredLanguage;
 }): Promise<File> {
-  const { nickname, prose, pictureUrl } = opts;
+  const { nickname, prose, pictureUrl, language } = opts;
 
   // Translated content-responsibility notice — must accompany the image
   // wherever it goes (item 6 of BUGS_AND_IMPROVEMENTS_02.md). Pulled from
-  // the same i18n key the in-app footer uses, so the two stay in sync
-  // automatically if either is ever edited.
-  const notice = i18n.t('footer.contentNotice');
-  const sourceLabel = i18n.t('footer.source');
+  // the same i18n key the in-app footer uses, fixed to the story's own
+  // language (not the interface's) so a downloaded or shared picture always
+  // carries the notice in the language its prose is written in.
+  const fixedT = i18n.getFixedT(language);
+  const notice = fixedT('footer.contentNotice');
+  const sourceLabel = fixedT('footer.source');
+  const dir = textDirection(language);
 
   // Load the picture first (if any) so its drawn height is known.
   const picture = await loadPictureBitmap(pictureUrl);
@@ -160,19 +168,31 @@ export async function buildStoryImageFile(opts: {
   ctx.fillRect(0, 0, WIDTH, height);
   if (picture) ctx.drawImage(picture, 0, 0, WIDTH, pictureHeight);
 
+  // The prose and nickname render in the story's own direction (B-15 can
+  // put a Hebrew story on screen under any interface language); `start`
+  // anchors at the right edge under `rtl`, same as the in-app `dir`
+  // attribute (RoomGallery.tsx) mirrors for the DOM.
   ctx.textBaseline = 'top';
   ctx.fillStyle = INK;
   ctx.font = PROSE_FONT;
+  ctx.direction = dir;
+  ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
+  const textX = dir === 'rtl' ? WIDTH - PAD : PAD;
   let y = pictureHeight + PAD;
   for (const line of proseLines) {
-    ctx.fillText(line, PAD, y);
+    ctx.fillText(line, textX, y);
     y += PROSE_LINE_HEIGHT;
   }
 
   ctx.fillStyle = PINK;
   ctx.font = NAME_FONT;
-  ctx.fillText(`— ${nickname}`, PAD, y + PAD);
+  ctx.fillText(`— ${nickname}`, textX, y + PAD);
   y += PAD + NAME_HEIGHT + FOOTER_DIVIDER_PAD;
+
+  // The footer (QR, notice, source URL) is the app's own fixed chrome, not
+  // story content — always left-to-right regardless of the story's language.
+  ctx.direction = 'ltr';
+  ctx.textAlign = 'left';
 
   // Footer row begins here.
   const rowTop = y;
@@ -213,6 +233,7 @@ export async function downloadStoryImage(opts: {
   nickname: string;
   prose: string;
   pictureUrl: string | null;
+  language: AuthoredLanguage;
 }): Promise<void> {
   downloadFile(await buildStoryImageFile(opts));
 }

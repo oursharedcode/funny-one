@@ -128,6 +128,7 @@ describe('download button', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
   });
 
@@ -159,6 +160,7 @@ describe('share button', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
     expect(shareFiles).toHaveBeenCalledWith([file], {
       title: 'Funny Multi',
@@ -206,6 +208,7 @@ describe('video button', () => {
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
     });
   });
 
@@ -287,8 +290,8 @@ describe('story language (B-15)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
 
     await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
-    expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ prose });
-    expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject({ prose });
-    expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({ prose });
+    expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
+    expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
+    expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
   });
 });

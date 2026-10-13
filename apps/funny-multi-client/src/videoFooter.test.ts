@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
 import { SOURCE_URL } from './sourceUrl';
+import i18n from './i18n/index';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -34,7 +35,7 @@ describe('measureAttributionHeight', () => {
   });
 
   it('is at least the QR size (120px) even for a short notice', () => {
-    const height = measureAttributionHeight(ctx as unknown as CanvasRenderingContext2D, 720);
+    const height = measureAttributionHeight(ctx as unknown as CanvasRenderingContext2D, 720, 'en');
     expect(height).toBeGreaterThanOrEqual(120);
   });
 });
@@ -82,6 +83,7 @@ describe('drawAttribution', () => {
     drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
       topY: 0,
       canvasWidth: 720,
+      language: 'en',
     });
 
     const drawImageCalls = ctx.calls.filter((c) => c.method === 'drawImage');
@@ -90,5 +92,23 @@ describe('drawAttribution', () => {
     const fillTextArgs = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
     // URL is drawn without its protocol prefix.
     expect(fillTextArgs).toContain(SOURCE_URL.replace(/^https?:\/\//, ''));
+  });
+
+  describe('footer language (B-15)', () => {
+    afterEach(async () => {
+      await i18n.changeLanguage('en');
+    });
+
+    it('writes the source label in the language passed, not the active UI locale', async () => {
+      await i18n.changeLanguage('he');
+      const qrCanvas = document.createElement('canvas');
+      drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
+        topY: 0,
+        canvasWidth: 720,
+        language: 'en',
+      });
+      const fillTextArgs = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
+      expect(fillTextArgs).toContain('Source on GitHub');
+    });
   });
 });

@@ -3403,9 +3403,54 @@ Gates: typecheck 0, lint 0, `format:check` clean after one `prettier --write` ov
 
 ---
 
-~~RESUME HERE (after Step 69)~~ — carried into this note.
+## Step 71 — Three flaws Step 70 surfaced, plus a sibling bug in the video export, fixed (2026-10-13)
 
-**RESUME HERE (2026-10-09, after Step 70).** **Both games are live on hosts of their own:**
+**Shipped:**
+
+- *French prose template's literal "a/ont"* (`packages/shared/src/i18n/fr.ts`): the template now
+  reads a fixed singular auxiliary, "a" — not "a/ont" — matching the same singular-only
+  agreement ES/IT's own slot 4 already has. `packages/shared/src/pools/text/fr.ts`'s authoring
+  comment updated to match, flagging the one plural subject
+  (`who.cats-in-a-trench-coat`, "trois chats...") for B-3's native review.
+- *A downloaded or shared story picture's footer* now reads in the story's own language
+  (`i18n.getFixedT(language)`), not the viewer's interface locale — `downloadStory.ts`,
+  `RoomGallery.tsx`. The exported still's prose and nickname also now render right-to-left for a
+  Hebrew story independent of the viewer's own interface direction, resetting to left-to-right
+  before the QR/notice/source-URL footer, which is the app's own fixed chrome, not story content.
+- *The 5-second video export's attribution footer* had the identical bug — it mirrors
+  `downloadStory.ts`'s footer by design but was found, not yet fixed, while verifying the still's
+  fix. Same treatment: `videoFooter.ts`'s `computeLayout`/`measureAttributionHeight`/
+  `drawAttribution` and `recordWobble.ts`'s `buildWobbleVideoFile`/`recordWobbleVideo` now take
+  the story's own `language`, threaded from `RoomGallery.tsx`.
+- *Hebrew round-screen overlap*: `RoundScreen.tsx`'s container padding `pt-6` → `pt-12`, clearing
+  `TimerBar`'s mascot — fixed at the physical right edge regardless of text direction — from
+  "Round N of 7" under RTL.
+- Tests: new coverage in `downloadStory.test.ts` (footer language, RTL anchoring) and
+  `videoFooter.test.ts` (footer language); `recordWobble.test.ts` and `RoomGallery.test.tsx`
+  updated for the now-required `language` field.
+
+**Verified in a browser:** `.screens/fm-multilang-check.mjs` (ignored) rerun against a fresh
+production build — **0 problems**. Screenshots: the Hebrew round screen's mascot now clears
+"סיבוב 1 מתוך 7" with margin to spare; Boris, whose own interface is Russian, switched gallery
+story 1 to French and downloaded it — the exported prose reads "...a creusé un énorme trou..."
+(no literal "a/ont") and the footer notice and "Source sur GitHub" are both in French, not
+Russian.
+
+**Owed:** none from this step. B-15's own Owed is unchanged — the deploy, native review of the
+13 machine-drafted strings (with B-3), one real game on three phones in three languages. The
+client bundle's over-500 kB build warning (noted under B-15, unrelated to any of this) is still
+open.
+
+Gates: typecheck 0, lint 0; `format:check` clean after one `prettier --write` on
+`videoFooter.test.ts`; `npm test` outside the sandbox **961 passed** (321 + 233 + 164 + 190 +
+53), exit 0; `npm audit --omit=dev` 0; full `npm audit` only GHSA-vfj7-8cjw-p6xm and
+GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3. CI: after the push.
+
+---
+
+~~RESUME HERE (2026-10-09, after Step 70)~~ — carried into this note.
+
+**RESUME HERE (2026-10-13, after Step 71).** **Both games are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward). Funny One's Android app (`com.oursharedcode.funny1`) is signed and installed on
@@ -3413,8 +3458,10 @@ the owner's phone (Step 66). **FO-ID-1 is decided and done (Step 68): the pictur
 reviewed for a Families audience and the ten pictures the owner saw are blocklisted in the
 client — committed, not yet deployed. T-FO-8.3 is also done (Step 69): the rig — Funny One's
 own art, its default/offline picture — was reviewed the same way, 0 fails and 0 watches in 109
-layers and 200 composites; no SVG edit needed. B-15 is done too (Step 70): Funny Multi's
-multi-language room and its story-language switch — committed, not deployed.**
+layers and 200 composites; no SVG edit needed. B-15 is done (Step 70): Funny Multi's
+multi-language room and its story-language switch. Step 71 closes the three flaws Step 70
+surfaced on the way, plus a sibling bug found in the video export — all committed. None of this
+is deployed yet; Step 71 rides along with B-15's own deploy (owner decision 2026-10-13).**
 
 **Next, in order, the owner's:** (1) the deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -3424,7 +3471,8 @@ until then; (2) the T-FO-7.1 phone pass in the signed app, one op per message: o
 `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL bar and Play Protect
 (B-8) for Funny One's app and signs off Gate FO; (3) B-15's deploy, independent of (1) — Funny
 Multi's own `deploy/ship.sh ubuntu@152.69.166.212`, which ends any game in progress (rooms live
-in memory) — then one real game on three phones in three languages.
+in memory) and now also ships Step 71's fixes (owner decision 2026-10-13: one combined deploy,
+not a separate one) — then one real game on three phones in three languages.
 
 No agent-only step is queued. The next one waits on whichever owner item above lands first.
 
@@ -3506,16 +3554,12 @@ PWA/WebAPK install and for Funny One's app (T-FO-7.1 records it); whether to del
 brings it up); the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt`
 would settle it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
 `packages/shared/src/prompt.ts:81`; a mid-game reload-on-update risk in both clients'
-`swReload.ts`; the exported story picture's Hebrew text rendering LTR instead of RTL; all
-non-`en`/`ru` `home.title`s in both clients await native-speaker review; whether CI should run
+`swReload.ts`; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
+whether CI should run
 `npm audit` (owner decision — a local gate today); a script enforcing Step 53's audit rule
 (optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of their own (Tailwind 4
 raises the browser floor — a product decision; it is also the only fix for
 GHSA-rj75-hqrm-r3gf); B-11 (hub site, and whether it should host the privacy policy instead of
 each game's own root); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step 47); a player's
-report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68); three
-older flaws Step 70 brought into view — the French prose template's literal "a/ont"
-(`packages/shared/src/i18n/fr.ts:19`, B-3), a downloaded story picture's footer in the interface
-language under a story in another, and the timer's mascot over "Round 1 of 7" on a Hebrew round
-screen.
+report of an unfit library picture goes on `BLOCKED_PICTURES` the same way (Step 68).
 

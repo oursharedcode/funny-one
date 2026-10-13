@@ -11,10 +11,12 @@
 //   - content-responsibility notice (italic, gray, wrapped)
 //   - QR code on the left, source label + URL stacked to its right
 // Keeps the i18n notice in sync with the in-app SourceFooter via the same
-// `footer.contentNotice` key.
+// `footer.contentNotice` key, fixed to the story's own language (B-15) via
+// `i18n.getFixedT`, not the active UI locale — same fix as the still's footer.
 
 import i18n from './i18n/index';
 import { SOURCE_URL } from './sourceUrl';
+import type { AuthoredLanguage } from '@funny/shared';
 
 const QR_SIZE = 120;
 const QR_TEXT_GAP = 18;
@@ -82,8 +84,16 @@ interface FooterLayout {
 // dropped to the QR's bottom edge — with the URL just beneath it. A tall
 // notice pushes the source label lower so the two never overlap. Sets the
 // context font to NOTICE_FONT as a measuring side effect.
-function computeLayout(ctx: CanvasRenderingContext2D, canvasWidth: number): FooterLayout {
-  const notice = i18n.t('footer.contentNotice');
+//
+// `language` fixes the notice to the story's own language (B-15 can put a
+// story on screen under any interface language), not the active UI locale —
+// same fix as the downloadable still's footer (downloadStory.ts).
+function computeLayout(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  language: AuthoredLanguage,
+): FooterLayout {
+  const notice = i18n.getFixedT(language)('footer.contentNotice');
   const rightColX = PAD + QR_SIZE + QR_TEXT_GAP;
   const rightColWidth = canvasWidth - rightColX - PAD;
   ctx.font = NOTICE_FONT;
@@ -100,8 +110,9 @@ function computeLayout(ctx: CanvasRenderingContext2D, canvasWidth: number): Foot
 export function measureAttributionHeight(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
+  language: AuthoredLanguage,
 ): number {
-  return computeLayout(ctx, canvasWidth).footerRowHeight;
+  return computeLayout(ctx, canvasWidth, language).footerRowHeight;
 }
 
 // Picks the largest story font (STORY_MAX_PX → STORY_MIN_PX) whose wrapped
@@ -155,15 +166,15 @@ export function drawStoryText(
 export function drawAttribution(
   ctx: CanvasRenderingContext2D,
   qrCanvas: HTMLCanvasElement,
-  opts: { topY: number; canvasWidth: number },
+  opts: { topY: number; canvasWidth: number; language: AuthoredLanguage },
 ): void {
-  const { topY, canvasWidth } = opts;
-  const sourceLabel = i18n.t('footer.source');
+  const { topY, canvasWidth, language } = opts;
+  const sourceLabel = i18n.getFixedT(language)('footer.source');
 
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
 
-  const { noticeLines, rightColX, sourceLabelTop } = computeLayout(ctx, canvasWidth);
+  const { noticeLines, rightColX, sourceLabelTop } = computeLayout(ctx, canvasWidth, language);
 
   // QR code on the left.
   ctx.drawImage(qrCanvas, PAD, topY, QR_SIZE, QR_SIZE);

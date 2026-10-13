@@ -4,7 +4,7 @@
 // needs-fr-review — machine-translated stub awaiting native French review per CONTRIBUTING.md.
 //
 // Authored against the French prose template:
-//   "{0} avec {1} {3} {2} a/ont {4} {5}. Finalement, ça s'est terminé par {6}."
+//   "{0} avec {1} {3} {2} a {4} {5}. Finalement, ça s'est terminé par {6}."
 //
 // Per-slot authoring rules that fall out of that template:
 //
@@ -16,10 +16,14 @@
 //      renders AFTER slot 3 in the sentence, with no glue word between them
 //   3  when — carries its own preposition/adverbial ("pendant un petit
 //      tremblement de terre"); renders BEFORE slot 2, back-to-back with it
-//   4  bare PAST PARTICIPLE phrase only — the template supplies the auxiliary
-//      "a/ont" (avoir) immediately before this slot, so slot 4 must not
-//      repeat an auxiliary. Since the auxiliary is always "avoir", the
-//      participle stays invariant (no gender/number agreement needed)
+//   4  bare PAST PARTICIPLE phrase only — the template hardcodes the
+//      auxiliary as "a" (3rd person SINGULAR avoir) immediately before this
+//      slot, so slot 4 must not repeat an auxiliary and the participle stays
+//      invariant (no gender agreement needed with "avoir"). Same limitation
+//      as es-es.ts/it.ts's slot 4 (always singular agreement): the one
+//      plural subject, 'who.cats-in-a-trench-coat' ("trois chats..."), reads
+//      with a singular verb ("a cuit" rather than "ont cuit") until B-3's
+//      native review.
 //   5  why — must supply its own leading connective (pour, parce que, à
 //      cause de, afin de, ...) since nothing links it to slot 4
 //   6  ending — a bare NOUN PHRASE, not a clause: it is the object of

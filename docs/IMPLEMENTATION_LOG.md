@@ -3636,7 +3636,9 @@ version` 3.0.3. CI: after the push.
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
 
-**RESUME HERE (2026-10-14, after Step 72).** **Three sites are live on hosts of their own:**
+~~RESUME HERE (2026-10-14, after Step 72)~~ — carried into this note.
+
+**RESUME HERE (2026-10-15, after Step 72).** **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
@@ -3652,18 +3654,19 @@ blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, noth
 are committed; **Funny One's deploy is still the owner's — production serves its library
 un-blocked until then.**
 
-**Next, in order, the owner's:** (1) confirm the push — Step 72's two commits are here but not
-pushed, so CI has not run on them (Step 71's passed on 2026-10-13; production was built from
-Step 72's first commit); (2) Funny One's deploy — `deploy/ship-funny-one.sh
+**Confirmed 2026-10-15:** Step 72's three commits are pushed and CI passed (run `38737196381`).
+
+**Next, in order, the owner's:** (1) Funny One's deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
-owner runs it in Git Bash or grants it when asked; (3) the T-FO-7.1 phone pass in the signed
+owner runs it in Git Bash or grants it when asked; (2) the T-FO-7.1 phone pass in the signed
 app, one op per message: op 1 done (old-address icon removed), op 2 asked (app-list search),
 then the 18 checks of `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL
-bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (4) one real Funny Multi
+bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (3) one real Funny Multi
 game on three phones in three languages (B-15), and the landing page's design B on a real
-iPhone (`?v=b`; Chrome plays it). Asked on 2026-10-15, also the owner's: Avast blocks
-Playwright's WebKit on this PC (Step 72, found that day) — an exception for its folder
-(recommended; the agent then re-runs design B in WebKit) or quarantine.
+iPhone (`?v=b`; Chrome plays it); (4) an Avast exception for Playwright's WebKit folder on this
+PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.exe` as
+`IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
+build, found 2026-10-15); an exception is recommended so design B can be checked here too.
 
 No agent-only step is queued. The next one waits on whichever owner item above lands first.
 

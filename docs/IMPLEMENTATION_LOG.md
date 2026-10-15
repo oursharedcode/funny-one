@@ -3569,9 +3569,9 @@ nicely designed jumping words "Support Author" next/below to the red heart". Fil
   desktop, 60 pages: `lang`, `dir`, design, fonts, no sideways scroll, no broken image, no
   script error, the counts' labels; (5) the root's language redirect and the picker; (6) WebKit
   at iPhone size, English and Hebrew: design A's trailer plays in place with sound. Design B's
-  loop could not be watched in WebKit — Playwright's Windows build stops answering on that
-  page's video (its media stack, not the page) — so it was checked in Chrome: the loop plays
-  and pauses.
+  loop could not be watched in WebKit — its page stopped answering in every run, most likely
+  Avast's doing rather than WebKit's or the page's (found 2026-10-15, below) — so it was
+  checked in Chrome: the loop plays and pauses.
 
 **Deployed 2026-10-14, in the order `DEPLOYMENT.md` gives** (the request was the owner's go; the
 agent ran each step and auto mode allowed it): two DNS-only `A` records (`www.funny-family` and
@@ -3597,6 +3597,18 @@ files on the VM were not touched (still 2026-10-05's).
 (16:09 local). That deploy was never logged, so Step 71's note and `tasks.md` still called B-15
 undeployed. What went out today on top of it: Step 71's fixes and this step. `tasks.md` now
 says so.
+
+**Found 2026-10-15: the WebKit hang in (6) was most likely Avast, not WebKit.** The owner's
+screenshot: Avast's Behavior Shield blocked Playwright's `webkit-2359\WebKitWebProcess.exe` as
+`IDP.Generic` (a heuristic) on 2026-10-13 at 20:27:38 UTC (07:27 local on the 14th) — 7 s after
+the check's first WebKit screenshot, as its page stopped answering; that process was still
+there, stuck, ten minutes later. The two later runs stopped on design B every time, and once
+after the English trailer's tap (whether Avast acted then is not known); the Hebrew trailer, an
+MP4, played 1.2 s in, so the first reading — WebKit's media stack — does not hold. All 354
+files of that folder are byte-identical to Microsoft's own build of Playwright 1.63's WebKit
+(downloaded again over HTTPS and compared): a false positive on an unsigned test browser that
+this project installed. Design B in WebKit is unseen, not failed; the owner was asked to let
+that folder through, or to quarantine it.
 
 *Harmless, left as is:* a `GET /api/stats` on the page's host answers 200 with Funny Multi's
 `index.html` — Caddy forwards that path for the counts' POST, and the game's server answers any
@@ -3649,7 +3661,9 @@ app, one op per message: op 1 done (old-address icon removed), op 2 asked (app-l
 then the 18 checks of `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL
 bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (4) one real Funny Multi
 game on three phones in three languages (B-15), and the landing page's design B on a real
-iPhone (`?v=b`; Playwright's Windows WebKit hangs on its loop, Chrome plays it).
+iPhone (`?v=b`; Chrome plays it). Asked on 2026-10-15, also the owner's: Avast blocks
+Playwright's WebKit on this PC (Step 72, found that day) — an exception for its folder
+(recommended; the agent then re-runs design B in WebKit) or quarantine.
 
 No agent-only step is queued. The next one waits on whichever owner item above lands first.
 
@@ -3720,9 +3734,11 @@ into `grep -q` (Step 60). Never name a source folder `build`: the root `.gitigno
 `.prettierignore` skip every `build/`, so its files pass every local check and never reach a
 commit (Step 72). With `MSYS_NO_PATHCONV=1`, `curl -o /dev/null` exits 23 and stops the
 download early — its status code holds, its size does not; read sizes from `curl -sI` (Step
-72). The agent's shell cannot start Bubblewrap's Gradle step (Step 65) — compile checks use
-`gradlew.bat` by path; signed builds are the owner's anyway. Glob under
-`apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
+72). A WebKit check that stops answering here: ask the owner whether Avast alerted before
+blaming WebKit or the page — its Behavior Shield blocked Playwright's WebKit as `IDP.Generic` on
+2026-10-14, a false positive (Step 72). The agent's shell cannot start Bubblewrap's Gradle step
+(Step 65) — compile checks use `gradlew.bat` by path; signed builds are the owner's anyway.
+Glob under `apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
 (`.picture-review/venv`, open_clip, transformers) is on this PC only; `scripts/picture-review/`
 rebuilds it from scratch, and `score.py` plus the sheets take longer than a 10-minute tool call
 — run them in the background. Ports: 5183 (Funny Multi client), 5184 (Funny One client), 5187

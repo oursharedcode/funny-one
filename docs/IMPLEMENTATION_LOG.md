@@ -3756,7 +3756,14 @@ Tamil rules box at 320 px, so it does catch that. Funny Multi's Tamil title is n
 centred (French at 320 px: 61..255 of 320). Screenshots viewed: Tamil, Russian Funny One (three
 balanced lines at 320 px), Hebrew and Persian.
 
-**Owed:** the deploy, with Step 73.
+**Owed:** ~~the deploy, with Step 73~~ — done 2026-10-16, below.
+
+**Pushed and deployed 2026-10-16** (owner: "Confirm", then "ok" to the deploy): Steps 73 and 74
+pushed together, CI passed (run `38898907879`). `deploy/ship.sh` put `funny-multi:a603d44` live —
+health, privacy policy, `assetlinks.json` and the old address's 301 all checked by the script,
+exit 0. `deploy/ship-funny-family.sh` swapped in the landing page — its own eight checks passed,
+exit 0; `/fa/`, `/yue/`, `/hi/`, `/te/` and `/bn/` answer 200. Funny One is not deployed (the
+owner's).
 
 Gates:
 
@@ -3779,26 +3786,28 @@ Gates:
 
 ~~RESUME HERE (2026-10-16, after Step 73)~~ — carried into this note.
 
-**RESUME HERE (2026-10-16, after Step 74).** **Steps 73 and 74 (B-16) are committed, not
-pushed, not deployed.** Step 73 adds five languages (Cantonese, Persian, Hindi, Telugu,
-Bengali; 20 in all) to both games, the landing page and both privacy policies, and fixes the
-exported pictures for Chinese, Japanese, Hebrew and Persian. Step 74 makes every home title fit
-a phone (Funny Multi's Tamil one ran off the screen). Push them only once the owner confirms.
-Production still serves 15 languages.
+~~RESUME HERE (2026-10-16, after Step 74)~~ — carried into this note.
 
-**Next:** once pushed, deploy Funny Multi and the landing page (`deploy/ship.sh`,
-`deploy/ship-funny-family.sh`) when the owner asks — the owner's decision of 2026-10-16 was two
-commits and one deploy. Funny One's deploy, which now carries B-16 too, stays the owner's.
+**RESUME HERE (2026-10-16, after Step 74, pushed and deployed).** **Steps 73 and 74 (B-16) are
+pushed, CI passed (run `38898907879`), and Funny Multi and the landing page are deployed.**
+Step 73 added five languages (Cantonese, Persian, Hindi, Telugu, Bengali; 20 in all) to both
+games, the landing page and both privacy policies, and fixed the exported pictures for Chinese,
+Japanese, Hebrew and Persian. Step 74 made every home title fit a phone. Funny One's production
+still serves 15 languages until the owner deploys it; its deploy now carries B-16 too.
+
+**Next:** nothing is queued for the agent. B-16 stays open only for the five languages' native
+review (B-3). The owner's queue is below.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
-15 languages, designs A and B split per tab, with its visit counts and the funnel to Funny
-Multi's gift sheet on the public `/stats/` page; `https://www.oursharedcode.com/` links to it
-from a "Games" card. Funny Multi runs `funny-multi:2bd01ab`: B-15's multi-language room (Step
-70), Step 71's fixes, the visit counts and "Support Author" beside the ♥ (Step 72). B-15 itself
+20 languages since Step 73, designs A and B split per tab, with its visit counts and the funnel
+to Funny Multi's gift sheet on the public `/stats/` page; `https://www.oursharedcode.com/` links
+to it from a "Games" card. Funny Multi runs `funny-multi:a603d44`: B-15's multi-language room
+(Step 70), Step 71's fixes, the visit counts and "Support Author" beside the ♥ (Step 72), the 20
+languages (Step 73) and the fitted titles (Step 74). B-15 itself
 had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
@@ -3806,7 +3815,9 @@ blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, noth
 are committed; **Funny One's deploy is still the owner's — production serves its library
 un-blocked until then.**
 
-**Confirmed 2026-10-15:** Step 72's three commits are pushed and CI passed (run `38737196381`).
+**Confirmed 2026-10-16:** Steps 73 and 74 are pushed and CI passed (run `38898907879`). CI
+warned that GitHub moves `ubuntu-latest` to Ubuntu 26 from 2026-10-19: a red build after that
+date may be the new image, not the code.
 
 **Next, in order, the owner's:** (1) Funny One's deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -3820,8 +3831,7 @@ PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.
 `IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
 build, found 2026-10-15); an exception is recommended so design B can be checked here too.
 
-The agent's own queue is empty after the push and the deploy (above). Anything after them waits
-on whichever owner item lands first.
+The agent's own queue is empty. Anything next waits on whichever owner item lands first.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -3871,7 +3881,8 @@ installed apps can never be updated.
 Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 `deploy/ship-funny-one.sh` on 2026-10-07, and on 2026-10-14 allowed `deploy/ship.sh`,
 `deploy/ship-funny-family.sh`, two DNS records and two `.env` lines, the owner having asked for
-the deploy (Step 72) — so try once when the owner asks for a deploy, and if it is refused, hand
+the deploy (Step 72), and on 2026-10-16 allowed both ship scripts again (Steps 73–74) — so try
+once when the owner asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
 Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run

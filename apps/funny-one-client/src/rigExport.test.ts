@@ -10,6 +10,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Story } from '@funny/shared';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
+import { gameUrl } from './gameUrl';
+import i18n from './i18n/index';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -87,6 +89,22 @@ describe('buildStoryImageFile', () => {
   it('sanitizes the name into a safe filename, falling back to "story"', async () => {
     const file = await buildStoryImageFile({ name: '  ***  ', prose: 'x', story: fullStory() });
     expect(file.name).toBe('funny-story-story.png');
+  });
+
+  it('anchors a right-to-left story and its footer at the right edge (Step 73)', async () => {
+    await i18n.changeLanguage('fa');
+    try {
+      await buildStoryImageFile({ name: 'Ann', prose: 'story', story: fullStory() });
+    } finally {
+      await i18n.changeLanguage('en');
+    }
+    const x = (text: string) =>
+      ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === text)?.args[1];
+    const RIGHT_EDGE = 800 - 28; // WIDTH - PAD
+    expect(x('story')).toBe(RIGHT_EDGE);
+    expect(x('— Ann')).toBe(RIGHT_EDGE);
+    expect(x(i18n.getFixedT('fa')('footer.playYourself'))).toBe(RIGHT_EDGE);
+    expect(x(gameUrl())).toBe(RIGHT_EDGE);
   });
 });
 

@@ -1,0 +1,63 @@
+{
+  "_note": "needs-fa-review — machine-translated stub awaiting native Persian (Iran) review.",
+  "home": {
+    "title": "قصهٔ دست‌به‌دست",
+    "subtitle": "دستگاه را دست‌به‌دست کنید و با هم قصه‌های عجیب و غریب بسازید، 2 تا 7 بازیکن، بدون نیاز به اینترنت.",
+    "start": "شروع بازی",
+    "gameRules": "قانون‌های بازی",
+    "rules": "دستگاه را دست‌به‌دست کنید. هر دور، همه به نوبت به یک سؤال بامزه جواب می‌دهند. جواب‌ها قاطی می‌شوند و قصه‌های عجیب و غریب می‌سازند، بعد برای هر قصه یک عکس خنده‌دار ساخته می‌شود.",
+    "language": "زبان",
+    "seatCountHint": "در کل 2 تا 7 بازیکن",
+    "playerNamePlaceholder": "اسم",
+    "humanSeatLabel": "اسم بازیکن",
+    "virtualSeatLabel": "اسم بازیکن مجازی",
+    "humanBadge": "تو",
+    "virtualBadge": "ربات",
+    "removeSeat": "حذف بازیکن",
+    "addPlayer": "+ افزودن بازیکن",
+    "addVirtual": "+ افزودن بازیکن مجازی",
+    "pictures": "عکس‌ها",
+    "picturesBuiltIn": "داخلی",
+    "picturesOnline": "از اینترنت",
+    "picturesBuiltInHint": "روی همین دستگاه کشیده می‌شوند. اینترنت لازم نیست.",
+    "picturesOnlineHint": "کارتون‌ها از کتابخانهٔ عکس‌ها می‌آیند. اینترنت لازم است؛ بدون آن، عکس‌های داخلی را می‌بینی."
+  },
+  "thinking": {
+    "title": "{{name}} دارد فکر می‌کند…"
+  },
+  "handoff": {
+    "title": "دستگاه را بده به {{name}}",
+    "subtitle": "دزدکی جواب‌های بقیه را نگاه نکن.",
+    "ready": "من {{name}} هستم — بزن بریم"
+  },
+  "round": {
+    "progress": "سؤال {{current}} از {{total}}",
+    "pick": "جوابت را انتخاب کن",
+    "optionsLabel": "جواب‌هایی برای انتخاب",
+    "scrollHint": "برای دیدن بقیه، پایین برو",
+    "submit": "ثبت",
+    "submitDisabled": "اول یک جواب انتخاب کن",
+    "submitted": "ثبت شد"
+  },
+  "gallery": {
+    "title": "قصه‌ها",
+    "storyBy": "قصهٔ {{name}}",
+    "pictureAlt": "عکس قصهٔ {{name}}",
+    "prev": "قصهٔ قبلی",
+    "next": "قصهٔ بعدی",
+    "counter": "{{index}} از {{total}}",
+    "download": "دانلود",
+    "shareButton": "اشتراک‌گذاری"
+  },
+  "end": {
+    "title": "قصه‌ها آماده‌اند!",
+    "playAgain": "دوباره بازی کنیم",
+    "changePlayers": "عوض کردن بازیکن‌ها"
+  },
+  "footer": {
+    "gameLink": "لینک این بازی",
+    "playYourself": "خودت بازی کن",
+    "contentNotice": "این بازی فقط روی دستگاه خودت اجرا می‌شود. هر چه تایپ کنی، هیچ‌وقت از آن بیرون نمی‌رود.",
+    "contentNoticeOnline": "هر چه تایپ کنی، هیچ‌وقت از این دستگاه بیرون نمی‌رود. اگر عکس‌ها «از اینترنت» باشند، کارتون هر قصه از کتابخانهٔ عکس‌ها دانلود می‌شود."
+  }
+}

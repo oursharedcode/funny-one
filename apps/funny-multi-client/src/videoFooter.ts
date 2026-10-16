@@ -14,9 +14,9 @@
 // `footer.contentNotice` key, fixed to the story's own language (B-15) via
 // `i18n.getFixedT`, not the active UI locale — same fix as the still's footer.
 
-import i18n from './i18n/index';
+import i18n, { textDirection } from './i18n/index';
 import { SOURCE_URL } from './sourceUrl';
-import type { AuthoredLanguage } from '@funny/shared';
+import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
 const QR_SIZE = 120;
 const QR_TEXT_GAP = 18;
@@ -53,23 +53,6 @@ export async function renderQrCanvas(value: string): Promise<HTMLCanvasElement> 
     color: { dark: INK, light: CREAM },
   });
   return qrCanvas;
-}
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/)) {
-    if (!word) continue;
-    const test = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(test).width > maxWidth) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
 }
 
 interface FooterLayout {
@@ -141,20 +124,25 @@ function fitStory(
 // the block never exceeds `maxHeight` — keeping the attribution footer on
 // screen for long stories. Returns the y-coordinate just below the last line
 // so the caller can stack the attribution beneath it. Mirrors the prose the
-// downloadable PNG carries (downloadStory.ts), scaled for the video canvas.
+// downloadable PNG carries (downloadStory.ts), scaled for the video canvas,
+// in the story's own direction: a Hebrew or Persian story starts at the right
+// edge (Step 73; before, it followed whatever the page's direction was).
 export function drawStoryText(
   ctx: CanvasRenderingContext2D,
   prose: string,
-  opts: { topY: number; canvasWidth: number; maxHeight: number },
+  opts: { topY: number; canvasWidth: number; maxHeight: number; language: AuthoredLanguage },
 ): number {
-  const { topY, canvasWidth, maxHeight } = opts;
-  ctx.textAlign = 'left';
+  const { topY, canvasWidth, maxHeight, language } = opts;
+  const dir = textDirection(language);
+  ctx.direction = dir;
+  ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
   ctx.textBaseline = 'top';
   const { lineHeight, lines } = fitStory(ctx, prose, canvasWidth - PAD * 2, maxHeight);
   ctx.fillStyle = INK;
+  const x = dir === 'rtl' ? canvasWidth - PAD : PAD;
   let y = topY;
   for (const line of lines) {
-    ctx.fillText(line, PAD, y);
+    ctx.fillText(line, x, y);
     y += lineHeight;
   }
   return y;
@@ -170,11 +158,17 @@ export function drawAttribution(
 ): void {
   const { topY, canvasWidth, language } = opts;
   const sourceLabel = i18n.getFixedT(language)('footer.source');
+  const dir = textDirection(language);
 
-  ctx.textAlign = 'left';
+  // The notice and label keep the story's direction, as on the still
+  // (downloadStory.ts); the URL reads left to right under its label.
+  ctx.direction = dir;
+  ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
   ctx.textBaseline = 'top';
 
   const { noticeLines, rightColX, sourceLabelTop } = computeLayout(ctx, canvasWidth, language);
+
+  const colX = dir === 'rtl' ? canvasWidth - PAD : rightColX;
 
   // QR code on the left.
   ctx.drawImage(qrCanvas, PAD, topY, QR_SIZE, QR_SIZE);
@@ -184,7 +178,7 @@ export function drawAttribution(
   ctx.fillStyle = NOTICE_COLOR;
   let noticeY = topY;
   for (const line of noticeLines) {
-    ctx.fillText(line, rightColX, noticeY);
+    ctx.fillText(line, colX, noticeY);
     noticeY += NOTICE_LINE_HEIGHT;
   }
 
@@ -192,12 +186,10 @@ export function drawAttribution(
   const sourceLabelY = topY + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(sourceLabel, rightColX, sourceLabelY);
+  ctx.fillText(sourceLabel, colX, sourceLabelY);
 
+  ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(
-    SOURCE_URL.replace(/^https?:\/\//, ''),
-    rightColX,
-    sourceLabelY + URL_LINE_HEIGHT + 6,
-  );
+  ctx.fillText(SOURCE_URL.replace(/^https?:\/\//, ''), colX, sourceLabelY + URL_LINE_HEIGHT + 6);
+  ctx.textAlign = 'left';
 }

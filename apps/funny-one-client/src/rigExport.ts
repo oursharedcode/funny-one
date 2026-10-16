@@ -22,8 +22,8 @@
 
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { Story } from '@funny/shared';
-import i18n from './i18n/index';
+import { wrapText, type Story } from '@funny/shared';
+import i18n, { textDirection } from './i18n/index';
 import { gameUrl } from './gameUrl';
 import { downloadFile } from './share';
 import { RIG_INDEX } from './components/art/rig/rigIndex';
@@ -62,23 +62,6 @@ const NOTICE_SOURCE_GAP = 10;
 
 /** How long the export waits for the library picture before drawing the rig. */
 const LIBRARY_FETCH_TIMEOUT_MS = 8000;
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/)) {
-    if (!word) continue;
-    const test = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(test).width > maxWidth) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
 
 function safeFileName(name: string): string {
   const slug = name
@@ -240,19 +223,34 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
     await drawRigScene(ctx, story);
   }
 
+  // The prose and name run in the story's direction, which in Funny One is
+  // the interface's: a Hebrew or Persian story anchors at the right edge, as
+  // Funny Multi's still does (Step 71). Before Step 73 this canvas drew every
+  // story left to right.
+  const dir = textDirection(i18n.language);
   ctx.textBaseline = 'top';
   ctx.fillStyle = INK;
   ctx.font = PROSE_FONT;
+  ctx.direction = dir;
+  ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
+  const textX = dir === 'rtl' ? WIDTH - PAD : PAD;
   let y = pictureHeight + PAD;
   for (const line of proseLines) {
-    ctx.fillText(line, PAD, y);
+    ctx.fillText(line, textX, y);
     y += PROSE_LINE_HEIGHT;
   }
 
   ctx.fillStyle = PINK;
   ctx.font = NAME_FONT;
-  ctx.fillText(`— ${name}`, PAD, y + PAD);
+  ctx.fillText(`— ${name}`, textX, y + PAD);
   y += PAD + NAME_HEIGHT + FOOTER_DIVIDER_PAD;
+
+  // The footer's layout is the app's own (QR at the left, text beside it), but
+  // its notice and label are in the story's language, so they keep the
+  // story's direction and start at the column's start edge; drawn left to
+  // right, a Persian or Hebrew sentence came out scrambled (Step 73). The URL
+  // reads left to right but sits under its label, at the same edge.
+  const colX = dir === 'rtl' ? WIDTH - PAD : rightColX;
 
   const rowTop = y;
 
@@ -262,17 +260,19 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   ctx.font = NOTICE_FONT;
   let noticeY = rowTop;
   for (const line of noticeLines) {
-    ctx.fillText(line, rightColX, noticeY);
+    ctx.fillText(line, colX, noticeY);
     noticeY += NOTICE_LINE_HEIGHT;
   }
 
   const sourceLabelY = rowTop + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(sourceLabel, rightColX, sourceLabelY);
+  ctx.fillText(sourceLabel, colX, sourceLabelY);
 
+  ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(url, rightColX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(url, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.textAlign = 'left';
 
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob((b) => resolve(b), 'image/png');

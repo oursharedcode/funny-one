@@ -122,7 +122,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   parallel with B-1 (owner decision 2026-10-04), as an **Individual** — Apple does not take sole
   traders as organizations, shows the personal legal name as seller, needs no D-U-N-S, and moves
   the account to an Organization later on request. Findings in Step 58.
-- **B-3** Native-speaker review of the 13 machine-drafted pool languages (OD-F5).
+- **B-3** Native-speaker review of the 18 machine-drafted pool languages (OD-F5): T-6.3's 13 and
+  B-16's five.
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared
   with future Funny One).
@@ -245,6 +246,24 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     bug found while verifying this one); the Hebrew round screen's timer mascot over "Round 1 of
     7"; the exported still's Hebrew text rendering LTR instead of RTL. Still open, unrelated: the
     client bundle's over-500 kB build warning.
+- **B-16** Five more languages: Cantonese, Hindi, Telugu, Bengali and Persian (owner request
+  2026-10-16), in both games, the landing page and both privacy policies, 20 in all. Cantonese
+  (`yue`) is written Cantonese in Traditional characters under Hong Kong's flag; a browser set
+  to `zh-HK` or `zh-MO` gets it, while `zh-TW` stays on Mandarin. Persian (`fa`, Iran) is right
+  to left, like Hebrew. Hindi and Telugu share India's flag with Tamil, so the three are labelled
+  with their language's letters, TA, HI and TE (Tamil's label was IN). Every other flag was
+  checked distinct. The flag pictures are Twemoji's (CC-BY 4.0, credited in the README).
+  `LANGUAGES.md` now says how to add a language. **Code done 2026-10-16 (Step 73).**
+  - *Owed:* all text in the five new languages is machine-drafted and marked
+    `needs-<code>-review`, so it goes to B-3.
+  - *Seen on the way, older than B-16, fixed in Step 73:* exported story pictures broke lines
+    only at spaces, so every Mandarin and Japanese still since T-5.2 was drawn as one cut-off
+    line. One shared `wrapText` now also breaks between Han and kana characters. Funny One's
+    still drew Hebrew left to right; Step 71 had fixed only Funny Multi's. In every export (both
+    stills and the 5 s video) the footer's notice and label are in the story's language but
+    were drawn left to right, which scrambled Hebrew and Persian. They now run right to left at
+    the right edge, with the URL under them. The video's story text had no direction of its
+    own; it now has the story's.
 
 ## Dependency notes
 

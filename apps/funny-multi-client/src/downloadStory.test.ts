@@ -9,6 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
 import i18n from './i18n/index';
+import { SOURCE_URL } from './sourceUrl';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -114,7 +115,7 @@ describe('buildStoryImageFile', () => {
       ).toBeDefined();
     });
 
-    it('right-anchors the prose/nickname for a right-to-left story, resetting left for the footer', async () => {
+    it('right-anchors the prose, nickname and footer of a right-to-left story', async () => {
       await buildStoryImageFile({
         nickname: 'Mika',
         prose: 'story',
@@ -131,7 +132,9 @@ describe('buildStoryImageFile', () => {
       const sourceLabelCall = ctx.calls.find(
         (c) => c.method === 'fillText' && c.args[0] === 'קוד המקור ב-GitHub',
       );
-      expect(sourceLabelCall?.args[1]).not.toBe(RIGHT_EDGE);
+      expect(sourceLabelCall?.args[1]).toBe(RIGHT_EDGE);
+      const urlCall = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === SOURCE_URL);
+      expect(urlCall?.args[1]).toBe(RIGHT_EDGE);
     });
   });
 });

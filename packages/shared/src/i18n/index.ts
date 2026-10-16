@@ -27,6 +27,7 @@ import { ru } from './ru.js';
 import { id } from './id.js';
 import { it } from './it.js';
 import { zh } from './zh.js';
+import { yue } from './yue.js';
 import { ja } from './ja.js';
 import { ko } from './ko.js';
 import { ptBr } from './pt-br.js';
@@ -34,7 +35,11 @@ import { es419 } from './es-419.js';
 import { esEs } from './es-es.js';
 import { uk } from './uk.js';
 import { he } from './he.js';
+import { fa } from './fa.js';
 import { ta } from './ta.js';
+import { hi } from './hi.js';
+import { te } from './te.js';
+import { bn } from './bn.js';
 
 const CATALOGS: Readonly<Record<AuthoredLanguage, ServerI18n>> = {
   en,
@@ -44,6 +49,7 @@ const CATALOGS: Readonly<Record<AuthoredLanguage, ServerI18n>> = {
   id,
   it,
   zh,
+  yue,
   ja,
   ko,
   'pt-br': ptBr,
@@ -51,7 +57,11 @@ const CATALOGS: Readonly<Record<AuthoredLanguage, ServerI18n>> = {
   'es-es': esEs,
   uk,
   he,
+  fa,
   ta,
+  hi,
+  te,
+  bn,
 };
 
 function project<V>(pick: (d: ServerI18n) => V): Record<AuthoredLanguage, V> {
@@ -73,7 +83,7 @@ function isAuthored(code: string): code is AuthoredLanguage {
  * Narrows a `Room.language` (Funny Multi) or a picked `Language` (Funny One)
  * to a language this catalog can render.
  *
- * Both products type their language choice as the full 15-code `Language`
+ * Both products type their language choice as the full `Language`
  * union, while `QUESTIONS`/`PROSE_TEMPLATES`/`POOL_TEXTS` are all keyed by
  * `AuthoredLanguage` until Phase 6 widens it. Funny Multi's `rooms.isValidLanguage`
  * already rejects the rest at room creation, so this can only fire if that gate

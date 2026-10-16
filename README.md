@@ -43,7 +43,12 @@ must pass, and conventions worth knowing before touching the code.
 
 ## AGPL, and what that means for you
 
-This repo is licensed [AGPL-3.0-only](LICENSE). The repo _is_ the product: there are no
+This repo is licensed [AGPL-3.0-only](LICENSE).
+
+The flag pictures in each app's `public/flags/` are [Twemoji](https://github.com/twitter/twemoji)
+© Twitter, Inc. and other contributors, licensed under
+[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The Fredoka font is under the SIL Open
+Font License (`public/fonts/OFL.txt`). The repo _is_ the product: there are no
 secrets baked into any deployment, no server-side-only feature, nothing withheld from a
 self-hoster. If you deploy your own copy — modified or not — the AGPL requires you to make
 your source available to your users, same as everyone else deploying this game.
@@ -93,7 +98,7 @@ client (fonts are self-hosted); room state is in-memory and dies with the room. 
 keeps only anonymous daily visit counts — no IP address, no cookie, none in the Android app or
 when the browser sends Do Not Track or Global Privacy Control.
 
-The privacy policy players read, in all 15 languages, is
+The privacy policy players read, in all 20 languages, is
 [deploy/origin-root/funny37/privacy.html](deploy/origin-root/funny37/privacy.html), served by
 Caddy at `https://<FM_HOST>/privacy`. Change it in the same commit as any change to what the
 game collects, keeps or sends.

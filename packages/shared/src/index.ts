@@ -48,6 +48,11 @@ export { POOL_TEXTS } from './pools/text/index.js';
 export { QUESTIONS, PROSE_TEMPLATES, renderProse, requireAuthoredLanguage } from './i18n/index.js';
 export { polishProse, polishRussianProse } from './i18n/grammar.js';
 
+// Step 73 — the line-wrapper of every exported story picture, promoted from
+// three space-only copies so Chinese, Cantonese and Japanese stills wrap.
+export { wrapText } from './wrapText.js';
+export type { TextMeasurer } from './wrapText.js';
+
 // T-4.1 / D-10 — the image-prompt builder, promoted from
 // `apps/funny-multi-server/src/prompt.ts` so Funny One can address the same
 // picture library by the same cache keys.

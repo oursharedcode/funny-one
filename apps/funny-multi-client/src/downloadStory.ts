@@ -22,7 +22,7 @@
 import i18n, { textDirection } from './i18n/index';
 import { SOURCE_URL } from './sourceUrl';
 import { downloadFile } from './share';
-import type { AuthoredLanguage } from '@funny/shared';
+import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
 const WIDTH = 512;
 const PAD = 28;
@@ -48,24 +48,6 @@ const URL_LINE_HEIGHT = 16;
 // Minimum gap between the notice (top of the right column) and the source
 // label (dropped to the QR's bottom edge) so a long notice never overlaps it.
 const NOTICE_SOURCE_GAP = 10;
-
-// Greedy word-wrap against a measured context.
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/)) {
-    if (!word) continue;
-    const test = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(test).width > maxWidth) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
 
 function safeFileName(nickname: string): string {
   const slug = nickname
@@ -189,10 +171,12 @@ export async function buildStoryImageFile(opts: {
   ctx.fillText(`— ${nickname}`, textX, y + PAD);
   y += PAD + NAME_HEIGHT + FOOTER_DIVIDER_PAD;
 
-  // The footer (QR, notice, source URL) is the app's own fixed chrome, not
-  // story content — always left-to-right regardless of the story's language.
-  ctx.direction = 'ltr';
-  ctx.textAlign = 'left';
+  // The footer's layout is the app's own (QR at the left, text beside it), but
+  // its notice and label are in the story's language, so they keep the
+  // story's direction and start at the column's start edge; drawn left to
+  // right, a Persian or Hebrew sentence came out scrambled (Step 73). The URL
+  // reads left to right but sits under its label, at the same edge.
+  const colX = dir === 'rtl' ? WIDTH - PAD : rightColX;
 
   // Footer row begins here.
   const rowTop = y;
@@ -206,7 +190,7 @@ export async function buildStoryImageFile(opts: {
   ctx.font = NOTICE_FONT;
   let noticeY = rowTop;
   for (const line of noticeLines) {
-    ctx.fillText(line, rightColX, noticeY);
+    ctx.fillText(line, colX, noticeY);
     noticeY += NOTICE_LINE_HEIGHT;
   }
 
@@ -214,10 +198,12 @@ export async function buildStoryImageFile(opts: {
   const sourceLabelY = rowTop + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(sourceLabel, rightColX, sourceLabelY);
+  ctx.fillText(sourceLabel, colX, sourceLabelY);
 
+  ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(SOURCE_URL, rightColX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(SOURCE_URL, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.textAlign = 'left';
 
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob((b) => resolve(b), 'image/png');

@@ -70,7 +70,7 @@ describe('determinism', () => {
     // Exhaustive: 10⁴ = 10 000 stories, and no two may collide. Also the
     // cheapest place to assert every prompt is printable ASCII — a non-ASCII
     // character here would mean a display text had leaked into the picture,
-    // which is exactly what DD-4's one-cache-for-15-languages depends on not
+    // which is exactly what DD-4's one-cache-for-every-language depends on not
     // happening.
     const seen = new Set<string>();
     const [s0, s1, s2, s4] = VISUAL_SLOTS as [SlotIndex, SlotIndex, SlotIndex, SlotIndex];

@@ -16,6 +16,22 @@ describe('matchLanguageTag (T-FO-5.1a)', () => {
     expect(matchLanguageTag('fr-CA')).toBe('fr');
     expect(matchLanguageTag('zh-Hant-TW')).toBe('zh');
     expect(matchLanguageTag('ta-IN')).toBe('ta');
+    expect(matchLanguageTag('hi-IN')).toBe('hi');
+    expect(matchLanguageTag('te-IN')).toBe('te');
+    expect(matchLanguageTag('bn-BD')).toBe('bn');
+    expect(matchLanguageTag('bn-IN')).toBe('bn');
+    expect(matchLanguageTag('fa-IR')).toBe('fa');
+    expect(matchLanguageTag('fa')).toBe('fa');
+  });
+
+  it('reads Hong Kong and Macau Chinese as Cantonese, Taiwan as Mandarin', () => {
+    expect(matchLanguageTag('yue')).toBe('yue');
+    expect(matchLanguageTag('yue-Hant-HK')).toBe('yue');
+    expect(matchLanguageTag('zh-HK')).toBe('yue');
+    expect(matchLanguageTag('zh-Hant-HK')).toBe('yue');
+    expect(matchLanguageTag('zh-MO')).toBe('yue');
+    expect(matchLanguageTag('zh-TW')).toBe('zh');
+    expect(matchLanguageTag('zh-Hant')).toBe('zh');
   });
 
   it('routes Spanish and Portuguese regions to the shipped variants', () => {

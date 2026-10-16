@@ -15,7 +15,7 @@ const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0
 describe('CONTENT_LANGUAGES', () => {
   it("is the start window's list: every registry language, in registry order", () => {
     expect(CONTENT_LANGUAGES.map((l) => l.code)).toEqual(LANGUAGES.map((l) => l.code));
-    expect(CONTENT_LANGUAGES).toHaveLength(15);
+    expect(CONTENT_LANGUAGES).toHaveLength(20);
   });
 });
 

@@ -1,0 +1,63 @@
+{
+  "_note": "needs-bn-review — machine-translated stub awaiting native Bengali review.",
+  "home": {
+    "title": "হাতে হাতে গল্প",
+    "subtitle": "ডিভাইসটা হাতে হাতে ঘুরিয়ে সবাই মিলে উদ্ভট গল্প বানাও, 2 থেকে 7 জন খেলোয়াড়, ইন্টারনেট লাগবে না।",
+    "start": "খেলা শুরু করো",
+    "gameRules": "খেলার নিয়ম",
+    "rules": "ডিভাইসটা হাতে হাতে ঘোরাও। প্রতি রাউন্ডে সবাই পালা করে একই মজার প্রশ্নের উত্তর দেবে। তোমাদের উত্তরগুলো মিশে উদ্ভট সব গল্প হয়ে যাবে, তারপর প্রতিটা গল্পের জন্য একটা মজার ছবি তৈরি হবে।",
+    "language": "ভাষা",
+    "seatCountHint": "মোট 2–7 জন খেলোয়াড়",
+    "playerNamePlaceholder": "নাম",
+    "humanSeatLabel": "খেলোয়াড়ের নাম",
+    "virtualSeatLabel": "ভার্চুয়াল খেলোয়াড়ের নাম",
+    "humanBadge": "তুমি",
+    "virtualBadge": "বট",
+    "removeSeat": "খেলোয়াড় সরাও",
+    "addPlayer": "+ খেলোয়াড় যোগ করো",
+    "addVirtual": "+ ভার্চুয়াল যোগ করো",
+    "pictures": "ছবি",
+    "picturesBuiltIn": "অ্যাপের নিজস্ব",
+    "picturesOnline": "ইন্টারনেট থেকে",
+    "picturesBuiltInHint": "এই ডিভাইসেই আঁকা হয়। ইন্টারনেট লাগে না।",
+    "picturesOnlineHint": "ছবির লাইব্রেরি থেকে কার্টুন। ইন্টারনেট লাগবে; না থাকলে অ্যাপের নিজস্ব ছবি দেখাবে।"
+  },
+  "thinking": {
+    "title": "{{name}} ভাবছে…"
+  },
+  "handoff": {
+    "title": "{{name}}-এর হাতে দাও",
+    "subtitle": "অন্যদের উত্তরে উঁকি দিও না।",
+    "ready": "আমিই {{name}} — চলো"
+  },
+  "round": {
+    "progress": "প্রশ্ন {{current}} / {{total}}",
+    "pick": "তোমার উত্তর বেছে নাও",
+    "optionsLabel": "বেছে নেওয়ার মতো উত্তরগুলো",
+    "scrollHint": "আরও দেখতে স্ক্রল করো",
+    "submit": "জমা দাও",
+    "submitDisabled": "আগে একটা উত্তর বেছে নাও",
+    "submitted": "জমা হয়েছে"
+  },
+  "gallery": {
+    "title": "গল্পগুলো",
+    "storyBy": "{{name}}-এর গল্প",
+    "pictureAlt": "{{name}}-এর গল্পের ছবি",
+    "prev": "আগের গল্প",
+    "next": "পরের গল্প",
+    "counter": "{{index}} / {{total}}",
+    "download": "ডাউনলোড",
+    "shareButton": "শেয়ার"
+  },
+  "end": {
+    "title": "গল্পগুলো তৈরি!",
+    "playAgain": "আবার খেলো",
+    "changePlayers": "খেলোয়াড় বদলাও"
+  },
+  "footer": {
+    "gameLink": "এই খেলার লিংক",
+    "playYourself": "নিজেও খেলে দেখো",
+    "contentNotice": "এই খেলা পুরোপুরি তোমার ডিভাইসেই চলে। তুমি যা টাইপ করো, তার কিছুই বাইরে যায় না।",
+    "contentNoticeOnline": "তুমি যা টাইপ করো, তার কিছুই এই ডিভাইস থেকে বাইরে যায় না। ইন্টারনেটের ছবি চালু থাকলে প্রতিটা গল্পের কার্টুন ছবির লাইব্রেরি থেকে ডাউনলোড হয়।"
+  }
+}

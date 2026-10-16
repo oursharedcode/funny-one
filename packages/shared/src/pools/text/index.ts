@@ -5,7 +5,7 @@
 // T-1.5 shipped en + ru hand-authored. T-6.3 widens `AuthoredLanguage` to the
 // full `Language` union and adds the remaining 13 as machine-drafted stubs
 // (each flagged `needs-<code>-review` in its file header, FM-POOL-2/5) — so
-// this record is exhaustive over all 15 registry languages and TypeScript
+// this record is exhaustive over all 20 registry languages and TypeScript
 // refuses to compile if one is ever missing.
 
 import type { AuthoredLanguage, PoolTextMap } from '../schema.js';
@@ -16,6 +16,7 @@ import { ru } from './ru.js';
 import { id } from './id.js';
 import { it } from './it.js';
 import { zh } from './zh.js';
+import { yue } from './yue.js';
 import { ja } from './ja.js';
 import { ko } from './ko.js';
 import { ptBr } from './pt-br.js';
@@ -23,7 +24,11 @@ import { es419 } from './es-419.js';
 import { esEs } from './es-es.js';
 import { uk } from './uk.js';
 import { he } from './he.js';
+import { fa } from './fa.js';
 import { ta } from './ta.js';
+import { hi } from './hi.js';
+import { te } from './te.js';
+import { bn } from './bn.js';
 
 export const POOL_TEXTS: Readonly<Record<AuthoredLanguage, PoolTextMap>> = {
   en,
@@ -33,6 +38,7 @@ export const POOL_TEXTS: Readonly<Record<AuthoredLanguage, PoolTextMap>> = {
   id,
   it,
   zh,
+  yue,
   ja,
   ko,
   'pt-br': ptBr,
@@ -40,7 +46,11 @@ export const POOL_TEXTS: Readonly<Record<AuthoredLanguage, PoolTextMap>> = {
   'es-es': esEs,
   uk,
   he,
+  fa,
   ta,
+  hi,
+  te,
+  bn,
 };
 
-export { en, fr, de, ru, id, it, zh, ja, ko, ptBr, es419, esEs, uk, he, ta };
+export { en, fr, de, ru, id, it, zh, yue, ja, ko, ptBr, es419, esEs, uk, he, fa, ta, hi, te, bn };

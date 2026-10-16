@@ -54,11 +54,11 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
-// Keep the document direction in sync with the active UI language. Hebrew is
-// the only RTL language shipped; flipping `dir` at the root lets the
-// flex/grid layouts mirror automatically. Registered after init so it also
-// fires for the initial language.
-const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he']);
+// Keep the document direction in sync with the active UI language. Hebrew and
+// Persian (Step 73) are the RTL languages shipped; flipping `dir` at the root
+// lets the flex/grid layouts mirror automatically. Registered after init so it
+// also fires for the initial language.
+const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa']);
 
 /**
  * Text direction of a language. Exported for B-15: a story shown in a

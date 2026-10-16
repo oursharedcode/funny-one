@@ -91,6 +91,11 @@ describe('polishProse — non-Russian languages', () => {
     expect(polishProse('en', 'the llama  won!')).toBe('The llama won!');
   });
 
+  it('counts the Hindi and Bengali danda as a terminal mark', () => {
+    expect(polishProse('hi', 'आख़िर में सब सो गए।')).toBe('आख़िर में सब सो गए।');
+    expect(polishProse('bn', 'শেষমেশ সবাই ঘুমিয়ে পড়ল।')).toBe('শেষমেশ সবাই ঘুমিয়ে পড়ল।');
+  });
+
   it('does not insert Russian clause commas into a non-Russian language', () => {
     // The comma pass is tuned to Russian tokens; running it elsewhere could
     // only mangle text that happens to contain those letter sequences.

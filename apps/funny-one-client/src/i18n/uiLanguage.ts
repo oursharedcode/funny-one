@@ -33,6 +33,9 @@ export function matchLanguageTag(tag: string): Language | undefined {
   // `iw` is the pre-1989 code for Hebrew that some older Android builds
   // still report.
   if (primary === 'iw') return 'he';
+  // A Hong Kong or Macau phone (`zh-HK`, `zh-Hant-MO`) reads Cantonese;
+  // every other Chinese — Taiwan's included — stays on Mandarin.
+  if (primary === 'zh' && /-(hk|mo)$/.test(lower)) return 'yue';
   return isLanguage(primary) ? primary : undefined;
 }
 

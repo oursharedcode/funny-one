@@ -3634,11 +3634,115 @@ version` 3.0.3. CI: after the push.
 
 ---
 
+## Step 73 (task B-16) — Five more languages: Cantonese, Persian, Hindi, Telugu, Bengali (2026-10-16)
+
+**Owner request 2026-10-16:** "check if correct distinct flags and add languages Indian:
+Hindi,Telugu; Chinese Cantonese, Bangladesh:Bengali", then "Add Iran:Farsi". The owner took the
+recommended option each time: India's three languages are labelled by language, TA, HI and TE;
+Cantonese is written Cantonese in Traditional characters (`yue`, Hong Kong's flag), `zh-HK` and
+`zh-MO` go to it and Taiwan stays on Mandarin; the languages go into all three apps and both
+privacy policies; the languages come first (this step) and title fitting comes next (Step 74),
+in two commits and one deploy.
+
+**Shipped:**
+
+- *Registry* (`packages/shared/src/languages.ts`): Cantonese after Mandarin, Persian after
+  Hebrew, and Hindi, Telugu and Bengali after Tamil, for 20 in all. All 20 flag rows were checked
+  and are distinct; Tamil's label changed from IN to TA.
+- *Per language:* a prose template (`packages/shared/src/i18n/<code>.ts`), the 106 pool texts
+  (`pools/text/<code>.ts`), both clients' UI catalogues, the landing page's strings and game
+  names, a section in each privacy policy, and a flag picture in each app's `public/flags/`
+  (Twemoji, CC-BY 4.0, credited in the README). All of this text is machine-drafted and marked
+  `needs-<code>-review`.
+- *Language matching:* a browser set to `zh-HK` or `zh-MO` gets Cantonese, in Funny One's
+  `uiLanguage.ts` and in the landing page's `headScript.ts`; `zh-TW` stays on Mandarin. The
+  landing page's `<html lang>` for Cantonese is `zh-HK`, because hreflang wants an ISO 639-1
+  language.
+- *Persian is right to left,* like Hebrew, in both clients (`RTL_LANGUAGES`) and on the landing
+  page (`isRtl`).
+- *`grammar.ts`:* the final full stop now counts the danda (। and ॥), so Hindi and Bengali stories
+  no longer end in "।.".
+- *Exported pictures, both stills and the 5 s video:*
+  - One shared `wrapText` (`packages/shared/src/wrapText.ts`) replaces three copies that broke
+    lines only at spaces. It also breaks between Han and kana characters, and keeps closing marks
+    off the start of a line.
+  - Funny One's still draws the story in its own direction.
+  - Every footer's notice and label are drawn in the story's direction, with the URL under them.
+  - The video's story text takes the story's direction.
+- *Counts:* "15" and "19" became 20 in docs, comments and tests. Both clients' catalogue tests had
+  listed only the first 15 languages.
+- `LANGUAGES.md` now says how to add a language.
+
+**Verified in a browser** (Chromium only; Avast blocks WebKit here):
+
+- *Funny Multi:* a local production build served by the real server on 3000, with the picture
+  Worker stand-in on 5185, checked by `.screens/step73-langs-check.mjs` (ignored). **0 problems.**
+  - Home in each new language at 390 and 320 px: no sideways scroll, every title fits on two
+    lines, and all 20 flag labels are distinct.
+  - One five-phone game: the host in Cantonese, the joiners in Hindi, Telugu, Bengali and
+    Persian. Round 1 and the reveal appear in each phone's own language and script, with the
+    right closing mark; Persian runs right to left.
+  - Each phone's still was downloaded and viewed. Cantonese wraps, and Persian's prose and footer
+    read right to left.
+- *Funny One:*
+  - `scripts/funny-one-screens.mjs`, five new languages at 320 and 390 px: a full game each, no
+    overflow, no errors, Persian `dir=rtl`.
+  - `.screens/step73-fo-stills.mjs` (ignored): Cantonese, Mandarin and Japanese stills wrap;
+    Hebrew and Persian run right to left, footer included.
+- *Landing page:* `.screens/ff-hub-check.mjs --no-webkit` (ignored) checks all 20 languages ×
+  both designs × phone and desktop. All checks passed. "Support Author" stays on one line in
+  Persian at 390 and 320 px. The check now expects Persian to be right to left, and its new
+  `--no-webkit` flag skips the WebKit section.
+
+**Not seen:** a 5 s video of a Persian or Hebrew story (unit tests only).
+
+**Seen on the way, older than B-16:**
+
+- *Fixed here:*
+  - Since T-5.2, every Mandarin and Japanese still had been drawn as one cut-off line.
+  - Funny One's still drew Hebrew left to right (Step 71 had fixed only Funny Multi's).
+  - All three exports drew the footer left to right, which scrambled a Hebrew notice.
+- *Not fixed:*
+  - Funny Multi's `<html lang>` stays "en" whatever the language.
+  - A still's file name falls back to "funny-stories-<name>" when the game's title has no Latin
+    letters.
+
+**Owed:**
+
+- The five languages' native review (B-3).
+- The deploy, together with Step 74.
+- Funny Multi's Tamil home title, which is wider than a phone (Step 74).
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: **1327 passed** (242 + 352 + 270 + 171 + 239 + 53), exit 0.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
+---
+
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
 
 ~~RESUME HERE (2026-10-14, after Step 72)~~ — carried into this note.
 
-**RESUME HERE (2026-10-15, after Step 72).** **Three sites are live on hosts of their own:**
+~~RESUME HERE (2026-10-15, after Step 72)~~ — carried into this note.
+
+**RESUME HERE (2026-10-16, after Step 73).** **Step 73 (B-16) is committed, not pushed, not
+deployed.** It adds five languages (Cantonese, Persian, Hindi, Telugu, Bengali; 20 in all) to
+both games, the landing page and both privacy policies, and fixes the exported pictures for
+Chinese, Japanese, Hebrew and Persian. Push it only once the owner confirms. Production still
+serves 15 languages.
+
+**Next, the agent's: Step 74.** Fit long home titles in both clients' `Wordmark.tsx`, checking
+all 20 titles at 320, 360 and 390 px. Funny Multi's Tamil title is cut today. This was the
+owner's decision of 2026-10-16: languages first, then title fitting, in two commits and one
+deploy. After Step 74, deploy Funny Multi and the landing page (`deploy/ship.sh`,
+`deploy/ship-funny-family.sh`) when the owner asks. Funny One's deploy, which now carries B-16
+too, stays the owner's.
+
+**Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
@@ -3668,7 +3772,8 @@ PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.
 `IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
 build, found 2026-10-15); an exception is recommended so design B can be checked here too.
 
-No agent-only step is queued. The next one waits on whichever owner item above lands first.
+The agent's own queue holds only Step 74 (above). Anything after it waits on whichever owner item
+lands first.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -3739,7 +3844,8 @@ commit (Step 72). With `MSYS_NO_PATHCONV=1`, `curl -o /dev/null` exits 23 and st
 download early — its status code holds, its size does not; read sizes from `curl -sI` (Step
 72). A WebKit check that stops answering here: ask the owner whether Avast alerted before
 blaming WebKit or the page — its Behavior Shield blocked Playwright's WebKit as `IDP.Generic` on
-2026-10-14, a false positive (Step 72). The agent's shell cannot start Bubblewrap's Gradle step
+2026-10-14, a false positive (Step 72). `.screens/ff-hub-check.mjs --no-webkit` skips WebKit
+(Step 73). The agent's shell cannot start Bubblewrap's Gradle step
 (Step 65) — compile checks use `gradlew.bat` by path; signed builds are the owner's anyway.
 Glob under `apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
 (`.picture-review/venv`, open_clip, transformers) is on this PC only; `scripts/picture-review/`
@@ -3753,8 +3859,11 @@ Still open, none blocking: the move from Funny One's old address is unchecked in
 Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` name — worth
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
 Funny One's six new strings and its privacy policy outside English, Funny Multi's two B-15
-strings outside en/ru, and the landing page's text outside en/ru are machine drafts; Funny
-Multi's Tamil home title is wider than a phone (seen in Step 72, there since 2026-08-16); real
+strings outside en/ru, the landing page's text outside en/ru, and everything in B-16's five
+languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
+a still's file name is "funny-stories-<name>" when the title has no Latin letters (both seen in
+Step 73); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
+direction (unit tests only); real
 Funny One icons before any announcement or listing (also blocks A3 in
 `docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement — until
 then the landing page's GitHub link and Funny Multi's source link answer 404; T-7.1's iPhone

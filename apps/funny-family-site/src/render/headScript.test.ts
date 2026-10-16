@@ -136,6 +136,14 @@ describe('the head script: the language, on / only', () => {
     ['zh-Hans-CN', 'zh'],
     ['uk-UA', 'uk'],
     ['ta-IN', 'ta'],
+    ['hi-IN', 'hi'],
+    ['te-IN', 'te'],
+    ['bn-BD', 'bn'],
+    ['fa-IR', 'fa'],
+    ['zh-HK', 'yue'],
+    ['zh-Hant-MO', 'yue'],
+    ['yue-HK', 'yue'],
+    ['zh-TW', 'zh'],
   ])('matches %s to %s', (tag, code) => {
     expect(run(true, { languages: [tag] }).replaced).toEqual([`/${code}/`]);
   });

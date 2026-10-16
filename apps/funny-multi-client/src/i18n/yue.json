@@ -1,0 +1,130 @@
+{
+  "_note": "needs-yue-review — machine-translated stub awaiting native Cantonese (Hong Kong) review per CONTRIBUTING.md.",
+  "questions": [
+    "邊個？",
+    "仲有邊個？",
+    "喺邊度？",
+    "幾時？",
+    "佢哋做咗乜嘢？",
+    "為咗乜嘢？",
+    "最後點收場？"
+  ],
+  "home": {
+    "title": "無厘頭故事",
+    "subtitle": "3 至 7 個人一齊砌無厘頭故事，用手機玩啱晒。",
+    "nicknamePlaceholder": "改個花名",
+    "gameRules": "遊戲規則",
+    "rules": "每一輪都有一條搞笑問題，喺清單度揀一個答案。你揀嘅答案會同其他人嘅撈埋一齊，變成一個個無厘頭故事。跟住每個故事都會變成一幅漫畫，我哋再一次過揭曉。",
+    "create": "建立房間",
+    "join": "加入房間",
+    "joining": "加入緊房間",
+    "roomGone": "呢個房間已經冇咗 — 可能已經玩完，或者條連結太舊。",
+    "createNew": "建立新房間",
+    "openRooms": "可以加入嘅房間：{{count}}",
+    "imagesToday": "每日最多 {{total}} 幅漫畫。每日 00:00 UTC 重設。",
+    "uiLanguage": "撳一下轉介面語言",
+    "unsupportedLanguage": "呢個房間用嘅語言，呢個版本嘅 app 仲未玩得。試吓更新頁面，或者建立一個新房間。",
+    "multiLanguage": "多語言房間",
+    "multiLanguageHint": "每個玩家都用自己喺上面旗仔揀咗嘅語言嚟玩。"
+  },
+  "lobby": {
+    "roomCodeLabel": "房間代碼",
+    "copyLink": "複製連結",
+    "copied": "複製咗！",
+    "qrCaption": "掃碼加入",
+    "waitingForHost": "等緊房主開始…",
+    "startGame": "開始遊戲",
+    "startDisabled": "最少要有 3 個玩家先可以開始",
+    "leave": "離開",
+    "host": "房主",
+    "capReached": "之後大約 {{hours}} 個鐘都冇得整圖。你照樣可以玩 — 玩家會見到故事文字，代替漫畫。",
+    "capReachedHost": "準備好就撳「開始遊戲」，或者等每日漫畫額度重設。"
+  },
+  "round": {
+    "progress": "第 {{current}} 輪，共 {{total}} 輪",
+    "pick": "揀你嘅答案",
+    "optionsLabel": "可以揀嘅答案",
+    "scrollHint": "碌落去睇多啲",
+    "submit": "提交",
+    "submitDisabled": "要先揀一個答案",
+    "submitted": "提交咗",
+    "storyLanguage": "故事語言"
+  },
+  "waiting": {
+    "title": "等緊其他人",
+    "progress": "{{submitted}} / {{total}} 提交咗",
+    "ellipsis": "坐定定，等陣吖。"
+  },
+  "reveal": {
+    "title": "你嘅故事嚟喇",
+    "spinner": "召喚混亂中…",
+    "retry": "再試一次",
+    "error": "整唔到。再試一次啦。",
+    "capReached": "漫畫焗爐滿晒喇。大約 {{hours}} 個鐘之後先有新漫畫。",
+    "pictureAlt": "AI 幫你個故事畫嘅漫畫",
+    "continue": "繼續"
+  },
+  "end": {
+    "title": "遊戲完咗",
+    "roundsOver": "全部回合玩晒喇",
+    "oneMoreGame": "再玩多一局",
+    "finishGame": "結束遊戲",
+    "ready": "我準備好玩新一局",
+    "readyActive": "準備好 ✓",
+    "waitingForHost": "等緊房主…",
+    "needPlayers": "再玩一局最少要 3 個玩家",
+    "waitingForReady": "等緊大家準備好"
+  },
+  "endScreen": {
+    "supportServer": "支持呢個伺服器"
+  },
+  "support": {
+    "openLabel": "支持作者",
+    "title": "支持",
+    "intro": "呢個係自願嘅心意 — 你唔欠任何嘢，亦唔會解鎖任何嘢。",
+    "close": "關閉",
+    "payId": "PayID",
+    "payIdBankNote": "你間銀行會顯示：{{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "揀一個一次性級別",
+    "lightning": "Lightning",
+    "donate": "捐款",
+    "copy": "複製",
+    "copied": "複製咗！"
+  },
+  "gallery": {
+    "share": "分享呢個房間啲圖",
+    "shareButton": "分享",
+    "title": "房間圖庫",
+    "storyBy": "{{nickname}} 嘅故事",
+    "noPicture": "呢個故事冇圖",
+    "pictureAlt": "{{nickname}} 個故事嘅漫畫",
+    "counter": "{{index}} / {{total}}",
+    "prev": "上一個故事",
+    "next": "下一個故事",
+    "download": "下載故事同靜態圖",
+    "downloadStoryOnly": "下載故事",
+    "downloadVideo": "下載 5 秒影片",
+    "recording": "錄緊…"
+  },
+  "playerLost": {
+    "label": "{{nickname}} 走咗",
+    "ignore": "唔理佢，繼續玩",
+    "newRoom": "建立新房間"
+  },
+  "footer": {
+    "source": "GitHub 上嘅原始碼",
+    "contentNotice": "玩家揀嘅答案同 AI 圖片，由呢個伺服器嘅營運者負責，同上游項目無關。"
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "搵唔到房間",
+    "ROOM_LOCKED": "遊戲已經開始咗",
+    "ROOM_FULL": "房間滿咗",
+    "NOT_HOST": "淨係房主先做得",
+    "NOT_ENOUGH_PLAYERS": "最少要 3 個玩家",
+    "INVALID_NICKNAME": "花名無效",
+    "INVALID_OPTION": "呢個答案已經冇咗 — 揀過第二個啦",
+    "RATE_LIMITED": "慢慢嚟，唞一唞先",
+    "SERVER_BUSY": "伺服器好忙"
+  }
+}

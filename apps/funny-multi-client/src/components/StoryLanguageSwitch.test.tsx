@@ -35,7 +35,7 @@ describe('closed', () => {
 });
 
 describe('open', () => {
-  it("offers the start window's 15 languages, the current one pressed and focused", () => {
+  it("offers the start window's 20 languages, the current one pressed and focused", () => {
     const { toggle } = renderSwitch();
     fireEvent.click(toggle);
 

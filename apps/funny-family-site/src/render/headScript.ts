@@ -32,7 +32,8 @@ d.setAttribute('data-variant', v);`;
 
 // The browser-language match is the one Funny One makes (its uiLanguage.ts
 // matchLanguageTag): an exact code, then Spanish and Portuguese by region,
-// Hebrew's old code, then the primary subtag.
+// Hebrew's old code, Hong Kong and Macau Chinese as Cantonese, then the
+// primary subtag.
 const REDIRECT = `
 var codes = ${JSON.stringify(LANGUAGE_CODES)};
 function match(tag) {
@@ -43,6 +44,7 @@ function match(tag) {
   if (p === 'es') return t === 'es' ? 'es-es' : 'es-419';
   if (p === 'pt') return 'pt-br';
   if (p === 'iw') return 'he';
+  if (p === 'zh' && /-(hk|mo)$/.test(t)) return 'yue';
   return codes.indexOf(p) >= 0 ? p : null;
 }
 var target = null;

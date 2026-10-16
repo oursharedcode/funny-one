@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // `when.wrong-feeling-tuesday` badge: a calendar page with one day circled and a big question
-// mark — drawn as a path, not text, so it survives all 15 languages.
+// mark — drawn as a path, not text, so it survives all 20 languages.
 
 import { Plate } from './Plate';
 

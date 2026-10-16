@@ -52,6 +52,7 @@ describe('drawStoryText', () => {
       topY: 100,
       canvasWidth: 720,
       maxHeight: 400,
+      language: 'en',
     });
     expect(bottom).toBeGreaterThan(100);
     const fillTextCalls = ctx.calls.filter((c) => c.method === 'fillText');
@@ -64,10 +65,22 @@ describe('drawStoryText', () => {
       topY: 0,
       canvasWidth: 720,
       maxHeight: 60,
+      language: 'en',
     });
     // fitStory tries STORY_MAX_PX (24) down to STORY_MIN_PX (14); a story
     // this long can't fit 60px at 24px lines, so it must have shrunk.
     expect(ctx.font).not.toContain('24px');
+  });
+
+  it('starts a right-to-left story at the right edge (Step 73)', () => {
+    drawStoryText(ctx as unknown as CanvasRenderingContext2D, 'story', {
+      topY: 0,
+      canvasWidth: 720,
+      maxHeight: 400,
+      language: 'fa',
+    });
+    const call = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'story');
+    expect(call?.args[1]).toBe(720 - 40); // canvasWidth - PAD
   });
 });
 
@@ -109,6 +122,20 @@ describe('drawAttribution', () => {
       });
       const fillTextArgs = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
       expect(fillTextArgs).toContain('Source on GitHub');
+    });
+
+    it('right-anchors the label and URL of a right-to-left story (Step 73)', () => {
+      const qrCanvas = document.createElement('canvas');
+      drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
+        topY: 0,
+        canvasWidth: 720,
+        language: 'he',
+      });
+      const x = (text: string) =>
+        ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === text)?.args[1];
+      expect(x(i18n.getFixedT('he')('footer.source'))).toBe(720 - 40); // canvasWidth - PAD
+      expect(x(SOURCE_URL.replace(/^https?:\/\//, ''))).toBe(720 - 40);
+      expect(ctx.textAlign).toBe('left'); // reset for the next frame's drawing
     });
   });
 });

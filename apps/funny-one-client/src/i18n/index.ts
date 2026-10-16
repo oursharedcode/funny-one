@@ -46,9 +46,15 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
-const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he']);
+const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa']);
+
+/** Text direction of a language; the exported still draws its story by it (Step 73). */
+export function textDirection(lng: string): 'rtl' | 'ltr' {
+  return RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
+}
+
 function applyDirection(lng: string): void {
-  document.documentElement.dir = RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
+  document.documentElement.dir = textDirection(lng);
 }
 i18n.on('languageChanged', applyDirection);
 applyDirection(i18n.language);

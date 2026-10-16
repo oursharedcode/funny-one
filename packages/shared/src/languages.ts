@@ -40,9 +40,14 @@ export interface LanguageOption {
 // Ordering follows the standard native-script + region pattern used by
 // Google/Apple/Netflix language pickers. English is the upstream default
 // (#1); Russian sits at #4 as the second first-class shipped language.
-// Slots 2-3 and 5-14 are stubs: registry + i18n JSON + pool display texts ship
+// Slots 2-3 and 5-19 are stubs: registry + i18n JSON + pool display texts ship
 // in each language at machine-translation quality with a `needs-<code>-review`
 // header in every file, awaiting native-speaker review (FM-POOL-5, OD-F5).
+// Cantonese (`yue`, written Cantonese in Traditional characters, Hong Kong)
+// sits beside Mandarin; Persian (right to left) follows Hebrew; Hindi, Telugu
+// and Bengali follow Tamil (Step 73).
+// Three languages share India's flag, so their `country` label is the
+// language instead of the country — TA, HI, TE — to keep every row distinct.
 export const LANGUAGES = [
   { code: 'en', name: 'English (United Kingdom)', flag: '🇬🇧', country: 'GB' },
   { code: 'fr', name: 'Français (France)', flag: '🇫🇷', country: 'FR' },
@@ -51,6 +56,7 @@ export const LANGUAGES = [
   { code: 'id', name: 'Indonesia (Indonesia)', flag: '🇮🇩', country: 'ID' },
   { code: 'it', name: 'Italiano (Italia)', flag: '🇮🇹', country: 'IT' },
   { code: 'zh', name: '中文 (普通话)', flag: '🇨🇳', country: 'CN' },
+  { code: 'yue', name: '粵語 (香港)', flag: '🇭🇰', country: 'HK' },
   { code: 'ja', name: '日本語 (日本)', flag: '🇯🇵', country: 'JP' },
   { code: 'ko', name: '한국어 (대한민국)', flag: '🇰🇷', country: 'KR' },
   { code: 'pt-br', name: 'Português (Brasil)', flag: '🇧🇷', country: 'BR' },
@@ -58,7 +64,11 @@ export const LANGUAGES = [
   { code: 'es-es', name: 'Español (España)', flag: '🇪🇸', country: 'ES' },
   { code: 'uk', name: 'Українська (Україна)', flag: '🇺🇦', country: 'UA' },
   { code: 'he', name: 'עברית (ישראל)', flag: '🇮🇱', country: 'IL' },
-  { code: 'ta', name: 'தமிழ் (இந்தியா)', flag: '🇮🇳', country: 'IN' },
+  { code: 'fa', name: 'فارسی (ایران)', flag: '🇮🇷', country: 'IR' },
+  { code: 'ta', name: 'தமிழ் (இந்தியா)', flag: '🇮🇳', country: 'TA' },
+  { code: 'hi', name: 'हिन्दी (भारत)', flag: '🇮🇳', country: 'HI' },
+  { code: 'te', name: 'తెలుగు (భారతదేశం)', flag: '🇮🇳', country: 'TE' },
+  { code: 'bn', name: 'বাংলা (বাংলাদেশ)', flag: '🇧🇩', country: 'BD' },
 ] as const satisfies readonly LanguageOption[];
 
 export type Language = (typeof LANGUAGES)[number]['code'];

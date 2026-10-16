@@ -24,6 +24,7 @@ import fr from './fr.json';
 import id from './id.json';
 import itCatalog from './it.json';
 import zh from './zh.json';
+import yue from './yue.json';
 import ja from './ja.json';
 import ko from './ko.json';
 import ptBr from './pt-br.json';
@@ -31,7 +32,11 @@ import es419 from './es-419.json';
 import esEs from './es-es.json';
 import uk from './uk.json';
 import he from './he.json';
+import fa from './fa.json';
 import ta from './ta.json';
+import hi from './hi.json';
+import te from './te.json';
+import bn from './bn.json';
 
 type Catalog = Record<string, unknown>;
 const CATALOGS: Record<string, Catalog> = {
@@ -42,6 +47,7 @@ const CATALOGS: Record<string, Catalog> = {
   id,
   it: itCatalog,
   zh,
+  yue,
   ja,
   ko,
   'pt-br': ptBr,
@@ -49,7 +55,11 @@ const CATALOGS: Record<string, Catalog> = {
   'es-es': esEs,
   uk,
   he,
+  fa,
   ta,
+  hi,
+  te,
+  bn,
 };
 
 /**

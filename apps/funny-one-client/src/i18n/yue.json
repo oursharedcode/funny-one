@@ -1,0 +1,63 @@
+{
+  "_note": "needs-yue-review — machine-translated stub awaiting native Cantonese (Hong Kong) review.",
+  "home": {
+    "title": "輪流講故仔",
+    "subtitle": "傳住部機輪流玩，一齊砌無厘頭故事，2 至 7 個人，唔使上網。",
+    "start": "開始遊戲",
+    "gameRules": "遊戲規則",
+    "rules": "部機輪住傳。每一輪，大家輪流答同一條搞笑問題。你哋嘅答案會撈埋一齊變成無厘頭故事，跟住每個故事都會配一幅搞笑圖畫。",
+    "language": "語言",
+    "seatCountHint": "總共 2–7 個玩家",
+    "playerNamePlaceholder": "名字",
+    "humanSeatLabel": "玩家名字",
+    "virtualSeatLabel": "虛擬玩家名字",
+    "humanBadge": "你",
+    "virtualBadge": "機械人",
+    "removeSeat": "移除玩家",
+    "addPlayer": "+ 加玩家",
+    "addVirtual": "+ 加虛擬玩家",
+    "pictures": "圖片",
+    "picturesBuiltIn": "內置",
+    "picturesOnline": "由網上下載",
+    "picturesBuiltInHint": "喺呢部機度畫，唔使上網。",
+    "picturesOnlineHint": "由圖庫攞漫畫。要上網；冇網嘅話就用內置圖片。"
+  },
+  "thinking": {
+    "title": "{{name}} 諗緊…"
+  },
+  "handoff": {
+    "title": "交畀 {{name}}",
+    "subtitle": "唔好偷睇其他人嘅答案呀。",
+    "ready": "我係 {{name}} — 嚟啦"
+  },
+  "round": {
+    "progress": "第 {{current}} 條，共 {{total}} 條",
+    "pick": "揀你嘅答案",
+    "optionsLabel": "可以揀嘅答案",
+    "scrollHint": "碌落去睇多啲",
+    "submit": "提交",
+    "submitDisabled": "要先揀一個答案",
+    "submitted": "提交咗"
+  },
+  "gallery": {
+    "title": "故事集",
+    "storyBy": "{{name}} 嘅故事",
+    "pictureAlt": "{{name}} 個故事嘅圖",
+    "prev": "上一個故事",
+    "next": "下一個故事",
+    "counter": "{{index}} / {{total}}",
+    "download": "下載",
+    "shareButton": "分享"
+  },
+  "end": {
+    "title": "啲故事搞掂喇！",
+    "playAgain": "再玩多次",
+    "changePlayers": "換玩家"
+  },
+  "footer": {
+    "gameLink": "呢個遊戲嘅連結",
+    "playYourself": "你都嚟玩吓",
+    "contentNotice": "呢個遊戲全部喺你部機度運行。你打嘅嘢一個字都唔會離開部機。",
+    "contentNoticeOnline": "你打嘅嘢一個字都唔會離開呢部機。用網上圖片嘅話，每個故事嘅漫畫會由圖庫下載。"
+  }
+}

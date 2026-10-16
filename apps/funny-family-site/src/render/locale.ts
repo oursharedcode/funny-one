@@ -6,7 +6,12 @@
 import { LANGUAGES } from '@funny/shared';
 import type { Language } from '@funny/shared';
 
-/** The BCP 47 tag of <html lang> and hreflang. `zh` is Simplified Chinese. */
+/**
+ * The BCP 47 tag of <html lang> and hreflang. `zh` is Simplified Chinese.
+ * Cantonese is `zh-HK`, not `yue`: hreflang wants an ISO 639-1 language, and
+ * `zh-HK` is also what makes fonts pick Hong Kong glyphs and speech pick a
+ * Cantonese voice.
+ */
 export const HTML_LANG: Record<Language, string> = {
   en: 'en',
   fr: 'fr',
@@ -15,6 +20,7 @@ export const HTML_LANG: Record<Language, string> = {
   id: 'id',
   it: 'it',
   zh: 'zh-Hans',
+  yue: 'zh-HK',
   ja: 'ja',
   ko: 'ko',
   'pt-br': 'pt-BR',
@@ -22,7 +28,11 @@ export const HTML_LANG: Record<Language, string> = {
   'es-es': 'es-ES',
   uk: 'uk',
   he: 'he',
+  fa: 'fa',
   ta: 'ta',
+  hi: 'hi',
+  te: 'te',
+  bn: 'bn',
 };
 
 /** Open Graph's locale (language_TERRITORY); es_LA is Facebook's Latin American Spanish. */
@@ -34,6 +44,7 @@ export const OG_LOCALE: Record<Language, string> = {
   id: 'id_ID',
   it: 'it_IT',
   zh: 'zh_CN',
+  yue: 'zh_HK',
   ja: 'ja_JP',
   ko: 'ko_KR',
   'pt-br': 'pt_BR',
@@ -41,13 +52,17 @@ export const OG_LOCALE: Record<Language, string> = {
   'es-es': 'es_ES',
   uk: 'uk_UA',
   he: 'he_IL',
+  fa: 'fa_IR',
   ta: 'ta_IN',
+  hi: 'hi_IN',
+  te: 'te_IN',
+  bn: 'bn_BD',
 };
 
 export const LANGUAGE_CODES: readonly Language[] = LANGUAGES.map((option) => option.code);
 
 export function isRtl(code: Language): boolean {
-  return code === 'he';
+  return code === 'he' || code === 'fa';
 }
 
 /** A language's name as the games' pickers show it: "Deutsch (Deutschland)". */

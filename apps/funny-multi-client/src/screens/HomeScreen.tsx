@@ -15,7 +15,7 @@
 //    tightened at T-2.3 so a room cannot be created in a language whose pools
 //    would throw at reveal, seven rounds later). SRC offered all 15 here, which
 //    against this server would fail the create with an unexplained error. The
-//    join-mode picker is untouched at all 15 — it only switches the *interface*
+//    join-mode picker offers every registry language — it only switches the *interface*
 //    language, and i18next falls back to English for the 13 catalogues Phase 6
 //    adds. T-6.1/T-6.3 widen `AUTHORED_LANGUAGES` and this list follows.
 // 3. `LANGUAGES`/`isLanguage` come from `@funny/shared`; T-3.1 did not carry a
@@ -323,7 +323,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               the left (centered title above a scrollable blurb), language picker
               on the right. Here the flags switch the interface language only
               (spec §8) — the room's content language is fixed by the host, so
-              this list stays at the full 15 registry entries. In a
+              this list stays at the full registry. In a
               multi-language room the language picked here is also the one this
               player's questions, options and stories come in (B-15). */}
           <div className="flex w-full items-start gap-3">

@@ -252,6 +252,7 @@ export async function buildWobbleVideoFile(opts: {
       topY: storyTop,
       canvasWidth: W,
       maxHeight: maxStoryHeight,
+      language,
     });
 
     // Static attribution footer matching the downloadable PNG's footer:

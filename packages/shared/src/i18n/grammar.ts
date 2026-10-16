@@ -108,11 +108,12 @@ function capitalizeFirst(text: string): string {
 // answer can carry its own terminal mark or none). The zh/ja templates end in
 // the fullwidth ideographic full stop "。" rather than ASCII ".", so it (and
 // its fullwidth siblings) must count as already-terminated too — otherwise
-// this appends a second, ASCII period after it (T-6.4 spot-check).
+// this appends a second, ASCII period after it (T-6.4 spot-check). Hindi and
+// Bengali end on the danda "।" (Step 73), which counts for the same reason.
 function ensureTerminalPeriod(text: string): string {
   const trimmed = text.trimEnd();
   if (trimmed === '') return trimmed;
-  return /[.!?…。！？]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+  return /[.!?…。！？।॥]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
 
 // Full offline pass: collapse the space runs empty answer slots leave behind,

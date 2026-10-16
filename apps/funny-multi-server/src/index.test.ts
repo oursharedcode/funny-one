@@ -118,6 +118,8 @@ describe('GET /config', () => {
     DEPLOYER_PAYID_NAME: 'EXAMPLE ACCOUNT NAME',
     DEPLOYER_SPONSORS_URL: 'https://github.com/sponsors/example-rail',
     DEPLOYER_LIGHTNING_ADDRESS: 'lightning-rail@wallet.example',
+    DEPLOYER_KOFI_URL: 'https://ko-fi.com/example-rail',
+    DEPLOYER_BMC_URL: 'https://buymeacoffee.com/example-rail',
   };
   const DONATE_URL = 'https://example.com/donate';
   const SUPPORT_VARS = [...Object.keys(NEW_RAILS), 'DEPLOYER_DONATE_URL'];
@@ -140,6 +142,8 @@ describe('GET /config', () => {
         payIdName: null,
         sponsorsUrl: null,
         lightningAddress: null,
+        kofiUrl: null,
+        bmcUrl: null,
         donateUrl: null,
       },
     });
@@ -156,6 +160,8 @@ describe('GET /config', () => {
       payIdName: null,
       sponsorsUrl: null,
       lightningAddress: null,
+      kofiUrl: null,
+      bmcUrl: null,
       donateUrl: null,
     });
   });
@@ -171,6 +177,8 @@ describe('GET /config', () => {
         payIdName: NEW_RAILS.DEPLOYER_PAYID_NAME,
         sponsorsUrl: NEW_RAILS.DEPLOYER_SPONSORS_URL,
         lightningAddress: NEW_RAILS.DEPLOYER_LIGHTNING_ADDRESS,
+        kofiUrl: NEW_RAILS.DEPLOYER_KOFI_URL,
+        bmcUrl: NEW_RAILS.DEPLOYER_BMC_URL,
         donateUrl: DONATE_URL,
       },
     });
@@ -187,9 +195,9 @@ describe('GET /config', () => {
 
   it('never puts a support rail in any socket event or ack', async () => {
     // Static config stays off the socket (FM-TIER-3). T-9.4a moved
-    // `donateUrl` off `lobby:update` onto /config alongside the other four
-    // rails, so with all five vars set, nothing either client receives
-    // through a create + join — event or ack — may carry one of the values.
+    // `donateUrl` off `lobby:update` onto /config alongside the other rails,
+    // so with every var set, nothing either client receives through a
+    // create + join — event or ack — may carry one of the values.
     Object.assign(process.env, NEW_RAILS, { DEPLOYER_DONATE_URL: DONATE_URL });
     const h = await listen();
     const host = await connect(h);
@@ -225,7 +233,15 @@ describe('GET /config', () => {
     for (const value of [...Object.values(NEW_RAILS), DONATE_URL]) {
       expect(traffic).not.toContain(value);
     }
-    for (const field of ['payId', 'payIdName', 'sponsorsUrl', 'lightningAddress', 'donateUrl']) {
+    for (const field of [
+      'payId',
+      'payIdName',
+      'sponsorsUrl',
+      'lightningAddress',
+      'kofiUrl',
+      'bmcUrl',
+      'donateUrl',
+    ]) {
       expect(traffic).not.toContain(`"${field}"`);
     }
   });

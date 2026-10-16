@@ -154,7 +154,8 @@ exit
 
 `.env.example` in the repo documents every variable, including the optional ones
 (the `DEPLOYER_*` support rails — PayID + registered name, GitHub Sponsors URL, Lightning
-address, legacy donate URL — for the Support screen, `MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
+address, Ko-fi and Buy Me a Coffee pages, legacy donate URL — for the Support screen,
+`MAX_ROOMS`, `MAX_IMAGES_PER_DAY`,
 `ROUND_DURATION_MS`, `PORT`). The defaults are right for a family-sized deployment.
 
 #### Optional: the Support screen
@@ -168,6 +169,8 @@ DEPLOYER_PAYID=you@example.com
 DEPLOYER_PAYID_NAME="YOUR REGISTERED NAME"
 DEPLOYER_SPONSORS_URL=https://github.com/sponsors/<you>
 DEPLOYER_LIGHTNING_ADDRESS=you@your-wallet.com
+DEPLOYER_KOFI_URL=https://ko-fi.com/<you>
+DEPLOYER_BMC_URL=https://buymeacoffee.com/<you>
 DEPLOYER_DONATE_URL=https://example.com/donate
 ```
 
@@ -179,6 +182,10 @@ DEPLOYER_DONATE_URL=https://example.com/donate
   and a gift stays a one-off (the screen tells players to choose one).
 - `DEPLOYER_LIGHTNING_ADDRESS` is a Lightning address (`user@wallet`), shown as a
   `lightning:` link and a QR code. Pay it once from a second wallet before you publish it.
+- `DEPLOYER_KOFI_URL` and `DEPLOYER_BMC_URL` are your Ko-fi and Buy Me a Coffee pages, shown
+  as two buttons in those brands' colours under Lightning. Both take card payments, so a
+  disputed gift can cost you a dispute fee; leave them unset to offer only the three rails
+  above (README → _Why the card rails are optional_).
 - `DEPLOYER_DONATE_URL` is any other single link, listed last.
 
 The server reads these once at boot, so restart it after editing:

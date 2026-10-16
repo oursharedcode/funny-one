@@ -162,6 +162,8 @@ export async function buildServer({
     payIdName: process.env.DEPLOYER_PAYID_NAME || null,
     sponsorsUrl: process.env.DEPLOYER_SPONSORS_URL || null,
     lightningAddress: process.env.DEPLOYER_LIGHTNING_ADDRESS || null,
+    kofiUrl: process.env.DEPLOYER_KOFI_URL || null,
+    bmcUrl: process.env.DEPLOYER_BMC_URL || null,
     donateUrl: process.env.DEPLOYER_DONATE_URL || null,
   };
   fastify.get(`${base}config`, async () => ({ support }));

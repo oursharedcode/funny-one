@@ -43,6 +43,13 @@ describe('statKey', () => {
     expect(statKey({ e: 'fm_gift', s: 'direct', l: 'ta', t: 'lightning' })).toBe(
       'fm_gift||ta|direct|lightning||',
     );
+    // Step 75: the two brand buttons under Lightning.
+    expect(statKey({ e: 'fm_gift', s: 'hub', v: 'b', l: 'en', t: 'kofi' })).toBe(
+      'fm_gift|b|en|hub|kofi||',
+    );
+    expect(statKey({ e: 'fm_gift', s: 'direct', l: 'de', t: 'bmc' })).toBe(
+      'fm_gift||de|direct|bmc||',
+    );
     expect(statKey({ e: 'fm_gift', s: 'direct', l: 'ta', t: 'fm' })).toBeNull();
   });
 

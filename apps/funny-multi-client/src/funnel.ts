@@ -19,7 +19,7 @@ import i18n from './i18n';
 import { serverOrigin, withBase } from './basePath';
 import { isStoreShell } from './storeShell';
 
-export type GiftRail = 'payid' | 'sponsors' | 'lightning' | 'donate';
+export type GiftRail = 'payid' | 'sponsors' | 'lightning' | 'kofi' | 'bmc' | 'donate';
 
 type Origin = { s: 'direct' } | { s: 'hub'; v: 'a' | 'b' };
 

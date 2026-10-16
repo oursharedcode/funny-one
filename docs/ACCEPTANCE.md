@@ -149,6 +149,7 @@ and sends one real $1 gift over each rail (FM-TIER-3). Same URL as above.
 | D3  | **PayID gift.** In the other bank's app, pay $1 to the PayID pasted in D2. | Before you confirm, the bank shows the payee as **MARK WEB TOOLS**, the same name as the screen. The $1 arrives in the receiving account (Osko: usually within a minute). |
 | D4  | **Sponsors gift.** On A, signed in to GitHub as the other account, tap the Sponsors link; pick the **$1 one-time** tier and pay. | The link opens `github.com/sponsors/oursharedcode` in a new tab, with the one-time tiers ($1/$3/$5) offered. After paying, `oursharedcode`'s Sponsors dashboard lists a $1 one-time sponsorship (the money follows on GitHub's payout schedule). |
 | D5  | **Lightning gift.** (a) On A, scan the screen's QR code with the second wallet and pay about $1. (b) On C, tap the Lightning address link. | (a) The wallet reads the address from the QR code, fetches an invoice and pays; the payment shows in Wallet of Satoshi within seconds. (b) Android opens a Lightning wallet app, or offers a chooser, with the address filled in — paying again is optional. |
+| D6  | **Notes and brand buttons (Step 75, added 2026-10-17).** On C, then on A: open the ♥. Tap the red button, come back, tap the yellow one. | PayID's title has _In Australia_ beside it and Lightning's _Crypto Bitcoin_. Under the Lightning card: a red _Support me on Ko-fi_ button, then a yellow _Buy me a coffee_ button, each with a cup icon. Each opens its page (`ko-fi.com/freeenglishbooks`, `buymeacoffee.com/freeenglishbooks`) in a new tab, and the Support screen is still there when you come back. Needs Step 75 deployed and the two `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` lines in the VM's `.env`. |
 
 ### Part D results
 
@@ -167,6 +168,7 @@ and sends one real $1 gift over each rail (FM-TIER-3). Same URL as above.
 | D3  | pass                            | $1 from the owner's other bank: payee shown as MARK WEB TOOLS; arrived. |
 | D4  | waived (owner, 2026-10-03)      | Owner reported paying the $1 one-time tier; arrival not confirmed — the dashboard check was not done, and the agent's `gh` token (no `read:user`) listed 0 sponsorships — inconclusive, since that token may not see one-time or private ones. |
 | D5  | (b) pass; (a) waived (owner, 2026-10-03) | (b) pass: the address link on C opened a Lightning wallet with the address filled in. (a) not done — the QR payment from a second wallet. |
+| D6  | not yet run                     | Added with Step 75 (2026-10-17); runs after that deploy. |
 
 **Owner waiver, 2026-10-03:** the owner will not run D4 (Sponsors arrival) or D5(a) (QR payment
 from a second wallet) in this project and does not want to be reminded of them. They are

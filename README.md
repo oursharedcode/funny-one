@@ -60,7 +60,7 @@ deployment gets every feature this repo has — a gift is support, never a key t
 
 The game is free to play. If you'd like to say thanks, the official deployment has a
 **Support** screen — the ♥ in the corner of the Home screen, or _Support this server_ on the
-end screen — for voluntary gifts: nothing is owed, nothing is unlocked. It offers three
+end screen — for voluntary gifts: nothing is owed, nothing is unlocked. It offers five
 rails:
 
 - **PayID/Osko** (Australian banks): tap to copy the PayID. The screen also shows the account
@@ -69,21 +69,24 @@ rails:
   **Sponsor** button on this repo is the same account, wired by `.github/FUNDING.yml`.
 - **Bitcoin Lightning**: tap to copy the address, open it as a `lightning:` link in your
   wallet app, or scan its QR code from another device.
+- **Ko-fi** and **Buy Me a Coffee**: two buttons that open those pages in a new tab.
 
 On your own deployment the addresses are yours. None are in the code: set `DEPLOYER_PAYID`
-and `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS` (and, if
-you like, the older single-link `DEPLOYER_DONATE_URL`) in the server's `.env`, and gifts go
-to whoever runs the server. Leave them all unset and neither the ♥ nor the screen appears.
-See [DEPLOYMENT.md](DEPLOYMENT.md#optional-the-support-screen).
+and `DEPLOYER_PAYID_NAME`, `DEPLOYER_SPONSORS_URL`, `DEPLOYER_LIGHTNING_ADDRESS`,
+`DEPLOYER_KOFI_URL`, `DEPLOYER_BMC_URL` (and, if you like, the older single-link
+`DEPLOYER_DONATE_URL`) in the server's `.env`, and gifts go to whoever runs the server. Leave
+them all unset and neither the ♥ nor the screen appears. See
+[DEPLOYMENT.md](DEPLOYMENT.md#optional-the-support-screen).
 
-### Why no card payments
+### Why the card rails are optional
 
-No card checkout — not Stripe, PayPal, Ko-fi or Buy Me a Coffee, nor any other card-based
-merchant of record. On those, a single disputed $1 gift costs the recipient $15–30 in
-dispute fees, which is a bet a small project cannot take. Only chargeback-free rails are
-offered: a PayID transfer is a push from the payer's own bank; on GitHub Sponsors GitHub is
-the merchant of record, so a dispute is not debited from the recipient's account; a
-Lightning payment is final.
+There is no card checkout inside the game. The first three rails are chargeback-free: a
+PayID transfer is a push from the payer's own bank; on GitHub Sponsors GitHub is the
+merchant of record, so a dispute is not debited from the recipient's account; a Lightning
+payment is final. Ko-fi and Buy Me a Coffee take cards, and there a single disputed $1 gift
+can cost the recipient $15–30 in dispute fees. The official deployment links them anyway, at
+its owner's choice (2026-10-17), as the author's books page does; on your own deployment,
+leave `DEPLOYER_KOFI_URL` and `DEPLOYER_BMC_URL` unset to offer only the first three.
 
 ## Adding a language
 

@@ -10,6 +10,8 @@ const NO_RAILS: SupportConfig = {
   payIdName: null,
   sponsorsUrl: null,
   lightningAddress: null,
+  kofiUrl: null,
+  bmcUrl: null,
   donateUrl: null,
 };
 
@@ -26,6 +28,7 @@ describe('hasAnyRail', () => {
 
   it('is true on the web once any one rail is set', () => {
     expect(hasAnyRail({ ...NO_RAILS, lightningAddress: 'me@wallet' })).toBe(true);
+    expect(hasAnyRail({ ...NO_RAILS, kofiUrl: 'https://ko-fi.com/me' })).toBe(true);
   });
 
   // B-1c (FM-APP-3): the store app offers no gifts, whatever the server says.
@@ -37,6 +40,8 @@ describe('hasAnyRail', () => {
         payIdName: 'Me',
         sponsorsUrl: 'https://github.com/sponsors/me',
         lightningAddress: 'me@wallet',
+        kofiUrl: 'https://ko-fi.com/me',
+        bmcUrl: 'https://buymeacoffee.com/me',
         donateUrl: 'https://example.com/give',
       }),
     ).toBe(false);

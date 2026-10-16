@@ -64,6 +64,8 @@ const GIFT_RAILS: Record<string, string> = {
   payid: 'PayID',
   sponsors: 'GitHub Sponsors',
   lightning: 'Lightning',
+  kofi: 'Ko-fi',
+  bmc: 'Buy Me a Coffee',
   donate: 'Donation page',
 };
 const DESIGNS: Record<'a' | 'b', string> = { a: 'A: trailer card', b: 'B: background video' };

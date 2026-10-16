@@ -24,6 +24,8 @@ const NO_RAILS: SupportConfig = {
   payIdName: null,
   sponsorsUrl: null,
   lightningAddress: null,
+  kofiUrl: null,
+  bmcUrl: null,
   donateUrl: null,
 };
 

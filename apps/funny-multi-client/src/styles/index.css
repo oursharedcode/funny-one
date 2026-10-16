@@ -263,6 +263,35 @@ body {
   animation: support-hop 3s ease-in-out infinite;
 }
 
+/* ── The support sheet's Ko-fi and Buy Me a Coffee buttons (Step 75) ─────
+   The books page's sheen (oursharedcode.github.io): a soft band of light
+   crosses the button now and then. Brighter on the yellow button, where the
+   plain one hardly shows. The button itself is relative and overflow-hidden. */
+
+@keyframes gift-sheen {
+  0%,
+  62% {
+    left: -60%;
+  }
+  92%,
+  100% {
+    left: 115%;
+  }
+}
+.gift-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 55%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: gift-sheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.gift-sheen-bright::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+}
+
 /* Reduced motion: idle loops stop; color cues stay (DESIGN_SYSTEM §4). */
 @media (prefers-reduced-motion: reduce) {
   .bot-blink,
@@ -276,7 +305,8 @@ body {
   .picture-wobble-jiggle,
   .picture-wobble-pulse,
   .support-beat,
-  .support-hop {
+  .support-hop,
+  .gift-sheen::after {
     animation: none;
   }
 }

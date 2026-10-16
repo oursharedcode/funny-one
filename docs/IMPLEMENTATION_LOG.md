@@ -3776,6 +3776,81 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 75 (task B-17) — Support screen: "In Australia", "Crypto Bitcoin", Ko-fi and Buy Me a Coffee (2026-10-17)
+
+**Owner request 2026-10-17** (with a marked-up screenshot of the Support screen): "Add to the
+Support Author, see the attached picture: next to PayID "In Australia"; next to Lightning "Crypto
+Bitcoin"; below add links to Ko-fi, Buy me cofee from the english books project. … I understand
+that the description is for english books - ignore the description, does not change the
+description." The same message asked for Arabic, Swahili and Yoruba, the ♥ on
+`www.oursharedcode.com`, QR codes on the landing page and a visitor map on `/stats/`, and a later
+one for the ♥ on the landing page; each is a task of its own, B-18 to B-22 in
+`steering/tasks.md`. The owner's choices in that day's interview, each the recommended option:
+the two links as **brand buttons**; on `oursharedcode.com` **a sheet of its own**; for the map
+**our own lookup and our own map**; Arabic as **Modern Standard Arabic** under Morocco's flag.
+
+**Shipped:**
+
+- *Two deployer variables,* `DEPLOYER_KOFI_URL` and `DEPLOYER_BMC_URL`, read at boot like the
+  other rails and served by `GET /config` as `kofiUrl` and `bmcUrl` (`SupportConfig`,
+  `packages/shared`). Either one is enough for the ♥ to show (`hasAnyRail`); the store app still
+  shows none.
+- *The Support screen* (`SupportScreen.tsx`): a small amber note beside PayID's title ("In
+  Australia") and Lightning's ("Crypto Bitcoin"), wrapping under the title when it must. Under
+  Lightning, Ko-fi and Buy Me a Coffee as two round buttons in the brands' colours (#ff5e5b with
+  white, #ffdd00 with near-black), with the books page's cup icons and its sheen: a band of light
+  crosses each button every 4.5 s, and stops under reduced motion. Each opens its page in a new
+  tab. Rows: PayID, Sponsors, Lightning, Ko-fi, Buy Me a Coffee, donate URL.
+- *Counting:* the funnel's gift rails gain `kofi` and `bmc` (client `funnel.ts`, server
+  `analytics.ts`, and `/stats/`'s gift table as "Ko-fi" and "Buy Me a Coffee"). The key space
+  stays closed: 58 combinations per language a day at most.
+- *Strings:* four per catalogue (`payIdWhere`, `lightningWhat`, `kofi`, `bmc`) in all 20
+  languages. The button labels are the books page's where it has the language (`content.mjs`:
+  en, hi, pt-br, zh, es-es), in the game's own register (Bengali's informal forms, like the rest
+  of its catalogue); the other 18 languages besides en and ru are machine drafts for B-3.
+- *Privacy policy* (`deploy/origin-root/funny37/privacy.html`, dated 2026-10-17): the gift
+  paragraph names Ko-fi and Buy Me a Coffee in all 20 languages.
+- *Docs:* `.env.example`, `DEPLOYMENT.md`, the README ("Why no card payments" became "Why the card
+  rails are optional"); D-6(a) amended, FM-TIER-3 and FM-TIER-4, design §10.2, §11 and DD-12;
+  acceptance check D6.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *White on Ko-fi's red* is 3.0:1, just under WCAG AA even for large text. Kept: it is the
+   brand's own pairing and the books page's, in bold 20 px. Near-black on that red would read
+   better (6.2:1) and look less like Ko-fi.
+2. *The two pages amend D-6(a) rather than join D-6(e):* they take cards, so a disputed gift can
+   cost a fee. The owner asked for them; the game still has no card checkout of its own, and a
+   self-hoster can leave both unset.
+3. *The order of the coming steps:* B-18 (the landing page's ♥, the owner's newest request), B-19
+   (QR codes), B-20 (the map), then B-21 (the three languages), so that every new string of
+   B-17–B-20 is drafted in them at once, and last B-22, in the other repository, whose push
+   deploys.
+
+**Verified in a browser** (`.screens/step75-support.mjs`, ignored; the production build on a local
+server with made-up rails, Chromium at phone size, every other origin aborted): a Ko-fi tap is
+counted once as `fm_gift||en|direct|kofi||` and opens `ko-fi.com` in a new tab while the game
+stays in its own; Buy Me a Coffee likewise as `bmc`. In all 20 languages at 390 and 320 px the
+rows come in the design's order, both notes sit beside their titles, both buttons stay inside the
+column with their icon and sheen, and nothing scrolls sideways. At 390 px every button label is
+one line except Tamil's two, Bengali's two and Telugu's Ko-fi; at 320 px Tamil's Buy Me a Coffee
+takes three. Reduced motion stops the sheen. Screenshots viewed: English, Hebrew (notes and icons
+mirrored) and Tamil at 320 px.
+
+**Owed:** the deploy, with two lines in production's `.env`:
+`DEPLOYER_KOFI_URL=https://ko-fi.com/freeenglishbooks` and
+`DEPLOYER_BMC_URL=https://buymeacoffee.com/freeenglishbooks` — until they are there, production
+shows the two notes and no new buttons. Then D6.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1337 tests (242 + 359 + 270 + 174 + 239 + 53). The first run
+  caught `/stats/`'s gift-table test, which did not know the two new rows; fixed.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -3788,15 +3863,23 @@ Gates:
 
 ~~RESUME HERE (2026-10-16, after Step 74)~~ — carried into this note.
 
-**RESUME HERE (2026-10-16, after Step 74, pushed and deployed).** **Steps 73 and 74 (B-16) are
-pushed, CI passed (run `38898907879`), and Funny Multi and the landing page are deployed.**
-Step 73 added five languages (Cantonese, Persian, Hindi, Telugu, Bengali; 20 in all) to both
-games, the landing page and both privacy policies, and fixed the exported pictures for Chinese,
-Japanese, Hebrew and Persian. Step 74 made every home title fit a phone. Funny One's production
-still serves 15 languages until the owner deploys it; its deploy now carries B-16 too.
+~~RESUME HERE (2026-10-16, after Step 74, pushed and deployed)~~ — carried into this note.
 
-**Next:** nothing is queued for the agent. B-16 stays open only for the five languages' native
-review (B-3). The owner's queue is below.
+**RESUME HERE (2026-10-17, after Step 75).** **Step 75 (B-17) is committed, not pushed** — the
+push waits for the owner's word. It gives Funny Multi's Support screen the notes "In Australia"
+and "Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a Coffee (D-6(a)
+amended). Its deploy needs two lines in production's `.env` (Step 75's *Owed*). Steps 73 and 74
+(B-16) are pushed, CI passed (run `38898907879`), and Funny Multi and the landing page run them:
+20 languages, and every home title fits a phone. Funny One's production still serves 15
+languages until the owner deploys it; its deploy carries B-16 too.
+
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-18–B-22): Step 76
+(B-18), the beating ♥ and hopping "Support Author" in the landing page's header, both designs,
+opening a sheet of the page's own fed by Funny Multi's config — the owner's newest request;
+Step 77 (B-19), QR codes of the games' addresses on the landing page; Step 78 (B-20), the
+visitor map on `/stats/`; Step 79 (B-21), Arabic, Swahili and Yoruba, 23 languages; Step 80
+(B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose
+push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -3815,9 +3898,10 @@ blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, noth
 are committed; **Funny One's deploy is still the owner's — production serves its library
 un-blocked until then.**
 
-**Confirmed 2026-10-16:** Steps 73 and 74 are pushed and CI passed (run `38898907879`). CI
-warned that GitHub moves `ubuntu-latest` to Ubuntu 26 from 2026-10-19: a red build after that
-date may be the new image, not the code.
+**Owner decision open, with a date:** CI warned that GitHub moves `ubuntu-latest` to Ubuntu 26
+from 2026-10-19. Pinning the workflow to `ubuntu-24.04` (proposed 2026-10-17, unanswered) keeps
+the next push on today's image; without it, a red build after that date may be the new image,
+not the code.
 
 **Next, in order, the owner's:** (1) Funny One's deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -3831,7 +3915,7 @@ PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.
 `IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
 build, found 2026-10-15); an exception is recommended so design B can be checked here too.
 
-The agent's own queue is empty. Anything next waits on whichever owner item lands first.
+The agent's own queue is Steps 76–80 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -3840,8 +3924,8 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Open owner decisions: none new. Step 72's thirteen decisions were the agent's, as the request
-asked — each is in that entry with its options, and any of them can be reversed. **B-2 (Apple)
+Open owner decisions: the CI pin above. Step 72's thirteen decisions and Step 75's three were
+the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e
@@ -3865,8 +3949,8 @@ The paid Workers AI plan is cancelled; production generation is off (`[ai]` comm
 block is in Funny One's client, Funny Multi still shows them.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
-what, wait for "done", automate first). Production's `.env` holds the support rails,
-`BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
+what, wait for "done", automate first). Production's `.env` holds the support rails (not yet
+Step 75's Ko-fi and Buy Me a Coffee lines), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
 `FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Backups on the
 VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`. The
 visit counts live in the volume `funny_stats_data` (`/data/stats.json` in the game's container,

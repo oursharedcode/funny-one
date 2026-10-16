@@ -200,6 +200,10 @@ export interface SupportConfig {
   payIdName: string | null;
   sponsorsUrl: string | null;
   lightningAddress: string | null;
+  // Step 75 (B-17): two card-based gift pages, shown as brand buttons under
+  // Lightning — see the D-6(a) amendment in steering/requirements.md.
+  kofiUrl: string | null;
+  bmcUrl: string | null;
   donateUrl: string | null;
 }
 

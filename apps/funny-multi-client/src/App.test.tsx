@@ -357,6 +357,8 @@ describe('support (T-9.4)', () => {
             payIdName: null,
             sponsorsUrl: null,
             lightningAddress: null,
+            kofiUrl: null,
+            bmcUrl: null,
             donateUrl: null,
             ...support,
           },

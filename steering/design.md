@@ -539,10 +539,17 @@ retired by D-6; nothing of it was built.*
   with a 2 s "Copied!" state; PayID row shows "your bank will display: <name>"; Sponsors row
   is a plain link with the "choose one-time" hint; Lightning row is an `<a href="lightning:…">`
   plus a QR rendered by the existing `QRCode` component (design-system copy, no CDN, no new
-  encoder). Header copy: voluntary gift, nothing owed. All strings in the 15 locale files.
+  encoder). Header copy: voluntary gift, nothing owed. All strings in every locale file.
   *(Corrected 2026-09-29 — owner decision was to reuse the existing component rather than vendor
   a new canvas encoder; the original text was written before that component existed in this
   client.)*
+- **Step 75 (B-17, 2026-10-17)**: two more optional vars, `DEPLOYER_KOFI_URL` and
+  `DEPLOYER_BMC_URL` (`kofiUrl`, `bmcUrl` in the shape above), D-6(a) as amended. The order
+  becomes PayID → Sponsors → Lightning → Ko-fi → Buy Me a Coffee → donate URL. Ko-fi and Buy
+  Me a Coffee are full-width pill buttons in the brands' colours (#ff5e5b with white, #ffdd00
+  with #10121a) with the books page's cup icons and sheen; each opens its page in a new tab and
+  counts as gift rail `kofi` / `bmc`. PayID's and Lightning's titles carry a short note in a
+  pill: "In Australia", "Crypto Bitcoin".
 - Store shells (FM-APP-3): the screen stays in the bundle and is hidden at run time — a TWA
   renders the deployed web bundle, so no build flag can see it. `storeShell.ts` reports the
   Android app on either of two signals: `?shell=android` on the launch URL (set by the
@@ -567,6 +574,7 @@ retired by D-6; nothing of it was built.*
 | `DEPLOYER_PAYID` / `DEPLOYER_PAYID_NAME` | server | support rails (§10.2, D-6): PayID and the exact registered account name |
 | `DEPLOYER_SPONSORS_URL` | server | support rails (§10.2): GitHub Sponsors profile |
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
+| `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
 
 R2 bucket (`IMAGES`) and KV (`STATS_KV`) are wrangler.toml bindings, not env vars.
 
@@ -651,7 +659,7 @@ device, is under `tasks.md` B-14.
 | DD-9 | Lottie recording engine dropped, `wobbleEngine` field removed from protocol. *(2026-10-05, B-12: the monkey that engine drew is back, inside the one recorder — no engine choice, no field, no Lottie library; DD-9 stands.)* | ARC-3 locks the stack (no Lottie); removing the field is the honest protocol |
 | DD-10 | ~~Premium as cap-bypass on the existing free path~~ Retired 2026-09-16 by D-6/D-7 — no premium tier; nothing was built | — |
 | DD-11 | Pre-generate the whole 10⁴ library into R2 with the game's own `buildPrompt` (§10.1) | Player count decoupled from the Workers AI daily budget for ≈ $21 once (measured 2026-10-02; estimated ≈ $10); keys match because the same function makes them; free egress means no per-view cost |
-| DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |
+| DD-12 | Support rails as deployer env vars rendered by a client screen, no payment code (§10.2) | Chargeback-free rails only (D-6) — since 2026-10-17 plus two optional card-based links, Ko-fi and Buy Me a Coffee (D-6(a) as amended); the official deployment and every self-hoster show their own addresses from one code path; nothing to secure server-side |
 | DD-13 | Multi-language room (B-15): each client renders questions, options and stories in its player's language from option ids; the server keeps one language per room (§5, §8.1, §8.2, §9) | DD-1's ids already make a story language-free, so the server needs no per-player language and no new event, and a chain written in three languages is still one story; client and server ship as one build (DD-2), so they render a story identically |
 | DD-14 | Funny Family landing page (`apps/funny-family-site`, Step 72): pre-rendered static pages, one per language at `/<code>/` (English at `/`, a browser in another of the 15 languages is sent on to its page), vanilla TypeScript built by Vite, served by the same Caddy at `HUB_HOST`; two designs — A, a trailer card that plays on click; B, a muted background loop — split 50/50 per tab, `?v=a`/`?v=b` forces one | One screen needs no framework or server: ~5 kB of script, every language indexable, nothing running on the 1 GB VM; the split lets the funnel (DD-15) choose the design by its clicks to Funny Multi, judged by a two-proportion z-test on `/stats/` once each design has 100 visits |
 | DD-15 | Visit and funnel counts kept first-party by Funny Multi's server (`analytics.ts`): events with allowlisted labels only (variant, language, source, target, referrer class, phone or not), summed per UTC day into one JSON file in a volume, kept 400 days; the landing page posts through its own host, the game from its client (`funnel.ts`); `/stats/` (public, `noindex`) reads `GET /api/stats/summary`. No IP address, cookie or identifier is stored; nothing is sent from the Android app or under Do Not Track / Global Privacy Control | Answers "does the landing page lead to plays and gifts" without a third-party tracker, a database or a consent banner; FM-CPL-2 says exactly this |

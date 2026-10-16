@@ -109,6 +109,8 @@ describe('renderStats', () => {
       ['PayID', '1'],
       ['GitHub Sponsors', '0'],
       ['Lightning', '0'],
+      ['Ko-fi', '0'],
+      ['Buy Me a Coffee', '0'],
       ['Donation page', '0'],
     ]);
   });

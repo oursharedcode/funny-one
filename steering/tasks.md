@@ -269,6 +269,43 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     column shrinks the font to fit (never below 24 px). Funny Multi's Tamil title had run off a
     phone. Also on Funny One's home in Tamil: the player row scrolled sideways at 320 px and the
     rules box cut a long word; both fixed.
+- **B-17** Funny Multi's Support screen: two notes and two more rails (owner request 2026-10-17,
+  with a marked-up screenshot). "In Australia" beside PayID's title, "Crypto Bitcoin" beside
+  Lightning's, and under Lightning the author's Ko-fi and Buy Me a Coffee pages — the ones the
+  books page links (`oursharedcode.github.io`, its D9) — as two buttons in the brands' colours
+  with that page's cup icons and sheen (owner choice "brand buttons"). Two new deployer
+  variables, `DEPLOYER_KOFI_URL` and `DEPLOYER_BMC_URL`; an unset one hides its button. D-6(a)
+  amended: the owner accepts the card-dispute risk of these two pages, and the game still has no
+  card checkout. The funnel counts the buttons as gift rails `kofi` and `bmc`, and the privacy
+  policy names both in all 20 languages. **Code done 2026-10-17 (Step 75).**
+  - *Owed:* the four new strings are machine drafts in 18 languages (with B-3); check D6 of
+    `docs/ACCEPTANCE.md` after the deploy, which needs the two `.env` lines.
+  - *Kept on purpose:* white on Ko-fi's red is 3.0:1, just under AA even for large text; it is
+    the brand's own pairing, as on the books page, in bold 20 px.
+- **B-18** The beating ♥ and the hopping words "Support Author" on the landing page (owner request
+  2026-10-17, with a screenshot): in the header of both designs, between the «Семейная Чепуха»
+  logo and the language picker, opening a support sheet of the landing page's own with the same
+  rails as the game. The rails come at run time from Funny Multi's server, so the deployer's
+  variables stay their one source; with no rail set there is no heart. *Planned: Step 76.*
+- **B-19** QR codes on the landing page (owner request 2026-10-17, with three screenshots): a QR
+  code of each game's address beside the Funny Multi and Funny One buttons at the top of design A
+  and of design B, and beside each "Play now" button in the "Pick a game" cards, so a visitor at a
+  computer can open a game on a phone. *Planned: Step 77.*
+- **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
+  `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
+  each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the
+  country, never the address; `/stats/` draws its own world map, shaded by visits, with a list
+  of the top countries. Both privacy policies say so. *Planned: Step 78.*
+- **B-21** Three African languages: Arabic, Swahili and Yoruba (owner request 2026-10-17, after
+  that day's research), in both games, the landing page and both privacy policies, 23 in all.
+  Arabic is Modern Standard Arabic (owner choice), labelled «العربية (المغرب)» under Morocco's
+  flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. *Planned: Step 79,
+  after B-18–B-20, so their new strings are drafted in the new languages at once.*
+- **B-22** The ♥ and "Support Author" on `https://www.oursharedcode.com/` (owner request
+  2026-10-17; owner choice "own sheet there"): top right, opening a sheet on that site with PayID,
+  Sponsors, Lightning, Ko-fi and Buy Me a Coffee. It lives in that site's own repository
+  (`oursharedcode.github.io`), where a push deploys, so it waits for the owner's go-ahead; the
+  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 80.*
 
 ## Dependency notes
 

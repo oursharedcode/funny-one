@@ -12,7 +12,8 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (780 combinations a day at most).
+// into the file and the key space is closed (58 combinations per language a
+// day at most).
 //
 // Persistence is one JSON file (STATS_FILE; docker-compose.yml mounts a volume
 // for it), written whole and atomically when something changed, at most every
@@ -42,7 +43,7 @@ const DEVICES = ['m', 'd'] as const;
 // author's site.
 const HUB_TARGETS = ['fm', 'fo', 'gh', 'video', 'root'] as const;
 // Which gift rail was used on Funny Multi's support sheet.
-const GIFT_TARGETS = ['payid', 'sponsors', 'lightning', 'donate'] as const;
+const GIFT_TARGETS = ['payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'] as const;
 
 // Each event's own labels. Every one listed is required, except that a Funny
 // Multi event carries `v` only when it came through the hub — a visit that did

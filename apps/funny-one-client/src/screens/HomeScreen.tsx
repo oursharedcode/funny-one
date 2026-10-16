@@ -125,7 +125,7 @@ export default function HomeScreen({ onStart }: Props) {
           <div className="border-b border-amber-200 py-2 text-center font-semibold">
             {t('home.gameRules')}
           </div>
-          <ScrollBox className="flex-1" contentClassName="p-3 text-base">
+          <ScrollBox className="flex-1" contentClassName="break-words p-3 text-base">
             {t('home.rules')}
           </ScrollBox>
         </div>
@@ -166,7 +166,7 @@ export default function HomeScreen({ onStart }: Props) {
           {seats.map((seat) => (
             <li key={seat.id} className="flex items-center gap-2">
               <input
-                className="flex-1 rounded border border-amber-300 p-2 text-base"
+                className="min-w-0 flex-1 rounded border border-amber-300 p-2 text-base"
                 placeholder={t('home.playerNamePlaceholder')}
                 value={seat.name}
                 maxLength={20}

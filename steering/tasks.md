@@ -264,6 +264,11 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     were drawn left to right, which scrambled Hebrew and Persian. They now run right to left at
     the right edge, with the URL under them. The video's story text had no direction of its
     own; it now has the story's.
+  - *Title fitting, Step 74 (owner decision 2026-10-16: its own commit after the languages):*
+    both clients' home title now wraps onto centred, balanced lines, and a word wider than the
+    column shrinks the font to fit (never below 24 px). Funny Multi's Tamil title had run off a
+    phone. Also on Funny One's home in Tamil: the player row scrolled sideways at 320 px and the
+    rules box cut a long word; both fixed.
 
 ## Dependency notes
 

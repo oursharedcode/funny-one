@@ -242,7 +242,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               <div className="border-b border-amber-200 py-2 text-center font-semibold">
                 {t('home.gameRules')}
               </div>
-              <ScrollBox className="flex-1" contentClassName="p-3 text-base">
+              <ScrollBox className="flex-1" contentClassName="break-words p-3 text-base">
                 {t('home.rules')}
               </ScrollBox>
             </div>
@@ -331,7 +331,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               <div className="border-b border-amber-200 py-2 text-center font-semibold">
                 {t('home.gameRules')}
               </div>
-              <ScrollBox className="flex-1" contentClassName="p-3 text-base">
+              <ScrollBox className="flex-1" contentClassName="break-words p-3 text-base">
                 {t('home.rules')}
               </ScrollBox>
             </div>

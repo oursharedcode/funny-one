@@ -3721,6 +3721,54 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 74 (task B-16) — Home titles fit a phone in all 20 languages (2026-10-16)
+
+**Owner request 2026-10-16:** "do Step 74", the title fitting that the owner's decision of the
+same day had put after the languages, in a commit of its own.
+
+**Before** (`.screens/step74-titles.mjs`, ignored, all 20 titles of both games at 320, 360 and
+390 px): Funny Multi's Tamil title «வேடிக்கையான கதைகள்» ran off both edges of the screen at every
+width (its first word is ≈ 440 px at 48 px; a 320 px screen's column has 272 px). Every other
+title fitted, but a title that wrapped sat at the left of the column — at the right for Hebrew
+and Persian — instead of in the middle.
+
+**Shipped:**
+
+- *Both `Wordmark.tsx` files* (kept identical below Funny One's header): the title is centred and
+  balanced (`text-center text-balance`). A small hook measures it against its column's content
+  width and, when one word is still too wide, lowers the font until it fits, never below 24 px.
+  It runs again when the text changes (a language switch), when the column's width changes, and
+  once the web fonts have loaded. The header comment's example titles were stale ("Funny
+  Stories", "ЧЕПУ-ХА-ХА") and now read "Funny Multi" and «Чепуха 37».
+- *A `Wordmark.test.tsx` in each client:* a title that fits keeps its size, a too-wide one shrinks
+  to the largest whole size that fits, and the floor holds.
+- *Seen on the way, Funny One's home in Tamil at 320 px:* the player row's "நீங்கள்" badge pushed
+  the ✕ button off the screen, so the page scrolled sideways (the name field now may shrink,
+  `min-w-0`); and the rules box cut a long word at its edge (the rules text now breaks long
+  words, `break-words`, in both games' rules boxes).
+
+**Verified in a browser** (Chromium, both clients on in-process Vite servers):
+`.screens/step74-titles.mjs` reports **0 problems** across 2 games × 20 languages × 3 widths — no
+title leaves its column, no page scrolls sideways, every title is the catalogue's. The check now
+also counts scroll boxes that clip their text; with `break-words` taken out it flags Funny One's
+Tamil rules box at 320 px, so it does catch that. Funny Multi's Tamil title is now 29, 34 and
+37 px at 320, 360 and 390 px, on two lines; every other title keeps 48 px. Wrapped titles are
+centred (French at 320 px: 61..255 of 320). Screenshots viewed: Tamil, Russian Funny One (three
+balanced lines at 320 px), Hebrew and Persian.
+
+**Owed:** the deploy, with Step 73.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1333 tests (242 + 355 + 270 + 174 + 239 + 53). One run hit
+  the documented load flake in Funny One's `StoryGallery.test.tsx` ("steps forward and wraps
+  back to the first story"); that file alone and then the whole Funny One workspace re-ran clean,
+  174/174.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -3729,18 +3777,18 @@ Gates:
 
 ~~RESUME HERE (2026-10-15, after Step 72)~~ — carried into this note.
 
-**RESUME HERE (2026-10-16, after Step 73).** **Step 73 (B-16) is committed, not pushed, not
-deployed.** It adds five languages (Cantonese, Persian, Hindi, Telugu, Bengali; 20 in all) to
-both games, the landing page and both privacy policies, and fixes the exported pictures for
-Chinese, Japanese, Hebrew and Persian. Push it only once the owner confirms. Production still
-serves 15 languages.
+~~RESUME HERE (2026-10-16, after Step 73)~~ — carried into this note.
 
-**Next, the agent's: Step 74.** Fit long home titles in both clients' `Wordmark.tsx`, checking
-all 20 titles at 320, 360 and 390 px. Funny Multi's Tamil title is cut today. This was the
-owner's decision of 2026-10-16: languages first, then title fitting, in two commits and one
-deploy. After Step 74, deploy Funny Multi and the landing page (`deploy/ship.sh`,
-`deploy/ship-funny-family.sh`) when the owner asks. Funny One's deploy, which now carries B-16
-too, stays the owner's.
+**RESUME HERE (2026-10-16, after Step 74).** **Steps 73 and 74 (B-16) are committed, not
+pushed, not deployed.** Step 73 adds five languages (Cantonese, Persian, Hindi, Telugu,
+Bengali; 20 in all) to both games, the landing page and both privacy policies, and fixes the
+exported pictures for Chinese, Japanese, Hebrew and Persian. Step 74 makes every home title fit
+a phone (Funny Multi's Tamil one ran off the screen). Push them only once the owner confirms.
+Production still serves 15 languages.
+
+**Next:** once pushed, deploy Funny Multi and the landing page (`deploy/ship.sh`,
+`deploy/ship-funny-family.sh`) when the owner asks — the owner's decision of 2026-10-16 was two
+commits and one deploy. Funny One's deploy, which now carries B-16 too, stays the owner's.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -3772,8 +3820,8 @@ PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.
 `IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
 build, found 2026-10-15); an exception is recommended so design B can be checked here too.
 
-The agent's own queue holds only Step 74 (above). Anything after it waits on whichever owner item
-lands first.
+The agent's own queue is empty after the push and the deploy (above). Anything after them waits
+on whichever owner item lands first.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video

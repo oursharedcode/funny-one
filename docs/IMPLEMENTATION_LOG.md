@@ -4026,6 +4026,95 @@ reload warns that the Caddyfile is not formatted: `caddy fmt` would drop the bla
 there at least since Step 72 — harmless. Funny One is not deployed (the owner's). Owed: D6, the
 owner's.
 
+## Step 78 (task B-19) — the games' QR codes beside their buttons on the landing page (2026-10-17)
+
+**Owner request 2026-10-17** (with three screenshots marked "QR"): "For the landing page
+"funny-family", add QR codes for the each game URL see the attached pictures" — beside the Funny
+Multi and Funny One buttons at the top of design A and of design B, and beside each "Play now"
+in the "Pick a game" cards, so a visitor at a computer can open a game on a phone. Started on
+the owner's "go".
+
+**Shipped:**
+
+- *Four codes on a computer's screen,* each beside its button: the hero's Funny Multi and Funny
+  One, and each card's "Play now". Each holds exactly its button's address: Funny Multi's with
+  the page's language and the design shown (`?lang=…&from=hub&hv=a|b`), so the phone opens the
+  game in that language; Funny One's plain `https://www.funny1.oursharedcode.com/`.
+- *Drawn at build time* (`render/page.ts`) with Step 76's `qrPath`, error correction M as the
+  gift sheet's: an SVG of 104 px with two modules of white all round and a 2 px frame. Funny
+  Multi's address makes a version 4 code (33 modules) in 17 languages and version 5 (37) in
+  pt-br, es-419 and es-es; Funny One's is version 3 (29) — 2.5 to 3.2 px a module. No script:
+  each page's HTML grows by 23 kB, 3.0 kB gzipped and 2.4 kB with zstd (Caddy's first choice),
+  for its six codes — Funny Multi has one per design.
+- *Only on a wide screen with a mouse* (`min-width: 900px` and `hover: hover`): on a phone or a
+  tablet the screen is the phone. Below 900 px and on touch screens the page is as before.
+- *Placement.* Design A, as the owner's picture: the two games one above the other, each code
+  to the right of its button and the line under it (to the left in Hebrew and Persian), level
+  with the button's top, and the two codes lined up (the games share their columns, CSS
+  subgrid). Design B, as the owner's picture: the two side by side and centred, each with its
+  code — the text widens from 760 px to the hero's full width for them, while the heading keeps
+  its 760 px and the lead its width. In the cards the code follows "Play now", the button
+  centred against it; each card grows by about 50 px.
+- *Not a link, not read out:* `aria-hidden`, not focusable — the button beside it is the same
+  address — and no caption.
+- *Counting:* a scan opens Funny Multi with `from=hub&hv=…`, so it counts as a visit from the
+  landing page in the design the visitor saw, though nobody clicked. `/stats/`'s funnel note now
+  says that opened games can therefore outnumber clicks. The privacy policy already covers it
+  ("whether the visit came through the Funny Family page and which version of that page was
+  shown"); Funny One counts nothing.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *Funny Multi has a code per design.* The page's script sets the button's `hv` to the design
+   shown (`client/main.ts`); a code drawn at build time cannot be changed, so both are in the
+   page and the rule that hides the other design's parts shows the right one. Without script the
+   page is design A, and so are its codes.
+2. *A computer only:* `hover: hover` from 900 px, the width where the hero goes side by side. A
+   tablet with a trackpad, or a touch laptop, reports `hover` and shows them.
+3. *104 px,* two buttons high: 2.5 px a module even for the longest address, and still small
+   enough to sit beside a button in the hero's text column.
+4. *No caption and no link:* the owner's pictures show the code alone; a caption would be one
+   more string in 20 languages, and a link would repeat the button beside it.
+5. *The code is never squeezed:* where room is short the button wraps instead. That happens
+   once — Tamil's Funny Multi in design A's hero, from 900 to 959 px (52 → 73 px high) —
+   measured with and without the codes for every language, both designs and six widths from
+   900 to 1280 px.
+6. *Scans are not told apart from clicks:* that needs a new source in the game and its server
+   (`from=hubqr`, say) and a row on `/stats/`; the note explains the numbers instead. It can
+   follow as a step of its own.
+
+**Verified in a browser** (`.screens/step78-hub-qr.mjs` and `.screens/step78-wrap.mjs`,
+ignored; the production build on `vite preview` at 5187, Chromium, every other origin aborted —
+none was asked for; jsQR 1.4.0, installed outside the repository for the check):
+
+- *Every code reads back:* jsQR decoded each shown code, alone and together with its button,
+  from screenshots, to its button's address with the design's `hv` — 20 languages × both designs
+  at 1280×800 (160 codes) and at 900×800 (the hero's, and English's cards), four languages at
+  1920×1080 and at 1536×864 with 125 % scaling.
+- *Placement,* at all those sizes: each code 104×104, beside its button on the inline-end side
+  (left in Hebrew and Persian), level with the button's top in the hero, inside the hero's text,
+  the card and the screen, nothing scrolling sideways; design A's two codes lined up, design
+  B's two games on one row in every language from 900 px, its heading at most 760 px wide.
+- *No code* at 899 px, on a phone (390×844, touch) or a tablet either way (1024×1366 and
+  1366×1024, touch): English, Russian, Hebrew and Tamil, both designs.
+- *Without JavaScript:* design A with design A's codes (English, Hebrew).
+- Screenshots viewed: the hero in English (both designs, 1280 px), Russian (A at 1280, B at
+  1920), Hebrew (A, 1280) and Tamil (both, 900); the cards in English and Tamil at 1280 and on
+  a tablet.
+
+**Not run:** WebKit — its executables are still missing (owner item 4 of the RESUME note); a
+phone's camera — jsQR read screenshots, but a phone pointed at a real screen is the owner's
+check, after the deploy.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1470 tests (373 + 359 + 272 + 174 + 239 + 53), 21 more than
+  Step 76's, all in the landing page; all passed on the first run.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4046,7 +4135,14 @@ owner's.
 
 ~~RESUME HERE (2026-10-17, after Step 77)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 77, pushed and deployed).** **Steps 75 (B-17), 76 (B-18)
+~~RESUME HERE (2026-10-17, after Step 77, pushed and deployed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-17, after Step 78).** **Step 78 (B-19) is committed, not pushed:** the
+landing page shows each game's address as a QR code beside its buttons — the hero's two and each
+card's "Play now" — on a wide screen with a mouse, so a visitor at a computer can open a game on
+a phone; drawn at build time, no script, Funny Multi's once per design. It changes only the
+landing page (and one sentence on `/stats/`), so its deploy is `deploy/ship-funny-family.sh`
+alone. **Steps 75 (B-17), 76 (B-18)
 and 77 are pushed, CI passed (run `38998055486`, on `ubuntu-24.04`), and Funny Multi and the
 landing page run them.** Step 75 gave Funny Multi's Support screen the notes "In Australia" and
 "Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a Coffee (D-6(a) amended);
@@ -4057,13 +4153,14 @@ name had run under the language picker in eight languages). Step 77 pinned CI to
 `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15 languages until the
 owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-19–B-22): Step 78
-(B-19), QR codes of the games' addresses beside the landing page's game buttons and the cards'
-"Play now" — for a visitor at a computer, so on wider screens; drawn at build time with Step
-76's `qrPath`; Step 79 (B-20), the visitor map on `/stats/`; Step 80 (B-21), Arabic, Swahili
-and Yoruba, 23 languages — measure the header again for them (Step 76's one-row widths and
-fitted names); Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's
-own repository, whose push deploys — so it waits for the owner's go-ahead.
+**Next for the agent, in order:** the owner's word on pushing Step 78 and deploying the landing
+page (`deploy/ship-funny-family.sh`, once CI passes); then (all asked 2026-10-17;
+`steering/tasks.md` B-20–B-22) Step 79 (B-20), the visitor map on `/stats/`; Step 80 (B-21),
+Arabic, Swahili and Yoruba, 23 languages — measure the header again for them (Step 76's one-row
+widths and fitted names) and re-run `.screens/step78-hub-qr.mjs` (design B's two games on one
+row from 900 px, every code read back); Step 81 (B-22), the ♥ and its sheet on
+`www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for the
+owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4103,9 +4200,11 @@ folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring bot
 quarantine with an exception for the folder is recommended; until then no WebKit check runs
 here, and Step 76 skipped its own; (5) acceptance check D6 of `docs/ACCEPTANCE.md`, now that
 Step 75 is live: on the phone, then the PC, the Support screen's two notes and its Ko-fi and Buy
-Me a Coffee buttons.
+Me a Coffee buttons; (6) once Step 78 is deployed, a phone's camera on the landing page's four
+codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
+in the page's language.
 
-The agent's own queue is Steps 78–81 above.
+The agent's own queue is Steps 79–81 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4114,7 +4213,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three and Step 76's seven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven and Step 78's six were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e

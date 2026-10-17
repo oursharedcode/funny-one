@@ -301,7 +301,13 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-19** QR codes on the landing page (owner request 2026-10-17, with three screenshots): a QR
   code of each game's address beside the Funny Multi and Funny One buttons at the top of design A
   and of design B, and beside each "Play now" button in the "Pick a game" cards, so a visitor at a
-  computer can open a game on a phone. *Planned: Step 78.*
+  computer can open a game on a phone. **Code done 2026-10-17 (Step 78)**, not yet pushed or
+  deployed: drawn at build time, shown only on a wide screen with a mouse (from 900 px, `hover:
+  hover`), Funny Multi's once per design so that a scan tells the game which design was seen.
+  - *Owed:* the deploy (`deploy/ship-funny-family.sh`); then the owner points a phone at the
+    four codes on the PC, in both designs.
+  - *Kept on purpose:* no caption and not a link; a scan counts as a visit from the landing page
+    with no click, so `/stats/` can show more opened games than clicks (its funnel note says so).
 - **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the

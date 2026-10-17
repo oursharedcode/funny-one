@@ -11,7 +11,8 @@
 // modules in client/ only add on top — the trailer playing in place, the
 // background loop, closing the picker, counting visits and clicks, and
 // (Step 76) the header's Support Author ♥ with its gift sheet, which only a
-// script can fill (render/support.ts).
+// script can fill (render/support.ts). Step 78's QR codes beside the games'
+// buttons are drawn here, at build time, and cost the page no script.
 
 import type { Language } from '@funny/shared';
 import { CODE_ART, FM_ART, FO_ART, PAUSE_PLAY_ICONS, PLAY_ICON } from './art.ts';
@@ -36,7 +37,11 @@ import {
   ROOT_URL,
   SITE_ORIGIN,
 } from '../links.ts';
+import { qrPath } from '../qr.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
+
+/** The side of a game's QR code, in CSS pixels: 2.5 to 3.2 per module, margin included. */
+const QR_PX = 104;
 
 /** The files a page loads, as Vite built them (or the source modules in dev). */
 export interface EntryAssets {
@@ -121,6 +126,28 @@ ${landing}
 </header>`;
 }
 
+/**
+ * Step 78: a game's address as a QR code, so a visitor at a computer can open
+ * the game on a phone. The stylesheet shows it only on a wide screen with a
+ * mouse. Hidden from assistive technology: the link beside it says the same.
+ */
+function playQr(url: string, only?: 'va-only' | 'vb-only'): string {
+  const { size, d } = qrPath(url);
+  // Two modules of white all round, the quiet zone a scanner looks for, as
+  // the gift sheet's code (client/support.ts).
+  const side = size + 4;
+  return `<svg class="play-qr${only ? ` ${only}` : ''}" viewBox="-2 -2 ${side} ${side}" width="${QR_PX}" height="${QR_PX}" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="-2" y="-2" width="${side}" height="${side}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+
+/**
+ * Funny Multi's code, one per design: like the button's link (which main.ts
+ * corrects), it tells the game which design the visitor saw, and a code drawn
+ * at build time cannot be corrected.
+ */
+function fmQr(code: Language): string {
+  return playQr(fmUrl(code, 'a'), 'va-only') + playQr(fmUrl(code, 'b'), 'vb-only');
+}
+
 function hero(code: Language): string {
   const s = STRINGS[code];
   const names = GAME_NAMES[code];
@@ -135,8 +162,8 @@ function hero(code: Language): string {
 <h1 id="hero-title">${esc(s.heroTitle)}</h1>
 <p class="lead">${esc(s.heroLead)}</p>
 <div class="cta">
-<div class="cta-item"><a class="btn btn-primary" href="${esc(fmUrl(code, 'a'))}" data-track="fm">${esc(names.fm)}</a><span class="cta-tag">${esc(s.fmTag)}</span></div>
-<div class="cta-item"><a class="btn btn-secondary" href="${FO_URL}" data-track="fo">${esc(names.fo)}</a><span class="cta-tag">${esc(s.foTag)}</span></div>
+<div class="cta-item"><a class="btn btn-primary" href="${esc(fmUrl(code, 'a'))}" data-track="fm">${esc(names.fm)}</a><span class="cta-tag">${esc(s.fmTag)}</span>${fmQr(code)}</div>
+<div class="cta-item"><a class="btn btn-secondary" href="${FO_URL}" data-track="fo">${esc(names.fo)}</a><span class="cta-tag">${esc(s.foTag)}</span>${playQr(FO_URL)}</div>
 </div>
 </div>
 <figure class="trailer va-only">
@@ -151,19 +178,26 @@ function hero(code: Language): string {
 function games(code: Language): string {
   const s = STRINGS[code];
   const names = GAME_NAMES[code];
-  const card = (key: 'fm' | 'fo', art: string, href: string, tag: string, text: string): string =>
+  const card = (
+    key: 'fm' | 'fo',
+    art: string,
+    href: string,
+    qr: string,
+    tag: string,
+    text: string,
+  ): string =>
     `<article class="game game-${key}">
 <div class="game-art">${art}</div>
 <h3>${esc(names[key])}</h3>
 <p class="tag">${esc(tag)}</p>
 <p>${esc(text)}</p>
-<a class="btn ${key === 'fm' ? 'btn-primary' : 'btn-secondary'}" href="${esc(href)}" data-track="${key}">${esc(s.play)}<span class="sr-only">: ${esc(names[key])}</span></a>
+<div class="game-play"><a class="btn ${key === 'fm' ? 'btn-primary' : 'btn-secondary'}" href="${esc(href)}" data-track="${key}">${esc(s.play)}<span class="sr-only">: ${esc(names[key])}</span></a>${qr}</div>
 </article>`;
   return `<section class="games" id="games" aria-labelledby="games-title">
 <h2 id="games-title">${esc(s.gamesTitle)}</h2>
 <div class="game-grid">
-${card('fm', FM_ART, fmUrl(code, 'a'), s.fmTag, s.fmText)}
-${card('fo', FO_ART, FO_URL, s.foTag, s.foText)}
+${card('fm', FM_ART, fmUrl(code, 'a'), fmQr(code), s.fmTag, s.fmText)}
+${card('fo', FO_ART, FO_URL, playQr(FO_URL), s.foTag, s.foText)}
 </div>
 </section>`;
 }

@@ -4,7 +4,8 @@
 // along a row, in module units — so it scales to any size and stays crisp.
 // The gift sheet draws its Lightning address with it when the sheet first
 // opens (client/support.ts loads this module only then: the encoder is
-// most of its weight).
+// most of its weight). Step 78: the build draws the games' codes with it
+// too (render/page.ts), so those cost the page nothing.
 
 import QRCode from 'qrcode';
 

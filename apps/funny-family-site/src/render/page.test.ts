@@ -17,6 +17,7 @@ import {
   ROOT_URL,
   SITE_ORIGIN,
 } from '../links.ts';
+import { qrPath } from '../qr.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
 import { SUPPORT_STRINGS } from '../supportStrings.ts';
 
@@ -142,6 +143,55 @@ describe('renderPage', () => {
     expect(toggle?.hidden).toBe(true);
     expect(toggle?.dataset.pause).toBe(STRINGS.en.videoPause);
     expect(toggle?.dataset.resume).toBe(STRINGS.en.videoResume);
+  });
+});
+
+describe("the games' QR codes (Step 78)", () => {
+  // Each code as its classes and its drawing, which qr.test.ts ties to the text.
+  const codes = (box: Element | undefined): [string | null, string | null][] =>
+    [...(box?.querySelectorAll('svg.play-qr') ?? [])].map((svg) => [
+      svg.getAttribute('class'),
+      svg.querySelector('path')?.getAttribute('d') ?? null,
+    ]);
+
+  it.each(CODES)(
+    "%s: beside each game's button, the button's address; Funny Multi's once per design",
+    (code) => {
+      const doc = parse(renderPage(code, ASSETS));
+      const fm = [
+        ['play-qr va-only', qrPath(fmUrl(code, 'a')).d],
+        ['play-qr vb-only', qrPath(fmUrl(code, 'b')).d],
+      ];
+      const fo = [['play-qr', qrPath(FO_URL).d]];
+      // The hero's two buttons, then the two cards' "Play now".
+      for (const selector of ['.hero .cta-item', '.game-play']) {
+        const [fmBox, foBox, ...rest] = doc.querySelectorAll(selector);
+        expect(rest).toEqual([]);
+        expect(fmBox?.querySelector('a')?.dataset.track).toBe('fm');
+        expect(codes(fmBox)).toEqual(fm);
+        expect(foBox?.querySelector('a')?.dataset.track).toBe('fo');
+        expect(codes(foBox)).toEqual(fo);
+      }
+      expect(doc.querySelectorAll('svg.play-qr')).toHaveLength(6);
+    },
+  );
+
+  it('each has the quiet zone a scanner looks for, and is neither read out nor focused', () => {
+    // In page order: the hero's three codes, then the cards' three.
+    const urls = [fmUrl('he', 'a'), fmUrl('he', 'b'), FO_URL];
+    const svgs = [...parse(renderPage('he', ASSETS)).querySelectorAll('svg.play-qr')];
+    expect(svgs).toHaveLength(6);
+    svgs.forEach((svg, i) => {
+      const side = qrPath(urls[i % 3] ?? '').size + 4;
+      expect(svg.getAttribute('viewBox')).toBe(`-2 -2 ${side} ${side}`);
+      const paper = svg.querySelector('rect');
+      expect(
+        ['x', 'y', 'width', 'height', 'fill'].map((name) => paper?.getAttribute(name)),
+      ).toEqual(['-2', '-2', String(side), String(side), '#fff']);
+      expect(svg.getAttribute('aria-hidden')).toBe('true');
+      expect(svg.getAttribute('focusable')).toBe('false');
+      expect(svg.closest('a')).toBeNull();
+    });
   });
 });
 

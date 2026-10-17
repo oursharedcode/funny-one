@@ -540,7 +540,11 @@ html[data-variant='b'] .cta-tag {
   color: var(--ink-soft);
 }
 
-.game .btn {
+.game-play {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
   margin-block-start: auto;
 }
 
@@ -551,6 +555,77 @@ html[data-variant='b'] .cta-tag {
 
   .game {
     padding: 28px 32px 32px;
+  }
+}
+
+/* Step 78: each game's address as a QR code beside its button, so a visitor
+   at a computer can open the game on a phone — shown only on a wide screen
+   with a mouse, since on a phone or a tablet the screen is the phone. Funny
+   Multi has one code per design (render/page.ts); the rule at the top hides
+   the other design's. */
+.play-qr {
+  display: none;
+}
+
+@media (min-width: 900px) and (hover: hover) {
+  /* Never squeezed: where room is short (Tamil, just over 900px) the button
+     beside it wraps instead. */
+  .play-qr {
+    display: block;
+    flex: none;
+    max-width: none;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  /* In the hero the code stands beside the button and the line under it,
+     which stay together at the top. */
+  .cta-item {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto 1fr;
+    gap: 8px 20px;
+    align-items: start;
+    justify-items: start;
+  }
+
+  .cta-item > :not(.play-qr) {
+    grid-column: 1;
+  }
+
+  .cta-item .play-qr {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  /* Design A: the text column has room for one game at a time, so the two
+     stand one above the other and share their columns — the codes line up. */
+  html:not([data-variant='b']) .cta {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+  }
+
+  html:not([data-variant='b']) .cta-item {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+  }
+
+  /* Design B: the two side by side, as before — the text widens to make
+     room for the codes, and the heading keeps its width. */
+  html[data-variant='b'] .hero-copy {
+    max-width: none;
+  }
+
+  html[data-variant='b'] .hero h1 {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  html[data-variant='b'] .cta-item {
+    align-items: start;
+    justify-items: center;
   }
 }
 

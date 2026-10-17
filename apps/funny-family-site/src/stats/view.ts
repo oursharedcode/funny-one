@@ -360,7 +360,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
         ]),
       ),
       note(
-        'Each step counts browser tabs that reached it. Between a click and an opened game some are lost: a tab closed while loading, or a browser that counts on one site and not the other.',
+        'Each step counts browser tabs that reached it. Between a click and an opened game some are lost: a tab closed while loading, or a browser that counts on one site and not the other. And a phone that scans one of the page’s QR codes opens the game without a click, so opened games can outnumber clicks.',
       ),
     ),
   );

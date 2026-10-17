@@ -4113,7 +4113,19 @@ Gates:
   Step 76's, all in the landing page; all passed on the first run.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39025578460`, below).
+
+**Pushed and deployed 2026-10-17** (owner: "push and deploy"): CI passed in 2 min 38 s on
+`ubuntu-24.04` (run `39025578460`, image version 20261012.334.1, as Step 77's run).
+`deploy/ship-funny-family.sh` swapped in the landing page — its eight checks passed, exit 0.
+Funny Multi was not redeployed: its container kept running with no restarts, and Caddy reloaded
+in place (the same formatting warning as Step 77's deploy). Checked with curl afterwards, all
+passed: each of the 20 pages answers 200 with `no-cache` and is byte for byte the build that was
+shipped (English's grew from 26 to 49 kB, the 23 kB counted above), with its six codes; all 120
+codes, drawn from the served HTML to a bitmap, read back with jsQR to their buttons' addresses
+(design B's with `hv=b`); the page's script and style sheet are the build's; `/stats/` has no
+code, and its script carries the new funnel note. Owed: the owner's phone scan (item 6 of the
+RESUME note).
 
 ---
 
@@ -4137,30 +4149,29 @@ Gates:
 
 ~~RESUME HERE (2026-10-17, after Step 77, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 78).** **Step 78 (B-19) is committed, not pushed:** the
-landing page shows each game's address as a QR code beside its buttons — the hero's two and each
-card's "Play now" — on a wide screen with a mouse, so a visitor at a computer can open a game on
-a phone; drawn at build time, no script, Funny Multi's once per design. It changes only the
-landing page (and one sentence on `/stats/`), so its deploy is `deploy/ship-funny-family.sh`
-alone. **Steps 75 (B-17), 76 (B-18)
-and 77 are pushed, CI passed (run `38998055486`, on `ubuntu-24.04`), and Funny Multi and the
-landing page run them.** Step 75 gave Funny Multi's Support screen the notes "In Australia" and
-"Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a Coffee (D-6(a) amended);
-production's `.env` has their two lines. Step 76 put Funny Multi's beating ♥ and hopping
-"Support Author" in the landing page's header, both designs, opening a gift sheet of the page's
-own that reads the game server's rails, and made long names fit narrow phones (the family's
-name had run under the language picker in eight languages). Step 77 pinned CI to
-`ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15 languages until the
-owner deploys it; its deploy carries B-16 too.
+~~RESUME HERE (2026-10-17, after Step 78)~~ — carried into this note.
 
-**Next for the agent, in order:** the owner's word on pushing Step 78 and deploying the landing
-page (`deploy/ship-funny-family.sh`, once CI passes); then (all asked 2026-10-17;
-`steering/tasks.md` B-20–B-22) Step 79 (B-20), the visitor map on `/stats/`; Step 80 (B-21),
-Arabic, Swahili and Yoruba, 23 languages — measure the header again for them (Step 76's one-row
-widths and fitted names) and re-run `.screens/step78-hub-qr.mjs` (design B's two games on one
-row from 900 px, every code read back); Step 81 (B-22), the ♥ and its sheet on
-`www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for the
-owner's go-ahead.
+**RESUME HERE (2026-10-17, after Step 78, pushed and deployed).** **Step 78 (B-19) is pushed, CI
+passed (run `39025578460`, on `ubuntu-24.04`), and the landing page runs it:** each game's
+address stands as a QR code beside its buttons — the hero's two and each card's "Play now" — on
+a wide screen with a mouse, so a visitor at a computer can open a game on a phone; drawn at
+build time, no script, Funny Multi's once per design. Only the landing page was deployed; Funny
+Multi was not touched. **Steps 75 (B-17), 76 (B-18) and 77 are pushed, CI passed (run
+`38998055486`), and Funny Multi and the landing page run them.** Step 75 gave Funny Multi's
+Support screen the notes "In Australia" and "Crypto Bitcoin" and, under Lightning, buttons for
+Ko-fi and Buy Me a Coffee (D-6(a) amended); production's `.env` has their two lines. Step 76 put
+Funny Multi's beating ♥ and hopping "Support Author" in the landing page's header, both designs,
+opening a gift sheet of the page's own that reads the game server's rails, and made long names
+fit narrow phones (the family's name had run under the language picker in eight languages).
+Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
+languages until the owner deploys it; its deploy carries B-16 too.
+
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): Step 79
+(B-20), the visitor map on `/stats/`; Step 80 (B-21), Arabic, Swahili and Yoruba, 23 languages —
+measure the header again for them (Step 76's one-row widths and fitted names) and re-run
+`.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every code read back);
+Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository,
+whose push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4168,12 +4179,12 @@ Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
 20 languages since Step 73, designs A and B split per tab, with its visit counts and the funnel
-to Funny Multi's gift sheet on the public `/stats/` page, and since Step 76 the ♥ and a gift
-sheet of its own in the header; `https://www.oursharedcode.com/` links to it from a "Games"
-card. Funny Multi runs `funny-multi:42bafbc`: B-15's multi-language room (Step 70), Step 71's
-fixes, the visit counts and "Support Author" beside the ♥ (Step 72), the 20 languages (Step
-73), the fitted titles (Step 74) and the Support screen's notes, Ko-fi and Buy Me a Coffee (Step
-75). B-15 itself
+to Funny Multi's gift sheet on the public `/stats/` page, since Step 76 the ♥ and a gift sheet
+of its own in the header, and since Step 78 each game's QR code beside its buttons on a
+computer's screen; `https://www.oursharedcode.com/` links to it from a "Games" card. Funny
+Multi runs `funny-multi:42bafbc`: B-15's multi-language room (Step 70), Step 71's fixes, the
+visit counts and "Support Author" beside the ♥ (Step 72), the 20 languages (Step 73), the fitted
+titles (Step 74) and the Support screen's notes, Ko-fi and Buy Me a Coffee (Step 75). B-15 itself
 had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
@@ -4200,7 +4211,7 @@ folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring bot
 quarantine with an exception for the folder is recommended; until then no WebKit check runs
 here, and Step 76 skipped its own; (5) acceptance check D6 of `docs/ACCEPTANCE.md`, now that
 Step 75 is live: on the phone, then the PC, the Support screen's two notes and its Ko-fi and Buy
-Me a Coffee buttons; (6) once Step 78 is deployed, a phone's camera on the landing page's four
+Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landing page's four
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language.
 

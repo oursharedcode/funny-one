@@ -277,25 +277,25 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   variables, `DEPLOYER_KOFI_URL` and `DEPLOYER_BMC_URL`; an unset one hides its button. D-6(a)
   amended: the owner accepts the card-dispute risk of these two pages, and the game still has no
   card checkout. The funnel counts the buttons as gift rails `kofi` and `bmc`, and the privacy
-  policy names both in all 20 languages. **Code done 2026-10-17 (Step 75).**
+  policy names both in all 20 languages. **Code done and deployed 2026-10-17 (Step 75)**, with
+  the two `.env` lines.
   - *Owed:* the four new strings are machine drafts in 18 languages (with B-3); check D6 of
-    `docs/ACCEPTANCE.md` after the deploy, which needs the two `.env` lines.
+    `docs/ACCEPTANCE.md` (the owner's, on the phone and the PC).
   - *Kept on purpose:* white on Ko-fi's red is 3.0:1, just under AA even for large text; it is
     the brand's own pairing, as on the books page, in bold 20 px.
 - **B-18** The beating ♥ and the hopping words "Support Author" on the landing page (owner request
   2026-10-17, with a screenshot): in the header of both designs, between the «Семейная Чепуха»
   logo and the language picker, opening a support sheet of the landing page's own with the same
   rails as the game. The rails come at run time from Funny Multi's server, so the deployer's
-  variables stay their one source; with no rail set there is no heart. **Code done 2026-10-17
-  (Step 76).** Below 900 px the ♥ takes a centred row of its own under the name and the picker.
+  variables stay their one source; with no rail set there is no heart. **Code done and deployed
+  2026-10-17 (Step 76).** Below 900 px the ♥ takes a centred row of its own under the name and
+  the picker.
   On the way, long names now fit a phone: the family's name in the header and a game's name on
   its card shrink where a word is wider than its box (the name had run under the picker in
   German, Tamil and six more languages on narrow phones).
-  - *Owed:* the deploy — `deploy/ship.sh` first (the server's `/api/config` and Caddy's third
-    path on the landing page's host), then `deploy/ship-funny-family.sh`; the ♥ shows whatever
-    rails production has, Ko-fi and Buy Me a Coffee once Step 75's two `.env` lines are in. The
-    privacy policy's new landing-page sentence is a machine draft in 18 languages (with B-3).
-    WebKit (design B on an iPhone-size screen) was not checked: its executables are gone here.
+  - *Owed:* the privacy policy's new landing-page sentence is a machine draft in 18 languages
+    (with B-3). WebKit (design B on an iPhone-size screen) was not checked: its executables are
+    gone here.
   - *Kept on purpose:* no time limit on the page's request for the rails — a late answer still
     brings the ♥, which until then holds its place unseen.
 - **B-19** QR codes on the landing page (owner request 2026-10-17, with three screenshots): a QR

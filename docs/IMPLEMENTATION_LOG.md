@@ -3837,10 +3837,11 @@ one line except Tamil's two, Bengali's two and Telugu's Ko-fi; at 320 px Tamil's
 takes three. Reduced motion stops the sheen. Screenshots viewed: English, Hebrew (notes and icons
 mirrored) and Tamil at 320 px.
 
-**Owed:** the deploy, with two lines in production's `.env`:
+**Owed:** ~~the deploy, with two lines in production's `.env`:
 `DEPLOYER_KOFI_URL=https://ko-fi.com/freeenglishbooks` and
 `DEPLOYER_BMC_URL=https://buymeacoffee.com/freeenglishbooks` — until they are there, production
-shows the two notes and no new buttons. Then D6.
+shows the two notes and no new buttons~~ — done 2026-10-17 (Step 77's entry). Then D6, the
+owner's.
 
 Gates:
 
@@ -3979,7 +3980,8 @@ proxying `/api` to it — Chromium, every other origin aborted):
 quarantine is the likely place (owner item 4 in the RESUME note). Design B's ♥ on an iPhone is
 part of the owner's real-iPhone look (item 3).
 
-**Owed:** the deploy, after the push. Step 75's two `.env` lines first, then `deploy/ship.sh`
+**Owed:** ~~the deploy, after the push~~ — done 2026-10-17 in this order (Step 77's entry). Step
+75's two `.env` lines first, then `deploy/ship.sh`
 (the server's `/api/config`, Caddy's third path, the privacy policy), then
 `deploy/ship-funny-family.sh`. The other order is safe: until Caddy forwards `/api/config` the
 page gets its own 404 and shows no ♥. The ♥ shows whatever rails production has.
@@ -4000,13 +4002,29 @@ the warning on CI's run of 2026-10-16: "The ubuntu-latest label will migrate to 
 beginning October 19, 2026" (actions/runner-images issue 14748).
 
 - `.github/workflows/ci.yml` runs on `ubuntu-24.04`, the image `ubuntu-latest` gave that run
-  (`38898907879`, image version 20261012.601), so a red build after 2026-10-19 is the code, not a
-  new image. The move to Ubuntu 26 can come later, on purpose, as a step of its own.
+  (`38898907879`, image version 20261012.334.1), so a red build after 2026-10-19 is the code, not
+  a new image. The move to Ubuntu 26 can come later, on purpose, as a step of its own.
 - The planned steps move up by one: B-19 is now Step 78, B-20 Step 79, B-21 Step 80 and B-22
   Step 81 (`steering/tasks.md`, the RESUME note).
 
 Gates: the tree differs from Step 76's only in the workflow and these notes; `format:check`
-re-run clean, the rest as Step 76 recorded them. CI: the push of Steps 75–77.
+re-run clean, the rest as Step 76 recorded them. CI: passed (run `38998055486`, below).
+
+**Pushed and deployed 2026-10-17** (owner: "Push and deploy"): Steps 75–77 pushed together. CI
+passed in 3 min 39 s on `ubuntu-24.04` (run `38998055486`), image version 20261012.334.1 — the
+one the last unpinned run had. Production's `.env` was copied to `~/funny/.env.bak-step75`, then
+got Step 75's two lines, each once. `deploy/ship.sh` put `funny-multi:42bafbc` live — health,
+privacy policy, `assetlinks.json` and the old address's 301 checked by the script, exit 0; then
+`deploy/ship-funny-family.sh` swapped in the landing page — its eight checks passed, exit 0.
+Checked with curl afterwards, all passed: `/config` lists the Ko-fi and Buy Me a Coffee pages,
+`/api/config` answers the same on both hosts, and the landing page's `/config` stays its 404;
+`/`, `/ru/`, `/he/` and `/ta/` carry the ♥ and its sheet with `no-cache`, `/stats/` has no ♥,
+and the QR chunk answers 200; the game's script carries "In Australia" and "Crypto Bitcoin"; the
+privacy policy names Ko-fi and has Step 76's sentence. On the VM the game's container runs the
+commit's image with no restarts, and the visit counts of the five days before survived. Caddy's
+reload warns that the Caddyfile is not formatted: `caddy fmt` would drop the blank line 23,
+there at least since Step 72 — harmless. Funny One is not deployed (the owner's). Owed: D6, the
+owner's.
 
 ---
 
@@ -4026,21 +4044,18 @@ re-run clean, the rest as Step 76 recorded them. CI: the push of Steps 75–77.
 
 ~~RESUME HERE (2026-10-17, after Step 76)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 77).** **Steps 75 (B-17), 76 (B-18) and 77 are committed;
-the owner asked on 2026-10-17 for their push and deploy, which follow this commit** — if no later
-note records them, read `git status` and production's state before anything else. Step 75 gives
-Funny Multi's Support screen the notes "In Australia" and "Crypto Bitcoin" and, under Lightning,
-buttons for Ko-fi and Buy Me a Coffee (D-6(a) amended). Step 76 puts Funny Multi's beating ♥ and
-hopping "Support Author" in the landing page's header, both designs, opening a gift sheet of the
-page's own that reads the game server's rails, and makes long names fit narrow phones (the
-family's name had run under the language picker in eight languages). Step 77 pins CI to
-`ubuntu-24.04` (owner, 2026-10-17). Their deploy: Step 75's two lines in production's `.env`,
-then `deploy/ship.sh` (the game, its `/api/config`, Caddy's third path on the landing page's
-host), then `deploy/ship-funny-family.sh` (the page; the other order is safe — no ♥ until Caddy
-forwards the rails). Steps 73 and 74 (B-16) are pushed, CI passed (run `38898907879`), and Funny
-Multi and the landing page run them: 20 languages, and every home title fits a phone. Funny
-One's production still serves 15 languages until the owner deploys it; its deploy carries B-16
-too.
+~~RESUME HERE (2026-10-17, after Step 77)~~ — carried into this note.
+
+**RESUME HERE (2026-10-17, after Step 77, pushed and deployed).** **Steps 75 (B-17), 76 (B-18)
+and 77 are pushed, CI passed (run `38998055486`, on `ubuntu-24.04`), and Funny Multi and the
+landing page run them.** Step 75 gave Funny Multi's Support screen the notes "In Australia" and
+"Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a Coffee (D-6(a) amended);
+production's `.env` has their two lines. Step 76 put Funny Multi's beating ♥ and hopping
+"Support Author" in the landing page's header, both designs, opening a gift sheet of the page's
+own that reads the game server's rails, and made long names fit narrow phones (the family's
+name had run under the language picker in eight languages). Step 77 pinned CI to
+`ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15 languages until the
+owner deploys it; its deploy carries B-16 too.
 
 **Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-19–B-22): Step 78
 (B-19), QR codes of the games' addresses beside the landing page's game buttons and the cards'
@@ -4056,10 +4071,12 @@ Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
 20 languages since Step 73, designs A and B split per tab, with its visit counts and the funnel
-to Funny Multi's gift sheet on the public `/stats/` page; `https://www.oursharedcode.com/` links
-to it from a "Games" card. Funny Multi runs `funny-multi:a603d44`: B-15's multi-language room
-(Step 70), Step 71's fixes, the visit counts and "Support Author" beside the ♥ (Step 72), the 20
-languages (Step 73) and the fitted titles (Step 74). B-15 itself
+to Funny Multi's gift sheet on the public `/stats/` page, and since Step 76 the ♥ and a gift
+sheet of its own in the header; `https://www.oursharedcode.com/` links to it from a "Games"
+card. Funny Multi runs `funny-multi:42bafbc`: B-15's multi-language room (Step 70), Step 71's
+fixes, the visit counts and "Support Author" beside the ♥ (Step 72), the 20 languages (Step
+73), the fitted titles (Step 74) and the Support screen's notes, Ko-fi and Buy Me a Coffee (Step
+75). B-15 itself
 had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
@@ -4084,7 +4101,9 @@ folder last changed (found in Step 76), most likely in Avast's quarantine — it
 blocked `webkit-2359\WebKitWebProcess.exe` as `IDP.Generic` on 2026-10-14, a false positive (the
 folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring both from the
 quarantine with an exception for the folder is recommended; until then no WebKit check runs
-here, and Step 76 skipped its own.
+here, and Step 76 skipped its own; (5) acceptance check D6 of `docs/ACCEPTANCE.md`, now that
+Step 75 is live: on the phone, then the PC, the Support screen's two notes and its Ko-fi and Buy
+Me a Coffee buttons.
 
 The agent's own queue is Steps 78–81 above.
 
@@ -4119,11 +4138,12 @@ The paid Workers AI plan is cancelled; production generation is off (`[ai]` comm
 block is in Funny One's client, Funny Multi still shows them.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
-what, wait for "done", automate first). Production's `.env` holds the support rails (not yet
-Step 75's Ko-fi and Buy Me a Coffee lines), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
+what, wait for "done", automate first). Production's `.env` holds the support rails (Ko-fi and
+Buy Me a Coffee since Step 75's deploy), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
 `FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Backups on the
-VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`. The
-visit counts live in the volume `funny_stats_data` (`/data/stats.json` in the game's container,
+VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`,
+`.env.bak-step75` (taken before Step 75's two lines). The visit counts live in the volume
+`funny_stats_data` (`/data/stats.json` in the game's container,
 written every 15 s when something changed and on shutdown), so a deploy keeps them; removing
 the volume loses them. The production Worker secret is on this PC at
 `~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
@@ -4135,7 +4155,8 @@ installed apps can never be updated.
 Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 `deploy/ship-funny-one.sh` on 2026-10-07, and on 2026-10-14 allowed `deploy/ship.sh`,
 `deploy/ship-funny-family.sh`, two DNS records and two `.env` lines, the owner having asked for
-the deploy (Step 72), and on 2026-10-16 allowed both ship scripts again (Steps 73–74) — so try
+the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–74), and on
+2026-10-17 two `.env` lines and both ship scripts (Steps 75–77) — so try
 once when the owner asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production

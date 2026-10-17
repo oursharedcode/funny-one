@@ -312,13 +312,13 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the
   country, never the address; `/stats/` draws its own world map, shaded by visits, with a list
-  of the top countries. Both privacy policies say so. **Code done 2026-10-18 (Step 79):** the
-  server downloads DB-IP's file itself once a month into the stats volume (`GEO_DIR`) and counts
-  each visit's country in a tally of its own; `/stats/` shows "Visits by country", an Equal Earth
-  map of Natural Earth's shapes and a table, from the day countries were first counted.
-  - *Owed:* the push and both deploys (`deploy/ship.sh`, `deploy/ship-funny-family.sh`), the
-    owner's to ask for; then the table's load on the VM, read from the server's log. The privacy
-    bullet is a machine draft outside en/ru (with B-3).
+  of the top countries. Both privacy policies say so. **Code done and deployed 2026-10-18 (Step
+  79):** the server downloads DB-IP's file itself once a month into the stats volume (`GEO_DIR`)
+  and counts each visit's country in a tally of its own; `/stats/` shows "Visits by country", an
+  Equal Earth map of Natural Earth's shapes and a table, from the day countries were first
+  counted.
+  - *Owed:* the first counted country on production's `/stats/` — no visit had come in the
+    minutes after the deploy. The privacy bullet is a machine draft outside en/ru (with B-3).
   - *Kept on purpose:* only visits are placed, never clicks or gifts, and a country is never
     joined to a label; Funny One's policy is unchanged — it counts nothing, and Funny Multi's
     covers the landing page.

@@ -4223,8 +4223,8 @@ settings blank; the landing page's Vite on 5187):
   the phone the key wrapped mid-phrase, so "Shaded on a log scale" became an entry of its own
   and the scale narrowed to 96 px.
 
-**Not run:** WebKit — its executables are still missing (owner item 4 of the RESUME note); the
-table's load on the 1 GB VM — read from its log after the deploy.
+**Not run:** WebKit — its executables are still missing (owner item 4 of the RESUME note). The
+table's load on the 1 GB VM was read from its log after the deploy, below.
 
 Gates:
 
@@ -4234,7 +4234,24 @@ Gates:
   in every language) and 4 on the landing page; all passed.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39038453891`, below).
+
+**Pushed and deployed 2026-10-18** (owner: "push and deploy"): CI passed in 2 min 59 s on
+`ubuntu-24.04` (run `39038453891`, image version 20261012.334.1). `deploy/ship.sh` swapped in
+Funny Multi as `funny-multi:bcc18b8`, with the new compose file (`GEO_DIR`) and privacy policy —
+its checks passed, exit 0 — then `deploy/ship-funny-family.sh` the landing page, its eight
+checks passed, exit 0; each Caddy reload gave the usual formatting warning. On the VM the game's
+container runs the commit's image with no restarts. 3.6 s after it began listening it logged
+`country table` — October 2026's file, 710,834 rows, read in 2.4 s; the stats volume now holds
+that one file in `/data/geo` (4,491,785 bytes), and its visit counts survived. After the load
+the container used 111 MiB and the VM had 406 MB available. Checked with curl afterwards, all
+passed: the summary carries `countries` and `countriesSince` (still `{}` and `null` — no visit
+had come in the minutes after the deploy); `/stats/` answers with `no-cache`, and its page,
+script (44,918 bytes) and style sheet are byte for byte the build that was shipped, with "Visits
+by country" and the DB-IP and Natural Earth credits; the privacy policy is the repository's,
+names DB-IP in all 20 sections and is dated 2026-10-18; the landing pages and the game
+answer 200. Owed: the first counted country on `/stats/` — the next visit brings it (the owner's
+QR scan, item 6 of the RESUME note, would).
 
 ---
 
@@ -4262,18 +4279,19 @@ Gates:
 
 ~~RESUME HERE (2026-10-17, after Step 78, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 79).** **Step 79 (B-20) is committed, not pushed:**
-`/stats/` gains "Visits by country" — a world map of our own, shaded by visits, and a table —
-fed by a country tally that Funny Multi's server keeps apart from its other counts. The server
-finds a visit's country in its own copy of DB-IP's free database, which it downloads once a
-month into the stats volume (`GEO_DIR=/data/geo`, set by `docker-compose.yml`), and keeps no
-address; the privacy policy says so in all 20 languages. It changes Funny Multi's server and the
-landing page, so its release is the push, CI, then `deploy/ship.sh` and
-`deploy/ship-funny-family.sh` — on the owner's word. After the deploy, check: the server's log
-has a `country table` line with about 710,000 rows (its `ms` is the read on the 1 GB VM; a
-`country table` error means the download failed — visits then count as "Not known" and it
-retries hourly); `curl` of `/api/stats/summary` carries `countries` and `countriesSince` once a
-visit has come; the policy's "updated" reads 2026-10-18.
+~~RESUME HERE (2026-10-18, after Step 79)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 79, pushed and deployed).** **Step 79 (B-20) is pushed, CI
+passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
+`/stats/` has "Visits by country" — a world map of our own, shaded by visits, and a table — fed
+by a country tally that Funny Multi's server keeps apart from its other counts. The server finds
+a visit's country in its own copy of DB-IP's free database, which it downloads once a month into
+the stats volume (`GEO_DIR=/data/geo`, set by `docker-compose.yml`), and keeps no address; the
+privacy policy says so in all 20 languages. On the VM the table loaded 3.6 s after the server
+began listening (710,834 rows, read in 2.4 s); after a later deploy, the server's log should
+again have a `country table` line with about that many rows — a `country table` error means the
+download failed, and visits then count as "Not known" while it retries hourly. No visit had come
+in the minutes after the deploy, so `/stats/` still said that no country had been counted.
 
 **Step 78 (B-19) is pushed, CI passed (run `39025578460`, on `ubuntu-24.04`), and the landing
 page runs it:** each game's
@@ -4290,13 +4308,14 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): Step
-79's release once the owner says so, and the checks above; Step 80 (B-21), Arabic, Swahili and
-Yoruba, 23 languages — measure the header again for them (Step 76's one-row widths and fitted
-names), re-run `.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every
-code read back), and give their privacy sections Step 79's bullet too (a test counts one DB-IP
-per language); Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own
-repository, whose push deploys — so it waits for the owner's go-ahead.
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): a look
+at `/api/stats/summary` — its `countries` should have filled since the deploy, B-20's last
+check; Step 80 (B-21), Arabic, Swahili and Yoruba, 23 languages — measure the header again for
+them (Step 76's one-row widths and fitted names), re-run `.screens/step78-hub-qr.mjs` (design
+B's two games on one row from 900 px, every code read back), and give their privacy sections
+Step 79's bullet too (a test counts one DB-IP per language); Step 81 (B-22), the ♥ and its sheet
+on `www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for
+the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4305,11 +4324,13 @@ only forward), and since Step 72 the landing page «Семейная Чепух�
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
 20 languages since Step 73, designs A and B split per tab, with its visit counts and the funnel
 to Funny Multi's gift sheet on the public `/stats/` page, since Step 76 the ♥ and a gift sheet
-of its own in the header, and since Step 78 each game's QR code beside its buttons on a
-computer's screen; `https://www.oursharedcode.com/` links to it from a "Games" card. Funny
-Multi runs `funny-multi:42bafbc`: B-15's multi-language room (Step 70), Step 71's fixes, the
-visit counts and "Support Author" beside the ♥ (Step 72), the 20 languages (Step 73), the fitted
-titles (Step 74) and the Support screen's notes, Ko-fi and Buy Me a Coffee (Step 75). B-15 itself
+of its own in the header, since Step 78 each game's QR code beside its buttons on a computer's
+screen, and since Step 79 a world map of its visitors' countries on `/stats/`;
+`https://www.oursharedcode.com/` links to it from a "Games" card. Funny Multi runs
+`funny-multi:bcc18b8`: B-15's multi-language room (Step 70), Step 71's fixes, the visit counts
+and "Support Author" beside the ♥ (Step 72), the 20 languages (Step 73), the fitted titles (Step
+74), the Support screen's notes, Ko-fi and Buy Me a Coffee (Step 75) and the country of each
+visit (Step 79). B-15 itself
 had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
@@ -4340,7 +4361,7 @@ Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landi
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language.
 
-The agent's own queue is Step 79's release and Steps 80–81 above.
+The agent's own queue is the look at B-20's first countries and Steps 80–81 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4392,8 +4413,8 @@ Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 `deploy/ship-funny-one.sh` on 2026-10-07, and on 2026-10-14 allowed `deploy/ship.sh`,
 `deploy/ship-funny-family.sh`, two DNS records and two `.env` lines, the owner having asked for
 the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–74), and on
-2026-10-17 two `.env` lines and both ship scripts (Steps 75–77) — so try
-once when the owner asks for a deploy, and if it is refused, hand
+2026-10-17 two `.env` lines and both ship scripts (Steps 75–77), and on 2026-10-18 both ship
+scripts again (Step 79) — so try once when the owner asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
 Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run

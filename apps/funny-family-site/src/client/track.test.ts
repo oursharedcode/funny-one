@@ -46,10 +46,14 @@ describe('deviceClass and isClickTarget', () => {
     expect(deviceClass(768)).toBe('d');
   });
 
-  it('knows the five click targets', () => {
+  it('knows the twelve click targets', () => {
     for (const target of ['fm', 'fo', 'gh', 'video', 'root'])
       expect(isClickTarget(target)).toBe(true);
-    for (const value of ['', 'FM', 'bogus', null, 1]) expect(isClickTarget(value)).toBe(false);
+    // Step 76: the ♥ and the gift sheet it opens.
+    for (const target of ['support', 'payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'])
+      expect(isClickTarget(target)).toBe(true);
+    for (const value of ['', 'FM', 'bogus', 'payId', null, 1])
+      expect(isClickTarget(value)).toBe(false);
   });
 });
 

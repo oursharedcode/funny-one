@@ -171,11 +171,12 @@
 	encode zstd gzip
 
 	# The page's visit counts and the summary /stats/ reads live in the game's
-	# server (analytics.ts), one store for this page and Funny Multi alike.
-	# Same origin, so the page needs no CORS; only these two paths, so nothing
-	# else of the game's answers on this host.
-	@hub_stats path /api/stats /api/stats/summary
-	handle @hub_stats {
+	# server (analytics.ts), one store for this page and Funny Multi alike; so
+	# do the gift rails its Support Author sheet shows (/api/config, Step 76).
+	# Same origin, so the page needs no CORS; only these three paths, so
+	# nothing else of the game's answers on this host.
+	@hub_api path /api/stats /api/stats/summary /api/config
+	handle @hub_api {
 		reverse_proxy funny-multi:3000
 	}
 

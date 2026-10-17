@@ -7,7 +7,8 @@
 //   hub_view   once per tab: the design shown (v), the page's language (l),
 //              where the visit came from as a class (r), phone or not (d)
 //   hub_click  once per tab per target (t): either game, the source code,
-//              the trailer, the author's site
+//              the trailer, the author's site, and (Step 76) the Support
+//              Author ♥ and each gift rail on the sheet it opens
 //
 // No URL, no identifier, no cookie; the referrer is classified here and only
 // its class is sent. Nothing at all is sent when the browser asks not to be
@@ -18,7 +19,20 @@ import { REFERRER_KEY, SENT_KEY } from '../keys.ts';
 
 export type ReferrerClass = 'direct' | 'search' | 'social' | 'oursharedcode' | 'games' | 'other';
 
-const TARGETS = ['fm', 'fo', 'gh', 'video', 'root'] as const;
+const TARGETS = [
+  'fm',
+  'fo',
+  'gh',
+  'video',
+  'root',
+  'support',
+  'payid',
+  'sponsors',
+  'lightning',
+  'kofi',
+  'bmc',
+  'donate',
+] as const;
 export type ClickTarget = (typeof TARGETS)[number];
 
 // This site under both its names: a visit from one of its own pages is not

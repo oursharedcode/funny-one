@@ -31,6 +31,20 @@ describe('statKey', () => {
     expect(statKey({ e: 'hub_click', v: 'a', l: 'he', t: 'fm' })).toBe('hub_click|a|he||fm||');
   });
 
+  it("keys the hub's ♥ and the rails on its own gift sheet as hub clicks", () => {
+    // Step 76: the landing page's Support Author ♥ opens a sheet of its own.
+    expect(statKey({ e: 'hub_click', v: 'b', l: 'fa', t: 'support' })).toBe(
+      'hub_click|b|fa||support||',
+    );
+    for (const rail of ['payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate']) {
+      expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: rail })).toBe(
+        `hub_click|a|en||${rail}||`,
+      );
+    }
+    // ...but the ♥ is no gift rail on Funny Multi's own sheet.
+    expect(statKey({ e: 'fm_gift', s: 'direct', l: 'en', t: 'support' })).toBeNull();
+  });
+
   it('takes a variant on a game event only when it came through the hub', () => {
     expect(statKey({ e: 'fm_view', s: 'hub', v: 'a', l: 'en' })).toBe('fm_view|a|en|hub|||');
     expect(statKey({ e: 'fm_view', s: 'direct', l: 'en' })).toBe('fm_view||en|direct|||');

@@ -88,6 +88,146 @@ html[data-variant='b'] .va-only {
   font-weight: 700;
 }
 
+/* Step 76: the Support Author ♥ between the name and the picker, as on Funny
+   Multi's Home (SupportHeart.tsx): the heart beats twice, then the label's
+   words hop after it one by one (each part's delay is set inline), then
+   everything rests until the next cycle; one duration keeps them in step.
+   It holds its place invisible until the gift rails arrive
+   (client/support.ts), so showing it moves nothing; without them, or
+   without scripts, it is gone (hidden, or the page's <noscript> style). */
+.support-open {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: var(--pink-dark);
+  font: inherit;
+  cursor: pointer;
+}
+
+.support-open[hidden] {
+  display: none;
+}
+
+.support-open[data-state='pending'] {
+  visibility: hidden;
+}
+
+.support-heart {
+  display: inline-block;
+  color: var(--pink);
+  font-size: 1.75rem;
+  line-height: 1;
+  animation: support-beat 3s ease-in-out infinite;
+}
+
+.support-words {
+  padding: 5px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.support-open:hover .support-words {
+  background: var(--amber);
+}
+
+.hop {
+  display: inline-block;
+  animation: support-hop 3s ease-in-out infinite;
+}
+
+@keyframes support-beat {
+  0%,
+  28%,
+  100% {
+    transform: scale(1);
+  }
+  7% {
+    transform: scale(1.22);
+  }
+  14% {
+    transform: scale(1);
+  }
+  21% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes support-hop {
+  0%,
+  30%,
+  100% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(-6px);
+  }
+  19% {
+    transform: translateY(0);
+  }
+  24% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Too narrow for all three in a row: the name and the picker keep the first
+   row, the ♥ takes a second one of its own, in the middle. 900px, where the
+   hero goes side by side too: the widest row, Tamil's, needs 878px. On the
+   narrowest phones the label wraps rather than leave the screen. */
+@media (max-width: 899.98px) {
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  .top .brand {
+    justify-self: start;
+  }
+
+  .support-open {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+  }
+
+  .support-words {
+    white-space: normal;
+    text-wrap: balance;
+  }
+}
+
+/* The narrowest phones (Step 76): a smaller monkey and closer gaps give the
+   name 14px more, so German's one word and Tamil's first fit whole at the
+   smallest size client/fit.ts goes to rather than lose a letter to a second
+   line. */
+@media (max-width: 359.98px) {
+  .top {
+    column-gap: 8px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand img {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+}
+
 /* Hero, design A: the text, then the trailer (beside it on a wide screen). */
 .hero {
   position: relative;
@@ -355,6 +495,7 @@ html[data-variant='b'] .cta-tag {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  min-width: 0;
   padding: 24px;
   border: var(--edge);
   border-radius: var(--radius);
@@ -376,7 +517,10 @@ html[data-variant='b'] .cta-tag {
   background: var(--sky-soft);
 }
 
+/* Kept to the card (Step 76): Tamil's long word on a 320px phone shrinks the
+   font (client/fit.ts) rather than widen the card and the page. */
 .game h3 {
+  max-width: 100%;
   font-size: 1.75rem;
   margin-block-end: 10px;
 }
@@ -566,6 +710,237 @@ html[data-variant='b'] .cta-tag {
   font-weight: 700;
 }
 
+/* Step 76: the gift sheet the ♥ opens, a modal <dialog> with the rows of
+   Funny Multi's own (SupportScreen.tsx): amber-edged rails with a note
+   beside their names, then the Ko-fi and Buy Me a Coffee buttons in their
+   brands' colours, with the books page's sheen crossing them now and then. */
+html.sheet-open {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.sheet {
+  width: min(100% - 24px, 30rem);
+  max-height: calc(100% - 24px);
+  margin: auto;
+  padding: 0;
+  border: var(--edge);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--lift);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sheet::backdrop {
+  background: rgba(31, 41, 55, 0.55);
+}
+
+.sheet-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sheet-head h2 {
+  margin: 0;
+  color: var(--pink-dark);
+  font-size: 1.75rem;
+}
+
+.sheet-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.625rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sheet-close:hover {
+  background: var(--amber);
+}
+
+.sheet-intro {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+.rail {
+  padding: 12px;
+  border: 2px solid #fcd34d;
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.rail-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.rail-note {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.rail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 6px;
+}
+
+.rail-row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.rail code,
+.rail-link {
+  overflow-wrap: anywhere;
+}
+
+.rail-link {
+  display: block;
+  font-weight: 600;
+}
+
+.rail > .rail-link {
+  margin-block-start: 6px;
+}
+
+.rail-copy {
+  flex: none;
+  min-height: 40px;
+  padding: 4px 16px;
+  border: 2px solid #fcd34d;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rail-copy:hover {
+  background: var(--cream);
+}
+
+.rail-hint {
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+}
+
+.rail-qr {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 10px;
+}
+
+.rail-qr:empty {
+  display: none;
+}
+
+.gift {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 3.5rem;
+  padding: 8px 20px;
+  overflow: hidden;
+  border-radius: 999px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.gift svg {
+  flex: none;
+}
+
+.gift-kofi,
+.gift-kofi:hover {
+  background: #ff5e5b;
+  color: #fff;
+}
+
+.gift-bmc,
+.gift-bmc:hover {
+  background: #ffdd00;
+  color: #10121a;
+}
+
+.gift::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  width: 55%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: gift-sheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.gift-bmc::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+}
+
+@keyframes gift-sheen {
+  0%,
+  62% {
+    inset-inline-start: -60%;
+  }
+  92%,
+  100% {
+    inset-inline-start: 115%;
+  }
+}
+
+.rail-donate {
+  display: block;
+  padding: 12px;
+  border: 2px solid #fcd34d;
+  border-radius: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
 /* The 404 page. */
 .not-found {
   max-width: 1080px;
@@ -593,5 +968,11 @@ html[data-variant='b'] .cta-tag {
 
   .trailer-play:hover .play-badge svg {
     transform: none;
+  }
+
+  .support-heart,
+  .hop,
+  .gift::after {
+    animation: none;
   }
 }

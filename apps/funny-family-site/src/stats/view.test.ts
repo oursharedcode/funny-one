@@ -115,6 +115,33 @@ describe('renderStats', () => {
     ]);
   });
 
+  it('lists what was clicked on the landing page, its own ♥ and gift sheet too', () => {
+    const root = render({
+      ...SUMMARY,
+      days: {
+        '2026-10-01': {
+          ...SUMMARY.days['2026-10-01'],
+          'hub_click|a|en||support||': 2,
+          'hub_click|b|ru||kofi||': 1,
+        },
+      },
+    });
+    expect(tableOf(root, 'What was clicked on the landing page')).toEqual([
+      ['Funny Multi', '3', '30%'],
+      ['Funny One', '1', '10%'],
+      ['The source code (GitHub)', '0', '0%'],
+      ['The trailer', '0', '0%'],
+      ['oursharedcode.com', '0', '0%'],
+      ['Support Author ♥: opened the gift sheet', '2', '20%'],
+      ['Gift sheet: PayID copied', '0', '0%'],
+      ['Gift sheet: GitHub Sponsors', '0', '0%'],
+      ['Gift sheet: Lightning', '0', '0%'],
+      ['Gift sheet: Ko-fi', '1', '10%'],
+      ['Gift sheet: Buy Me a Coffee', '0', '0%'],
+      ['Gift sheet: donation page', '0', '0%'],
+    ]);
+  });
+
   it('lists the languages with visits, busiest first, by their names', () => {
     const root = render();
     expect(tableOf(root, 'By language')).toEqual([

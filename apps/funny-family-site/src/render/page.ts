@@ -9,12 +9,15 @@
 // The page works without JavaScript: every link is a real link, the trailer
 // link opens the video file, and the language picker is a <details>. The
 // modules in client/ only add on top — the trailer playing in place, the
-// background loop, closing the picker, counting visits and clicks.
+// background loop, closing the picker, counting visits and clicks, and
+// (Step 76) the header's Support Author ♥ with its gift sheet, which only a
+// script can fill (render/support.ts).
 
 import type { Language } from '@funny/shared';
 import { CODE_ART, FM_ART, FO_ART, PAUSE_PLAY_ICONS, PLAY_ICON } from './art.ts';
 import { esc, withLink } from './html.ts';
 import { headScript } from './headScript.ts';
+import { supportButton, supportSheet } from './support.ts';
 import {
   HTML_LANG,
   isRtl,
@@ -90,6 +93,7 @@ ${ogAlternates.join('\n')}
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-180.png">
 ${assetTags(assets)}
+<noscript><style>.support-open{display:none}</style></noscript>
 </head>`;
 }
 
@@ -107,11 +111,13 @@ ${items.join('\n')}
 </details>`;
 }
 
+/** The header; a landing page's (`picker`) also has the ♥ and the language picker. */
 export function siteHeader(code: Language, picker: boolean): string {
   const s = STRINGS[code];
+  const landing = picker ? `${supportButton(code)}\n${languagePicker(code)}` : '';
   return `<header class="top">
 <a class="brand" href="${pagePath(code)}"><img src="/icon-192.png" alt="" width="44" height="44"><span>${esc(s.brand)}</span></a>
-${picker ? languagePicker(code) : ''}
+${landing}
 </header>`;
 }
 
@@ -232,6 +238,7 @@ ${how(code)}
 ${source(code)}
 </main>
 ${footer(code)}
+${supportSheet(code)}
 </body>
 </html>
 `;

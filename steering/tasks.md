@@ -286,7 +286,18 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   2026-10-17, with a screenshot): in the header of both designs, between the «Семейная Чепуха»
   logo and the language picker, opening a support sheet of the landing page's own with the same
   rails as the game. The rails come at run time from Funny Multi's server, so the deployer's
-  variables stay their one source; with no rail set there is no heart. *Planned: Step 76.*
+  variables stay their one source; with no rail set there is no heart. **Code done 2026-10-17
+  (Step 76).** Below 900 px the ♥ takes a centred row of its own under the name and the picker.
+  On the way, long names now fit a phone: the family's name in the header and a game's name on
+  its card shrink where a word is wider than its box (the name had run under the picker in
+  German, Tamil and six more languages on narrow phones).
+  - *Owed:* the deploy — `deploy/ship.sh` first (the server's `/api/config` and Caddy's third
+    path on the landing page's host), then `deploy/ship-funny-family.sh`; the ♥ shows whatever
+    rails production has, Ko-fi and Buy Me a Coffee once Step 75's two `.env` lines are in. The
+    privacy policy's new landing-page sentence is a machine draft in 18 languages (with B-3).
+    WebKit (design B on an iPhone-size screen) was not checked: its executables are gone here.
+  - *Kept on purpose:* no time limit on the page's request for the rails — a late answer still
+    brings the ♥, which until then holds its place unseen.
 - **B-19** QR codes on the landing page (owner request 2026-10-17, with three screenshots): a QR
   code of each game's address beside the Funny Multi and Funny One buttons at the top of design A
   and of design B, and beside each "Play now" button in the "Pick a game" cards, so a visitor at a

@@ -53,12 +53,21 @@ const REFERRERS: Record<string, string> = {
   other: 'Other websites',
 };
 const DEVICES: Record<string, string> = { m: 'Phone-sized screen', d: 'Larger screen' };
+// Step 76: the header's Support Author ♥ opens a gift sheet on the landing
+// page itself; its rails count as the page's clicks too.
 const HUB_TARGETS: Record<string, string> = {
   fm: 'Funny Multi',
   fo: 'Funny One',
   gh: 'The source code (GitHub)',
   video: 'The trailer',
   root: 'oursharedcode.com',
+  support: 'Support Author ♥: opened the gift sheet',
+  payid: 'Gift sheet: PayID copied',
+  sponsors: 'Gift sheet: GitHub Sponsors',
+  lightning: 'Gift sheet: Lightning',
+  kofi: 'Gift sheet: Ko-fi',
+  bmc: 'Gift sheet: Buy Me a Coffee',
+  donate: 'Gift sheet: donation page',
 };
 const GIFT_RAILS: Record<string, string> = {
   payid: 'PayID',

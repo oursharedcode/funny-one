@@ -157,6 +157,8 @@ export async function buildServer({
   // T-9.3 (FM-TIER-3, design §10.2): support-rail addresses, read once at
   // boot from DEPLOYER_* env vars. A REST route rather than a socket payload
   // because the Home ♥ affordance has to show this before any room exists.
+  // Step 76: the landing page's own ♥ reads the same answer at /api/config,
+  // the one path its host's proxy forwards beside the stats (Caddyfile).
   const support: SupportConfig = {
     payId: process.env.DEPLOYER_PAYID || null,
     payIdName: process.env.DEPLOYER_PAYID_NAME || null,
@@ -166,7 +168,9 @@ export async function buildServer({
     bmcUrl: process.env.DEPLOYER_BMC_URL || null,
     donateUrl: process.env.DEPLOYER_DONATE_URL || null,
   };
-  fastify.get(`${base}config`, async () => ({ support }));
+  const config = async () => ({ support });
+  fastify.get(`${base}config`, config);
+  fastify.get(`${base}api/config`, config);
 
   // Step 72: visit and funnel counts (analytics.ts). The landing page posts
   // here through its own host's proxy (deploy/caddy/Caddyfile) and so does

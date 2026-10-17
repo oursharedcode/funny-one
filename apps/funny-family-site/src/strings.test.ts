@@ -5,6 +5,7 @@ import { LANGUAGES } from '@funny/shared';
 import type { Language } from '@funny/shared';
 import { describe, expect, it } from 'vitest';
 import { GAME_NAMES, STRINGS } from './strings.ts';
+import { SUPPORT_STRINGS } from './supportStrings.ts';
 
 const CODES = LANGUAGES.map((option) => option.code);
 
@@ -81,5 +82,23 @@ describe('the games’ names', () => {
       fo: entry(fo, 'home.title'),
       source: entry(fm, 'footer.source'),
     });
+  });
+});
+
+describe('the Support Author sheet', () => {
+  it('covers exactly the languages the games ship', () => {
+    expect(Object.keys(SUPPORT_STRINGS).sort()).toEqual([...CODES].sort());
+  });
+
+  it.each(CODES)('%s reads exactly like Funny Multi’s own sheet', (code) => {
+    const fm = catalog('funny-multi-client', code);
+    expect(Object.keys(SUPPORT_STRINGS[code])).toEqual(Object.keys(SUPPORT_STRINGS.en));
+    for (const [key, value] of Object.entries(SUPPORT_STRINGS[code])) {
+      expect(value, `${code}.${key}`).toBe(entry(fm, `support.${key}`));
+    }
+  });
+
+  it.each(CODES)('%s names the bank account exactly once', (code) => {
+    expect(SUPPORT_STRINGS[code].payIdBankNote.split('{{name}}')).toHaveLength(2);
   });
 });

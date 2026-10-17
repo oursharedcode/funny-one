@@ -193,6 +193,20 @@ describe('GET /config', () => {
     expect(root.statusCode).toBe(404);
   });
 
+  it('gives the landing page the same answer at /api/config', async () => {
+    // Step 76: the landing page's host forwards /api/* paths only, so its ♥
+    // reads the rails here — the same object, not a second copy to drift.
+    Object.assign(process.env, NEW_RAILS, { DEPLOYER_DONATE_URL: DONATE_URL });
+    const server = await boot();
+    const game = await server.fastify.inject({ method: 'GET', url: '/config' });
+    const hub = await server.fastify.inject({ method: 'GET', url: '/api/config' });
+    expect(hub.statusCode).toBe(200);
+    expect(hub.json()).toEqual(game.json());
+    expect(hub.json<{ support: { kofiUrl: string } }>().support.kofiUrl).toBe(
+      NEW_RAILS.DEPLOYER_KOFI_URL,
+    );
+  });
+
   it('never puts a support rail in any socket event or ack', async () => {
     // Static config stays off the socket (FM-TIER-3). T-9.4a moved
     // `donateUrl` off `lobby:update` onto /config alongside the other rails,

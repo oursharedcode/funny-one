@@ -3,9 +3,11 @@
 import { LANGUAGES } from '@funny/shared';
 import { describe, expect, it } from 'vitest';
 import { esc, withLink } from './html.ts';
+import { renderNotFound, renderStatsPage } from './extra.ts';
 import { HTML_LANG, OG_LOCALE, shortLanguageName } from './locale.ts';
 import { assetTags, renderPage } from './page.ts';
 import type { EntryAssets } from './page.ts';
+import { hopParts } from './support.ts';
 import {
   FO_URL,
   fmUrl,
@@ -16,6 +18,7 @@ import {
   SITE_ORIGIN,
 } from '../links.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
+import { SUPPORT_STRINGS } from '../supportStrings.ts';
 
 const CODES = LANGUAGES.map((option) => option.code);
 
@@ -139,5 +142,111 @@ describe('renderPage', () => {
     expect(toggle?.hidden).toBe(true);
     expect(toggle?.dataset.pause).toBe(STRINGS.en.videoPause);
     expect(toggle?.dataset.resume).toBe(STRINGS.en.videoResume);
+  });
+});
+
+describe('the Support Author ♥ and its gift sheet (Step 76)', () => {
+  it.each(CODES)(
+    '%s: the ♥ sits between the name and the picker, waiting for its rails',
+    (code) => {
+      const doc = parse(renderPage(code, ASSETS));
+      const label = SUPPORT_STRINGS[code].openLabel;
+      const header = doc.querySelector('header.top');
+      expect([...(header?.children ?? [])].map((child) => child.className)).toEqual([
+        'brand',
+        'support-open',
+        'lang',
+      ]);
+      const open = doc.querySelector<HTMLButtonElement>('button.support-open');
+      expect(open?.getAttribute('type')).toBe('button');
+      expect(open?.dataset.state).toBe('pending');
+      expect(open?.getAttribute('aria-label')).toBe(label);
+      expect(open?.getAttribute('aria-controls')).toBe('support-sheet');
+      expect(open?.dataset.track).toBe('support');
+      expect(open?.querySelector('.support-heart')?.textContent).toBe('♥');
+      // The words hop one after another, and together still read as the label.
+      expect(open?.querySelector('.support-words')?.textContent).toBe(label);
+      const delays = [...(open?.querySelectorAll('.hop') ?? [])].map((hop) =>
+        hop.getAttribute('style'),
+      );
+      expect(delays).toEqual(hopParts(label).map((_, i) => `animation-delay:${200 + i * 110}ms`));
+    },
+  );
+
+  it.each(CODES)('%s: the sheet has the rows of the game, in its order and language', (code) => {
+    const doc = parse(renderPage(code, ASSETS));
+    const t = SUPPORT_STRINGS[code];
+    const sheet = doc.querySelector('dialog#support-sheet');
+    expect(sheet?.hasAttribute('open')).toBe(false);
+    expect(doc.getElementById(sheet?.getAttribute('aria-labelledby') ?? '')?.textContent).toBe(
+      t.title,
+    );
+    expect(sheet?.querySelector('.sheet-intro')?.textContent).toBe(t.intro);
+    expect(sheet?.querySelector('.sheet-close')?.getAttribute('aria-label')).toBe(t.close);
+
+    const rows = [...(sheet?.querySelectorAll<HTMLElement>('[data-rail]') ?? [])];
+    expect(rows.map((row) => row.dataset.rail)).toEqual([
+      'payId',
+      'payIdName',
+      'sponsorsUrl',
+      'lightningAddress',
+      'kofiUrl',
+      'bmcUrl',
+      'donateUrl',
+    ]);
+    expect([...(sheet?.querySelectorAll('.rail-title') ?? [])].map((p) => p.textContent)).toEqual([
+      `${t.payId} ${t.payIdWhere}`,
+      t.sponsors,
+      `${t.lightning} ${t.lightningWhat}`,
+    ]);
+    // The account name goes where the translation puts it.
+    const bankNote = sheet?.querySelector('[data-rail="payIdName"]');
+    expect(bankNote?.textContent).toBe(t.payIdBankNote.replace('{{name}}', ''));
+    expect(bankNote?.querySelector('[data-text="payIdName"]')).not.toBeNull();
+    expect(sheet?.querySelector('.gift-kofi')?.textContent).toBe(t.kofi);
+    expect(sheet?.querySelector('.gift-bmc')?.textContent).toBe(t.bmc);
+    expect(sheet?.querySelector('.rail-donate')?.textContent).toBe(t.donate);
+    const copies = [...(sheet?.querySelectorAll<HTMLElement>('button[data-copy]') ?? [])];
+    expect(copies.map((button) => [button.textContent, button.dataset.copied])).toEqual([
+      [t.copy, t.copied],
+      [t.copy, t.copied],
+    ]);
+
+    // Every rail is counted, and none links anywhere until the script fills it in.
+    const tracked = [...(sheet?.querySelectorAll<HTMLElement>('[data-track]') ?? [])];
+    expect(tracked.map((element) => element.dataset.track)).toEqual([
+      'payid',
+      'sponsors',
+      'lightning',
+      'lightning',
+      'kofi',
+      'bmc',
+      'donate',
+    ]);
+    expect(sheet?.querySelectorAll('a[href]')).toHaveLength(0);
+    for (const link of sheet?.querySelectorAll('a[target="_blank"]') ?? [])
+      expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+  });
+
+  it('without scripts there is no ♥ to press', () => {
+    const doc = parse(renderPage('en', ASSETS));
+    expect(doc.head.querySelector('noscript')?.textContent).toContain(
+      '.support-open{display:none}',
+    );
+  });
+
+  it('the stats page and the 404 page have neither', () => {
+    for (const html of [renderStatsPage(ASSETS), renderNotFound(ASSETS)]) {
+      expect(html).not.toContain('support-open');
+      expect(html).not.toContain('support-sheet');
+    }
+  });
+
+  it('hops word by word, or character by character where words have no spaces', () => {
+    expect(hopParts('Support Author')).toEqual(['Support', 'Author']);
+    expect(hopParts('  Поддержать   автора ')).toEqual(['Поддержать', 'автора']);
+    expect(hopParts('支持作者')).toEqual(['支', '持', '作', '者']);
+    // A letter and its combining accent hop together.
+    expect(hopParts('Café')).toEqual(['C', 'a', 'f', 'é']);
   });
 });

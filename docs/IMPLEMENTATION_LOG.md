@@ -3851,6 +3851,148 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 76 (task B-18) — the landing page's ♥ "Support Author" and its gift sheet (2026-10-17)
+
+**Owner request 2026-10-17** (with a screenshot of Funny Multi's Home: the ♥ and "SUPPORT
+AUTHOR" between the logo and the language picker): "see the attached picture, for the landing
+page (both variants), on the top of the page, add the jumping picture and jumping words "Support
+Author" and the link".
+
+**Shipped:**
+
+- *The ♥ in the header* of both designs, between the «Семейная Чепуха» name and the language
+  picker, on every landing page (not on `/stats/`): Funny Multi's heart beating twice every 3 s
+  and its words hopping after it one by one, split as the game splits them (`hopParts`: the
+  words, or the characters of a label written without spaces, as in Chinese and Japanese). One
+  button whose name is its visible label. From 900 px the three share one row; below it the
+  name and the picker keep the first row and the ♥ takes a centred row of its own, its words
+  wrapping only where one line is wider than the header. Reduced motion stops the beat and the
+  hops.
+- *The gift sheet it opens,* a modal `<dialog>` of the page's own that copies Funny Multi's
+  Support screen (`render/support.ts`, `client/support.ts`): PayID with "In Australia", a copy
+  button and the bank's account name; GitHub Sponsors; Lightning with "Crypto Bitcoin", its
+  `lightning:` link, a copy button and a QR code; the Ko-fi and Buy Me a Coffee buttons in the
+  brands' colours with their sheen; the donation page. ×, Escape or a tap on the dim backdrop
+  closes it, and focus goes back to the ♥. Addresses read left to right on the Hebrew and
+  Persian pages too, and a translating browser leaves them alone. Where the Clipboard API is
+  missing or refused, copy goes through a selected textarea inside the dialog.
+- *The rails come from the game's server,* so the deployer's `DEPLOYER_*` variables stay their
+  one source: the server answers `GET /api/config` exactly as it answers `/config`, and Caddy
+  forwards that path on the landing page's host beside the two stats paths (`@hub_api`, three
+  paths; nothing else of the game's answers there). A rail that is not set loses its row. No
+  rail, no answer, an error, an answer that is not the game's JSON, a browser without modal
+  dialogs or no script at all: no ♥. Until the answer comes the ♥ holds its place unseen, so
+  showing it moves nothing.
+- *Strings:* `supportStrings.ts` copies Funny Multi's `support` strings in all 20 languages;
+  `strings.test.ts` fails when a game catalogue changes and the copy does not.
+- *The QR code* is an SVG drawn from the `qrcode` package (MIT; a new dependency of the landing
+  page, `@types/qrcode` for development), loaded only when the sheet first opens: that chunk is
+  9.2 kB gzipped, and the page's own script stays at 4.1 kB.
+- *Counting:* the page's `hub_click` gains the ♥ (`support`) and the six gift rails (`payid`,
+  `sponsors`, `lightning`, `kofi`, `bmc`, `donate`), 12 targets in all; the key space stays
+  closed, 72 combinations per language a day at most (58 before). `/stats/` names the seven new
+  rows.
+- *Long names fit a phone* (`client/fit.ts`): the family's name in the header and a game's name
+  on its card shrink, down to 12 px, where one word is wider than its box, and are fitted again
+  when the window's width changes and once the web fonts are in. Below 360 px the monkey is
+  36 px and the header's gaps 8 px, which gives the name 14 px more.
+- *Privacy policy* (`deploy/origin-root/funny37/privacy.html`): the landing page's sentence now
+  names the Support sheet being opened and the gift options used, in all 20 languages.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *A sheet on the page, not a link into the game:* a visitor who came to pick a game is not
+   sent into one to give, and it is what the owner chose for `oursharedcode.com` (B-22). The
+   sheet copies the game's, so the two read alike.
+2. *One row from 900 px,* where the hero goes side by side too. The width each language needs
+   for the name, the ♥ and the picker in one row, widest first: ta 878, te 710, uk 659, ru 653,
+   it 618, de 614, id 611, bn 603, pt-br 592, fr 589, hi 586, es-419 and es-es 583, ja 575,
+   ko 550, en 546, he 513, fa 507, yue 454, zh 432. Below 900 px the ♥'s row adds 46–56 px to
+   the header.
+3. *Long names shrink rather than break.* Before Step 76, with no ♥ at all, the name already
+   ran under the picker in eight languages on narrow phones: German at 360 and 320 px (by 25 and
+   65 px), Tamil at 390, 360 and 320 px (24, 54 and 94 px), and Russian, Indonesian, Italian,
+   Brazilian Portuguese, Ukrainian and Telugu at 320 px (3–20 px) — production shows this today.
+   `overflow-wrap: anywhere` would have kept the row but split the words mid-letter, so the font
+   shrinks instead, as the games' home titles do (Step 74). Sizes now, from 22 px: German 20,
+   16 and 13 px at 390, 360 and 320; Tamil 18, 14 and 12; at 320 px Russian and Telugu 20,
+   Indonesian and Italian 21, Brazilian Portuguese 19, Ukrainian 17. Every other language keeps
+   22 px at every width. At the 12 px floor German's and Tamil's names still lost a letter to a
+   second line at 320 px, hence the smaller monkey there; no name breaks inside a word now.
+4. *Tamil's game card at 320 px:* "வேடிக்கையான கதைகள்" was wider than its card and widened the
+   page; it now shrinks to 25 px (from 28).
+5. *No time limit on the request for the rails:* a late answer still brings the ♥, which until
+   then holds its place unseen.
+6. *The privacy sentence's translations are the agent's;* outside en and ru they are machine
+   drafts (B-3).
+7. *A local stall, not the page's:* in four runs of the check's section 2 (80 page loads each),
+   five pages waited about 10 or 20 s for `/api/config` through `vite preview`'s proxy — whole
+   multiples of 10 s, a timer rather than load — and a request of the script's own sent then
+   took 2 s or timed out; the last run had none. Alone it never came back: 150
+   requests in a row through the proxy took at most 92 ms, 40 fresh connections 43 ms, 40 under
+   eight parallel page loads 244 ms, and four fresh browsers settled the ♥ in 0.6–1.1 s.
+   Production has no Vite, and a late answer only delays the ♥. The check now loads one page
+   first, and a ♥ that does not settle is timed three ways at once (through the proxy, from the
+   game's server directly, a file from the page's server) beside when the game's server logged
+   the request — so the next stall says where it is.
+
+**Verified in a browser** (`.screens/step76-hub-support.mjs`, ignored; the production builds on
+local servers — the game's on 3000 with seven made-up rails, the page's `vite preview` on 5187
+proxying `/api` to it — Chromium, every other origin aborted):
+
+- *Counted,* on a fresh server, at phone size: the visit once as design A in English; the ♥ once,
+  and a second ♥ in the same tab not again; each copy (PayID, Lightning) once, with "Copied!" on
+  the button and for screen readers, the address on the clipboard, and back after 1.5 s; each
+  link (Sponsors, Ko-fi, Buy Me a Coffee, donation page) once, opening its address in a new tab
+  while the sheet stays open. Design B in Russian counted as its own, with the Russian sheet.
+- *The sheet:* a modal that stops the page scrolling, focus inside, every row in order with its
+  value, both notes; the QR code module for module the `qrcode` package's own (version 2,
+  25×25, 318 dark modules) at 148 px with its white margin, drawn on the first opening. Escape,
+  ×, and a click on the backdrop close it (a click inside does not), and focus goes back to the
+  ♥; Enter on the ♥ opens it.
+- *Placement,* 20 languages × both designs × 11 widths from 1280 to 320 px: one row from 900 px
+  and a centred ♥ row below it, nothing overlapping or covering the ♥, no sideways scroll, the
+  ♥'s words on one line except Tamil's at 320 px (322 px of words in 288), no name broken inside
+  a word, the shrunk sizes of decision 3.
+- *Motion:* the heart beats to 1.2× and the words hop 6 px, the brand buttons' sheen runs;
+  under reduced motion nothing moves.
+- *No ♥* — and the header back to one row of 68 px — with no rails, only the bank's name, links
+  that are not web addresses, blank strings, no answer, a page for an answer, a 404, a 500, an
+  empty object, and no script. Ko-fi alone gives a sheet of one row.
+- *The sheet in every language* at 390 and 320 px, and English, Hebrew, Tamil and Japanese at
+  1280: inside the screen and scrolling inside itself where it is taller (at phone height it
+  always is), nothing sticking out or clipped, right to left in Hebrew and Persian with the
+  addresses left to right, focus inside.
+- *Through the real Caddyfile* (`.screens/step76-caddy.mjs`, ignored; production's caddy
+  2.11.4 in a throwaway container on 5186): on the landing page's host `/api/config` answers the
+  game's JSON, while `/config`, `/api/config/`, `/api/configs`, `/api/config/x`, `/health` and
+  `/api/stats/x` stay the page's own 404; the ♥, Ko-fi and Buy Me a Coffee are counted once
+  through Caddy, an unknown target refused by the server (400); `/`, `/ru/` and `/he/` carry the
+  ♥ and the sheet with `no-cache`, `/stats/` none; the game's host answers both `/config` and
+  `/api/config`. 21 checks; Caddy's only warnings are the known "not formatted" one and two that
+  come from the test's plain-HTTP hosts.
+- Screenshots viewed: the sheet in English at 390 px (top and end) and 1280 px and in Hebrew at
+  320 px; the header in German and Tamil at 320 px.
+
+**Not run:** WebKit at iPhone size (the check's section 6). Playwright's `Playwright.exe` and
+`WebKitWebProcess.exe` have been missing from `webkit-2359` since 2026-10-15 20:33 — Avast's
+quarantine is the likely place (owner item 4 in the RESUME note). Design B's ♥ on an iPhone is
+part of the owner's real-iPhone look (item 3).
+
+**Owed:** the deploy, after the push. Step 75's two `.env` lines first, then `deploy/ship.sh`
+(the server's `/api/config`, Caddy's third path, the privacy policy), then
+`deploy/ship-funny-family.sh`. The other order is safe: until Caddy forwards `/api/config` the
+page gets its own 404 and shows no ♥. The ♥ shows whatever rails production has.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1449 tests (352 + 359 + 272 + 174 + 239 + 53), 112 more than
+  Step 75's — 110 in the landing page, 2 in the server; all passed on the first run.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -3865,21 +4007,29 @@ Gates:
 
 ~~RESUME HERE (2026-10-16, after Step 74, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 75).** **Step 75 (B-17) is committed, not pushed** — the
-push waits for the owner's word. It gives Funny Multi's Support screen the notes "In Australia"
-and "Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a Coffee (D-6(a)
-amended). Its deploy needs two lines in production's `.env` (Step 75's *Owed*). Steps 73 and 74
-(B-16) are pushed, CI passed (run `38898907879`), and Funny Multi and the landing page run them:
-20 languages, and every home title fits a phone. Funny One's production still serves 15
-languages until the owner deploys it; its deploy carries B-16 too.
+~~RESUME HERE (2026-10-17, after Step 75)~~ — carried into this note.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-18–B-22): Step 76
-(B-18), the beating ♥ and hopping "Support Author" in the landing page's header, both designs,
-opening a sheet of the page's own fed by Funny Multi's config — the owner's newest request;
-Step 77 (B-19), QR codes of the games' addresses on the landing page; Step 78 (B-20), the
-visitor map on `/stats/`; Step 79 (B-21), Arabic, Swahili and Yoruba, 23 languages; Step 80
-(B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose
-push deploys — so it waits for the owner's go-ahead.
+**RESUME HERE (2026-10-17, after Step 76).** **Steps 75 (B-17) and 76 (B-18) are committed, not
+pushed** — the push waits for the owner's word. Step 75 gives Funny Multi's Support screen the
+notes "In Australia" and "Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a
+Coffee (D-6(a) amended). Step 76 puts Funny Multi's beating ♥ and hopping "Support Author" in
+the landing page's header, both designs, opening a gift sheet of the page's own that reads the
+game server's rails, and makes long names fit narrow phones (the family's name had run under the
+language picker in eight languages). Their deploy, after the push: Step 75's two lines in
+production's `.env`, then `deploy/ship.sh` (the game, its `/api/config`, Caddy's third path on
+the landing page's host), then `deploy/ship-funny-family.sh` (the page; the other order is safe
+— no ♥ until Caddy forwards the rails). Steps 73 and 74 (B-16) are pushed, CI passed (run
+`38898907879`), and Funny Multi and the landing page run them: 20 languages, and every home
+title fits a phone. Funny One's production still serves 15 languages until the owner deploys
+it; its deploy carries B-16 too.
+
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-19–B-22): Step 77
+(B-19), QR codes of the games' addresses beside the landing page's game buttons and the cards'
+"Play now" — for a visitor at a computer, so on wider screens; drawn at build time with Step
+76's `qrPath`; Step 78 (B-20), the visitor map on `/stats/`; Step 79 (B-21), Arabic, Swahili
+and Yoruba, 23 languages — measure the header again for them (Step 76's one-row widths and
+fitted names); Step 80 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's
+own repository, whose push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -3910,12 +4060,15 @@ app, one op per message: op 1 done (old-address icon removed), op 2 asked (app-l
 then the 18 checks of `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL
 bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (3) one real Funny Multi
 game on three phones in three languages (B-15), and the landing page's design B on a real
-iPhone (`?v=b`; Chrome plays it); (4) an Avast exception for Playwright's WebKit folder on this
-PC, or quarantine — its Behavior Shield blocked `webkit-2359\WebKitWebProcess.exe` as
-`IDP.Generic` on 2026-10-14, a false positive (the folder is byte-identical to Microsoft's
-build, found 2026-10-15); an exception is recommended so design B can be checked here too.
+iPhone (`?v=b`; Chrome plays it); (4) Playwright's WebKit on this PC: `Playwright.exe` and
+`WebKitWebProcess.exe` have been missing from `webkit-2359` since 2026-10-15 20:33, when the
+folder last changed (found in Step 76), most likely in Avast's quarantine — its Behavior Shield
+blocked `webkit-2359\WebKitWebProcess.exe` as `IDP.Generic` on 2026-10-14, a false positive (the
+folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring both from the
+quarantine with an exception for the folder is recommended; until then no WebKit check runs
+here, and Step 76 skipped its own.
 
-The agent's own queue is Steps 76–80 above.
+The agent's own queue is Steps 77–80 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -3924,8 +4077,8 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Open owner decisions: the CI pin above. Step 72's thirteen decisions and Step 75's three were
-the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Open owner decisions: the CI pin above. Step 72's thirteen decisions, Step 75's three and Step
+76's seven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e
@@ -3988,7 +4141,11 @@ download early — its status code holds, its size does not; read sizes from `cu
 72). A WebKit check that stops answering here: ask the owner whether Avast alerted before
 blaming WebKit or the page — its Behavior Shield blocked Playwright's WebKit as `IDP.Generic` on
 2026-10-14, a false positive (Step 72). `.screens/ff-hub-check.mjs --no-webkit` skips WebKit
-(Step 73). The agent's shell cannot start Bubblewrap's Gradle step
+(Step 73). A fresh page through `vite preview` on 5187 now and then waits about 10 or 20 s for
+`/api/config` from the game's server on 3000 — five times in Step 76's checks, never when tried
+alone; `.screens/step76-hub-support.mjs` loads one page first and, when a ♥ does not settle,
+times the request three ways and reads the server's log, so re-run a lone "never settled"
+before suspecting the page. The agent's shell cannot start Bubblewrap's Gradle step
 (Step 65) — compile checks use `gradlew.bat` by path; signed builds are the owner's anyway.
 Glob under `apps/funny-one-client/src` can time out — use `ls` or `grep -rl`. The review stack
 (`.picture-review/venv`, open_clip, transformers) is on this PC only; `scripts/picture-review/`
@@ -4002,8 +4159,8 @@ Still open, none blocking: the move from Funny One's old address is unchecked in
 Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` name — worth
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
 Funny One's six new strings and its privacy policy outside English, Funny Multi's two B-15
-strings outside en/ru, the landing page's text outside en/ru, and everything in B-16's five
-languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
+strings outside en/ru, the landing page's text and Step 76's privacy
+sentence outside en/ru, and everything in B-16's five languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
 a still's file name is "funny-stories-<name>" when the title has no Latin letters (both seen in
 Step 73); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real

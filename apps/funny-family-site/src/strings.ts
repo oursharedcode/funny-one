@@ -4,7 +4,7 @@
 // (@funny/shared LANGUAGES). English is the master. Russian is reviewed and
 // uses the binding names: «Семейная Чепуха» for the family of games,
 // «Чепуха 37» and «Одна Чепуха: по кругу» for the two games. The other
-// thirteen are machine-quality drafts awaiting a native speaker, exactly like
+// eighteen are machine-quality drafts awaiting a native speaker, exactly like
 // the games' own catalogs (FM-POOL-5, task B-3).
 //
 // A game's name is never written here: GAME_NAMES copies what each game calls

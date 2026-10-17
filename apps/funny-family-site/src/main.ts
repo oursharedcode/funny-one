@@ -2,10 +2,14 @@
 
 // Step 72: the landing page's script. The page is whole without it (see
 // render/page.ts); this adds the video playing in place, the background loop
-// of design B, the picker closing like a menu, and the visit counts.
+// of design B, the picker closing like a menu, the visit counts, and (Step 76)
+// the header's Support Author ♥ with its gift sheet and long names shrunk to
+// fit a narrow phone.
 
 import './styles/landing.css';
+import { initFit } from './client/fit.ts';
 import { initLanguageMenu } from './client/languageMenu.ts';
+import { initSupport } from './client/support.ts';
 import { initTracking } from './client/track.ts';
 import { initBackgroundLoop, initTrailer } from './client/video.ts';
 
@@ -19,7 +23,9 @@ for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-track="f
   link.href = url.href;
 }
 
+initFit(window);
 initTracking(window);
 initLanguageMenu(document);
 initTrailer(document);
 initBackgroundLoop(window);
+void initSupport(window);

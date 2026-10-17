@@ -12,7 +12,7 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (58 combinations per language a
+// into the file and the key space is closed (72 combinations per language a
 // day at most).
 //
 // Persistence is one JSON file (STATS_FILE; docker-compose.yml mounts a volume
@@ -39,11 +39,13 @@ const SOURCES = ['hub', 'direct'] as const;
 const REFERRERS = ['direct', 'search', 'social', 'oursharedcode', 'games', 'other'] as const;
 // Phone-sized screen or not.
 const DEVICES = ['m', 'd'] as const;
-// What was clicked on the hub: either game, the source code, the video, the
-// author's site.
-const HUB_TARGETS = ['fm', 'fo', 'gh', 'video', 'root'] as const;
-// Which gift rail was used on Funny Multi's support sheet.
+// Which gift rail was used on a support sheet — Funny Multi's, or (Step 76)
+// the hub's own.
 const GIFT_TARGETS = ['payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'] as const;
+// What was clicked on the hub: either game, the source code, the video, the
+// author's site, and (Step 76) its Support Author ♥ and the gift rails on the
+// sheet that opens.
+const HUB_TARGETS = ['fm', 'fo', 'gh', 'video', 'root', 'support', ...GIFT_TARGETS] as const;
 
 // Each event's own labels. Every one listed is required, except that a Funny
 // Multi event carries `v` only when it came through the hub — a visit that did

@@ -3993,6 +3993,21 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 77 — CI pinned to Ubuntu 24.04 (2026-10-17)
+
+**Owner decision 2026-10-17:** "Agree to the recommended" — the pin proposed that morning, after
+the warning on CI's run of 2026-10-16: "The ubuntu-latest label will migrate to Ubuntu 26
+beginning October 19, 2026" (actions/runner-images issue 14748).
+
+- `.github/workflows/ci.yml` runs on `ubuntu-24.04`, the image `ubuntu-latest` gave that run
+  (`38898907879`, image version 20261012.601), so a red build after 2026-10-19 is the code, not a
+  new image. The move to Ubuntu 26 can come later, on purpose, as a step of its own.
+- The planned steps move up by one: B-19 is now Step 78, B-20 Step 79, B-21 Step 80 and B-22
+  Step 81 (`steering/tasks.md`, the RESUME note).
+
+Gates: the tree differs from Step 76's only in the workflow and these notes; `format:check`
+re-run clean, the rest as Step 76 recorded them. CI: the push of Steps 75–77.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4009,26 +4024,30 @@ Gates:
 
 ~~RESUME HERE (2026-10-17, after Step 75)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 76).** **Steps 75 (B-17) and 76 (B-18) are committed, not
-pushed** — the push waits for the owner's word. Step 75 gives Funny Multi's Support screen the
-notes "In Australia" and "Crypto Bitcoin" and, under Lightning, buttons for Ko-fi and Buy Me a
-Coffee (D-6(a) amended). Step 76 puts Funny Multi's beating ♥ and hopping "Support Author" in
-the landing page's header, both designs, opening a gift sheet of the page's own that reads the
-game server's rails, and makes long names fit narrow phones (the family's name had run under the
-language picker in eight languages). Their deploy, after the push: Step 75's two lines in
-production's `.env`, then `deploy/ship.sh` (the game, its `/api/config`, Caddy's third path on
-the landing page's host), then `deploy/ship-funny-family.sh` (the page; the other order is safe
-— no ♥ until Caddy forwards the rails). Steps 73 and 74 (B-16) are pushed, CI passed (run
-`38898907879`), and Funny Multi and the landing page run them: 20 languages, and every home
-title fits a phone. Funny One's production still serves 15 languages until the owner deploys
-it; its deploy carries B-16 too.
+~~RESUME HERE (2026-10-17, after Step 76)~~ — carried into this note.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-19–B-22): Step 77
+**RESUME HERE (2026-10-17, after Step 77).** **Steps 75 (B-17), 76 (B-18) and 77 are committed;
+the owner asked on 2026-10-17 for their push and deploy, which follow this commit** — if no later
+note records them, read `git status` and production's state before anything else. Step 75 gives
+Funny Multi's Support screen the notes "In Australia" and "Crypto Bitcoin" and, under Lightning,
+buttons for Ko-fi and Buy Me a Coffee (D-6(a) amended). Step 76 puts Funny Multi's beating ♥ and
+hopping "Support Author" in the landing page's header, both designs, opening a gift sheet of the
+page's own that reads the game server's rails, and makes long names fit narrow phones (the
+family's name had run under the language picker in eight languages). Step 77 pins CI to
+`ubuntu-24.04` (owner, 2026-10-17). Their deploy: Step 75's two lines in production's `.env`,
+then `deploy/ship.sh` (the game, its `/api/config`, Caddy's third path on the landing page's
+host), then `deploy/ship-funny-family.sh` (the page; the other order is safe — no ♥ until Caddy
+forwards the rails). Steps 73 and 74 (B-16) are pushed, CI passed (run `38898907879`), and Funny
+Multi and the landing page run them: 20 languages, and every home title fits a phone. Funny
+One's production still serves 15 languages until the owner deploys it; its deploy carries B-16
+too.
+
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-19–B-22): Step 78
 (B-19), QR codes of the games' addresses beside the landing page's game buttons and the cards'
 "Play now" — for a visitor at a computer, so on wider screens; drawn at build time with Step
-76's `qrPath`; Step 78 (B-20), the visitor map on `/stats/`; Step 79 (B-21), Arabic, Swahili
+76's `qrPath`; Step 79 (B-20), the visitor map on `/stats/`; Step 80 (B-21), Arabic, Swahili
 and Yoruba, 23 languages — measure the header again for them (Step 76's one-row widths and
-fitted names); Step 80 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's
+fitted names); Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's
 own repository, whose push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
@@ -4048,10 +4067,9 @@ blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, noth
 are committed; **Funny One's deploy is still the owner's — production serves its library
 un-blocked until then.**
 
-**Owner decision open, with a date:** CI warned that GitHub moves `ubuntu-latest` to Ubuntu 26
-from 2026-10-19. Pinning the workflow to `ubuntu-24.04` (proposed 2026-10-17, unanswered) keeps
-the next push on today's image; without it, a red build after that date may be the new image,
-not the code.
+**CI runs on `ubuntu-24.04`** since Step 77 (owner, 2026-10-17): GitHub moves `ubuntu-latest`
+to Ubuntu 26 from 2026-10-19, and the pin keeps a red build the code's, not a new image's.
+Moving to Ubuntu 26 is a step of its own, whenever it is wanted.
 
 **Next, in order, the owner's:** (1) Funny One's deploy — `deploy/ship-funny-one.sh
 ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
@@ -4068,7 +4086,7 @@ folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring bot
 quarantine with an exception for the folder is recommended; until then no WebKit check runs
 here, and Step 76 skipped its own.
 
-The agent's own queue is Steps 77–80 above.
+The agent's own queue is Steps 78–81 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4077,8 +4095,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Open owner decisions: the CI pin above. Step 72's thirteen decisions, Step 75's three and Step
-76's seven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three and Step 76's seven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e

@@ -9,7 +9,8 @@ on:
 # FM-ARC-5: one workflow, typecheck + lint + test. No deploy jobs.
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned in Step 77: GitHub moves ubuntu-latest to Ubuntu 26 from 2026-10-19.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 

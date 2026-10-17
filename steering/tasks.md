@@ -301,22 +301,22 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-19** QR codes on the landing page (owner request 2026-10-17, with three screenshots): a QR
   code of each game's address beside the Funny Multi and Funny One buttons at the top of design A
   and of design B, and beside each "Play now" button in the "Pick a game" cards, so a visitor at a
-  computer can open a game on a phone. *Planned: Step 77.*
+  computer can open a game on a phone. *Planned: Step 78.*
 - **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the
   country, never the address; `/stats/` draws its own world map, shaded by visits, with a list
-  of the top countries. Both privacy policies say so. *Planned: Step 78.*
+  of the top countries. Both privacy policies say so. *Planned: Step 79.*
 - **B-21** Three African languages: Arabic, Swahili and Yoruba (owner request 2026-10-17, after
   that day's research), in both games, the landing page and both privacy policies, 23 in all.
   Arabic is Modern Standard Arabic (owner choice), labelled «العربية (المغرب)» under Morocco's
-  flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. *Planned: Step 79,
+  flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. *Planned: Step 80,
   after B-18–B-20, so their new strings are drafted in the new languages at once.*
 - **B-22** The ♥ and "Support Author" on `https://www.oursharedcode.com/` (owner request
   2026-10-17; owner choice "own sheet there"): top right, opening a sheet on that site with PayID,
   Sponsors, Lightning, Ko-fi and Buy Me a Coffee. It lives in that site's own repository
   (`oursharedcode.github.io`), where a push deploys, so it waits for the owner's go-ahead; the
-  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 80.*
+  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 81.*
 
 ## Dependency notes
 

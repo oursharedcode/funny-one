@@ -2,12 +2,24 @@
 
 // Step 72: /stats/ drawn from one summary (data.ts): the headline numbers,
 // the funnel from the landing page to Funny Multi's gift sheet, the A/B test
-// of the page's two designs, the days, and where the visits came from. Built
-// with DOM calls and text nodes only: nothing in the answer is ever parsed as
-// HTML.
+// of the page's two designs, the days, and where the visits came from — by
+// Step 79 their countries too, on a map of the page's own (worldMap.ts).
+// Built with DOM calls and text nodes only: nothing in the answer is ever
+// parsed as HTML.
 
-import { daily, daysBetween, funnel, rate, rowsOf, total, totalsBy } from './data.ts';
-import type { FunnelStep, Match, Row, Summary } from './data.ts';
+import {
+  countryRows,
+  daily,
+  daysBetween,
+  funnel,
+  NOT_KNOWN,
+  rate,
+  rowsOf,
+  total,
+  totalsBy,
+} from './data.ts';
+import type { CountryRow, FunnelStep, Match, Row, Summary } from './data.ts';
+import { DOTS, MAP_HEIGHT, MAP_WIDTH, OUTLINE, SHAPES } from './worldMap.ts';
 import { verdict } from './ztest.ts';
 
 type Child = Node | string | null;
@@ -293,6 +305,152 @@ function chart(days: readonly string[], lines: readonly Line[]): HTMLElement {
   );
 }
 
+// Step 79: the map's shades, from one visit to the busiest country's, and the
+// grey of a country with none.
+const SHADES = ['#f9a8d4', '#db2777', '#831843'] as const;
+const NO_VISITS = '#e5e7eb';
+const regions =
+  typeof Intl.DisplayNames === 'function'
+    ? new Intl.DisplayNames(['en'], { type: 'region' })
+    : null;
+
+/** A country's English name, or its code where the browser has none. */
+function countryName(code: string): string {
+  if (code === NOT_KNOWN) return 'Not known';
+  if (!/^[A-Z]{2}$/.test(code)) return code;
+  try {
+    return regions?.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+/** The colour `t` of the way from one #rrggbb to another. */
+function mix(from: string, to: string, t: number): string {
+  let color = '#';
+  for (let i = 1; i < 7; i += 2) {
+    const a = parseInt(from.slice(i, i + 2), 16);
+    const b = parseInt(to.slice(i, i + 2), 16);
+    color += Math.round(a + (b - a) * t)
+      .toString(16)
+      .padStart(2, '0');
+  }
+  return color;
+}
+
+/** The shade of `count` visits when the busiest country has `max`: on a log scale, so a few still show. */
+function shade(count: number, max: number): string {
+  const t = max > 1 ? Math.min(1, Math.log(count) / Math.log(max)) : 1;
+  return t < 0.5 ? mix(SHADES[0], SHADES[1], t * 2) : mix(SHADES[1], SHADES[2], t * 2 - 1);
+}
+
+function worldMap(rows: readonly CountryRow[]): HTMLElement {
+  const visits = new Map(rows.map((row) => [row.code, row]));
+  const max = Math.max(0, ...rows.filter((row) => row.code !== NOT_KNOWN).map((row) => row.all));
+  const place = (tag: string, code: string, attrs: Record<string, string | number>): SVGElement => {
+    const row = visits.get(code);
+    const element = svg(tag, {
+      ...attrs,
+      'data-code': code,
+      fill: row ? shade(row.all, max) : NO_VISITS,
+    });
+    element.append(
+      svg(
+        'title',
+        {},
+        row
+          ? `${countryName(code)}: ${num(row.all)} ${row.all === 1 ? 'visit' : 'visits'} (landing page ${num(row.hub)}, Funny Multi ${num(row.fm)})`
+          : `${countryName(code)}: no visits`,
+      ),
+    );
+    return element;
+  };
+
+  const map = svg('svg', {
+    viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
+    role: 'img',
+    'aria-label':
+      'A world map, each country shaded by its visits; the numbers are in the table below the map.',
+  });
+  const land = svg('g', { class: 'map-land' });
+  for (const [code, d] of Object.entries(SHAPES)) land.append(place('path', code, { d }));
+  // A country too small to see gets a dot as well, if it has visits.
+  for (const [code, [cx, cy]] of Object.entries(DOTS)) {
+    if (visits.has(code)) land.append(place('circle', code, { class: 'map-dot', cx, cy, r: 5 }));
+  }
+  map.append(svg('path', { class: 'map-sea', d: OUTLINE }), land);
+
+  const key = (color: string): HTMLElement =>
+    h('span', { class: 'map-key', style: `background: ${color}` });
+  return h(
+    'div',
+    { class: 'chart map' },
+    map,
+    h(
+      'ul',
+      { class: 'legend' },
+      h('li', {}, key(NO_VISITS), 'No visits'),
+      max > 1
+        ? h(
+            'li',
+            {},
+            '1',
+            h('span', {
+              class: 'map-scale',
+              style: `background: linear-gradient(90deg, ${SHADES.join(', ')})`,
+            }),
+            `${num(max)} visits`,
+          )
+        : null,
+      max > 1 ? h('li', {}, 'Shaded on a log scale') : null,
+      max === 1 ? h('li', {}, key(shade(1, 1)), '1 visit') : null,
+    ),
+  );
+}
+
+function countrySection(summary: Summary): HTMLElement {
+  const title = 'Visits by country';
+  const since = typeof summary.countriesSince === 'string' ? summary.countriesSince : null;
+  if (since === null) return section(title, note('No visit’s country has been counted yet.'));
+  const rows = countryRows(summary);
+  const whole = rows.reduce((sum, row) => sum + row.all, 0);
+  return section(
+    title,
+    worldMap(rows),
+    h(
+      'div',
+      { class: 'countries' },
+      table(
+        ['Country', 'Visits, both sites', 'Landing page', 'Funny Multi', 'Share'],
+        rows.map((row) => [
+          countryName(row.code),
+          num(row.all),
+          num(row.hub),
+          num(row.fm),
+          pct(rate(row.all, whole)),
+        ]),
+      ),
+    ),
+    since > summary.from
+      ? note(
+          `Countries are counted from ${fullDate.format(dateOf(since))}: the visits before that day are missing here.`,
+        )
+      : null,
+    note(
+      'Each site counts its own visits, so a tab that goes from the landing page on to Funny Multi counts once on each. “Not known” is a visit from an address the database does not place.',
+    ),
+    h(
+      'p',
+      { class: 'stats-note' },
+      'Our own server finds the country in a copy of DB-IP’s free database and keeps only the country, never the address. ',
+      h('a', { href: 'https://db-ip.com' }, 'IP Geolocation by DB-IP'),
+      ' (CC BY 4.0). Map: ',
+      h('a', { href: 'https://www.naturalearthdata.com/' }, 'Natural Earth'),
+      '.',
+    ),
+  );
+}
+
 function languageTable(rows: readonly Row[], names: Record<string, string>): HTMLElement {
   const columns: readonly Match[] = [
     { e: 'hub_view' },
@@ -468,6 +626,8 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
     ),
   );
 
+  fragment.append(countrySection(summary));
+
   fragment.append(
     section(
       'Where the landing page’s visits came from',
@@ -524,7 +684,12 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
         h(
           'li',
           {},
-          'What is kept is a number per day for each combination of a few labels: no cookies, no IP addresses, no identifiers. Days older than 400 are dropped.',
+          'A visit’s country is found from its IP address on our own server, in a copy of DB-IP’s free country database that the server downloads once a month. Only the country is kept, counted apart from every other label, so it cannot be joined to a language, a referrer or a gift.',
+        ),
+        h(
+          'li',
+          {},
+          'What is kept is a number per day for each combination of a few labels, and one for each country: no cookies, no IP addresses, no identifiers. Days older than 400 are dropped.',
         ),
       ),
     ),

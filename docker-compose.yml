@@ -35,6 +35,10 @@ services:
       # The landing page's and the game's visit counts (Step 72, the server's
       # analytics.ts): kept in a volume, so a deploy does not reset them.
       STATS_FILE: /data/stats.json
+      # DB-IP's monthly country file, which the server downloads itself and
+      # finds a visit's country in (Step 79, geo.ts): in the same volume, so
+      # a deploy does not download it again.
+      GEO_DIR: /data/geo
     volumes:
       - stats_data:/data
     restart: unless-stopped

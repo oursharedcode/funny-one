@@ -165,8 +165,75 @@ describe('createStatsStore', () => {
         '2026-10-14': { 'hub_view|a|en|||direct|m': 2 },
         '2026-10-15': { 'hub_view|a|en|||direct|m': 1 },
       },
+      countries: {},
+      countriesSince: null,
     });
     expect(Object.keys(s.summary(1).days)).toEqual(['2026-10-15']);
+  });
+
+  it('tallies the country of a visit apart from its labels', () => {
+    const s = store(null);
+    const gameVisit = { e: 'fm_view', s: 'direct', l: 'ru' };
+    expect(s.record(view, 'AU')).toBe(true);
+    s.record(view, 'AU');
+    s.record(gameVisit, 'RU');
+    // Not known, and not a country: both count as ZZ.
+    s.record(view, null);
+    s.record(view, 'au');
+    // No lookup: no country counted.
+    s.record(view);
+    // Not a visit: its country is not counted.
+    s.record({ e: 'hub_click', v: 'a', l: 'en', t: 'fm' }, 'AU');
+    s.record({ e: 'fm_gift', s: 'direct', l: 'ru', t: 'payid' }, 'RU');
+    // Refused: nothing at all is counted.
+    expect(s.record({ ...view, v: 'z' }, 'AU')).toBe(false);
+
+    const summary = s.summary(30);
+    expect(summary.countries).toEqual({ hub_view: { AU: 2, ZZ: 2 }, fm_view: { RU: 1 } });
+    expect(summary.countriesSince).toBe('2026-10-14');
+    expect(summary.days['2026-10-14']['hub_view|a|en|||direct|m']).toBe(5);
+
+    // The next day: summed over the span, and since stays at the first day.
+    clock = new Date('2026-10-15T08:00:00Z');
+    s.record(view, 'NZ');
+    expect(s.summary(30).countries).toEqual({
+      hub_view: { AU: 2, ZZ: 2, NZ: 1 },
+      fm_view: { RU: 1 },
+    });
+    expect(s.summary(1)).toMatchObject({
+      countries: { hub_view: { NZ: 1 } },
+      countriesSince: '2026-10-14',
+    });
+  });
+
+  it('keeps the countries in the file and drops their old days', () => {
+    const file = join(dir, 'stats.json');
+    writeFileSync(
+      file,
+      JSON.stringify({
+        version: 1,
+        days: { '2026-10-13': { 'hub_view|a|en|||direct|m': 4 } },
+        countries: {
+          '2025-01-01': { 'hub_view|AU': 5 },
+          '2026-10-13': { 'hub_view|AU': 3, 'fm_view|ZZ': 1, 'hub_view|<b>': 1, 'bad|key|x': 2 },
+        },
+      }),
+    );
+    const first = store(file);
+    expect(first.summary(RETENTION_DAYS)).toMatchObject({
+      countries: { hub_view: { AU: 3 }, fm_view: { ZZ: 1 } },
+      countriesSince: '2026-10-13',
+    });
+    first.record(view, 'JP');
+    first.flush();
+    expect(JSON.parse(readFileSync(file, 'utf8')).countries).toEqual({
+      '2026-10-13': { 'hub_view|AU': 3, 'fm_view|ZZ': 1 },
+      '2026-10-14': { 'hub_view|JP': 1 },
+    });
+
+    // A file from before Step 79 has no countries: none are counted yet.
+    writeFileSync(file, JSON.stringify({ version: 1, days: {} }));
+    expect(store(file).summary(30)).toMatchObject({ countries: {}, countriesSince: null });
   });
 
   it('writes the file only when something changed, and reads it back', () => {
@@ -179,6 +246,7 @@ describe('createStatsStore', () => {
     expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({
       version: 1,
       days: { '2026-10-14': { 'hub_view|a|en|||direct|m': 1 } },
+      countries: {},
     });
     expect(existsSync(`${file}.tmp`)).toBe(false);
 
@@ -238,17 +306,31 @@ describe('POST /api/stats and GET /api/stats/summary', () => {
     }
   });
 
-  async function boot(basePath = '/'): Promise<BuiltServer> {
-    built = await buildServer({ logger: false, basePath, statsFile: null });
+  async function boot(
+    basePath = '/',
+    countryOf?: (ip: string) => string | null,
+  ): Promise<BuiltServer> {
+    built = await buildServer({ logger: false, basePath, statsFile: null, countryOf });
     return built;
   }
 
-  function beacon(server: BuiltServer, body: unknown, ua = PHONE_UA, url = '/api/stats') {
-    // sendBeacon's own content type for a string body.
+  function beacon(
+    server: BuiltServer,
+    body: unknown,
+    ua = PHONE_UA,
+    url = '/api/stats',
+    ip = '198.51.100.7',
+  ) {
+    // sendBeacon's own content type for a string body; the address as the
+    // proxy in front passes it on.
     return server.fastify.inject({
       method: 'POST',
       url,
-      headers: { 'content-type': 'text/plain;charset=UTF-8', 'user-agent': ua },
+      headers: {
+        'content-type': 'text/plain;charset=UTF-8',
+        'user-agent': ua,
+        'x-forwarded-for': ip,
+      },
       payload: typeof body === 'string' ? body : JSON.stringify(body),
     });
   }
@@ -308,6 +390,33 @@ describe('POST /api/stats and GET /api/stats/summary', () => {
     }
     expect((await beacon(server, event)).statusCode).toBe(429);
     expect(await today(server)).toEqual({ 'fm_view||en|direct|||': 60 });
+  });
+
+  it("counts a visit's country, looked up from its address, and shows no address", async () => {
+    const places: Record<string, string> = { '1.0.0.1': 'AU', '77.88.8.8': 'RU' };
+    const server = await boot('/', (ip) => places[ip] ?? null);
+    const hubVisit = { e: 'hub_view', v: 'b', l: 'en', r: 'search', d: 'd' };
+    const gameVisit = { e: 'fm_view', s: 'hub', v: 'b', l: 'ru' };
+    const send = (body: object, ip: string) => beacon(server, body, PHONE_UA, '/api/stats', ip);
+    expect((await send(hubVisit, '1.0.0.1')).statusCode).toBe(204);
+    await send(hubVisit, '1.0.0.1');
+    await send(gameVisit, '77.88.8.8');
+    await send(gameVisit, '203.0.113.50');
+    await send({ e: 'hub_click', v: 'b', l: 'en', t: 'fm' }, '1.0.0.1');
+
+    const res = await server.fastify.inject({ method: 'GET', url: '/api/stats/summary?days=1' });
+    expect(res.json()).toMatchObject({
+      countries: { hub_view: { AU: 2 }, fm_view: { RU: 1, ZZ: 1 } },
+      countriesSince: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+    });
+    expect(res.body).not.toMatch(/1\.0\.0\.1|77\.88|203\.0/);
+  });
+
+  it('counts no country without a lookup', async () => {
+    const server = await boot();
+    await beacon(server, { e: 'fm_view', s: 'direct', l: 'en' });
+    const res = await server.fastify.inject({ method: 'GET', url: '/api/stats/summary?days=1' });
+    expect(res.json()).toMatchObject({ countries: {}, countriesSince: null });
   });
 
   it('marks the summary uncacheable and unindexed', async () => {

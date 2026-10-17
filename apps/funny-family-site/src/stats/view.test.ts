@@ -47,6 +47,11 @@ function tableOf(root: HTMLElement, heading: string, index = 0): string[][] {
   );
 }
 
+/** The country map's key, as the text of each entry. */
+function legendOf(root: HTMLElement): string[] {
+  return [...root.querySelectorAll('.map .legend li')].map((item) => item.textContent ?? '');
+}
+
 describe('periodText', () => {
   it('names the period and its length in days', () => {
     expect(periodText(SUMMARY)).toBe('1 Oct 2026 – 3 Oct 2026: 3 days, counted by UTC day.');
@@ -174,12 +179,73 @@ describe('renderStats', () => {
     expect(empty.querySelector('.tile-value')?.textContent).toBe('0');
   });
 
+  it('shades each country on the map by its visits, and lists them', () => {
+    const root = render({
+      ...SUMMARY,
+      countries: { hub_view: { AU: 5, LU: 2, ZZ: 1 }, fm_view: { AU: 3, RU: 1 } },
+      countriesSince: '2026-09-01',
+    });
+    expect(tableOf(root, 'Visits by country')).toEqual([
+      ['Australia', '8', '5', '3', '66.7%'],
+      ['Luxembourg', '2', '2', '0', '16.7%'],
+      ['Russia', '1', '0', '1', '8.3%'],
+      ['Not known', '1', '1', '0', '8.3%'],
+    ]);
+    const place = (code: string, tag = 'path'): Element | null =>
+      root.querySelector(`.map-land ${tag}[data-code="${code}"]`);
+    // On a log scale: the busiest the darkest, one visit the lightest, two of
+    // eight a third of the way.
+    expect(place('AU')?.getAttribute('fill')).toBe('#831843');
+    expect(place('RU')?.getAttribute('fill')).toBe('#f9a8d4');
+    expect(place('LU')?.getAttribute('fill')).toBe('#e55296');
+    expect(place('FR')?.getAttribute('fill')).toBe('#e5e7eb');
+    expect(place('AU')?.textContent).toBe('Australia: 8 visits (landing page 5, Funny Multi 3)');
+    expect(place('FR')?.textContent).toBe('France: no visits');
+    // Luxembourg is too small to see, so it has a dot as well; only a country
+    // with visits gets one.
+    expect(
+      [...root.querySelectorAll('.map-dot')].map((dot) => dot.getAttribute('data-code')),
+    ).toEqual(['LU']);
+    expect(place('LU', 'circle')?.getAttribute('fill')).toBe('#e55296');
+    // The key's scale runs from 1 to the busiest country's 8.
+    expect(legendOf(root)).toEqual(['No visits', '18 visits', 'Shaded on a log scale']);
+    expect(root.querySelector('a[href="https://db-ip.com"]')?.textContent).toBe(
+      'IP Geolocation by DB-IP',
+    );
+    expect(root.textContent).not.toContain('Countries are counted from');
+  });
+
+  it('says from when countries are counted, and draws no map before any was', () => {
+    const later = render({
+      ...SUMMARY,
+      countries: { hub_view: { AU: 1 } },
+      countriesSince: '2026-10-02',
+    });
+    expect(later.textContent).toContain(
+      'Countries are counted from 2 Oct 2026: the visits before that day are missing here.',
+    );
+    expect(later.querySelector('.map-land path[data-code="AU"]')?.getAttribute('fill')).toBe(
+      '#831843',
+    );
+    expect(legendOf(later)).toEqual(['No visits', '1 visit']);
+    const quiet = render({ ...SUMMARY, countries: {}, countriesSince: '2026-09-01' });
+    expect(tableOf(quiet, 'Visits by country')).toEqual([['Nothing counted in this period.']]);
+    expect(quiet.querySelector('.map-land path:not([fill="#e5e7eb"])')).toBeNull();
+    expect(legendOf(quiet)).toEqual(['No visits']);
+    const before = render();
+    expect(before.querySelector('.map')).toBeNull();
+    expect(before.textContent).toContain('No visit’s country has been counted yet.');
+  });
+
   it('never reads a label as markup', () => {
     const root = render({
       ...SUMMARY,
       days: { '2026-10-01': { 'hub_view|a|<img src=x onerror=alert(1)>|||direct|m': 1 } },
+      countries: { hub_view: { '<img src=x onerror=alert(1)>': 1 } },
+      countriesSince: '2026-10-01',
     });
     expect(root.querySelector('img[src="x"]')).toBeNull();
     expect(tableOf(root, 'By language')[0]?.[0]).toBe('<img src=x onerror=alert(1)>');
+    expect(tableOf(root, 'Visits by country')[0]?.[0]).toBe('<img src=x onerror=alert(1)>');
   });
 });

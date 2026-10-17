@@ -61,6 +61,10 @@ describe('privacy.html', () => {
     expect(html.match(/href="mailto:privacy@oursharedcode\.com"/g)).toHaveLength(LANGUAGES.length);
   });
 
+  it('says in every section that a visit’s country is looked up (Step 79)', () => {
+    expect(html.match(/DB-IP/g)).toHaveLength(LANGUAGES.length);
+  });
+
   it('loads nothing: no scripts, stylesheets, images, fonts or frames', () => {
     // The page states that the game makes no third-party requests; it must not
     // make any of its own, to anyone.

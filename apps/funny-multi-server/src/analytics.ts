@@ -15,6 +15,14 @@
 // into the file and the key space is closed (72 combinations per language a
 // day at most).
 //
+// Step 79 (B-20): a visit — hub_view or fm_view, not a click or a gift — also
+// adds one to its country's daily total, which /stats/ draws as a world map.
+// That total is a tally of its own, never joined to the labels above: tied to
+// a language, a referrer or a gift, a country could single out the one person
+// who came from it. geo.ts finds the country from the visit's address, which
+// goes no further; a visit it cannot place counts as `ZZ`. Two events by some
+// 250 codes keep this key space closed too.
+//
 // Persistence is one JSON file (STATS_FILE; docker-compose.yml mounts a volume
 // for it), written whole and atomically when something changed, at most every
 // FLUSH_MS and once more on close. Without STATS_FILE (dev, tests) the counts
@@ -57,6 +65,11 @@ const SPEC: Record<StatEvent, Partial<Record<Field, readonly string[]>>> = {
   fm_support: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   fm_gift: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: GIFT_TARGETS },
 };
+
+/** Step 79: the events whose country is counted — the visits. */
+export const GEO_EVENTS: readonly StatEvent[] = ['hub_view', 'fm_view'];
+/** DB-IP's code for space no country holds; here, any visit not placed. */
+const NOT_KNOWN = 'ZZ';
 
 function isStatEvent(value: unknown): value is StatEvent {
   return typeof value === 'string' && (STAT_EVENTS as readonly string[]).includes(value);
@@ -115,11 +128,22 @@ export interface StatsSummary {
   fields: readonly string[];
   /** day → key → count; days with no events are absent. */
   days: Record<string, Record<string, number>>;
+  /**
+   * Step 79: event → country → visits over the days covered, for the
+   * GEO_EVENTS only; `ZZ` is a visit whose country is not known.
+   */
+  countries: Record<string, Record<string, number>>;
+  /** The first day a country was counted on, of the days kept; null for none. */
+  countriesSince: string | null;
 }
 
 export interface StatsStore {
-  /** Counts one event. False when the event is not one this module accepts. */
-  record(input: unknown): boolean;
+  /**
+   * Counts one event. False when the event is not one this module accepts.
+   * A visit's `country` (two capital letters; null when it is not known) goes
+   * to the country tally as well; left out, as with no lookup, it does not.
+   */
+  record(input: unknown, country?: string | null): boolean;
   /** The counts of the last `days` UTC days, today included. */
   summary(days: number): StatsSummary;
   /** Writes the file now if anything changed since the last write. */
@@ -150,32 +174,48 @@ function utcDay(at: Date): string {
   return at.toISOString().slice(0, 10);
 }
 
+/** day → key → count. */
+type Tally = Record<string, Record<string, number>>;
+
 interface StatsFile {
   version: 1;
-  days: Record<string, Record<string, number>>;
+  days: Tally;
+  /** Step 79: day → `event|CC` → count. A file from before has none. */
+  countries: Tally;
 }
 
-function readDays(file: string, onError: (err: unknown) => void): StatsFile['days'] {
+/** A tally from the file: its well-formed days, keys and counts only. */
+function readTally(raw: unknown, keyPattern = /^/): Tally {
+  const tally: Tally = {};
+  if (typeof raw !== 'object' || !raw) return tally;
+  for (const [day, counts] of Object.entries(raw)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || typeof counts !== 'object' || !counts) continue;
+    const kept: Record<string, number> = {};
+    for (const [key, n] of Object.entries(counts)) {
+      if (keyPattern.test(key) && typeof n === 'number' && Number.isSafeInteger(n) && n > 0) {
+        kept[key] = n;
+      }
+    }
+    tally[day] = kept;
+  }
+  return tally;
+}
+
+function readFile(file: string, onError: (err: unknown) => void): Omit<StatsFile, 'version'> {
   let text: string;
   try {
     text = readFileSync(file, 'utf8');
   } catch (err) {
     // No file yet is the normal first start; anything else is worth a line.
     if ((err as NodeJS.ErrnoException).code !== 'ENOENT') onError(err);
-    return {};
+    return { days: {}, countries: {} };
   }
   try {
     const parsed = JSON.parse(text) as Partial<StatsFile>;
-    const days: StatsFile['days'] = {};
-    for (const [day, counts] of Object.entries(parsed.days ?? {})) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || typeof counts !== 'object' || !counts) continue;
-      const kept: Record<string, number> = {};
-      for (const [key, n] of Object.entries(counts)) {
-        if (Number.isSafeInteger(n) && n > 0) kept[key] = n;
-      }
-      days[day] = kept;
-    }
-    return days;
+    return {
+      days: readTally(parsed.days),
+      countries: readTally(parsed.countries, /^[a-z_]+\|[A-Z]{2}$/),
+    };
   } catch (err) {
     // Keep the unreadable file for a look rather than overwrite it at the
     // first flush.
@@ -185,7 +225,7 @@ function readDays(file: string, onError: (err: unknown) => void): StatsFile['day
     } catch {
       // Nothing more to do: counting starts over either way.
     }
-    return {};
+    return { days: {}, countries: {} };
   }
 }
 
@@ -197,18 +237,22 @@ export function createStatsStore(options: StatsStoreOptions): StatsStore {
     now = () => new Date(),
     onError = () => {},
   } = options;
-  const days: StatsFile['days'] = file ? readDays(file, onError) : {};
+  const { days, countries }: Omit<StatsFile, 'version'> = file
+    ? readFile(file, onError)
+    : { days: {}, countries: {} };
   let dirty = false;
 
   function prune(): void {
     const oldest = utcDay(new Date(now().getTime() - (retentionDays - 1) * DAY_MS));
-    for (const day of Object.keys(days)) {
-      if (day < oldest) delete days[day];
+    for (const tally of [days, countries]) {
+      for (const day of Object.keys(tally)) {
+        if (day < oldest) delete tally[day];
+      }
     }
   }
   prune();
 
-  function record(input: unknown): boolean {
+  function record(input: unknown, country?: string | null): boolean {
     const key = statKey(input);
     if (!key) return false;
     const day = utcDay(now());
@@ -219,6 +263,16 @@ export function createStatsStore(options: StatsStoreOptions): StatsStore {
       prune();
     }
     counts[key] = (counts[key] ?? 0) + 1;
+    const event = (input as { e: StatEvent }).e;
+    if (country !== undefined && GEO_EVENTS.includes(event)) {
+      const place = `${event}|${country && /^[A-Z]{2}$/.test(country) ? country : NOT_KNOWN}`;
+      let places = countries[day];
+      if (!places) {
+        places = {};
+        countries[day] = places;
+      }
+      places[place] = (places[place] ?? 0) + 1;
+    }
     dirty = true;
     return true;
   }
@@ -231,7 +285,30 @@ export function createStatsStore(options: StatsStoreOptions): StatsStore {
     for (const [day, counts] of Object.entries(days)) {
       if (day >= from && day <= to) slice[day] = { ...counts };
     }
-    return { from, to, fields: STAT_FIELDS, days: slice };
+    // The map shows the whole span, so the countries come summed over it.
+    const places: StatsSummary['countries'] = {};
+    let since: string | null = null;
+    for (const [day, counts] of Object.entries(countries)) {
+      if (since === null || day < since) since = day;
+      if (day < from || day > to) continue;
+      for (const [place, n] of Object.entries(counts)) {
+        const [event, code] = place.split('|');
+        let byCode = places[event];
+        if (!byCode) {
+          byCode = {};
+          places[event] = byCode;
+        }
+        byCode[code] = (byCode[code] ?? 0) + n;
+      }
+    }
+    return {
+      from,
+      to,
+      fields: STAT_FIELDS,
+      days: slice,
+      countries: places,
+      countriesSince: since,
+    };
   }
 
   function flush(): void {
@@ -243,7 +320,7 @@ export function createStatsStore(options: StatsStoreOptions): StatsStore {
     const tmp = `${file}.tmp`;
     try {
       mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(tmp, JSON.stringify({ version: 1, days } satisfies StatsFile));
+      writeFileSync(tmp, JSON.stringify({ version: 1, days, countries } satisfies StatsFile));
       renameSync(tmp, file);
     } catch (err) {
       dirty = true;

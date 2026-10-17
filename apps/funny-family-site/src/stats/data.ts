@@ -13,6 +13,13 @@ export interface Summary {
   fields: readonly string[];
   /** day → key → count; days with no events are absent. */
   days: Record<string, Record<string, number>>;
+  /**
+   * Step 79: event → country code → visits, summed over the days covered;
+   * `ZZ` is a visit whose country is not known. A server from before has none.
+   */
+  countries?: Record<string, Record<string, number>>;
+  /** The first day a country was counted on, of the days the server keeps; null for none. */
+  countriesSince?: string | null;
 }
 
 /** One stored count: a day, an event, its labels ('' where it has none). */
@@ -103,6 +110,43 @@ export function daily(rows: readonly Row[], match: Match, days: readonly string[
     if (matches(row, match)) sums.set(row.day, (sums.get(row.day) ?? 0) + row.n);
   }
   return days.map((day) => sums.get(day) ?? 0);
+}
+
+/** DB-IP's code for an address no country holds; here, a visit not placed. */
+export const NOT_KNOWN = 'ZZ';
+
+/** One country's visits over the period. */
+export interface CountryRow {
+  code: string;
+  /** To the landing page. */
+  hub: number;
+  /** To Funny Multi. */
+  fm: number;
+  /** Both together. */
+  all: number;
+}
+
+/** Step 79: the visits of each country, most first and `ZZ` last. */
+export function countryRows(summary: Summary): CountryRow[] {
+  const rows = new Map<string, CountryRow>();
+  for (const [event, site] of [
+    ['hub_view', 'hub'],
+    ['fm_view', 'fm'],
+  ] as const) {
+    const counts: unknown = summary.countries?.[event];
+    if (typeof counts !== 'object' || counts === null) continue;
+    for (const [code, n] of Object.entries(counts as Record<string, unknown>)) {
+      if (typeof n !== 'number' || !Number.isFinite(n) || n <= 0) continue;
+      const row = rows.get(code) ?? { code, hub: 0, fm: 0, all: 0 };
+      row[site] += n;
+      row.all += n;
+      rows.set(code, row);
+    }
+  }
+  const last = (row: CountryRow): number => Number(row.code === NOT_KNOWN);
+  return [...rows.values()].sort(
+    (a, b) => last(a) - last(b) || b.all - a.all || a.code.localeCompare(b.code),
+  );
 }
 
 /** `part` of `whole`, or null when there is no whole to take a part of. */

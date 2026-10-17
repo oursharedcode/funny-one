@@ -278,3 +278,54 @@
   margin-block-start: 10px;
   font-size: 0.9375rem;
 }
+
+/* Step 79: the world map of visits by country, and its table. The shades are
+   fill attributes, set by stats/view.ts; the strokes stay a pixel wide at any
+   size. */
+.map svg {
+  display: block;
+}
+
+.map-sea {
+  fill: var(--sky-soft);
+  stroke: #bae6fd;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-land path {
+  fill-rule: evenodd;
+  stroke: var(--paper);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-land .map-dot {
+  stroke: var(--paper);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-key,
+.map-scale {
+  display: inline-block;
+  inline-size: 18px;
+  block-size: 12px;
+  border: 1px solid rgb(31 41 55 / 25%);
+  border-radius: 3px;
+}
+
+.map-scale {
+  inline-size: 96px;
+}
+
+.countries .table-wrap {
+  max-height: 420px;
+  margin-block-start: 14px;
+  overflow-y: auto;
+}
+
+.countries thead th {
+  position: sticky;
+  inset-block-start: 0;
+}

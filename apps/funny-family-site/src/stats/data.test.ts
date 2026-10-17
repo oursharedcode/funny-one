@@ -2,7 +2,17 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { daily, daysBetween, funnel, isSummary, rate, rowsOf, total, totalsBy } from './data.ts';
+import {
+  countryRows,
+  daily,
+  daysBetween,
+  funnel,
+  isSummary,
+  rate,
+  rowsOf,
+  total,
+  totalsBy,
+} from './data.ts';
 import type { Summary } from './data.ts';
 
 // Keys as the server writes them: e|v|l|s|t|r|d.
@@ -128,5 +138,31 @@ describe('sums', () => {
       { label: 'd', count: 0, ofPrevious: null, ofFirst: 0 },
     ]);
     expect(funnel([{ label: 'a', count: 0 }])[0]?.ofFirst).toBeNull();
+  });
+});
+
+describe('countryRows', () => {
+  it('adds up both sites’ visits by country, most first and the not-known last', () => {
+    expect(
+      countryRows({
+        ...SUMMARY,
+        countries: {
+          hub_view: { AU: 3, ZZ: 9, NZ: 1, JP: 0 },
+          fm_view: { AU: 2, RU: 1, NZ: Number.NaN },
+          fm_gift: { AU: 5 },
+        },
+      }),
+    ).toEqual([
+      { code: 'AU', hub: 3, fm: 2, all: 5 },
+      { code: 'NZ', hub: 1, fm: 0, all: 1 },
+      { code: 'RU', hub: 0, fm: 1, all: 1 },
+      { code: 'ZZ', hub: 9, fm: 0, all: 9 },
+    ]);
+  });
+
+  it('has none from a server before them, or from an answer it cannot read', () => {
+    expect(countryRows(SUMMARY)).toEqual([]);
+    const odd = { hub_view: null, fm_view: 'AU' } as unknown as Summary['countries'];
+    expect(countryRows({ ...SUMMARY, countries: odd })).toEqual([]);
   });
 });

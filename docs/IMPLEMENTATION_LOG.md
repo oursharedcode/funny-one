@@ -4127,6 +4127,115 @@ codes, drawn from the served HTML to a bitmap, read back with jsQR to their butt
 code, and its script carries the new funnel note. Owed: the owner's phone scan (item 6 of the
 RESUME note).
 
+## Step 79 (task B-20) — visits by country on `/stats/`, on a world map of our own (2026-10-18)
+
+**Owner request 2026-10-17:** "For the"stats" page, add a map of geographic location of
+visitors . See the implemented in the project `C:\Mark\Dev\promengi`". In that day's interview
+the owner chose "own lookup + own map": the server finds each visit's country itself and
+`/stats/` draws its own map — no lookup service is asked about a visitor and no map is loaded
+from elsewhere. Started on the owner's "start Step 79 now" (2026-10-18).
+
+**Shipped:**
+
+- *A visit's country, found on our own server* (`apps/funny-multi-server/src/geo.ts`, new): the
+  server keeps DB-IP's free "IP to Country Lite" file (CC BY 4.0) in `GEO_DIR` — `/data/geo` in
+  the stats volume, set by `docker-compose.yml` — and searches it in memory: each address
+  family's range starts in a `Uint32Array` beside a `Uint16Array` of countries, 8.5 MB for
+  October 2026's 710,834 rows, a binary search per lookup. On start it reads the newest file
+  there; once a day it checks whether the month has turned and, if so, downloads the new file
+  (about 4.5 MB), checks that it parses — sorted, non-overlapping, at least 100,000 rows — swaps
+  it in and deletes the old one. With no table it tries every hour, taking the month before
+  while the new one is not out; a failed download keeps the table it has. No address is sent
+  anywhere or kept. With `GEO_DIR` unset nothing is downloaded and no country is counted.
+- *A tally of its own* (`analytics.ts`): a visit — `hub_view` or `fm_view`, not a click or a
+  gift — also adds one to `event|CC` for its UTC day, in the same file as the labelled counts
+  and dropped after the same 400 days, but never joined to a label. A visit the table does not
+  place (a private address, or one before the table is in) counts as `ZZ`. The summary,
+  `GET /api/stats/summary`, adds `countries` (event → country → visits over the period) and
+  `countriesSince` (the first kept day with a country); a stats file from before reads as having
+  no countries.
+- *"Visits by country" on `/stats/`,* after "Day by day": a world map of our own, inline SVG —
+  Equal Earth (areas true), Natural Earth's 1:110m countries (public domain) cut down to about a
+  pixel at 1,000 units wide, Antarctica left out — each country shaded by its visits on a log
+  scale from pale pink (one visit) to deep plum (the busiest), grey for none, its name and
+  numbers in a hover title. A country with visits but too small to see (Luxembourg, Malta,
+  Singapore…) also gets a dot, at its 1:50m label point. Every place is keyed by the code DB-IP
+  gives it (ISO 3166-1, and XK for Kosovo), so French Guiana and Svalbard are cut out of France
+  and Norway, and Northern Cyprus and Somaliland drawn with Cyprus and Somalia. Then a key; a
+  table — country, both sites, landing page, Funny Multi, share — busiest first and "Not known"
+  last; a note when countries were first counted after the period's start; and the credits:
+  "IP Geolocation by DB-IP", linked as its licence asks, and Natural Earth. "How the counting
+  works" says how a country is found and kept.
+- *The map ships as code:* `src/stats/worldMap.ts` (30.7 kB, 11.3 kB gzipped: 176 shapes and 96
+  dot points), written by `scripts/world-map.mjs` from Natural Earth's two GeoJSON files, which
+  stay out of the repository, so the build downloads nothing. `/stats/`'s script is now 44.9 kB,
+  18.4 kB gzipped.
+- *The privacy policy* (Funny Multi's, which the landing page links): a third bullet under
+  "Visit counts" in all 20 languages — the server looks up the country of the IP address in its
+  own copy of DB-IP's free database, asks no outside service, keeps the country counts apart
+  from the other details and does not store the address; "updated" is 2026-10-18. A test checks
+  that every section names DB-IP.
+- DD-15 in `steering/design.md` says the same; `.env.example` documents `GEO_DIR`.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *The server downloads the file itself, once a month, into the volume* — not a copy committed
+   to the repository (4.5 MB more each month, stale by the next) and not a lookup service asked
+   per visit (the address would leave the server). The VM fetches about 4.5 MB a month from
+   `download.db-ip.com`.
+2. *Countries are a tally of their own,* not a seventh label: joined to a language, a referrer
+   or a gift, a country could single out the one visitor who came from it, and the labels' key
+   space would grow some 250-fold.
+3. *Only visits are placed* (`hub_view`, `fm_view`): clicks and gifts by country would be the
+   joining that 2 avoids.
+4. *A visit not placed still counts,* as "Not known" (`ZZ`), so the table adds up to the visits
+   counted; it is listed last and not drawn.
+5. *`countriesSince` comes from the days kept,* not a stored date: the first day with a country.
+   Until 400 days have passed, `/stats/` notes that earlier visits are missing whenever a period
+   starts before it.
+6. *The lookup is made in `main()`, and its table loads while the server already listens:* a
+   test never downloads anything, and a visit in the seconds before the table is in counts as
+   not known.
+7. *No flags in the country table:* the landing page has flags for its 20 languages only; some
+   250 more images for one table were not worth it.
+8. *Dots only for countries with visits:* 96 grey dots would speckle the map.
+9. *A log scale:* with one country far ahead, a linear one would leave all the others the
+   palest shade.
+10. *The map is generated once and committed,* with the script that makes it: Natural Earth
+    changes rarely, and the build stays offline.
+11. *Funny One's policy is unchanged:* it counts nothing ("no analytics"), and the landing page
+    has no policy of its own — it links Funny Multi's, which covers both — so B-20's "both
+    privacy policies" comes down to that one.
+
+**Verified locally** (the server on 3000 with `GEO_DIR` in the scratch folder and the Worker
+settings blank; the landing page's Vite on 5187):
+
+- *The real download:* the server fetched DB-IP's October 2026 file and logged `country table`
+  with 710,834 rows 4.8 s after it began listening, 3.3 s of it the read; restarted, it read the
+  kept file from disk in 4.0 s and downloaded nothing.
+- *Seeded visits* (`scripts/seed-countries.mjs` in the scratch folder): beacons posted with
+  `x-forwarded-for` addresses from 17 countries, each picked from DB-IP's own file, one Japanese
+  over IPv6, and two private addresses — `/api/stats/summary` counted each under its country,
+  the private ones under `ZZ`.
+- *In Chromium* (`.screens/stats-map-check.mjs`, ignored) at 1280×900 and 390×844: 176 shapes,
+  the 15 seeded countries big enough to draw shaded, dots for Luxembourg, Malta and Singapore,
+  each country's title and the table right, nothing scrolling sideways. Screenshots viewed; on
+  the phone the key wrapped mid-phrase, so "Shaded on a log scale" became an entry of its own
+  and the scale narrowed to 96 px.
+
+**Not run:** WebKit — its executables are still missing (owner item 4 of the RESUME note); the
+table's load on the 1 GB VM — read from its log after the deploy.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1510 tests (377 + 359 + 308 + 174 + 239 + 53), 40 more than
+  Step 78's: 36 in Funny Multi's server (`geo.test.ts`, the country tally, the policy's bullet
+  in every language) and 4 on the landing page; all passed.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4151,8 +4260,23 @@ RESUME note).
 
 ~~RESUME HERE (2026-10-17, after Step 78)~~ — carried into this note.
 
-**RESUME HERE (2026-10-17, after Step 78, pushed and deployed).** **Step 78 (B-19) is pushed, CI
-passed (run `39025578460`, on `ubuntu-24.04`), and the landing page runs it:** each game's
+~~RESUME HERE (2026-10-17, after Step 78, pushed and deployed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 79).** **Step 79 (B-20) is committed, not pushed:**
+`/stats/` gains "Visits by country" — a world map of our own, shaded by visits, and a table —
+fed by a country tally that Funny Multi's server keeps apart from its other counts. The server
+finds a visit's country in its own copy of DB-IP's free database, which it downloads once a
+month into the stats volume (`GEO_DIR=/data/geo`, set by `docker-compose.yml`), and keeps no
+address; the privacy policy says so in all 20 languages. It changes Funny Multi's server and the
+landing page, so its release is the push, CI, then `deploy/ship.sh` and
+`deploy/ship-funny-family.sh` — on the owner's word. After the deploy, check: the server's log
+has a `country table` line with about 710,000 rows (its `ms` is the read on the 1 GB VM; a
+`country table` error means the download failed — visits then count as "Not known" and it
+retries hourly); `curl` of `/api/stats/summary` carries `countries` and `countriesSince` once a
+visit has come; the policy's "updated" reads 2026-10-18.
+
+**Step 78 (B-19) is pushed, CI passed (run `39025578460`, on `ubuntu-24.04`), and the landing
+page runs it:** each game's
 address stands as a QR code beside its buttons — the hero's two and each card's "Play now" — on
 a wide screen with a mouse, so a visitor at a computer can open a game on a phone; drawn at
 build time, no script, Funny Multi's once per design. Only the landing page was deployed; Funny
@@ -4166,12 +4290,13 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): Step 79
-(B-20), the visitor map on `/stats/`; Step 80 (B-21), Arabic, Swahili and Yoruba, 23 languages —
-measure the header again for them (Step 76's one-row widths and fitted names) and re-run
-`.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every code read back);
-Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository,
-whose push deploys — so it waits for the owner's go-ahead.
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): Step
+79's release once the owner says so, and the checks above; Step 80 (B-21), Arabic, Swahili and
+Yoruba, 23 languages — measure the header again for them (Step 76's one-row widths and fitted
+names), re-run `.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every
+code read back), and give their privacy sections Step 79's bullet too (a test counts one DB-IP
+per language); Step 81 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own
+repository, whose push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4215,7 +4340,7 @@ Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landi
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language.
 
-The agent's own queue is Steps 79–81 above.
+The agent's own queue is Step 79's release and Steps 80–81 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4224,7 +4349,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven and Step 78's six were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six and Step 79's eleven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e
@@ -4255,7 +4380,8 @@ VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-
 `.env.bak-step75` (taken before Step 75's two lines). The visit counts live in the volume
 `funny_stats_data` (`/data/stats.json` in the game's container,
 written every 15 s when something changed and on shutdown), so a deploy keeps them; removing
-the volume loses them. The production Worker secret is on this PC at
+the volume loses them. Step 79 keeps DB-IP's country file in the same volume (`/data/geo`, about
+4.5 MB, replaced each month by the server); losing it costs one download. The production Worker secret is on this PC at
 `~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
 added by the owner by hand (Step 57) — the stored token cannot manage it. The Android signing
 key (Step 59, used for both apps) is `~/.android-keys/funny37-upload.jks`, alias `funny37`; a
@@ -4308,7 +4434,7 @@ Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` na
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
 Funny One's six new strings and its privacy policy outside English, Funny Multi's two B-15
 strings outside en/ru, the landing page's text and Step 76's privacy
-sentence outside en/ru, and everything in B-16's five languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
+sentence and Step 79's privacy bullet outside en/ru, and everything in B-16's five languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
 a still's file name is "funny-stories-<name>" when the title has no Latin letters (both seen in
 Step 73); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real

@@ -47,6 +47,7 @@ import {
 import { maybeSyncImageCounter, syncImageCounterFromWorker } from './image.js';
 import { buildStats, broadcastStats } from './stats.js';
 import { createStatsStore, isBotAgent, summaryDays } from './analytics.js';
+import { createGeo, type Geo } from './geo.js';
 
 // ---------------------------------------------------------------------------
 // T-2.1 — bootstrap only (design §3). This is SRC/server/src/index.ts reduced
@@ -99,6 +100,11 @@ const CLIENT_DIST = fileURLToPath(new URL('../../funny-multi-client/dist/', impo
 // keeps them in memory only; docker-compose.yml points it into a volume.
 const STATS_FILE = process.env.STATS_FILE || null;
 
+// Step 79 (B-20): the directory geo.ts keeps DB-IP's monthly country file in.
+// Unset, no visit's country is counted; docker-compose.yml points it into the
+// stats volume.
+const GEO_DIR = process.env.GEO_DIR || null;
+
 // Visit and funnel events per IP per minute. A hub visit sends one or two and
 // a game one a handful, so this only stops a script, while a family or a
 // school behind one address stays far below it.
@@ -136,6 +142,12 @@ export interface BuildServerOptions {
   basePath?: string;
   /** Overrides the STATS_FILE env var; null keeps the counts in memory. */
   statsFile?: string | null;
+  /**
+   * Step 79: the country of a visit's address, for the country tally
+   * (analytics.ts); left out, no country is counted. main() passes geo.ts's
+   * lookup, tests a stand-in.
+   */
+  countryOf?: (ip: string) => string | null;
 }
 
 export async function buildServer({
@@ -143,6 +155,7 @@ export async function buildServer({
   disconnectGraceMs = DISCONNECT_GRACE_MS,
   basePath = BASE_PATH,
   statsFile = STATS_FILE,
+  countryOf,
 }: BuildServerOptions = {}): Promise<BuiltServer> {
   const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
@@ -207,7 +220,9 @@ export async function buildServer({
         return reply.code(400).send();
       }
     }
-    return reply.code(visits.record(event) ? 204 : 400).send();
+    // Step 79: the address is looked up and dropped; only a visit's country
+    // is counted.
+    return reply.code(visits.record(event, countryOf?.(ip)) ? 204 : 400).send();
   });
 
   fastify.get<{ Querystring: { days?: string } }>(
@@ -548,7 +563,18 @@ export async function buildServer({
 }
 
 async function main(): Promise<void> {
-  const { fastify, io } = await buildServer();
+  // Step 79: the country lookup downloads its table, so, like the counter
+  // sync below, it is made here and never in a test. It is in place before
+  // the listen, so no visit comes before it.
+  let geo: Geo | null = null;
+  const { fastify, io } = await buildServer({
+    countryOf: GEO_DIR ? (ip) => geo?.country(ip) ?? null : undefined,
+  });
+  geo = createGeo({
+    dir: GEO_DIR,
+    onError: (err) => fastify.log.error(err, 'country table'),
+    onLoad: (load) => fastify.log.info(load, 'country table'),
+  });
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
   fastify.log.info(`mounted under ${BASE_PATH}`);
 

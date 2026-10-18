@@ -4556,6 +4556,62 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 83 — The gift pages moved to markwebtools (2026-10-18)
+
+**Owner request 2026-10-18:** "there are changed gift URLs: buymeacoffee.com/markwebtools
+https://ko-fi.com/markwebtools Please check and if neede - update".
+
+**Checked:**
+
+- *The new pages answer:* `https://buymeacoffee.com/markwebtools` 200, and
+  `https://ko-fi.com/markwebtools` 200 with the title "Support Mark Web Tools" — to curl's own
+  user agent Ko-fi sometimes answers 403, Cloudflare's bot challenge (`Cf-Mitigated:
+  challenge`), not a broken link.
+- *The old ones are gone:* `ko-fi.com/freeenglishbooks` forwards (302) to Ko-fi's home page and
+  `buymeacoffee.com/freeenglishbooks` answers 404 — so Funny Multi's Support screen and the
+  landing page's gift sheet, live since Steps 75 and 76, were sending givers nowhere.
+- *Where the two addresses live:* only in production's `.env` (`DEPLOYER_KOFI_URL`,
+  `DEPLOYER_BMC_URL`), which Funny Multi's server reads at boot and serves at `GET /config`; the
+  landing page reads that on each visit through `/api/config`. The code and its tests carry
+  only placeholders, `DEPLOYMENT.md` `<you>`; of the docs, `docs/ACCEPTANCE.md`'s D6 named the
+  old pages (Step 75's entry does too, and stays as history).
+- *The other sites:* the books page (`oursharedcode.github.io`, its D9) and `ielts_books` had
+  already been moved to the new pages by the sessions working on them; `www.oursharedcode.com`
+  links only the new ones.
+
+**Changed:**
+
+- *Production,* on the owner's "if needed — update": in the VM's `~/funny/.env`, the two lines
+  now name `markwebtools` — backup `~/funny/.env.bak-step83` first; no other line changed (21
+  lines before and after, mode 600 kept). The game's container was recreated on the image it
+  ran (`funny-multi:bcc18b8`, `sha256:a7f43a8f…`, unchanged), so the server read them; Caddy
+  stayed up. `/health` 200; both `https://www.funny37.oursharedcode.com/config` and
+  `https://www.funny-family.oursharedcode.com/api/config` serve the new pages. A game in
+  progress at that moment would have been lost (rooms live in memory); the visit counts are
+  written on shutdown and kept.
+- *`docs/ACCEPTANCE.md`:* D6 names the new pages.
+- *`steering/tasks.md`:* B-17 records the move; B-22 is now planned as Step 84.
+
+**Decided on the way** (the agent's; either can be reversed):
+
+1. *Configuration only:* the rails are the deployer's variables by design (Step 75), so the
+   change is the two `.env` lines and a container recreated on its own image — no build, no
+   code, no deploy of the landing page.
+2. *Done at once:* the owner's "if needed — update" was taken as the go-ahead for production's
+   two lines, as Step 75's were, since the live buttons led to dead pages.
+
+**Not seen:** a tap on either button in the live Support screen or gift sheet (curl only; no
+headless browser against production) — D6 of `docs/ACCEPTANCE.md` covers it.
+
+Gates (one run with Step 82's, on a tree holding both steps' changes; Step 83 changes no code,
+and none of the gates reads `docs/` or `steering/`):
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1593 tests, all passed.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4590,19 +4646,24 @@ Gates:
 
 ~~RESUME HERE (2026-10-18, after Step 81)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 82).** **Steps 81 (B-21) and 82 (B-19a) are committed,
-not pushed.** Step 81 brings Arabic, Swahili and Yoruba to both games, the landing page and both
-privacy policies — 23 languages: Arabic is Modern Standard Arabic under Morocco's flag, right to
-left; Yoruba's headings take the system font and its stories Cambria or the platform's serif,
-since Fredoka and Georgia lack its letters; both games now set `<html lang>`; all three are
-machine drafts awaiting native reviewers (B-3). Step 82 shows the landing page's four QR codes
-on phones and tablets too, each on its button's row — to its right, to its left in Hebrew,
-Persian and Arabic — at 52 px on most phones (a button's height) and larger on screens with
-fewer pixels; a computer keeps Step 78's. Their push and deploy wait for the owner's word — the
-landing page and Funny Multi by their ship scripts; Funny One's deploy is the owner's (item 1
-below). **Step 80 (B-1e) is done — the Play Console organisation account MARK WEB TOOLS is fully
-verified (identity, website, phone) and can publish; the Equifax D-U-N-S rename is submitted,**
-due about 2026-11-17 — no action until then (Step 80's Owed).
+~~RESUME HERE (2026-10-18, after Step 82)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 83).** **Steps 81 (B-21), 82 (B-19a) and 83 are
+committed, not pushed.** Step 81 brings Arabic, Swahili and Yoruba to both games, the landing
+page and both privacy policies — 23 languages: Arabic is Modern Standard Arabic under Morocco's
+flag, right to left; Yoruba's headings take the system font and its stories Cambria or the
+platform's serif, since Fredoka and Georgia lack its letters; both games now set `<html lang>`;
+all three are machine drafts awaiting native reviewers (B-3). Step 82 shows the landing page's
+four QR codes on phones and tablets too, each on its button's row — to its right, to its left
+in Hebrew, Persian and Arabic — at 52 px on most phones (a button's height) and larger on
+screens with fewer pixels; a computer keeps Step 78's. Their push and deploy wait for the
+owner's word — the landing page and Funny Multi by their ship scripts; Funny One's deploy is the
+owner's (item 1 below). **Step 83 is live already:** the owner's gift pages moved to
+`ko-fi.com/markwebtools` and `buymeacoffee.com/markwebtools` (the old ones are dead), and
+production's two `.env` lines name them since 2026-10-18, the game's container recreated on its
+own image; its commit only records it. **Step 80 (B-1e) is done — the Play Console organisation
+account MARK WEB TOOLS is fully verified (identity, website, phone) and can publish; the Equifax
+D-U-N-S rename is submitted,** due about 2026-11-17 — no action until then (Step 80's Owed).
 
 **Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
@@ -4632,12 +4693,9 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order:** Step 83, the record of the owner's new gift pages
-(`ko-fi.com/markwebtools`, `buymeacoffee.com/markwebtools`, owner message 2026-10-18) —
-production's two `.env` lines already name them (switched 2026-10-18, backup
-`.env.bak-step83`), and `docs/ACCEPTANCE.md`'s D6 is edited but not committed. Then Step 84
-(B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose
-push deploys — so it waits for the owner's go-ahead.
+**Next for the agent:** Step 84 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in
+that site's own repository, whose push deploys — so it waits for the owner's go-ahead. Its
+Ko-fi and Buy Me a Coffee are the `markwebtools` pages (Step 83).
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4679,12 +4737,13 @@ folder was byte-identical to Microsoft's build, found 2026-10-15). Restoring bot
 quarantine with an exception for the folder is recommended; until then no WebKit check runs
 here, and Step 76 skipped its own; (5) acceptance check D6 of `docs/ACCEPTANCE.md`, now that
 Step 75 is live: on the phone, then the PC, the Support screen's two notes and its Ko-fi and Buy
-Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landing page's four
+Me a Coffee buttons, which open the `markwebtools` pages since Step 83; (6) now that Step 78
+is live, a phone's camera on the landing page's four
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language — and once Step 82 is deployed, the same from a phone's and a tablet's
 screen.
 
-The agent's own queue is Steps 83–84 above.
+The agent's own queue is Step 84 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4693,7 +4752,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven and Step 82's nine were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine and Step 83's two were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
@@ -4719,10 +4778,10 @@ block is in Funny One's client, Funny Multi still shows them.
 
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` holds the support rails (Ko-fi and
-Buy Me a Coffee since Step 75's deploy), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
+Buy Me a Coffee since Step 75's deploy, the owner's `markwebtools` pages since Step 83), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
 `FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Backups on the
 VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`,
-`.env.bak-step75` (taken before Step 75's two lines). The visit counts live in the volume
+`.env.bak-step75` (taken before Step 75's two lines), `.env.bak-step83` (before Step 83's). The visit counts live in the volume
 `funny_stats_data` (`/data/stats.json` in the game's container,
 written every 15 s when something changed and on shutdown), so a deploy keeps them; removing
 the volume loses them. Step 79 keeps DB-IP's country file in the same volume (`/data/geo`, about
@@ -4738,7 +4797,8 @@ Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 `deploy/ship-funny-family.sh`, two DNS records and two `.env` lines, the owner having asked for
 the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–74), and on
 2026-10-17 two `.env` lines and both ship scripts (Steps 75–77), and on 2026-10-18 both ship
-scripts again (Step 79) — so try once when the owner asks for a deploy, and if it is refused, hand
+scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
+(Step 83) — so try once when the owner asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
 Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run

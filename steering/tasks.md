@@ -281,7 +281,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   amended: the owner accepts the card-dispute risk of these two pages, and the game still has no
   card checkout. The funnel counts the buttons as gift rails `kofi` and `bmc`, and the privacy
   policy names both in all 20 languages. **Code done and deployed 2026-10-17 (Step 75)**, with
-  the two `.env` lines.
+  the two `.env` lines. The owner moved both pages to `ko-fi.com/markwebtools` and
+  `buymeacoffee.com/markwebtools` on 2026-10-18; the VM's two lines followed that day (Step 83).
   - *Owed:* the four new strings are machine drafts in 18 languages (with B-3); check D6 of
     `docs/ACCEPTANCE.md` (the owner's, on the phone and the PC).
   - *Kept on purpose:* white on Ko-fi's red is 3.0:1, just under AA even for large text; it is
@@ -350,7 +351,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   2026-10-17; owner choice "own sheet there"): top right, opening a sheet on that site with PayID,
   Sponsors, Lightning, Ko-fi and Buy Me a Coffee. It lives in that site's own repository
   (`oursharedcode.github.io`), where a push deploys, so it waits for the owner's go-ahead; the
-  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 83.*
+  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 84.*
 
 ## Dependency notes
 

@@ -104,13 +104,16 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-1d** — **closed 2026-10-05 (Step 59)**, block in `steering/tasks-done.md`. The Android TWA
   is built, signed, and installed on the owner's phone; every check passed, including B-8's.
 - **B-1e (owner)** Play developer account — organization, under the ABN (owner decision
-  2026-10-03). Stopped at the signup's "Payments profile" step: the D-U-N-S record's address is
-  incomplete, fix requested from Equifax 2026-10-03. **Owner decided 2026-10-04: stay with the
-  organization account** (not the personal one, so no 12-testers-for-14-days rule). An
-  organization account shows its legal address on every listing (Step 54). **Owner decided
-  2026-10-04: the listing address is the one already on the Equifax request.** Equifax had not
-  replied as of 2026-10-04; nothing more here until it does. Then payments profile, contacts,
-  fee; then the listing (assets, content rating 12+, Data Safety, release).
+  2026-10-03). **Owner decided 2026-10-04: stay with the organization account** (not the personal
+  one, so no 12-testers-for-14-days rule). An organization account shows its legal address on
+  every listing (Step 54). **Owner decided 2026-10-04: the listing address is the one already on
+  the Equifax request.** **Account done 2026-10-18 (Step 80):** the organisation account MARK WEB
+  TOOLS, created and paid 2026-10-17, has its identity, website and phone verified and can
+  publish.
+  - *Owed:* the Equifax D-U-N-S rename to MARK WEB TOOLS, submitted 2026-10-18, due about
+    2026-11-17; when it lands, the owner confirms the new name in Payments Center → Review updates,
+    before its deadline. Then the listing (assets, content rating 12+, Data Safety, release).
+  - Identifiers (ABN, D-U-N-S number, signup account) stay out of this repo (Step 54).
 - **B-2** ~~IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review~~ —
   **cancelled 2026-10-05 (owner decision): too costly** (the Apple Developer Program alone is
   US $99 every year). No native iPhone app, for either game (Funny One's iOS half of Phase S-3

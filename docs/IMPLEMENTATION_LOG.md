@@ -4424,7 +4424,7 @@ Gates:
   language matching, `<html lang>` and Yoruba's fonts; all passed.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39118378160`; the release is at the foot of Step 83's entry).
 
 ## Step 82 (task B-19a) — The games' QR codes on phones and tablets too, beside their buttons (2026-10-18)
 
@@ -4554,7 +4554,7 @@ Gates:
   Step 81's — the landing page's test of the rows; all passed.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39118378160`; the release is at the foot of Step 83's entry).
 
 ## Step 83 — The gift pages moved to markwebtools (2026-10-18)
 
@@ -4610,7 +4610,29 @@ and none of the gates reads `docs/` or `steering/`):
 - `npm test` outside the sandbox: 1593 tests, all passed.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39118378160`, below).
+
+**Pushed and deployed 2026-10-18** (owner: "Push and deploy"): Steps 81–83 went in one push
+(`96a6579..41d4a59`); CI passed in 3 min 35 s on `ubuntu-24.04` (run `39118378160`, image
+version 20261012.334.1). `deploy/ship.sh` swapped in Funny Multi as `funny-multi:41d4a59` — Step
+81's languages and privacy sections; its checks passed, exit 0 — then
+`deploy/ship-funny-family.sh` the landing page with Steps 81 and 82, its eight checks passed,
+exit 0; each Caddy reload gave the usual formatting warning. On the VM the game's container runs
+the commit's image (`sha256:9504c0e1…`) with no restarts; 3.6 s after it began listening it
+logged `country table` — October 2026's file, 710,834 rows, read in 3.3 s — and a few minutes
+later it used 52 MiB, with 452 MB available on the VM. Checked with curl afterwards, all passed:
+the landing page's `/`, `/ar/`, `/sw/`, `/yo/`, `/he/`, `/ta/`, `/stats/` and `/sitemap.xml` and
+its five assets are byte for byte the build that was shipped; `/ar/` is `lang="ar" dir="rtl"`,
+`/sw/` and `/yo/` are in their own languages, and the sitemap's 23 addresses include `/yo/`;
+`/`, `/ar/` and `/he/` each have the hero's two button rows and six codes, and the stylesheet
+carries the density tiers (`resolution<=2x`) and the button's `flex-shrink: 1000`; Funny Multi's
+`/health` is ok, its privacy policy has 23 sections, Yoruba's among them, and its script lists
+Kiswahili; `/config` and the landing page's `/api/config` name the `markwebtools` pages; every
+visit count from before the deploy is still there, and the country tally reads Australia, three
+landing-page visits. Funny One was not deployed: its production serves 15 languages until the
+owner runs `deploy/ship-funny-one.sh`. Owed: the owner's real-phone scan of the codes from a
+phone's and a tablet's screen (Step 82's Owed), and D6's taps on the two gift buttons (Step 83's
+Not seen).
 
 ---
 
@@ -4648,22 +4670,27 @@ and none of the gates reads `docs/` or `steering/`):
 
 ~~RESUME HERE (2026-10-18, after Step 82)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 83).** **Steps 81 (B-21), 82 (B-19a) and 83 are
-committed, not pushed.** Step 81 brings Arabic, Swahili and Yoruba to both games, the landing
-page and both privacy policies — 23 languages: Arabic is Modern Standard Arabic under Morocco's
-flag, right to left; Yoruba's headings take the system font and its stories Cambria or the
-platform's serif, since Fredoka and Georgia lack its letters; both games now set `<html lang>`;
-all three are machine drafts awaiting native reviewers (B-3). Step 82 shows the landing page's
-four QR codes on phones and tablets too, each on its button's row — to its right, to its left
-in Hebrew, Persian and Arabic — at 52 px on most phones (a button's height) and larger on
-screens with fewer pixels; a computer keeps Step 78's. Their push and deploy wait for the
-owner's word — the landing page and Funny Multi by their ship scripts; Funny One's deploy is the
-owner's (item 1 below). **Step 83 is live already:** the owner's gift pages moved to
-`ko-fi.com/markwebtools` and `buymeacoffee.com/markwebtools` (the old ones are dead), and
-production's two `.env` lines name them since 2026-10-18, the game's container recreated on its
-own image; its commit only records it. **Step 80 (B-1e) is done — the Play Console organisation
-account MARK WEB TOOLS is fully verified (identity, website, phone) and can publish; the Equifax
-D-U-N-S rename is submitted,** due about 2026-11-17 — no action until then (Step 80's Owed).
+~~RESUME HERE (2026-10-18, after Step 83)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 83, pushed and deployed).** **Steps 81 (B-21), 82 (B-19a)
+and 83 are pushed, CI passed (run `39118378160`, on `ubuntu-24.04`), and Funny Multi
+(`funny-multi:41d4a59`) and the landing page run Steps 81 and 82.** Step 81 brings Arabic,
+Swahili and Yoruba to both games, the landing page and both privacy policies — 23 languages:
+Arabic is Modern Standard Arabic under Morocco's flag, right to left; Yoruba's headings take the
+system font and its stories Cambria or the platform's serif, since Fredoka and Georgia lack its
+letters; both games now set `<html lang>`; all three are machine drafts awaiting native
+reviewers (B-3). Step 82 shows the landing page's four QR codes on phones and tablets too, each
+on its button's row — to its right, to its left in Hebrew, Persian and Arabic — at 52 px on most
+phones (a button's height) and larger on screens with fewer pixels; a computer keeps Step 78's.
+Funny One's production still serves 15 languages: its deploy is the owner's (item 1 below) and
+now carries Step 81's three with B-16's five. After the deploy the server's log again read
+DB-IP's 710,834 rows, and the visit counts were kept. **Step 83 was live before its commit:**
+the owner's gift pages moved to `ko-fi.com/markwebtools` and `buymeacoffee.com/markwebtools`
+(the old ones are dead), and production's two `.env` lines name them since 2026-10-18, the
+game's container recreated on its own image; its commit only records it. **Step 80 (B-1e) is
+done — the Play Console organisation account MARK WEB TOOLS is fully verified (identity,
+website, phone) and can publish; the Equifax D-U-N-S rename is submitted,** due about 2026-11-17
+— no action until then (Step 80's Owed).
 
 **Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
@@ -4702,15 +4729,15 @@ Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
-20 languages since Step 73 (23 once Step 81 is deployed), designs A and B split per tab, with its visit counts and the funnel
+20 languages since Step 73 and 23 since Step 81, designs A and B split per tab, with its visit counts and the funnel
 to Funny Multi's gift sheet on the public `/stats/` page, since Step 76 the ♥ and a gift sheet
 of its own in the header, since Step 78 each game's QR code beside its buttons on a computer's
-screen (on phones and tablets too once Step 82 is deployed), and since Step 79 a world map of its visitors' countries on `/stats/`;
+screen (on phones and tablets too since Step 82), and since Step 79 a world map of its visitors' countries on `/stats/`;
 `https://www.oursharedcode.com/` links to it from a "Games" card. Funny Multi runs
-`funny-multi:bcc18b8`: B-15's multi-language room (Step 70), Step 71's fixes, the visit counts
+`funny-multi:41d4a59`: B-15's multi-language room (Step 70), Step 71's fixes, the visit counts
 and "Support Author" beside the ♥ (Step 72), the 20 languages (Step 73), the fitted titles (Step
-74), the Support screen's notes, Ko-fi and Buy Me a Coffee (Step 75) and the country of each
-visit (Step 79). B-15 itself
+74), the Support screen's notes, Ko-fi and Buy Me a Coffee (Step 75), the country of each
+visit (Step 79) and Arabic, Swahili and Yoruba (Step 81). B-15 itself
 had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon but never logged
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
@@ -4740,7 +4767,7 @@ Step 75 is live: on the phone, then the PC, the Support screen's two notes and i
 Me a Coffee buttons, which open the `markwebtools` pages since Step 83; (6) now that Step 78
 is live, a phone's camera on the landing page's four
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
-in the page's language — and once Step 82 is deployed, the same from a phone's and a tablet's
+in the page's language — and, now that Step 82 is live, the same from a phone's and a tablet's
 screen.
 
 The agent's own queue is Step 84 above.
@@ -4798,7 +4825,8 @@ Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–74), and on
 2026-10-17 two `.env` lines and both ship scripts (Steps 75–77), and on 2026-10-18 both ship
 scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
-(Step 83) — so try once when the owner asks for a deploy, and if it is refused, hand
+(Step 83), and both ship scripts again (Steps 81–82) — so try once when the owner asks
+for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
 Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run

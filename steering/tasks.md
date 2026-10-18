@@ -316,13 +316,13 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   78's: "still like the QR codes on phones and tablets. make the QR as small as possible,
   location: just next to the button … Do not do two lines"): each code as small as a phone's
   camera still reads, on its button's row after it — to its left in Hebrew, Persian and Arabic —
-  and never under it; a computer keeps Step 78's. **Code done 2026-10-18 (Step 82):** 52 px on
-  most phones, a button's height; larger where the screen has fewer pixels to the CSS pixel — 56
-  at 2×, 72 below 2×, Step 78's 104 below 1.5× — so each square of the code keeps about 2.5 of
-  them. Where the row is short of room the button's words wrap first, then the code gives way,
-  never below 52 px; below 360 px the buttons have less room inside.
+  and never under it; a computer keeps Step 78's. **Code done and deployed 2026-10-18 (Step
+  82):** 52 px on most phones, a button's height; larger where the screen has fewer pixels to
+  the CSS pixel — 56 at 2×, 72 below 2×, Step 78's 104 below 1.5× — so each square of the code
+  keeps about 2.5 of them. Where the row is short of room the button's words wrap first, then
+  the code gives way, never below 52 px; below 360 px the buttons have less room inside.
   - *Owed:* the owner scans the codes with a real phone from a phone's and a tablet's screen, in
-    both designs, once deployed.
+    both designs (`?v=a`, `?v=b`).
 - **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the
@@ -342,9 +342,11 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   that day's research), in both games, the landing page and both privacy policies, 23 in all.
   Arabic is Modern Standard Arabic (owner choice), labelled «العربية (المغرب)» under Morocco's
   flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. **Code done
-  2026-10-18 (Step 81):** a browser set to any Arabic gets Arabic, and Tanzania's Swahili gets
-  Swahili; Yoruba's headings take the system font and its stories Cambria or the platform's serif,
-  since Fredoka and Georgia lack its letters; both games now set `<html lang>`.
+  2026-10-18 (Step 81) and deployed that day to Funny Multi and the landing page;** Funny One's
+  production gets them with the owner's deploy. A browser set to any Arabic gets Arabic, and
+  Tanzania's Swahili gets Swahili; Yoruba's headings take the system font and its stories
+  Cambria or the platform's serif, since Fredoka and Georgia lack its letters; both games now
+  set `<html lang>`.
   - *Owed:* a native reviewer for each of the three (with B-3); what Safari draws Yoruba in is
     unseen (no WebKit here).
 - **B-22** The ♥ and "Support Author" on `https://www.oursharedcode.com/` (owner request

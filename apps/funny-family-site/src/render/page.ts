@@ -40,7 +40,12 @@ import {
 import { qrPath } from '../qr.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
 
-/** The side of a game's QR code, in CSS pixels: 2.5 to 3.2 per module, margin included. */
+/**
+ * The side of a game's QR code on a computer, in CSS pixels: 2.5 to 3.2 per
+ * module, margin included. On a phone or a tablet the stylesheet sizes it by
+ * the screen's density instead — on most phones half that, the height of the
+ * button beside it, the least a full row can squeeze it to (Step 82).
+ */
 const QR_PX = 104;
 
 /** The files a page loads, as Vite built them (or the source modules in dev). */
@@ -127,9 +132,10 @@ ${landing}
 }
 
 /**
- * Step 78: a game's address as a QR code, so a visitor at a computer can open
- * the game on a phone. The stylesheet shows it only on a wide screen with a
- * mouse. Hidden from assistive technology: the link beside it says the same.
+ * Step 78: a game's address as a QR code, so a visitor can open the game on
+ * another phone — from a computer's screen, or (Step 82) from a phone or a
+ * tablet held out to a friend. Hidden from assistive technology: the link
+ * beside it says the same.
  */
 function playQr(url: string, only?: 'va-only' | 'vb-only'): string {
   const { size, d } = qrPath(url);
@@ -162,8 +168,8 @@ function hero(code: Language): string {
 <h1 id="hero-title">${esc(s.heroTitle)}</h1>
 <p class="lead">${esc(s.heroLead)}</p>
 <div class="cta">
-<div class="cta-item"><a class="btn btn-primary" href="${esc(fmUrl(code, 'a'))}" data-track="fm">${esc(names.fm)}</a><span class="cta-tag">${esc(s.fmTag)}</span>${fmQr(code)}</div>
-<div class="cta-item"><a class="btn btn-secondary" href="${FO_URL}" data-track="fo">${esc(names.fo)}</a><span class="cta-tag">${esc(s.foTag)}</span>${playQr(FO_URL)}</div>
+<div class="cta-item"><span class="cta-row"><a class="btn btn-primary" href="${esc(fmUrl(code, 'a'))}" data-track="fm">${esc(names.fm)}</a>${fmQr(code)}</span><span class="cta-tag">${esc(s.fmTag)}</span></div>
+<div class="cta-item"><span class="cta-row"><a class="btn btn-secondary" href="${FO_URL}" data-track="fo">${esc(names.fo)}</a>${playQr(FO_URL)}</span><span class="cta-tag">${esc(s.foTag)}</span></div>
 </div>
 </div>
 <figure class="trailer va-only">

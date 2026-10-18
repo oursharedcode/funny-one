@@ -315,7 +315,13 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   78's: "still like the QR codes on phones and tablets. make the QR as small as possible,
   location: just next to the button … Do not do two lines"): each code as small as a phone's
   camera still reads, on its button's row after it — to its left in Hebrew, Persian and Arabic —
-  and never under it; a computer keeps Step 78's. *Planned: Step 82.*
+  and never under it; a computer keeps Step 78's. **Code done 2026-10-18 (Step 82):** 52 px on
+  most phones, a button's height; larger where the screen has fewer pixels to the CSS pixel — 56
+  at 2×, 72 below 2×, Step 78's 104 below 1.5× — so each square of the code keeps about 2.5 of
+  them. Where the row is short of room the button's words wrap first, then the code gives way,
+  never below 52 px; below 360 px the buttons have less room inside.
+  - *Owed:* the owner scans the codes with a real phone from a phone's and a tablet's screen, in
+    both designs, once deployed.
 - **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the

@@ -178,6 +178,24 @@ describe("the games' QR codes (Step 78)", () => {
     },
   );
 
+  it("each code shares its button's row, the hero's line under both (Step 82)", () => {
+    const doc = parse(renderPage('he', ASSETS));
+    const children = (box: Element | null | undefined): (string | null)[] =>
+      [...(box?.children ?? [])].map((child) =>
+        child.tagName === 'A' ? 'button' : child.getAttribute('class'),
+      );
+    const fm = ['button', 'play-qr va-only', 'play-qr vb-only'];
+    const fo = ['button', 'play-qr'];
+    const [fmItem, foItem] = doc.querySelectorAll('.hero .cta-item');
+    expect(children(fmItem)).toEqual(['cta-row', 'cta-tag']);
+    expect(children(fmItem?.querySelector('.cta-row'))).toEqual(fm);
+    expect(children(foItem)).toEqual(['cta-row', 'cta-tag']);
+    expect(children(foItem?.querySelector('.cta-row'))).toEqual(fo);
+    const [fmCard, foCard] = doc.querySelectorAll('.game-play');
+    expect(children(fmCard)).toEqual(fm);
+    expect(children(foCard)).toEqual(fo);
+  });
+
   it('each has the quiet zone a scanner looks for, and is neither read out nor focused', () => {
     // In page order: the hero's three codes, then the cards' three.
     const urls = [fmUrl('he', 'a'), fmUrl('he', 'b'), FO_URL];

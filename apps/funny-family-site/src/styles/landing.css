@@ -541,10 +541,6 @@ html[data-variant='b'] .cta-tag {
 }
 
 .game-play {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px 24px;
   margin-block-start: auto;
 }
 
@@ -559,28 +555,106 @@ html[data-variant='b'] .cta-tag {
 }
 
 /* Step 78: each game's address as a QR code beside its button, so a visitor
-   at a computer can open the game on a phone — shown only on a wide screen
-   with a mouse, since on a phone or a tablet the screen is the phone. Funny
-   Multi has one code per design (render/page.ts); the rule at the top hides
-   the other design's. */
+   can open the game on another phone. Funny Multi has one code per design
+   (render/page.ts); the rule at the top hides the other design's.
+
+   Step 82, on a phone or a tablet: on the button's row after it (on its left
+   in a right-to-left language) — never under it — and as small as a phone's
+   camera still reads from about 12 cm. That takes some 2.5 of the screen's
+   own pixels to each square of the code (41 across in the largest, its
+   margin included): the button's height where a CSS pixel has more than two
+   of them, larger where it has fewer (below). Smooth edges: at these sizes,
+   edges snapped to whole pixels make the squares uneven, and a camera reads
+   them less far. Where the row is short of room, the button's words wrap
+   first; only then does the code give way, never below the button's height
+   (Tamil on a 320px phone with fewer pixels). */
 .play-qr {
-  display: none;
+  display: block;
+  flex: 0 1 auto;
+  width: 52px;
+  min-width: 52px;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff;
+  shape-rendering: geometricPrecision;
+}
+
+/* Every iPad and many tablets. A browser that cannot tell (Safari before
+   16.4) keeps the 52px: every Apple screen has two pixels or more. */
+@media (max-resolution: 2dppx) {
+  .play-qr {
+    width: 56px;
+  }
+}
+
+@media (max-resolution: 1.99dppx) {
+  .play-qr {
+    width: 72px;
+  }
+}
+
+/* Mostly a computer's screen in a narrow window: Step 78's code (below). */
+@media (max-resolution: 1.49dppx) {
+  .play-qr {
+    width: 104px;
+    border-radius: 12px;
+    shape-rendering: crispEdges;
+  }
+}
+
+.cta-row,
+.game-play {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+}
+
+.cta-row .btn,
+.game-play .btn {
+  flex-shrink: 1000;
+}
+
+/* Below 900px the row is never wider than the screen: without these, the
+   hero's text and its items would widen to the row's narrowest, codes
+   included. */
+@media (max-width: 899.98px) {
+  .hero-inner,
+  .hero-copy,
+  .cta-item {
+    min-width: 0;
+  }
+}
+
+/* The narrowest phones: less room inside the button, so that Tamil's one
+   word for "Play" and a code of the button's height share a card's row. */
+@media (max-width: 359.98px) {
+  .cta-row .btn,
+  .game-play .btn {
+    padding-inline: 18px;
+  }
 }
 
 @media (min-width: 900px) and (hover: hover) {
-  /* Never squeezed: where room is short (Tamil, just over 900px) the button
-     beside it wraps instead. */
+  /* A computer, where a phone reads the code at arm's length: as large as
+     Step 78 drew it, its edges sharp. Never squeezed: where room is short
+     (Tamil, just over 900px) the button's words wrap instead. */
   .play-qr {
-    display: block;
     flex: none;
-    max-width: none;
-    border: 2px solid var(--ink);
+    width: 104px;
     border-radius: 12px;
-    background: #fff;
+    shape-rendering: crispEdges;
   }
 
   /* In the hero the code stands beside the button and the line under it,
      which stay together at the top. */
+  .cta-row {
+    display: contents;
+  }
+
   .cta-item {
     display: grid;
     grid-template-columns: auto auto;
@@ -590,13 +664,21 @@ html[data-variant='b'] .cta-tag {
     justify-items: start;
   }
 
-  .cta-item > :not(.play-qr) {
-    grid-column: 1;
+  .cta-item .btn {
+    grid-area: 1 / 1;
+  }
+
+  .cta-tag {
+    grid-area: 2 / 1;
   }
 
   .cta-item .play-qr {
     grid-column: 2;
     grid-row: 1 / span 2;
+  }
+
+  .game-play {
+    gap: 24px;
   }
 
   /* Design A: the text column has room for one game at a time, so the two

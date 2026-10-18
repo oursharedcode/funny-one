@@ -4426,6 +4426,136 @@ Gates:
   GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
 - CI: after the push.
 
+## Step 82 (task B-19a) — The games' QR codes on phones and tablets too, beside their buttons (2026-10-18)
+
+**Owner request 2026-10-18,** after asking of Step 78's report "why not implemented for Phones
+and tablets?": "still like theQR  codes on phones and tablets. make the QR as small as
+possible, location: just next to the button (to the right for majority o languages; to the left
+for Hebrew and similar) - no two lines: first line button, second line QR code. Do not do two
+lines." It covers the hero's two buttons and each card's "Play now"; a computer keeps Step 78's
+codes. Planned in Step 81's RESUME note.
+
+**Shipped** (the landing page only; neither game is touched):
+
+- *Markup* (`src/render/page.ts`): in the hero, each game's button and its code — Funny Multi's
+  two, one per design — now share a row of their own (`.cta-row`), the line under the button
+  (`.cta-tag`) after it; a card's "Play now" already shared `.game-play` with its codes. A test
+  checks both (`page.test.ts`).
+- *On a phone or a tablet* (`src/styles/landing.css`) the codes now show, each on its button's
+  row after it — before it in Hebrew, Persian and Arabic, by the row's own direction — 12 px
+  from it and centred on it; the hero's line stays under the row. A code's side follows the
+  screen's density, so that each of its squares keeps some 2.5 of the screen's own pixels (41
+  squares across in the largest, Spanish's Funny Multi, its margin included): 52 px where a CSS
+  pixel has more than two of them — most phones, and the height of the button beside it; 56 at
+  exactly two (every iPad, many tablets); 72 from 1.5 to just under two; below 1.5, mostly a
+  computer's screen in a narrow window, Step 78's 104. Edges are smooth (`geometricPrecision`)
+  at 52 to 72 px and sharp at 104, as before.
+- *A row short of room* (a 320 px phone in Tamil, German, Swahili…): the button's words wrap
+  first (`flex-shrink: 1000`); only then does the code give way, square, never below 52 px.
+  Below 360 px the buttons keep 18 px inside on each side instead of 26, so that Tamil's one
+  word for "Play" and a code of the button's height share a card's row. Below 900 px the hero's
+  column and its items may be narrower than their content (`min-width: 0`), so no row is wider
+  than the screen.
+- *A computer* (from 900 px with a mouse) keeps Step 78's layout as it was — 104 px, sharp,
+  never squeezed: there the hero's new row is `display: contents`, so Step 78's grid places the
+  button, its line and its code as before, and a card keeps its 24 px gap.
+- Comments: Step 78's "shown only on a wide screen with a mouse, since on a phone or a tablet
+  the screen is the phone" is gone; `QR_PX` and `playQr` say what a phone gets.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *The size goes by the screen's density, not its width:* a camera reads squares of so many
+   millimetres, and a CSS pixel is 0.17 mm on a 3× phone but 0.26 mm on an iPad. One size for
+   all would be too large on phones or too small on the rest.
+2. *52 px on most phones,* the button's height, from a simulation (`.screens/step82-qr-size.mjs`,
+   scratch): each code drawn by Chromium at a screen's density, filmed by a simulated camera
+   (53° across, a 1080- or a 1440-pixel stream, blurred, with noise, four sub-pixel offsets) at
+   every whole cm from 8 to 16, and read by jsQR — weaker than a phone's own reader, so it errs
+   large. At 3× (460 ppi), of 36 films per stream (1080/1440), 52 px read 24/36 of English's
+   Funny Multi, 19/34 of Spanish's and 31/36 of Funny One; 48 px a little less (22/36, 16/32,
+   29/36); 56 px more (29/36, 26/35, 36/36) but would stand taller than the button, and the
+   owner asked for as small as possible. At 2.625× (420 ppi) 52 px read 21/34, 17/33 and 28/36.
+3. *The other tiers, measured the same way, kept:* at 2×, 56 px — an iPad (264 ppi) read 33/36,
+   29/36 and 35/36, a 2× phone (326 ppi) only 20/36, 17/29 and 33/36, and CSS cannot tell the
+   two apart (2× phones are now few); at 1.75×, 72 px read all; at 1.5×, 72 px read 34/36, 32/36
+   and 36/36 (64 px 27, 25 and 36); below 1.5×, 104 px read all, sharp or smooth, at 1×, 1.25×
+   and 1.333× (88 px read all too). The physical size decides; the tiers also keep each square
+   at about 2.5 device pixels or more. The simulation is noisy by a few films: read the gaps,
+   not the units.
+4. *Smooth edges below 104 px:* edges snapped to whole device pixels make some squares a pixel
+   wider than their neighbours, and at 1.5× the sharp code read a little less (33, 33 and 36);
+   at 104 px, sharp as in Step 78.
+5. *The button's words wrap before the code shrinks, and the code never goes below 52 px:* one
+   line above all, as the owner asked; at 52 the code is the button's height. A fixed code
+   instead broke Tamil's cards and design B's hero on a 320 px screen at 1.5× (below).
+6. *18 px inside the buttons below 360 px,* 26 elsewhere: the least change that keeps Tamil's
+   card on one line («விளையாடு», one word of 179 px with 26 px inside, in a card row of 234);
+   the button stays 52 px high.
+7. *A tablet held sideways stays a tablet:* a touch screen of 900 px or more (an iPad in
+   landscape) keeps its code on the button's row at its density's size; Step 78's computer
+   layout still wants a mouse (`hover: hover`).
+8. *Safari before 16.4 keeps 52 px:* it cannot read `resolution` queries, and every Apple screen
+   has two pixels or more to the CSS pixel, so an old iPad gets 52 instead of 56. A
+   `-webkit-max-device-pixel-ratio` fallback was tried and dropped: Vite's CSS minifier rewrote
+   it into range syntax (`-webkit-device-pixel-ratio<=2`), which old Safari cannot read either.
+9. *A row in the hero's markup* rather than a reordering in CSS alone: the button and its code
+   are one flex row on a phone, `display: contents` hands both back to Step 78's grid on a
+   computer, and the reading order — button, code, line — is the same on both.
+
+**Found and fixed on the way:** the check's first full run found Tamil on a 320 px screen at
+1.5× with its cards' codes outside the cards and design B's hero codes cut off, unreadable: a
+code of fixed width beside a one-word button, and the row's width carried up through the hero's
+grid. Hence decisions 5 and 6 and the `min-width: 0` rule. It also showed the check blind to it:
+Playwright's phone emulation zooms out of a page wider than the screen (the window's
+`innerWidth` grows with it), so "no sideways scroll" passed; the check now compares with the
+screen's own width.
+
+**Verified in a browser** (Chromium only; WebKit's executables are still missing here):
+
+- *`.screens/step82-hub-qr-phone.mjs`,* against the production build on 5187 (`vite preview`),
+  every request to another origin aborted: every language in both designs on two phones (320 px
+  at 2×, 390 px at 3×) — each of the four codes square and at its size, on its button's row
+  after it (before it in RTL), 12 px from it and centred on it, the hero's line under the row,
+  inside the column, the card and the screen, no sideways scroll and no zoom-out, no button's
+  words spilling out, and each code read back by jsQR, alone and with its button, as its
+  button's address with the design's `hv`; then nine languages on 21 more screens — 360 and 430
+  px at 3×, 412 px at 2.625×, tablets each way at 2× (768, 820 and 1024 px wide, and sideways),
+  at 2.25×, 1.5×, 1.333× and 1.25×, a 320 px phone at 1.5× and a 411 px one at 1.75×, and
+  windows under 900 px with a mouse at 1× to 2×; from 900 px with a mouse at 1×, 1.5× and 2×,
+  Step 78's 104; without JavaScript, design A's codes. **0 problems** in 484 page views (1,936
+  button rows; 2,504 readings by jsQR, each its button's address); no request left the machine.
+  A button's words take two lines (73 px high) in 36 of the rows, its code still beside it: at
+  320 px, Funny One's in the hero in French and Russian, both cards' in Persian and Telugu,
+  Funny Multi's in the hero in Tamil and both in Swahili; at 320 px and 1.5×, in the hero,
+  Russian's Funny One, Tamil's and German's Funny Multi and Swahili's two; and Tamil's Funny
+  Multi in the hero on phones from 360 to 412 px. A code gave way only on the 320 px screen at
+  1.5×, in Tamil, and never under 52 px: 70 of its 72 px in the hero, 59.5 in the cards.
+- *Step 78's own check* (`.screens/step78-hub-qr.mjs`, whose "no code below 900 px or on a touch
+  screen" is now the check above's), for the computer: **0 problems** — every language in both
+  designs at 1280×800 and at 900×800, a few at 1920×1080 and at 1536×864 with 125 % scaling:
+  each code 104 px and sharp beside its button, read back; design B's two games still on one row
+  in every language.
+- *Seen:* screenshots of the hero and the cards — Tamil's cards at 320 px, one row each;
+  Hebrew's hero at 320 px, each code left of its button; English's design B at 390 px;
+  Swahili's design B at 320 px and Tamil's hero at 390 px, a button's words on two lines and its
+  code still on the row; Arabic's hero on a 1024 px tablet held sideways, right to left;
+  English's cards on a 1180 px tablet; Arabic's cards at 390 px.
+
+**Not run:** WebKit, so Safari's smooth edges and its `resolution` queries are unseen. **Not
+seen:** a real camera on any of the new codes.
+
+**Owed:** the owner scans the codes with a real phone from a phone's and from a tablet's
+screen, in design A and in design B (`?v=a`, `?v=b`), once deployed.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox: 1593 tests (417 + 373 + 308 + 179 + 263 + 53), one more than
+  Step 81's — the landing page's test of the rows; all passed.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4458,16 +4588,21 @@ Gates:
 
 ~~RESUME HERE (2026-10-18, after Step 80)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 81).** **Step 81 (B-21) is committed, not pushed: Arabic,
-Swahili and Yoruba in both games, the landing page and both privacy policies — 23 languages.**
-Arabic is Modern Standard Arabic under Morocco's flag, right to left; Yoruba's headings take the
-system font and its stories Cambria or the platform's serif, since Fredoka and Georgia lack its
-letters; both games now set `<html lang>`. All three are machine drafts awaiting native
-reviewers (B-3). Its push and deploy wait for the owner's word — the landing page and Funny
-Multi by their ship scripts; Funny One's deploy is the owner's (item 1 below). **Step 80 (B-1e)
-is done — the Play Console organisation account MARK WEB TOOLS is fully verified (identity,
-website, phone) and can publish; the Equifax D-U-N-S rename is submitted,** due about
-2026-11-17 — no action until then (Step 80's Owed).
+~~RESUME HERE (2026-10-18, after Step 81)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 82).** **Steps 81 (B-21) and 82 (B-19a) are committed,
+not pushed.** Step 81 brings Arabic, Swahili and Yoruba to both games, the landing page and both
+privacy policies — 23 languages: Arabic is Modern Standard Arabic under Morocco's flag, right to
+left; Yoruba's headings take the system font and its stories Cambria or the platform's serif,
+since Fredoka and Georgia lack its letters; both games now set `<html lang>`; all three are
+machine drafts awaiting native reviewers (B-3). Step 82 shows the landing page's four QR codes
+on phones and tablets too, each on its button's row — to its right, to its left in Hebrew,
+Persian and Arabic — at 52 px on most phones (a button's height) and larger on screens with
+fewer pixels; a computer keeps Step 78's. Their push and deploy wait for the owner's word — the
+landing page and Funny Multi by their ship scripts; Funny One's deploy is the owner's (item 1
+below). **Step 80 (B-1e) is done — the Play Console organisation account MARK WEB TOOLS is fully
+verified (identity, website, phone) and can publish; the Equifax D-U-N-S rename is submitted,**
+due about 2026-11-17 — no action until then (Step 80's Owed).
 
 **Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
@@ -4497,12 +4632,12 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order:** Step 82 (B-19a), the games' QR codes on phones and tablets
-too (owner request 2026-10-18, `steering/tasks.md`): each code as small as a phone's camera
-still reads, on its button's row — to its right, to its left in Hebrew, Persian and Arabic —
-never under it; a computer keeps Step 78's. Then Step 83 (B-22), the ♥ and its sheet on
-`www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for the
-owner's go-ahead.
+**Next for the agent, in order:** Step 83, the record of the owner's new gift pages
+(`ko-fi.com/markwebtools`, `buymeacoffee.com/markwebtools`, owner message 2026-10-18) —
+production's two `.env` lines already name them (switched 2026-10-18, backup
+`.env.bak-step83`), and `docs/ACCEPTANCE.md`'s D6 is edited but not committed. Then Step 84
+(B-22), the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose
+push deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4512,7 +4647,7 @@ only forward), and since Step 72 the landing page «Семейная Чепух�
 20 languages since Step 73 (23 once Step 81 is deployed), designs A and B split per tab, with its visit counts and the funnel
 to Funny Multi's gift sheet on the public `/stats/` page, since Step 76 the ♥ and a gift sheet
 of its own in the header, since Step 78 each game's QR code beside its buttons on a computer's
-screen, and since Step 79 a world map of its visitors' countries on `/stats/`;
+screen (on phones and tablets too once Step 82 is deployed), and since Step 79 a world map of its visitors' countries on `/stats/`;
 `https://www.oursharedcode.com/` links to it from a "Games" card. Funny Multi runs
 `funny-multi:bcc18b8`: B-15's multi-language room (Step 70), Step 71's fixes, the visit counts
 and "Support Author" beside the ♥ (Step 72), the 20 languages (Step 73), the fitted titles (Step
@@ -4546,9 +4681,10 @@ here, and Step 76 skipped its own; (5) acceptance check D6 of `docs/ACCEPTANCE.m
 Step 75 is live: on the phone, then the PC, the Support screen's two notes and its Ko-fi and Buy
 Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landing page's four
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
-in the page's language.
+in the page's language — and once Step 82 is deployed, the same from a phone's and a tablet's
+screen.
 
-The agent's own queue is Steps 82–83 above.
+The agent's own queue is Steps 83–84 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4557,7 +4693,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven and Step 81's eleven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven and Step 82's nine were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real

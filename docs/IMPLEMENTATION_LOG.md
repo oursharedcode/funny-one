@@ -4253,6 +4253,32 @@ names DB-IP in all 20 sections and is dated 2026-10-18; the landing pages and th
 answer 200. Owed: the first counted country on `/stats/` — the next visit brings it (the owner's
 QR scan, item 6 of the RESUME note, would).
 
+## Step 80 (task B-1e) — Play organisation account: identity, website and phone verified; Equifax D-U-N-S rename submitted (2026-10-18)
+
+**Shipped:** Walked the owner through Play Console's "Finish setting up your developer account"
+checks, one small operation per message, automating what could be checked from this PC. Identity
+verified within minutes of the ASIC "Record of Registration for Business Name" upload
+(Organisation and Authorised representative both Verified). The website check needed no request
+from this session: `oursharedcode.com` was already a verified Search Console domain property
+from the promengi AdSense work (2026-09-08), so Play Console showed "Website verified" for
+`https://www.oursharedcode.com` on first look. Both phone numbers (contact and developer)
+verified by SMS. Play Console's Home now shows only "Create your first app" for the account
+MARK WEB TOOLS — it can publish. With Google's side clear, lifted the hold placed in Step 54 on
+the Equifax D-U-N-S rename: redated the prepared letter to 18 Oct 2026, rebuilt its PDF, and
+submitted it through `equifax.com.au/DandB-DUNSRequest` (confirmed "Your submission has been
+saved"), asking to rename the record from the owner's personal name to MARK WEB TOOLS, number
+and address unchanged.
+
+**Owed:** Equifax quotes about 30 days for a direct request (due around 2026-11-17). Once the
+rename lands, Google is expected to show a "no longer verified" banner on the payments profile;
+the owner then confirms the new name via Payments Center → Review updates, before its deadline —
+no action before then. If Equifax hasn't acted by early December, phone 13 8332 and quote the
+D-U-N-S number. `steering/tasks.md`'s B-1e block still reads "stopped at Payments profile": left
+as is this session, since the file already carries another session's unrelated uncommitted edits
+(the B-21 language work in progress); update B-1e there, with no identifiers, once that
+session's changes land. As agreed in Step 54, the ABN, D-U-N-S number and signup account stay
+out of the repo — they live only in the agent's private memory.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4281,7 +4307,14 @@ QR scan, item 6 of the RESUME note, would).
 
 ~~RESUME HERE (2026-10-18, after Step 79)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 79, pushed and deployed).** **Step 79 (B-20) is pushed, CI
+~~RESUME HERE (2026-10-18, after Step 79, pushed and deployed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 80).** **Step 80 (B-1e) is done — the Play Console
+organisation account MARK WEB TOOLS is fully verified (identity, website, phone) and can
+publish; the Equifax D-U-N-S rename is submitted,** due about 2026-11-17 — no action until then
+(Step 80's Owed). No game code changed this step.
+
+**Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
 `/stats/` has "Visits by country" — a world map of our own, shaded by visits, and a table — fed
 by a country tally that Funny Multi's server keeps apart from its other counts. The server finds
@@ -4308,14 +4341,16 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22): a look
-at `/api/stats/summary` — its `countries` should have filled since the deploy, B-20's last
-check; Step 80 (B-21), Arabic, Swahili and Yoruba, 23 languages — measure the header again for
-them (Step 76's one-row widths and fitted names), re-run `.screens/step78-hub-qr.mjs` (design
-B's two games on one row from 900 px, every code read back), and give their privacy sections
-Step 79's bullet too (a test counts one DB-IP per language); Step 81 (B-22), the ♥ and its sheet
-on `www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for
-the owner's go-ahead.
+**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22; renumbered
+by one — Step 80 went to B-1e instead): a look at `/api/stats/summary` — its `countries` should
+have filled since the deploy, B-20's last check; Step 81 (B-21), Arabic, Swahili and Yoruba, 23
+languages — measure the header again for them (Step 76's one-row widths and fitted names),
+re-run `.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every code
+read back), and give their privacy sections Step 79's bullet too (a test counts one DB-IP per
+language) — check `git status` first: another session's uncommitted `ar`/`sw`/`yo` files were
+already in the working tree as of this note, so most of the work may be done; Step 82 (B-22),
+the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose push
+deploys — so it waits for the owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4361,7 +4396,7 @@ Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landi
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language.
 
-The agent's own queue is the look at B-20's first countries and Steps 80–81 above.
+The agent's own queue is the look at B-20's first countries and Steps 81–82 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4373,12 +4408,13 @@ unchanged and still open.
 Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six and Step 79's eleven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
-key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on B-1e
-and real icons.
+key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
+icons — B-1e's account is ready (Step 80).
 
-B-1e (Play account) is waiting on Equifax: the listing address is the one on the Equifax request
-(owner decision 2026-10-04). Do not retry the Play signup before the D-U-N-S record is fixed;
-Google limits the tries. Enrollment identifiers are not in this repo (Step 54).
+B-1e (Play account) is done: MARK WEB TOOLS is signed up, paid and fully verified — identity, website and phone (Step 54, Step 80). Its Equifax D-U-N-S rename
+to match is submitted and pending (~30 days, due 2026-11-17); when it lands, the owner confirms
+the new name in Payments Center → Review updates, before its deadline. Enrollment identifiers
+are not in this repo (Step 54).
 
 `npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
 may list only **two IDs** — GHSA-vfj7-8cjw-p6xm (`braces`, Step 53) and GHSA-rj75-hqrm-r3gf

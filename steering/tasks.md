@@ -353,12 +353,12 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   2026-10-17; owner choice "own sheet there"): top right, opening a sheet on that site with PayID,
   Sponsors, Lightning, Ko-fi and Buy Me a Coffee. It lives in that site's own repository
   (`oursharedcode.github.io`), where a push deploys, so it waits for the owner's go-ahead; the
-  site's "fifteen languages" is out of date and is fixed with it. **Code done 2026-10-19 (Step
-  84), not yet committed or pushed:** the home page has the ♥ and "Support Author" and a sheet of
+  site's "fifteen languages" is out of date and is fixed with it. **Code done and live 2026-10-19
+  (Step 84; site commit `6917802`, CI run `39138417241`):** the home page has the ♥ and "Support Author" and a sheet of
   five rails (PayID, GitHub Sponsors, Lightning, Ko-fi, Buy Me a Coffee), "twenty-three languages",
   a Sponsors bullet on the privacy page, and a guard in `build.mjs` against the hand-written page
   drifting from `content.mjs`.
-  - *Owed:* the owner's go to commit and push (a push is an instant deploy); a read of the privacy
+  - *Owed:* a read of the privacy
     page's Sponsors bullet (the agent's wording); whether the site's PayID
     (`markwebtools@oursharedcode.com`) and the games' (`funny@oursharedcode.com`) are both
     registered; Safari, unseen (no WebKit here).

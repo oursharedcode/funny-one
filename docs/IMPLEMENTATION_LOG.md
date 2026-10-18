@@ -4657,9 +4657,8 @@ seven recommendations of the morning plan, below. The code is in the site's own 
 package.json); this repository records it.
 
 **Shipped:** the code below, written and seen in Chromium, in the site's repository as four
-modified files; with this step's commit it is committed there too, in a commit of that
-repository's own. **Not live:** nothing is pushed until the owner says so (see "Pushed" and
-"Owed" at the foot).
+files in a commit of that repository's own (`6917802`); **live since the push** — see "Pushed and
+live" at the foot.
 
 **Changed in `oursharedcode.github.io`:**
 
@@ -4747,15 +4746,12 @@ twenty-three, not fifteen; the privacy page carries the Sponsors bullet and toda
 
 **Not seen:** Safari (Playwright's WebKit is still missing here — owner item 4 of the RESUME note),
 so the popover sheet is Chromium-verified only and the `#support` fallback is what Safari without
-popovers would show; the live site (not pushed); a real tap on any of the four outside rails;
+popovers would show; the live site in a browser (only curl, against the repository's files); a real tap on any of the four outside rails;
 a phone's camera on the Lightning code (the decode above is the same data).
 
 **Owed:**
 
-- The owner's word to push both repositories. The site's push is a deploy for every visitor of
-  `www.oursharedcode.com`; after it, curl `/` for the sheet's five rails and `/privacy/` for the
-  Sponsors bullet once GitHub Pages has built, and record it here.
-- The owner's read of the privacy page's GitHub Sponsors bullet (the agent's wording).
+- The owner's read of the live privacy page's GitHub Sponsors bullet (the agent's wording).
 - The owner confirms that both PayIDs — the site's `markwebtools@oursharedcode.com` and the
   games' `funny@oursharedcode.com` — are registered with the bank, and whether they should agree.
 - The plan's decision 6: counting presses of the sheet, deferred (see "Deviation"); a task of its
@@ -4772,9 +4768,20 @@ reads them:
   included.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39138417241`, below).
 
-**Pushed:** not yet — waits for the owner's word, for both repositories.
+**Pushed and live 2026-10-19** (owner: "commit both repos and push"; the privacy bullet's read, the
+PayIDs and decision 6 were still open when the owner said so): the site's commit `6917802`
+(`e3bef01..6917802`, `oursharedcode/oursharedcode.github.io`) and this repository's `681cfc9`
+(`b9c4909..681cfc9`) went in one push each; CI passed in about 3 min 40 s (run `39138417241`).
+GitHub Pages served the new home page on the fifth poll, about a minute after the push. Checked
+with curl afterwards, all passed: `/`, `/privacy/` and `/sitemap.xml` are, line ending aside, the
+repository's files; the home page has the sheet (`id="support"`), "twenty-three languages", the
+GitHub Sponsors, Ko-fi and Buy Me a Coffee links and the `lightning:LNURL1` wallet link; the
+privacy page has the Sponsors bullet and "Last updated 19 October 2026"; the sitemap lists 27
+addresses. A browser was not pointed at the live site (the check above was against the same
+files, served locally). Owed, as above: the owner's read of the Sponsors bullet, the PayIDs,
+decision 6, and a real tap and scan on the live page.
 
 ---
 
@@ -4816,16 +4823,15 @@ reads them:
 
 ~~RESUME HERE (2026-10-18, after Step 83, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 84, committed, not yet pushed).** **Step 84 (B-22) is
-written and seen in Chromium, in the site's repository `oursharedcode.github.io`, and waits for
-the owner's word to push both repositories — a push there is a deploy for every visitor of
-`www.oursharedcode.com`.** The home page has the beating ♥ and hopping "Support Author" at the
+**RESUME HERE (2026-10-19, after Step 84, pushed and live).** **Step 84 (B-22) is pushed, CI
+passed (run `39138417241`), and live on `www.oursharedcode.com` — the site's commit `6917802`
+in `oursharedcode.github.io`, checked with curl against the repository's files.** The home page has the beating ♥ and hopping "Support Author" at the
 top right, opening a sheet with PayID, GitHub Sponsors, Bitcoin Lightning, Ko-fi and Buy Me a
 Coffee; "fifteen languages" is "twenty-three". The sheet counts nothing and reports nothing,
 which departs from the plan's decision 6a (the collector Worker would first need a `sponsors`
 rail, a page column and a deploy — a task of its own if the owner wants it); the privacy page
 says so and names GitHub Sponsors. `build.mjs` now stops if the hand-written home page loses
-one of the rails. **Owed by the owner:** a read of the privacy page's Sponsors bullet (the
+one of the rails. **Owed by the owner:** a read of the live privacy page's Sponsors bullet (the
 agent's wording); whether the site's PayID `markwebtools@oursharedcode.com` and the games'
 `funny@oursharedcode.com` are both registered, and should agree; and the plan's decision 6.
 Not seen: Safari (no WebKit here). Then the same note as before:
@@ -4878,10 +4884,10 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production caught up on
 2026-10-18 (above).
 
-**Next for the agent:** commit and push Step 84 — the site's repository first or last, either
-is fine, since the site's change does not need this repository's — on the owner's word; after
-the push, curl `https://www.oursharedcode.com/` for the sheet's five rails and `/privacy/` for
-the Sponsors bullet, once GitHub Pages has built. Nothing else is queued.
+**Next for the agent:** nothing is queued. If the owner wants the sheet's presses counted
+(Step 84's decision 6a, dropped), that is a task of its own in `ielts_books`'s collector — a
+`sponsors` rail, a page column, a D1 migration and a Worker deploy — then the sheet's script and
+the privacy paragraph change with it.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4927,7 +4933,7 @@ codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its ga
 in the page's language — and, now that Step 82 is live, the same from a phone's and a tablet's
 screen.
 
-The agent's own queue is the push of Step 84 above.
+The agent's own queue is empty.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video

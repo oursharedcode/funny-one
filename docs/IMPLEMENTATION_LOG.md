@@ -4629,10 +4629,25 @@ carries the density tiers (`resolution<=2x`) and the button's `flex-shrink: 1000
 `/health` is ok, its privacy policy has 23 sections, Yoruba's among them, and its script lists
 Kiswahili; `/config` and the landing page's `/api/config` name the `markwebtools` pages; every
 visit count from before the deploy is still there, and the country tally reads Australia, three
-landing-page visits. Funny One was not deployed: its production serves 15 languages until the
-owner runs `deploy/ship-funny-one.sh`. Owed: the owner's real-phone scan of the codes from a
-phone's and a tablet's screen (Step 82's Owed), and D6's taps on the two gift buttons (Step 83's
-Not seen).
+landing-page visits. Funny One followed later that day, below. Owed: the owner's real-phone scan
+of the codes from a phone's and a tablet's screen (Step 82's Owed), and D6's taps on the two
+gift buttons (Step 83's Not seen).
+
+**Funny One deployed 2026-10-18** (owner: "First try to automate the operation", on the agent's
+"in Git Bash, run deploy/ship-funny-one.sh"): the agent ran `deploy/ship-funny-one.sh
+ubuntu@152.69.166.212` from the clean tree at `0cd1ec5`, and the permission mode allowed it this
+time (it had refused it on 2026-10-07). Exit 0 in 55 s, Caddy reloaded at 22:08 with the usual
+formatting warning, its ten checks passed — the game, its service worker and manifest 200, the
+bare name and the old `/funny1-game` address 301 to the host, assetlinks `application/json`, the
+privacy policy, the old address's retiring service worker, Funny Multi's `/health`. It carries
+all that Funny One's client gained since its last deploy on 2026-10-05: the ten library pictures
+blocked for a Families audience (Step 68, FO-ID-1), B-16's five languages, the export fixes and
+the fitted titles (Steps 71, 73 and 74), and Step 81's three — 23 languages. Checked with curl
+afterwards: `index.html`, `sw.js`, the manifest, the two scripts and the style sheet are byte
+for byte the build; the live script holds all ten blocked pictures' hashes and names Kiswahili,
+Yorùbá and العربية; the privacy policy is the repository's, with 23 sections. The owner then
+opened it on a phone twice, chose العربية and answered "done" — Arabic, right to left. The
+Android app (`com.oursharedcode.funny1`) loads the site, so it needs no new build.
 
 ---
 
@@ -4682,15 +4697,15 @@ letters; both games now set `<html lang>`; all three are machine drafts awaiting
 reviewers (B-3). Step 82 shows the landing page's four QR codes on phones and tablets too, each
 on its button's row — to its right, to its left in Hebrew, Persian and Arabic — at 52 px on most
 phones (a button's height) and larger on screens with fewer pixels; a computer keeps Step 78's.
-Funny One's production still serves 15 languages: its deploy is the owner's (item 1 below) and
-now carries Step 81's three with B-16's five. After the deploy the server's log again read
-DB-IP's 710,834 rows, and the visit counts were kept. **Step 83 was live before its commit:**
-the owner's gift pages moved to `ko-fi.com/markwebtools` and `buymeacoffee.com/markwebtools`
-(the old ones are dead), and production's two `.env` lines name them since 2026-10-18, the
-game's container recreated on its own image; its commit only records it. **Step 80 (B-1e) is
-done — the Play Console organisation account MARK WEB TOOLS is fully verified (identity,
-website, phone) and can publish; the Equifax D-U-N-S rename is submitted,** due about 2026-11-17
-— no action until then (Step 80's Owed).
+Funny One followed the same day, run by the agent at the owner's word: 23 languages and Step
+68's ten blocked library pictures are live there too, and the owner saw Arabic right to left on
+a phone. After the deploy the server's log again read DB-IP's 710,834 rows, and the visit counts
+were kept. **Step 83 was live before its commit:** the owner's gift pages moved to
+`ko-fi.com/markwebtools` and `buymeacoffee.com/markwebtools` (the old ones are dead), and
+production's two `.env` lines name them since 2026-10-18, the game's container recreated on its
+own image; its commit only records it. **Step 80 (B-1e) is done — the Play Console organisation
+account MARK WEB TOOLS is fully verified (identity, website, phone) and can publish; the Equifax
+D-U-N-S rename is submitted,** due about 2026-11-17 — no action until then (Step 80's Owed).
 
 **Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
@@ -4717,8 +4732,8 @@ Ko-fi and Buy Me a Coffee (D-6(a) amended); production's `.env` has their two li
 Funny Multi's beating ♥ and hopping "Support Author" in the landing page's header, both designs,
 opening a gift sheet of the page's own that reads the game server's rails, and made long names
 fit narrow phones (the family's name had run under the language picker in eight languages).
-Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
-languages until the owner deploys it; its deploy carries B-16 too.
+Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production caught up on
+2026-10-18 (above).
 
 **Next for the agent:** Step 84 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in
 that site's own repository, whose push deploys — so it waits for the owner's go-ahead. Its
@@ -4742,16 +4757,14 @@ had been live since 2026-10-09 (`funny-multi:8036211`, deployed that afternoon b
 — found on the VM in Step 72). Funny One's Android app (`com.oursharedcode.funny1`) is signed
 and installed on the owner's phone (Step 66). FO-ID-1 (Step 68: ten library pictures
 blocklisted in Funny One's client) and T-FO-8.3 (Step 69: the rig reviewed, nothing to change)
-are committed; **Funny One's deploy is still the owner's — production serves its library
-un-blocked until then.**
+are committed, and deployed since 2026-10-18 — production no longer serves the ten.
 
 **CI runs on `ubuntu-24.04`** since Step 77 (owner, 2026-10-17): GitHub moves `ubuntu-latest`
 to Ubuntu 26 from 2026-10-19, and the pin keeps a red build the code's, not a new image's.
 Moving to Ubuntu 26 is a step of its own, whenever it is wanted.
 
-**Next, in order, the owner's:** (1) Funny One's deploy — `deploy/ship-funny-one.sh
-ubuntu@152.69.166.212` was refused to the agent on 2026-10-07 as a production deploy, so the
-owner runs it in Git Bash or grants it when asked; (2) the T-FO-7.1 phone pass in the signed
+**Next, in order, the owner's:** (1) Funny One's deploy — done 2026-10-18, the agent
+ran it at the owner's word; (2) the T-FO-7.1 phone pass in the signed
 app, one op per message: op 1 done (old-address icon removed), op 2 asked (app-list search),
 then the 18 checks of `docs/ACCEPTANCE_FUNNY_ONE.md` with Part E online — it also settles URL
 bar and Play Protect (B-8) for Funny One's app and signs off Gate FO; (3) one real Funny Multi
@@ -4825,8 +4838,9 @@ Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
 the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–74), and on
 2026-10-17 two `.env` lines and both ship scripts (Steps 75–77), and on 2026-10-18 both ship
 scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
-(Step 83), and both ship scripts again (Steps 81–82) — so try once when the owner asks
-for a deploy, and if it is refused, hand
+(Step 83), both ship scripts again (Steps 81–82) and, the owner asking for the op to be
+automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07) — so try once when the owner
+asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
 Worker secret, printing either `.env`, and an `nslookup` of new hosts (Step 55). Never run
@@ -4845,7 +4859,8 @@ into `grep -q` (Step 60). Never name a source folder `build`: the root `.gitigno
 `.prettierignore` skip every `build/`, so its files pass every local check and never reach a
 commit (Step 72). With `MSYS_NO_PATHCONV=1`, `curl -o /dev/null` exits 23 and stops the
 download early — its status code holds, its size does not; read sizes from `curl -sI` (Step
-72). A WebKit check that stops answering here: ask the owner whether Avast alerted before
+72); and `curl -o /c/...` writes nothing while still printing 200 — give it `C:/...` (seen
+2026-10-18). A WebKit check that stops answering here: ask the owner whether Avast alerted before
 blaming WebKit or the page — its Behavior Shield blocked Playwright's WebKit as `IDP.Generic` on
 2026-10-14, a false positive (Step 72). `.screens/ff-hub-check.mjs --no-webkit` skips WebKit
 (Step 73). A fresh page through `vite preview` on 5187 now and then waits about 10 or 20 s for

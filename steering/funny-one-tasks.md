@@ -189,9 +189,9 @@ external wait time, elapsed time rather than effort).
       (2026-10-07: a Spain-like flag, a title-like gibberish caption, five knight props pointed
       at the partner, besides the three). Checked in a phone-sized Chromium against the real
       `worker.js` run locally: the blocked story draws the rig with no request, its neighbour
-      shows the library picture. *Open:* the deploy — `deploy/ship-funny-one.sh` was refused by
-      the agent's permission mode on 2026-10-07, so the owner runs it (no TWA rebuild needed:
-      the app loads the site).
+      shows the library picture. **Deployed 2026-10-18:** the agent ran
+      `deploy/ship-funny-one.sh` at the owner's word (refused to it on 2026-10-07); the live
+      script holds all ten hashes. No TWA rebuild needed: the app loads the site.
 - [ ] **T-FO-8.3 (S)** *Filed 2026-10-07 (owner: "file it") — the same Families-audience
       review for Funny One's own art, the rig.* The rig is 109 hand-drawn SVG layers in
       `apps/funny-one-client/src/components/art/rig/` (`RIG_ART.md`), composited by fixed

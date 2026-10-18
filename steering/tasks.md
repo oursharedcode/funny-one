@@ -256,7 +256,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   to left, like Hebrew. Hindi and Telugu share India's flag with Tamil, so the three are labelled
   with their language's letters, TA, HI and TE (Tamil's label was IN). Every other flag was
   checked distinct. The flag pictures are Twemoji's (CC-BY 4.0, credited in the README).
-  `LANGUAGES.md` now says how to add a language. **Code done 2026-10-16 (Step 73).**
+  `LANGUAGES.md` now says how to add a language. **Code done 2026-10-16 (Step 73), deployed that
+  day to Funny Multi and the landing page and to Funny One on 2026-10-18.**
   - *Owed:* all text in the five new languages is machine-drafted and marked
     `needs-<code>-review`, so it goes to B-3.
   - *Seen on the way, older than B-16, fixed in Step 73:* exported story pictures broke lines
@@ -342,11 +343,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   that day's research), in both games, the landing page and both privacy policies, 23 in all.
   Arabic is Modern Standard Arabic (owner choice), labelled «العربية (المغرب)» under Morocco's
   flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. **Code done
-  2026-10-18 (Step 81) and deployed that day to Funny Multi and the landing page;** Funny One's
-  production gets them with the owner's deploy. A browser set to any Arabic gets Arabic, and
-  Tanzania's Swahili gets Swahili; Yoruba's headings take the system font and its stories
-  Cambria or the platform's serif, since Fredoka and Georgia lack its letters; both games now
-  set `<html lang>`.
+  2026-10-18 (Step 81) and deployed that day to Funny Multi, the landing page and Funny One.** A
+  browser set to any Arabic gets Arabic, and Tanzania's Swahili gets Swahili; Yoruba's headings
+  take the system font and its stories Cambria or the platform's serif, since Fredoka and
+  Georgia lack its letters; both games now set `<html lang>`.
   - *Owed:* a native reviewer for each of the three (with B-3); what Safari draws Yoruba in is
     unseen (no WebKit here).
 - **B-22** The ♥ and "Support Author" on `https://www.oursharedcode.com/` (owner request

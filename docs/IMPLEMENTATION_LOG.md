@@ -4649,6 +4649,133 @@ Yorùbá and العربية; the privacy policy is the repository's, with 23 sec
 opened it on a phone twice, chose العربية and answered "done" — Arabic, right to left. The
 Android app (`com.oursharedcode.funny1`) loads the site, so it needs no new build.
 
+## Step 84 (task B-22) — The ♥ and "Support Author" on `www.oursharedcode.com` (2026-10-19)
+
+**Owner request 2026-10-17** (B-22, "own sheet there"); **go-ahead 2026-10-19:** "go" to the
+seven recommendations of the morning plan, below. The code is in the site's own repository,
+`C:\Mark\Dev\oursharedcode.github.io` (GitHub Pages: a push deploys at once, no CI, no tests, no
+package.json); this repository records it.
+
+**Shipped:** the code below, written and seen in Chromium, in the site's repository as four
+modified files; with this step's commit it is committed there too, in a commit of that
+repository's own. **Not live:** nothing is pushed until the owner says so (see "Pushed" and
+"Owed" at the foot).
+
+**Changed in `oursharedcode.github.io`:**
+
+- *`index.html`* (hand-written, not generated; CRLF kept): a bar above the heading with the
+  beating ♥ and the hopping "Support Author" (Funny Multi's own motion and colours, 44 px tall;
+  the motion stops under `prefers-reduced-motion`); a sheet after the Games card with five rails in the
+  games' order — **PayID** (`markwebtools@oursharedcode.com`, a Copy button), **GitHub
+  Sponsors** (opens `github.com/sponsors/oursharedcode` in a new tab), **Bitcoin Lightning**
+  (the books page's inline-SVG code from `lightning.mjs`, the address, "Open in wallet" and Copy),
+  then **Ko-fi** and **Buy me a coffee** (the `markwebtools` pages of Step 83); and "fifteen
+  languages" → "twenty-three languages". The sheet is the books page's proven pattern: a native
+  `popover` that a script enables only where `showPopover` exists (a bottom sheet on phones, a
+  card on a computer); without a script or without popovers the ♥ is a link to `#support` and
+  the sheet is plain content on the page, its Copy buttons hidden. `/#support` opens it. No
+  network call and no beacon.
+- *`build.mjs`:* a guard. The home page is hand-written, so a rail that moves in `content.mjs`
+  would leave it paying the old one; `node build.mjs` now stops, naming what is missing, if
+  `index.html` lacks the PayID, the Lightning address, its wallet link and code, or the Ko-fi
+  and Buy Me a Coffee addresses. Tried both ways in a scratch copy: a good build said "Built 12
+  pages in 11 languages." and touched no committed page; a copy with a wrong PayID threw, exit 1.
+- *`privacy/index.html`:* the Tips paragraph says the home page's button opens a sheet with the
+  four ways and GitHub Sponsors, that the sheet counts nothing and reports nothing, and that
+  neither page reports an amount or whether you paid; a new bullet for GitHub Sponsors (what
+  GitHub passes on: the amount and tier, the GitHub username unless the sponsorship is
+  private, any email or message the giver shares); "Last updated" is 19 October 2026.
+- *`sitemap.xml`:* `lastmod` of `/` and `/privacy/` is 2026-10-19 (the other dates stay —
+  they are real).
+
+**Outside both repositories:** `C:\Mark\Dev\machine\ports.md` — the decade `oursharedcode`
+5190s and the row for 5191 (a static server over the site's folder, up only while a check of its
+pages runs).
+
+**Decisions of the morning plan** (the owner's "go" took every recommendation; each can be
+reversed):
+
+1. *Go-ahead:* (a) written, shown locally on 5191, committed and pushed on the owner's word —
+   taken; (b) a patch the owner pushes.
+2. *Pages:* (a) the home page only — taken; (b) home, about, contact and privacy; (c) every page.
+3. *Rails:* (a) the five, Sponsors included — taken; (b) the books page's four.
+4. *Rail source:* (a) hardcoded from `content.mjs` — taken (with Step 84's build guard against
+   drift); (b) read the game server's `/api/config` at each visit.
+5. *Build:* (a) hand-written into `index.html` — taken; (b) generate the home page from
+   `build.mjs`.
+6. *Counting presses:* (a) yes, through the books page's collector — recommended and taken by
+   the "go", **but not done, see "Deviation"**; (b) no counting.
+7. *Language:* (a) English only — taken; (b) the books page's eleven languages.
+
+**Deviation from the approved plan (6a → 6b), the agent's, to be confirmed:** counting was not
+built. The collector Worker (`ielts_books/collector/worker.js`) accepts only the books page's
+events — the rails `lightning`, `payid`, `kofi` and `bmc`, no `sponsors` — and stores no page, so
+presses of the home page's sheet would be added to the books page's with nothing to tell them
+apart, and Sponsors could not be counted at all. Doing it takes a `sponsors` rail, a page column
+and a D1 migration in that repository and a Worker deploy — a task of its own, and the owner's
+to ask for. Until then the home page's sheet counts nothing, and its privacy paragraph says so.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *The PayID is the site's, not the games':* the sheet shows `markwebtools@oursharedcode.com`,
+   what `content.mjs` and the books page use; Funny Multi's `DEPLOYER_PAYID` is
+   `funny@oursharedcode.com` (`docs/ACCEPTANCE.md:136`). Both are on the owner's domain; the
+   agent cannot see which are registered with the bank. **Owed:** the owner confirms both are
+   registered, and whether the games' and the site's should agree.
+2. *Ko-fi's button is a deeper red* (`#d93a37`, white text) than Ko-fi's own `#ff5e5b`, which is
+   weak against white text; Buy Me a Coffee keeps its yellow with dark text.
+3. *GitHub Sponsors' privacy bullet is the agent's wording* — **owed: the owner's read**, as it
+   goes live on the privacy page with the push.
+4. *`about/index.html` is unchanged:* it does not name the languages or the gift rails.
+5. *Sponsors' note under its button* is "Choose a one-time tier." (the games' English line,
+   Step 76).
+6. *The guard lives in `build.mjs`,* the one script the site already runs, rather than a new
+   file; it only reads `index.html`, so it cannot change a page.
+
+**Seen** (headless Chromium through `.screens/step84-home-support.mjs`, gitignored, over
+`python -m http.server 5191` in the site's folder; 161 checks, all passed; screenshots in
+`.screens/step84/`): at 390×844, 320×640 and 1280×800, each in light and dark — no sideways
+scroll (page or sheet); the ♥ button 44 px tall, above the heading and at the column's right edge;
+the five rails in order with the right links, the new-tab ones `noopener`; focus lands on the sheet,
+Tab reaches Close, Esc closes it and returns focus to the ♥; Copy says "Copied" and the clipboard
+holds the PayID, then the Lightning address; a tap outside closes it; the rendered Lightning code,
+screenshot and decoded with jsQR in each scheme, reads `LIGHTNING:LNURL1DP68GU…`; no console or
+page errors; **no request to any other origin**. Also: `/#support` opens the sheet; reduced motion
+stops the heart and the words; with scripts off the ♥ shows the sheet in place, its Copy and Close
+buttons hidden; with `showPopover` deleted `<html>` never gets `.pop`; the Games line says
+twenty-three, not fifteen; the privacy page carries the Sponsors bullet and today's date.
+
+**Not seen:** Safari (Playwright's WebKit is still missing here — owner item 4 of the RESUME note),
+so the popover sheet is Chromium-verified only and the `#support` fallback is what Safari without
+popovers would show; the live site (not pushed); a real tap on any of the four outside rails;
+a phone's camera on the Lightning code (the decode above is the same data).
+
+**Owed:**
+
+- The owner's word to push both repositories. The site's push is a deploy for every visitor of
+  `www.oursharedcode.com`; after it, curl `/` for the sheet's five rails and `/privacy/` for the
+  Sponsors bullet once GitHub Pages has built, and record it here.
+- The owner's read of the privacy page's GitHub Sponsors bullet (the agent's wording).
+- The owner confirms that both PayIDs — the site's `markwebtools@oursharedcode.com` and the
+  games' `funny@oursharedcode.com` — are registered with the bank, and whether they should agree.
+- The plan's decision 6: counting presses of the sheet, deferred (see "Deviation"); a task of its
+  own — a `sponsors` rail, a page column, a D1 migration and a deploy in `ielts_books`'s
+  collector — if the owner asks for it.
+- Safari, unseen (no WebKit here — owner item 4); a real tap on the four outside rails and a
+  phone's camera on the Lightning code, on the live page.
+
+Gates, for this repository's commit — it holds only `docs/` and `steering/`, and none of the gates
+reads them:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test`: 1593 tests (417 + 373 + 308 + 179 + 263 + 53), all passed, the real-socket suites
+  included.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
+- CI: after the push.
+
+**Pushed:** not yet — waits for the owner's word, for both repositories.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4687,7 +4814,23 @@ Android app (`com.oursharedcode.funny1`) loads the site, so it needs no new buil
 
 ~~RESUME HERE (2026-10-18, after Step 83)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 83, pushed and deployed).** **Steps 81 (B-21), 82 (B-19a)
+~~RESUME HERE (2026-10-18, after Step 83, pushed and deployed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Step 84, committed, not yet pushed).** **Step 84 (B-22) is
+written and seen in Chromium, in the site's repository `oursharedcode.github.io`, and waits for
+the owner's word to push both repositories — a push there is a deploy for every visitor of
+`www.oursharedcode.com`.** The home page has the beating ♥ and hopping "Support Author" at the
+top right, opening a sheet with PayID, GitHub Sponsors, Bitcoin Lightning, Ko-fi and Buy Me a
+Coffee; "fifteen languages" is "twenty-three". The sheet counts nothing and reports nothing,
+which departs from the plan's decision 6a (the collector Worker would first need a `sponsors`
+rail, a page column and a deploy — a task of its own if the owner wants it); the privacy page
+says so and names GitHub Sponsors. `build.mjs` now stops if the hand-written home page loses
+one of the rails. **Owed by the owner:** a read of the privacy page's Sponsors bullet (the
+agent's wording); whether the site's PayID `markwebtools@oursharedcode.com` and the games'
+`funny@oursharedcode.com` are both registered, and should agree; and the plan's decision 6.
+Not seen: Safari (no WebKit here). Then the same note as before:
+
+**Steps 81 (B-21), 82 (B-19a)
 and 83 are pushed, CI passed (run `39118378160`, on `ubuntu-24.04`), and Funny Multi
 (`funny-multi:41d4a59`) and the landing page run Steps 81 and 82.** Step 81 brings Arabic,
 Swahili and Yoruba to both games, the landing page and both privacy policies — 23 languages:
@@ -4735,9 +4878,10 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production caught up on
 2026-10-18 (above).
 
-**Next for the agent:** Step 84 (B-22), the ♥ and its sheet on `www.oursharedcode.com`, in
-that site's own repository, whose push deploys — so it waits for the owner's go-ahead. Its
-Ko-fi and Buy Me a Coffee are the `markwebtools` pages (Step 83).
+**Next for the agent:** commit and push Step 84 — the site's repository first or last, either
+is fine, since the site's change does not need this repository's — on the owner's word; after
+the push, curl `https://www.oursharedcode.com/` for the sheet's five rails and `/privacy/` for
+the Sponsors bullet, once GitHub Pages has built. Nothing else is queued.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
@@ -4783,7 +4927,7 @@ codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its ga
 in the page's language — and, now that Step 82 is live, the same from a phone's and a tablet's
 screen.
 
-The agent's own queue is Step 84 above.
+The agent's own queue is the push of Step 84 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4792,7 +4936,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine and Step 83's two were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two and Step 84's six were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real

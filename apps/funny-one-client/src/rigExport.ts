@@ -23,7 +23,7 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { wrapText, type Story } from '@funny/shared';
-import i18n, { textDirection } from './i18n/index';
+import i18n, { proseFontFamily, textDirection } from './i18n/index';
 import { gameUrl } from './gameUrl';
 import { downloadFile } from './share';
 import { RIG_INDEX } from './components/art/rig/rigIndex';
@@ -37,7 +37,8 @@ const RIG_H = STAGE_H * EXPORT_SCALE;
 
 const WIDTH = RIG_W;
 const PAD = 28;
-const PROSE_FONT = '22px Georgia, serif';
+// The prose and the notice take the story's own family (proseFontFamily).
+const PROSE_SIZE = '22px';
 const PROSE_LINE_HEIGHT = 32;
 const NAME_FONT = '16px system-ui, sans-serif';
 const NAME_HEIGHT = 24;
@@ -48,7 +49,7 @@ const PINK = '#ec4899';
 // Footer (same "scan-to-clone" contract as downloadStory.ts — item 6 of vol02
 // BUGS_AND_IMPROVEMENTS carried over unmodified).
 const FOOTER_DIVIDER_PAD = 18;
-const NOTICE_FONT = 'italic 13px Georgia, serif';
+const NOTICE_STYLE = 'italic 13px';
 const NOTICE_LINE_HEIGHT = 18;
 const NOTICE_COLOR = '#4b5563';
 const QR_SIZE = 96;
@@ -186,13 +187,17 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
 
   const qrCanvas = await renderQrCanvas(url);
 
+  // Funny One's story is in the interface's language (see the direction below).
+  const proseFont = `${PROSE_SIZE} ${proseFontFamily(i18n.language)}`;
+  const noticeFont = `${NOTICE_STYLE} ${proseFontFamily(i18n.language)}`;
+
   const rightColX = PAD + QR_SIZE + QR_TEXT_GAP;
   const rightColWidth = WIDTH - rightColX - PAD;
 
   const scratch = document.createElement('canvas').getContext('2d')!;
-  scratch.font = PROSE_FONT;
+  scratch.font = proseFont;
   const proseLines = wrapText(scratch, prose, WIDTH - PAD * 2);
-  scratch.font = NOTICE_FONT;
+  scratch.font = noticeFont;
   const noticeLines = wrapText(scratch, notice, rightColWidth);
 
   const noticeHeight = noticeLines.length * NOTICE_LINE_HEIGHT;
@@ -230,7 +235,7 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   const dir = textDirection(i18n.language);
   ctx.textBaseline = 'top';
   ctx.fillStyle = INK;
-  ctx.font = PROSE_FONT;
+  ctx.font = proseFont;
   ctx.direction = dir;
   ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
   const textX = dir === 'rtl' ? WIDTH - PAD : PAD;
@@ -257,7 +262,7 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   ctx.drawImage(qrCanvas, PAD, rowTop, QR_SIZE, QR_SIZE);
 
   ctx.fillStyle = NOTICE_COLOR;
-  ctx.font = NOTICE_FONT;
+  ctx.font = noticeFont;
   let noticeY = rowTop;
   for (const line of noticeLines) {
     ctx.fillText(line, colX, noticeY);

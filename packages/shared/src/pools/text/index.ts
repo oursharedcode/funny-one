@@ -5,7 +5,7 @@
 // T-1.5 shipped en + ru hand-authored. T-6.3 widens `AuthoredLanguage` to the
 // full `Language` union and adds the remaining 13 as machine-drafted stubs
 // (each flagged `needs-<code>-review` in its file header, FM-POOL-2/5) — so
-// this record is exhaustive over all 20 registry languages and TypeScript
+// this record is exhaustive over all 23 registry languages and TypeScript
 // refuses to compile if one is ever missing.
 
 import type { AuthoredLanguage, PoolTextMap } from '../schema.js';
@@ -29,6 +29,9 @@ import { ta } from './ta.js';
 import { hi } from './hi.js';
 import { te } from './te.js';
 import { bn } from './bn.js';
+import { ar } from './ar.js';
+import { sw } from './sw.js';
+import { yo } from './yo.js';
 
 export const POOL_TEXTS: Readonly<Record<AuthoredLanguage, PoolTextMap>> = {
   en,
@@ -51,6 +54,33 @@ export const POOL_TEXTS: Readonly<Record<AuthoredLanguage, PoolTextMap>> = {
   hi,
   te,
   bn,
+  ar,
+  sw,
+  yo,
 };
 
-export { en, fr, de, ru, id, it, zh, yue, ja, ko, ptBr, es419, esEs, uk, he, fa, ta, hi, te, bn };
+export {
+  en,
+  fr,
+  de,
+  ru,
+  id,
+  it,
+  zh,
+  yue,
+  ja,
+  ko,
+  ptBr,
+  es419,
+  esEs,
+  uk,
+  he,
+  fa,
+  ta,
+  hi,
+  te,
+  bn,
+  ar,
+  sw,
+  yo,
+};

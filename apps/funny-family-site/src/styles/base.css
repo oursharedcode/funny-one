@@ -64,6 +64,12 @@
     sans-serif;
 }
 
+/* Step 81: Fredoka has no ẹ, ọ or ṣ, so a Yoruba heading came out in two
+   fonts, a letter at a time; the system font has them all. */
+:root:lang(yo) {
+  --display: var(--text);
+}
+
 *,
 *::before,
 *::after {

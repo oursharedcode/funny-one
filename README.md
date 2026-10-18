@@ -101,7 +101,7 @@ client (fonts are self-hosted); room state is in-memory and dies with the room. 
 keeps only anonymous daily visit counts — no IP address, no cookie, none in the Android app or
 when the browser sends Do Not Track or Global Privacy Control.
 
-The privacy policy players read, in all 20 languages, is
+The privacy policy players read, in all 23 languages, is
 [deploy/origin-root/funny37/privacy.html](deploy/origin-root/funny37/privacy.html), served by
 Caddy at `https://<FM_HOST>/privacy`. Change it in the same commit as any change to what the
 game collects, keeps or sends.

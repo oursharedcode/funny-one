@@ -37,6 +37,9 @@ import ta from './ta.json';
 import hi from './hi.json';
 import te from './te.json';
 import bn from './bn.json';
+import ar from './ar.json';
+import sw from './sw.json';
+import yo from './yo.json';
 
 type Catalog = Record<string, unknown>;
 const CATALOGS: Record<string, Catalog> = {
@@ -60,6 +63,9 @@ const CATALOGS: Record<string, Catalog> = {
   hi,
   te,
   bn,
+  ar,
+  sw,
+  yo,
 };
 
 /**

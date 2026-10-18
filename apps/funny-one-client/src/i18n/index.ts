@@ -46,17 +46,33 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
-const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa']);
+const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa', 'ar']);
 
 /** Text direction of a language; the exported still draws its story by it (Step 73). */
 export function textDirection(lng: string): 'rtl' | 'ltr' {
   return RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
 }
 
-function applyDirection(lng: string): void {
-  document.documentElement.dir = textDirection(lng);
+/**
+ * The font family a story is drawn in. Georgia, the stories' serif, has none
+ * of Yoruba's ẹ, ọ, ṣ or ǹ: Chromium took the first three from another font a
+ * letter at a time and set ǹ as an n with its accent beside it — «nǹkan» came
+ * out "nn`kan" (Step 81). Yoruba takes Cambria, which has them all on Windows,
+ * or the platform's serif. For the exported still (rigExport.ts);
+ * styles/index.css says the same for the page.
+ */
+export function proseFontFamily(lng: string): string {
+  return lng === 'yo' ? 'Cambria, serif' : 'Georgia, serif';
 }
-i18n.on('languageChanged', applyDirection);
-applyDirection(i18n.language);
+
+// The document's direction and, since Step 81, its language: index.html says
+// "en" for every language; `lang` gives screen readers the right voice, CJK
+// text its own glyphs, and styles/index.css the hook for Yoruba's headings.
+function applyToDocument(lng: string): void {
+  document.documentElement.dir = textDirection(lng);
+  document.documentElement.lang = lng;
+}
+i18n.on('languageChanged', applyToDocument);
+applyToDocument(i18n.language);
 
 export default i18n;

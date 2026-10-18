@@ -59,7 +59,7 @@ export interface AnswerOption {
   readonly id: OptionId;
   /**
    * English image-prompt fragment. Required on visual slots, absent on prose
-   * slots. One fragment serves all 20 languages, which is what lets a single R2
+   * slots. One fragment serves all 23 languages, which is what lets a single R2
    * cache cover the whole world (FM-POOL-2, DD-4).
    */
   readonly promptEn?: string;
@@ -206,7 +206,8 @@ export const ASCII_PRINTABLE = /^[\x20-\x7E]+$/u;
  * coverage matrix. T-1.5 shipped en + ru as hand-authored references; T-6.3
  * machine-drafted the remaining 13 (each flagged `needs-<code>-review`) and
  * widened this to the full `Language` union, so the matrix now covers all 15
- * (20 since Step 73 added yue, fa, hi, te and bn the same way)
+ * (20 since Step 73 added yue, fa, hi, te and bn the same way, 23 since
+ * Step 81 added ar, sw and yo)
  * (D-2, FM-POOL-2/5). Every consumer keyed off `AUTHORED_LANGUAGES` — the
  * server's i18n loader, `rooms.isValidLanguage`, this package's own coverage
  * tests — widened for free the moment this list did.
@@ -234,4 +235,7 @@ export const AUTHORED_LANGUAGES: readonly AuthoredLanguage[] = [
   'hi',
   'te',
   'bn',
+  'ar',
+  'sw',
+  'yo',
 ];

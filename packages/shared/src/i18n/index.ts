@@ -40,6 +40,9 @@ import { ta } from './ta.js';
 import { hi } from './hi.js';
 import { te } from './te.js';
 import { bn } from './bn.js';
+import { ar } from './ar.js';
+import { sw } from './sw.js';
+import { yo } from './yo.js';
 
 const CATALOGS: Readonly<Record<AuthoredLanguage, ServerI18n>> = {
   en,
@@ -62,6 +65,9 @@ const CATALOGS: Readonly<Record<AuthoredLanguage, ServerI18n>> = {
   hi,
   te,
   bn,
+  ar,
+  sw,
+  yo,
 };
 
 function project<V>(pick: (d: ServerI18n) => V): Record<AuthoredLanguage, V> {

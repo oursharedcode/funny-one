@@ -14,14 +14,14 @@
 // `footer.contentNotice` key, fixed to the story's own language (B-15) via
 // `i18n.getFixedT`, not the active UI locale — same fix as the still's footer.
 
-import i18n, { textDirection } from './i18n/index';
+import i18n, { proseFontFamily, textDirection } from './i18n/index';
 import { SOURCE_URL } from './sourceUrl';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
 const QR_SIZE = 120;
 const QR_TEXT_GAP = 18;
 const PAD = 40;
-const NOTICE_FONT = 'italic 20px Georgia, serif';
+const NOTICE_STYLE = 'italic 20px'; // in the story's own family (proseFontFamily)
 const NOTICE_LINE_HEIGHT = 28;
 const NOTICE_COLOR = '#4b5563';
 const SOURCE_LABEL_FONT = 'bold 24px system-ui, sans-serif';
@@ -34,10 +34,11 @@ const NOTICE_SOURCE_GAP = 16;
 const INK = '#1f2937';
 const CREAM = '#fef3c7';
 
-// Story text drawn between the nickname badge and the attribution block.
-// The font auto-shrinks from MAX down to MIN px so a long story still fits
-// the height the caller budgets (so the QR footer never gets clipped).
-const STORY_FONT_FAMILY = 'Georgia, serif';
+// Story text drawn between the nickname badge and the attribution block,
+// in the story's own family (proseFontFamily: Yoruba's letters need one of
+// their own, Step 81). The font auto-shrinks from MAX down to MIN px so a
+// long story still fits the height the caller budgets (so the QR footer
+// never gets clipped).
 const STORY_MAX_PX = 24;
 const STORY_MIN_PX = 14;
 const STORY_LINE_RATIO = 1.42; // line height as a multiple of the font px
@@ -66,7 +67,7 @@ interface FooterLayout {
 // the left; the right column holds the notice (top) and the source label —
 // dropped to the QR's bottom edge — with the URL just beneath it. A tall
 // notice pushes the source label lower so the two never overlap. Sets the
-// context font to NOTICE_FONT as a measuring side effect.
+// context font to the notice's as a measuring side effect.
 //
 // `language` fixes the notice to the story's own language (B-15 can put a
 // story on screen under any interface language), not the active UI locale —
@@ -79,7 +80,7 @@ function computeLayout(
   const notice = i18n.getFixedT(language)('footer.contentNotice');
   const rightColX = PAD + QR_SIZE + QR_TEXT_GAP;
   const rightColWidth = canvasWidth - rightColX - PAD;
-  ctx.font = NOTICE_FONT;
+  ctx.font = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
   const noticeLines = wrapText(ctx, notice, rightColWidth);
   const noticeHeight = noticeLines.length * NOTICE_LINE_HEIGHT;
   const sourceLabelTop = Math.max(QR_SIZE - SOURCE_LABEL_HEIGHT, noticeHeight + NOTICE_SOURCE_GAP);
@@ -105,12 +106,13 @@ export function measureAttributionHeight(
 function fitStory(
   ctx: CanvasRenderingContext2D,
   prose: string,
+  family: string,
   maxWidth: number,
   maxHeight: number,
 ): { fontPx: number; lineHeight: number; lines: string[] } {
   let chosen = { fontPx: STORY_MIN_PX, lineHeight: 0, lines: [] as string[] };
   for (let fontPx = STORY_MAX_PX; fontPx >= STORY_MIN_PX; fontPx--) {
-    ctx.font = `${fontPx}px ${STORY_FONT_FAMILY}`;
+    ctx.font = `${fontPx}px ${family}`;
     const lines = wrapText(ctx, prose, maxWidth);
     const lineHeight = Math.round(fontPx * STORY_LINE_RATIO);
     chosen = { fontPx, lineHeight, lines };
@@ -137,7 +139,13 @@ export function drawStoryText(
   ctx.direction = dir;
   ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
   ctx.textBaseline = 'top';
-  const { lineHeight, lines } = fitStory(ctx, prose, canvasWidth - PAD * 2, maxHeight);
+  const { lineHeight, lines } = fitStory(
+    ctx,
+    prose,
+    proseFontFamily(language),
+    canvasWidth - PAD * 2,
+    maxHeight,
+  );
   ctx.fillStyle = INK;
   const x = dir === 'rtl' ? canvasWidth - PAD : PAD;
   let y = topY;
@@ -174,7 +182,7 @@ export function drawAttribution(
   ctx.drawImage(qrCanvas, PAD, topY, QR_SIZE, QR_SIZE);
 
   // Content-responsibility notice — right column, stacked from the top.
-  ctx.font = NOTICE_FONT;
+  ctx.font = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
   ctx.fillStyle = NOTICE_COLOR;
   let noticeY = topY;
   for (const line of noticeLines) {

@@ -16,9 +16,10 @@ import { LANGUAGES, isLanguage } from '@funny/shared';
 
 // Auto-discovery via Vite's `import.meta.glob`: every `<code>.json` next to
 // this file is registered as an i18next resource. Eager mode bundles all of
-// them into the main client chunk — adequate up to ~20 languages (each is
-// ~3 KB minified). If the count grows past that, switch to non-eager and
-// load on language selection.
+// them into the main client chunk. Step 81 measured 23 catalogues at 134 kB
+// minified (English 4 kB, Tamil 10 kB) and kept it: the PWA precaches every
+// chunk for offline play (vite.config.ts), so loading a catalogue on language
+// selection would spare only the parsing of the others.
 const modules = import.meta.glob<Record<string, unknown>>('./*.json', {
   eager: true,
   import: 'default',
@@ -54,11 +55,14 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
-// Keep the document direction in sync with the active UI language. Hebrew and
-// Persian (Step 73) are the RTL languages shipped; flipping `dir` at the root
-// lets the flex/grid layouts mirror automatically. Registered after init so it
+// Keep the document's direction and language in sync with the active UI
+// language. Hebrew, Persian (Step 73) and Arabic (Step 81) are the RTL
+// languages shipped; flipping `dir` at the root lets the flex/grid layouts
+// mirror automatically. `lang` (Step 81; index.html said "en" for every
+// language) gives screen readers the right voice, CJK text its own glyphs, and
+// styles/index.css the hook for Yoruba's headings. Registered after init so it
 // also fires for the initial language.
-const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa']);
+const RTL_LANGUAGES: ReadonlySet<string> = new Set(['he', 'fa', 'ar']);
 
 /**
  * Text direction of a language. Exported for B-15: a story shown in a
@@ -69,10 +73,23 @@ export function textDirection(lng: string): 'rtl' | 'ltr' {
   return RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
 }
 
-function applyDirection(lng: string): void {
-  document.documentElement.dir = textDirection(lng);
+/**
+ * The font family a story is drawn in. Georgia, the stories' serif, has none
+ * of Yoruba's ẹ, ọ, ṣ or ǹ: Chromium took the first three from another font a
+ * letter at a time and set ǹ as an n with its accent beside it — «nǹkan» came
+ * out "nn`kan" (Step 81). Yoruba takes Cambria, which has them all on Windows,
+ * or the platform's serif. For the canvas exports (downloadStory.ts,
+ * videoFooter.ts); styles/index.css says the same for the page.
+ */
+export function proseFontFamily(lng: string): string {
+  return lng === 'yo' ? 'Cambria, serif' : 'Georgia, serif';
 }
-i18n.on('languageChanged', applyDirection);
-applyDirection(i18n.language);
+
+function applyToDocument(lng: string): void {
+  document.documentElement.dir = textDirection(lng);
+  document.documentElement.lang = lng;
+}
+i18n.on('languageChanged', applyToDocument);
+applyToDocument(i18n.language);
 
 export default i18n;

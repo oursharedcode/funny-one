@@ -4,7 +4,7 @@
 // (@funny/shared LANGUAGES). English is the master. Russian is reviewed and
 // uses the binding names: «Семейная Чепуха» for the family of games,
 // «Чепуха 37» and «Одна Чепуха: по кругу» for the two games. The other
-// eighteen are machine-quality drafts awaiting a native speaker, exactly like
+// twenty-one are machine-quality drafts awaiting a native speaker, exactly like
 // the games' own catalogs (FM-POOL-5, task B-3).
 //
 // A game's name is never written here: GAME_NAMES copies what each game calls
@@ -78,6 +78,13 @@ export const GAME_NAMES: Record<Language, GameNames> = {
   hi: { fm: 'मज़ेदार कहानियाँ', fo: 'बारी-बारी कहानी', source: 'GitHub पर सोर्स कोड' },
   te: { fm: 'సరదా కథలు', fo: 'గొలుసు కథ', source: 'GitHubలో సోర్స్ కోడ్' },
   bn: { fm: 'মজার গল্প', fo: 'হাতে হাতে গল্প', source: 'GitHub-এ সোর্স কোড' },
+  ar: { fm: 'حكايات مضحكة', fo: 'حكاية بالدور', source: 'الشيفرة المصدرية على GitHub' },
+  sw: {
+    fm: 'Hadithi za Kuchekesha',
+    fo: 'Hadithi ya Kupokezana',
+    source: 'Msimbo chanzo kwenye GitHub',
+  },
+  yo: { fm: 'Ìtàn Àwàdà', fo: 'Ìtàn Yíká Tábìlì', source: 'Kóòdù orísun lórí GitHub' },
 };
 
 export const STRINGS: Record<Language, HubStrings> = {
@@ -85,7 +92,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Funny Family',
     metaTitle: 'Funny Family — silly story games to play together',
     metaDescription:
-      'Two free party games for friends and family: pick absurd answers, get silly stories, and watch each one become a cartoon. Play in your browser, in 20 languages.',
+      'Two free party games for friends and family: pick absurd answers, get silly stories, and watch each one become a cartoon. Play in your browser, in 23 languages.',
     heroTitle: 'Silly stories, made together',
     heroLead:
       'Two free party games for friends and family. Everyone picks absurd answers, the game mixes them into stories, and each story becomes a cartoon.',
@@ -118,7 +125,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Drôle de famille',
     metaTitle: "Drôle de famille — des jeux d'histoires loufoques à jouer ensemble",
     metaDescription:
-      "Deux jeux d'ambiance gratuits pour les amis et la famille : choisissez des réponses absurdes, obtenez des histoires loufoques, et chacune devient un dessin. Dans le navigateur, en 20 langues.",
+      "Deux jeux d'ambiance gratuits pour les amis et la famille : choisissez des réponses absurdes, obtenez des histoires loufoques, et chacune devient un dessin. Dans le navigateur, en 23 langues.",
     heroTitle: 'Des histoires loufoques, inventées ensemble',
     heroLead:
       "Deux jeux d'ambiance gratuits pour les amis et la famille. Chacun choisit des réponses absurdes, le jeu les mélange en histoires, et chaque histoire devient un dessin.",
@@ -152,7 +159,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Familienquatsch',
     metaTitle: 'Familienquatsch – lustige Geschichtenspiele für alle zusammen',
     metaDescription:
-      'Zwei kostenlose Partyspiele für Freunde und Familie: Wählt absurde Antworten, bekommt verrückte Geschichten – und jede wird zum Cartoon. Im Browser, in 20 Sprachen.',
+      'Zwei kostenlose Partyspiele für Freunde und Familie: Wählt absurde Antworten, bekommt verrückte Geschichten – und jede wird zum Cartoon. Im Browser, in 23 Sprachen.',
     heroTitle: 'Verrückte Geschichten, gemeinsam erfunden',
     heroLead:
       'Zwei kostenlose Partyspiele für Freunde und Familie. Alle wählen absurde Antworten, das Spiel mischt sie zu Geschichten, und jede Geschichte wird zum Cartoon.',
@@ -186,7 +193,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Семейная Чепуха',
     metaTitle: 'Семейная Чепуха — смешные истории, которые сочиняют вместе',
     metaDescription:
-      'Две бесплатные игры для друзей и семьи: выбирайте нелепые ответы, получайте смешные истории — и каждая превращается в рисунок. Играйте в браузере, на 20 языках.',
+      'Две бесплатные игры для друзей и семьи: выбирайте нелепые ответы, получайте смешные истории — и каждая превращается в рисунок. Играйте в браузере, на 23 языках.',
     heroTitle: 'Смешные истории — вместе',
     heroLead:
       'Две бесплатные игры для компании и семьи. Каждый выбирает нелепые ответы, игра собирает из них истории, и каждая история превращается в рисунок.',
@@ -220,7 +227,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Keluarga Lucu',
     metaTitle: 'Keluarga Lucu — game cerita konyol untuk dimainkan bersama',
     metaDescription:
-      'Dua game pesta gratis untuk teman dan keluarga: pilih jawaban absurd, dapatkan cerita konyol, dan lihat setiap cerita menjadi kartun. Main di browser, dalam 20 bahasa.',
+      'Dua game pesta gratis untuk teman dan keluarga: pilih jawaban absurd, dapatkan cerita konyol, dan lihat setiap cerita menjadi kartun. Main di browser, dalam 23 bahasa.',
     heroTitle: 'Cerita konyol, dibuat bersama',
     heroLead:
       'Dua game pesta gratis untuk teman dan keluarga. Semua memilih jawaban absurd, game meraciknya menjadi cerita, dan setiap cerita menjadi kartun.',
@@ -254,7 +261,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Famiglia Divertente',
     metaTitle: 'Famiglia Divertente — giochi di storie buffe da fare insieme',
     metaDescription:
-      'Due giochi di società gratuiti per amici e famiglia: scegliete risposte assurde, ottenete storie buffe e guardate ognuna diventare un disegno. Nel browser, in 20 lingue.',
+      'Due giochi di società gratuiti per amici e famiglia: scegliete risposte assurde, ottenete storie buffe e guardate ognuna diventare un disegno. Nel browser, in 23 lingue.',
     heroTitle: 'Storie buffe, inventate insieme',
     heroLead:
       'Due giochi di società gratuiti per amici e famiglia. Ognuno sceglie risposte assurde, il gioco le mescola in storie e ogni storia diventa un disegno.',
@@ -288,7 +295,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: '搞笑一家',
     metaTitle: '搞笑一家 — 一起玩的爆笑故事游戏',
     metaDescription:
-      '两款面向朋友和家人的免费聚会游戏：选出荒诞的答案，拼成爆笑故事，每个故事都会变成一幅漫画。在浏览器中即可玩，支持 20 种语言。',
+      '两款面向朋友和家人的免费聚会游戏：选出荒诞的答案，拼成爆笑故事，每个故事都会变成一幅漫画。在浏览器中即可玩，支持 23 种语言。',
     heroTitle: '一起编出爆笑故事',
     heroLead:
       '两款面向朋友和家人的免费聚会游戏。每个人挑选荒诞的答案，游戏把它们拼成故事，每个故事都会变成一幅漫画。',
@@ -319,7 +326,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: '搞笑一家親',
     metaTitle: '搞笑一家親 — 一家大細一齊玩嘅爆笑故事遊戲',
     metaDescription:
-      '兩款畀朋友同屋企人玩嘅免費派對遊戲：揀啲無厘頭答案，砌出爆笑故事，每個故事仲會變成一幅漫畫。用瀏覽器就玩得，有 20 種語言。',
+      '兩款畀朋友同屋企人玩嘅免費派對遊戲：揀啲無厘頭答案，砌出爆笑故事，每個故事仲會變成一幅漫畫。用瀏覽器就玩得，有 23 種語言。',
     heroTitle: '一齊砌出嚟嘅爆笑故事',
     heroLead:
       '兩款畀朋友同屋企人玩嘅免費派對遊戲。個個揀啲無厘頭答案，遊戲將佢哋撈埋一齊變成故事，每個故事仲會變成一幅漫畫。',
@@ -351,7 +358,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'おもしろファミリー',
     metaTitle: 'おもしろファミリー — みんなで遊べるおもしろストーリーゲーム',
     metaDescription:
-      '友だちや家族と遊べる無料のパーティーゲーム2本。とんでもない答えを選ぶとおかしな物語ができあがり、物語はそれぞれイラストになります。ブラウザで遊べて、20言語に対応。',
+      '友だちや家族と遊べる無料のパーティーゲーム2本。とんでもない答えを選ぶとおかしな物語ができあがり、物語はそれぞれイラストになります。ブラウザで遊べて、23言語に対応。',
     heroTitle: 'みんなでつくる、おかしな物語',
     heroLead:
       '友だちや家族と遊べる無料のパーティーゲーム2本。みんながとんでもない答えを選び、ゲームがそれを物語にまとめ、物語はそれぞれイラストになります。',
@@ -385,7 +392,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: '재미있는 가족',
     metaTitle: '재미있는 가족 — 함께 즐기는 엉뚱한 이야기 게임',
     metaDescription:
-      '친구와 가족을 위한 무료 파티 게임 두 가지: 엉뚱한 답을 고르면 웃긴 이야기가 만들어지고, 이야기마다 만화가 됩니다. 브라우저에서 20개 언어로 즐기세요.',
+      '친구와 가족을 위한 무료 파티 게임 두 가지: 엉뚱한 답을 고르면 웃긴 이야기가 만들어지고, 이야기마다 만화가 됩니다. 브라우저에서 23개 언어로 즐기세요.',
     heroTitle: '함께 만드는 엉뚱한 이야기',
     heroLead:
       '친구와 가족을 위한 무료 파티 게임 두 가지. 모두가 엉뚱한 답을 고르면 게임이 그 답들을 섞어 이야기를 만들고, 이야기마다 만화가 됩니다.',
@@ -419,7 +426,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Família Divertida',
     metaTitle: 'Família Divertida — jogos de histórias malucas para jogar juntos',
     metaDescription:
-      'Dois jogos grátis para amigos e família: escolham respostas absurdas, recebam histórias malucas e vejam cada uma virar um desenho. No navegador, em 20 idiomas.',
+      'Dois jogos grátis para amigos e família: escolham respostas absurdas, recebam histórias malucas e vejam cada uma virar um desenho. No navegador, em 23 idiomas.',
     heroTitle: 'Histórias malucas, criadas juntos',
     heroLead:
       'Dois jogos grátis para amigos e família. Cada um escolhe respostas absurdas, o jogo mistura tudo em histórias e cada história vira um desenho.',
@@ -453,7 +460,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Familia Divertida',
     metaTitle: 'Familia Divertida: juegos de historias disparatadas para jugar juntos',
     metaDescription:
-      'Dos juegos gratis para amigos y familia: elijan respuestas absurdas, obtengan historias disparatadas y vean cómo cada una se convierte en un dibujo. En el navegador y en 20 idiomas.',
+      'Dos juegos gratis para amigos y familia: elijan respuestas absurdas, obtengan historias disparatadas y vean cómo cada una se convierte en un dibujo. En el navegador y en 23 idiomas.',
     heroTitle: 'Historias disparatadas, creadas entre todos',
     heroLead:
       'Dos juegos gratis para amigos y familia. Cada uno elige respuestas absurdas, el juego las mezcla en historias y cada historia se convierte en un dibujo.',
@@ -487,7 +494,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Familia Divertida',
     metaTitle: 'Familia Divertida: juegos de historias disparatadas para jugar juntos',
     metaDescription:
-      'Dos juegos gratis para amigos y familia: elegid respuestas absurdas, obtened historias disparatadas y mirad cómo cada una se convierte en un dibujo. En el navegador y en 20 idiomas.',
+      'Dos juegos gratis para amigos y familia: elegid respuestas absurdas, obtened historias disparatadas y mirad cómo cada una se convierte en un dibujo. En el navegador y en 23 idiomas.',
     heroTitle: 'Historias disparatadas, creadas entre todos',
     heroLead:
       'Dos juegos gratis para amigos y familia. Cada uno elige respuestas absurdas, el juego las mezcla en historias y cada historia se convierte en un dibujo.',
@@ -521,7 +528,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'Кумедна родина',
     metaTitle: 'Кумедна родина — смішні історії, які складають разом',
     metaDescription:
-      'Дві безкоштовні ігри для друзів і родини: обирайте безглузді відповіді, отримуйте смішні історії — і кожна стає малюнком. Грайте в браузері, 20 мовами.',
+      'Дві безкоштовні ігри для друзів і родини: обирайте безглузді відповіді, отримуйте смішні історії — і кожна стає малюнком. Грайте в браузері, 23 мовами.',
     heroTitle: 'Смішні історії — разом',
     heroLead:
       'Дві безкоштовні ігри для компанії та родини. Кожен обирає безглузді відповіді, гра складає з них історії, і кожна історія стає малюнком.',
@@ -555,7 +562,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'משפחה מצחיקה',
     metaTitle: 'משפחה מצחיקה — משחקי סיפורים מטורפים לשחק יחד',
     metaDescription:
-      'שני משחקי מסיבה חינמיים לחברים ולמשפחה: בוחרים תשובות אבסורדיות, מקבלים סיפורים מטורפים, וכל סיפור הופך לציור. משחקים בדפדפן, ב-20 שפות.',
+      'שני משחקי מסיבה חינמיים לחברים ולמשפחה: בוחרים תשובות אבסורדיות, מקבלים סיפורים מטורפים, וכל סיפור הופך לציור. משחקים בדפדפן, ב-23 שפות.',
     heroTitle: 'סיפורים מטורפים, ביחד',
     heroLead:
       'שני משחקי מסיבה חינמיים לחברים ולמשפחה. כל אחד בוחר תשובות אבסורדיות, המשחק מערבב אותן לסיפורים, וכל סיפור הופך לציור.',
@@ -588,7 +595,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'خانوادهٔ بامزه',
     metaTitle: 'خانوادهٔ بامزه — بازی‌های قصه‌سازی خنده‌دار برای دورهمی',
     metaDescription:
-      'دو بازی رایگان برای دورهمی دوستان و خانواده: جواب‌های عجیب و غریب انتخاب کنید، قصه‌های خنده‌دار تحویل بگیرید و ببینید هر کدام کارتون می‌شود. در مرورگر، به 20 زبان.',
+      'دو بازی رایگان برای دورهمی دوستان و خانواده: جواب‌های عجیب و غریب انتخاب کنید، قصه‌های خنده‌دار تحویل بگیرید و ببینید هر کدام کارتون می‌شود. در مرورگر، به 23 زبان.',
     heroTitle: 'قصه‌های بامزه‌ای که با هم می‌سازیم',
     heroLead:
       'دو بازی رایگان برای دوستان و خانواده. همه جواب‌های عجیب و غریب انتخاب می‌کنند، بازی آن‌ها را قاطی می‌کند و قصه می‌سازد، و هر قصه یک کارتون می‌شود.',
@@ -622,7 +629,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'வேடிக்கையான குடும்பம்',
     metaTitle: 'வேடிக்கையான குடும்பம் — சேர்ந்து விளையாடும் வேடிக்கைக் கதை விளையாட்டுகள்',
     metaDescription:
-      'நண்பர்களுக்கும் குடும்பத்துக்கும் இரண்டு இலவச பார்ட்டி விளையாட்டுகள்: விநோதமான பதில்களைத் தேர்ந்தெடுங்கள், வேடிக்கையான கதைகளைப் பெறுங்கள் — ஒவ்வொரு கதையும் கார்ட்டூனாக மாறும். உலாவியில் 20 மொழிகளில் விளையாடுங்கள்.',
+      'நண்பர்களுக்கும் குடும்பத்துக்கும் இரண்டு இலவச பார்ட்டி விளையாட்டுகள்: விநோதமான பதில்களைத் தேர்ந்தெடுங்கள், வேடிக்கையான கதைகளைப் பெறுங்கள் — ஒவ்வொரு கதையும் கார்ட்டூனாக மாறும். உலாவியில் 23 மொழிகளில் விளையாடுங்கள்.',
     heroTitle: 'சேர்ந்து உருவாக்கும் வேடிக்கைக் கதைகள்',
     heroLead:
       'நண்பர்களுக்கும் குடும்பத்துக்கும் இரண்டு இலவச பார்ட்டி விளையாட்டுகள். எல்லோரும் விநோதமான பதில்களைத் தேர்ந்தெடுக்கிறார்கள், விளையாட்டு அவற்றைக் கலந்து கதைகளாக்குகிறது, ஒவ்வொரு கதையும் கார்ட்டூனாக மாறுகிறது.',
@@ -656,7 +663,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'मज़ेदार परिवार',
     metaTitle: 'मज़ेदार परिवार — साथ मिलकर खेलने वाले मज़ेदार कहानी-खेल',
     metaDescription:
-      'दोस्तों और परिवार के लिए दो मुफ़्त पार्टी गेम: बेतुके जवाब चुनें, मज़ेदार कहानियाँ पाएँ और देखें कि हर कहानी कैसे कार्टून बनती है। ब्राउज़र में, 20 भाषाओं में खेलें।',
+      'दोस्तों और परिवार के लिए दो मुफ़्त पार्टी गेम: बेतुके जवाब चुनें, मज़ेदार कहानियाँ पाएँ और देखें कि हर कहानी कैसे कार्टून बनती है। ब्राउज़र में, 23 भाषाओं में खेलें।',
     heroTitle: 'मिलकर बनाई गई मज़ेदार कहानियाँ',
     heroLead:
       'दोस्तों और परिवार के लिए दो मुफ़्त पार्टी गेम। हर कोई बेतुके जवाब चुनता है, खेल उन्हें मिलाकर कहानियाँ बनाता है, और हर कहानी एक कार्टून बन जाती है।',
@@ -689,7 +696,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'సరదా కుటుంబం',
     metaTitle: 'సరదా కుటుంబం — కలిసి ఆడుకునే సరదా కథల ఆటలు',
     metaDescription:
-      'స్నేహితులకు, కుటుంబానికి రెండు ఉచిత పార్టీ ఆటలు: తలాతోకా లేని జవాబులు ఎంచుకోండి, తమాషా కథలు పొందండి — ప్రతి కథ ఒక కార్టూన్‌గా మారుతుంది. బ్రౌజర్‌లోనే 20 భాషల్లో ఆడండి.',
+      'స్నేహితులకు, కుటుంబానికి రెండు ఉచిత పార్టీ ఆటలు: తలాతోకా లేని జవాబులు ఎంచుకోండి, తమాషా కథలు పొందండి — ప్రతి కథ ఒక కార్టూన్‌గా మారుతుంది. బ్రౌజర్‌లోనే 23 భాషల్లో ఆడండి.',
     heroTitle: 'కలిసి అల్లుకునే సరదా కథలు',
     heroLead:
       'స్నేహితులకు, కుటుంబానికి రెండు ఉచిత పార్టీ ఆటలు. అందరూ తలాతోకా లేని జవాబులు ఎంచుకుంటారు, ఆట వాటిని కలిపి కథలుగా అల్లుతుంది, ప్రతి కథ ఒక కార్టూన్‌గా మారుతుంది.',
@@ -723,7 +730,7 @@ export const STRINGS: Record<Language, HubStrings> = {
     brand: 'মজার পরিবার',
     metaTitle: 'মজার পরিবার — সবাই মিলে খেলার মতো মজার গল্পের খেলা',
     metaDescription:
-      'বন্ধু আর পরিবারের জন্য দুটো ফ্রি পার্টি গেম: উদ্ভট উত্তর বেছে নাও, মজার গল্প পাও, আর দেখো প্রতিটা গল্প কীভাবে কার্টুন হয়ে যায়। ব্রাউজারেই খেলো, 20টি ভাষায়।',
+      'বন্ধু আর পরিবারের জন্য দুটো ফ্রি পার্টি গেম: উদ্ভট উত্তর বেছে নাও, মজার গল্প পাও, আর দেখো প্রতিটা গল্প কীভাবে কার্টুন হয়ে যায়। ব্রাউজারেই খেলো, 23টি ভাষায়।',
     heroTitle: 'সবাই মিলে বানানো মজার গল্প',
     heroLead:
       'বন্ধু আর পরিবারের জন্য দুটো ফ্রি পার্টি গেম। সবাই উদ্ভট উত্তর বেছে নেয়, গেম সেগুলো মিশিয়ে গল্প বানায়, আর প্রতিটা গল্প একটা কার্টুন হয়ে যায়।',
@@ -752,5 +759,107 @@ export const STRINGS: Record<Language, HubStrings> = {
     privacyLink: 'গোপনীয়তা নীতি',
     footerMore: 'আরও ফ্রি জিনিস: {link}',
     skip: 'মূল কনটেন্টে যাও',
+  },
+  ar: {
+    brand: 'العائلة المرحة',
+    metaTitle: 'العائلة المرحة — ألعاب حكايات مضحكة نلعبها معا',
+    metaDescription:
+      'لعبتان جماعيتان مجانيتان للأصدقاء والعائلة: اختاروا إجابات عجيبة، واحصلوا على حكايات مضحكة، وشاهدوا كل حكاية تتحول إلى رسم كرتوني. العبوا في المتصفح، بأي من 23 لغة.',
+    heroTitle: 'حكايات عجيبة نصنعها معا',
+    heroLead:
+      'لعبتان جماعيتان مجانيتان للأصدقاء والعائلة. يختار الجميع إجابات عجيبة، فتمزجها اللعبة في حكايات، وتتحول كل حكاية إلى رسم كرتوني.',
+    gamesTitle: 'اختاروا لعبة',
+    fmTag: '3–7 لاعبين · كل لاعب على هاتفه',
+    fmText:
+      'أنشئوا غرفة وشاركوا الرابط أو رمز QR. يجيب كل لاعب على هاتفه، ثم تظهر الحكايات واحدة تلو الأخرى، ولكل منها رسمها الكرتوني الخاص.',
+    foTag: '2–7 لاعبين · هاتف واحد يتنقل من يد إلى يد',
+    foText:
+      'لا غرفة، ولا تسجيل، ولا حاجة إلى الإنترنت. مرروا الهاتف حول الطاولة، وأضيفوا لاعبين افتراضيين إن نقص العدد.',
+    play: 'العبوا الآن',
+    howTitle: 'طريقة اللعب',
+    how1: 'في كل جولة سؤال طريف: اختاروا إجابة من قائمة خيارات مضحكة.',
+    how2: 'تمزج اللعبة إجابات الجميع في حكايات قصيرة عجيبة.',
+    how3: 'تتحول كل حكاية إلى رسم كرتوني. اقرؤوها بصوت عال واضحكوا معا.',
+    videoPlay: 'تشغيل الفيديو',
+    videoCaption: 'شاهدوا الإعلان التشويقي (6 ثوان)',
+    videoPause: 'إيقاف فيديو الخلفية مؤقتا',
+    videoResume: 'تشغيل فيديو الخلفية',
+    ghTitle: 'مجانية ومفتوحة المصدر',
+    ghText:
+      'اللعبتان مفتوحتا المصدر بترخيص AGPL-3.0. اقرؤوا الشيفرة، أو اقترحوا إصلاحا، أو أطلقوا خادمكم الخاص.',
+    langLabel: 'اللغة',
+    privacyNote:
+      'لا ملفات تعريف ارتباط ولا إعلانات. تحصي هذه الصفحة الزيارات والنقرات، ولا تعرف أبدا من أنتم.',
+    privacyLink: 'سياسة الخصوصية',
+    footerMore: 'المزيد من الأشياء المجانية على {link}',
+    skip: 'الانتقال إلى المحتوى',
+  },
+  sw: {
+    brand: 'Familia ya Kicheko',
+    metaTitle: 'Familia ya Kicheko — michezo ya hadithi za kuchekesha ya kucheza pamoja',
+    metaDescription:
+      'Michezo miwili ya bure ya kikundi kwa marafiki na familia: chagua majibu ya ajabu, pata hadithi za kuchekesha, na utazame kila moja ikigeuka kuwa katuni. Cheza kwenye kivinjari chako, kwa lugha 23.',
+    heroTitle: 'Hadithi za kuchekesha, zilizotungwa pamoja',
+    heroLead:
+      'Michezo miwili ya bure ya kikundi kwa marafiki na familia. Kila mtu anachagua majibu ya ajabu, mchezo unayachanganya kuwa hadithi, na kila hadithi inageuka kuwa katuni.',
+    gamesTitle: 'Chagua mchezo',
+    fmTag: 'Wachezaji 3–7 · kila mmoja kwenye simu yake',
+    fmText:
+      'Unda chumba na utume kiungo au msimbo wa QR. Kila mtu anajibu kwenye simu yake, kisha hadithi zinafunuliwa moja baada ya nyingine — kila moja na katuni yake.',
+    foTag: 'Wachezaji 2–7 · simu moja, mnapokezana',
+    foText:
+      'Hakuna chumba, hakuna kujisajili, hakuna haja ya intaneti. Pokezaneni simu kuzunguka meza, na ongezeni wachezaji roboti ikiwa watu hawatoshi.',
+    play: 'Cheza sasa',
+    howTitle: 'Jinsi inavyofanya kazi',
+    how1: 'Kila raundi inaleta swali la kufurahisha — chagua jibu kutoka kwenye orodha ya machaguo ya kuchekesha.',
+    how2: 'Mchezo unachanganya majibu ya kila mtu kuwa hadithi fupi za ajabu.',
+    how3: 'Kila hadithi inageuka kuwa katuni. Zisomeni kwa sauti na mcheke pamoja.',
+    videoPlay: 'Cheza video',
+    videoCaption: 'Tazama kionjo (sekunde 6)',
+    videoPause: 'Sitisha video ya nyuma ya ukurasa',
+    videoResume: 'Cheza video ya nyuma ya ukurasa',
+    ghTitle: 'Bure na chanzo huria',
+    ghText:
+      'Michezo yote miwili ni ya chanzo huria chini ya leseni ya AGPL-3.0. Soma msimbo, pendekeza marekebisho au endesha seva yako mwenyewe.',
+    langLabel: 'Lugha',
+    privacyNote:
+      'Hakuna vidakuzi wala matangazo. Ukurasa huu huhesabu ziara na mibofyo tu, na kamwe haujui wewe ni nani.',
+    privacyLink: 'Sera ya faragha',
+    footerMore: 'Vitu zaidi vya bure kwenye {link}',
+    skip: 'Ruka hadi maudhui',
+  },
+  yo: {
+    brand: 'Ìdílé Aláwàdà',
+    metaTitle: 'Ìdílé Aláwàdà — eré ìtàn apanilẹ́rìn-ín tí a jọ ń ṣe',
+    metaDescription:
+      'Eré àríyá ọ̀fẹ́ méjì fún ọ̀rẹ́ àti ẹbí: ẹ yan ìdáhùn tí kò lórí tí kò nídìí, ẹ gba ìtàn apanilẹ́rìn-ín, kí ẹ sì wo bí ìtàn kọ̀ọ̀kan ṣe ń di àwòrán efe. Ẹ ṣeré lórí búráúsà yín, ní èdè 23.',
+    heroTitle: 'Ìtàn apanilẹ́rìn-ín tí a jọ hun',
+    heroLead:
+      'Eré àríyá ọ̀fẹ́ méjì fún ọ̀rẹ́ àti ẹbí. Gbogbo èèyàn ń yan ìdáhùn tí kò lórí tí kò nídìí, eré náà á dà wọ́n pọ̀ di ìtàn, ìtàn kọ̀ọ̀kan á sì di àwòrán efe.',
+    gamesTitle: 'Yan eré kan',
+    fmTag: 'Òṣèré 3–7 · kálukú lórí fóònù tirẹ̀',
+    fmText:
+      'Ṣẹ̀dá yàrá kan, kí o sì pín líǹkì tàbí kóòdù QR rẹ̀. Kálukú á dáhùn lórí fóònù tirẹ̀, lẹ́yìn náà a ó ṣí àwọn ìtàn payá lọ́kọ̀ọ̀kan — ìkọ̀ọ̀kan pẹ̀lú àwòrán efe tirẹ̀.',
+    foTag: 'Òṣèré 2–7 · fóònù kan ṣoṣo, láti ọwọ́ dé ọwọ́',
+    foText:
+      'Kò sí yàrá, kò sí ìforúkọsílẹ̀, kò nílò ẹ̀rọ ayélujára. Ẹ máa gbé fóònù yíká tábìlì, kí ẹ sì ṣàfikún òṣèré ẹ̀rọ bí èèyàn kò bá pọ̀ tó.',
+    play: 'Ṣeré báyìí',
+    howTitle: 'Bí ó ṣe ń ṣiṣẹ́',
+    how1: 'Ìyípo kọ̀ọ̀kan ń mú ìbéèrè alárinrin kan wá — yan ìdáhùn kan nínú àkójọ àwọn àṣàyàn apanilẹ́rìn-ín.',
+    how2: 'Eré náà á da ìdáhùn gbogbo èèyàn pọ̀ di àwọn ìtàn kékeré tí kò lórí tí kò nídìí.',
+    how3: 'Ìtàn kọ̀ọ̀kan á di àwòrán efe. Ẹ kà wọ́n sókè, kí ẹ sì jọ rẹ́rìn-ín.',
+    videoPlay: 'Wo fídíò náà',
+    videoCaption: 'Wo fídíò ṣókí (ìṣẹ́jú-àáyá 6)',
+    videoPause: 'Dá fídíò ẹ̀yìn dúró',
+    videoResume: 'Tẹ̀síwájú pẹ̀lú fídíò ẹ̀yìn',
+    ghTitle: 'Ọ̀fẹ́ ni, kóòdù rẹ̀ sì wà ní gbangba',
+    ghText:
+      'Kóòdù eré méjèèjì wà ní gbangba lábẹ́ ìwé àṣẹ AGPL-3.0. Ka kóòdù náà, dábàá àtúnṣe, tàbí gbé sẹ́fà tìrẹ kalẹ̀.',
+    langLabel: 'Èdè',
+    privacyNote:
+      'Kò sí kúkì, kò sí ìpolówó. Ojú-ìwé yìí ń ka iye àbẹ̀wò àti títẹ̀, ṣùgbọ́n kì í mọ ẹni tí o jẹ́.',
+    privacyLink: 'Ìlànà ìpamọ́ àṣírí',
+    footerMore: 'Àwọn nǹkan ọ̀fẹ́ mìíràn wà ní {link}',
+    skip: 'Fò lọ sí àkóónú',
   },
 };

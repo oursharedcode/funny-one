@@ -1,0 +1,63 @@
+{
+  "_note": "needs-yo-review — machine-translated stub awaiting native Yoruba review.",
+  "home": {
+    "title": "Ìtàn Yíká Tábìlì",
+    "subtitle": "Ẹ máa gbé fóònù kan fún ara yín, kí ẹ jọ hun ìtàn tí kò lórí tí kò nídìí. Òṣèré 2 sí 7, kò nílò ẹ̀rọ ayélujára.",
+    "start": "Bẹ̀rẹ̀ eré",
+    "gameRules": "Òfin eré",
+    "rules": "Ẹ máa gbé fóònù kiri láàárín ara yín. Ní ìyípo kọ̀ọ̀kan, gbogbo yín yóò dáhùn ìbéèrè alárinrin kan náà lọ́kọ̀ọ̀kan. A ó da àwọn ìdáhùn yín pọ̀ di ìtàn tí kò lórí tí kò nídìí, lẹ́yìn náà a ó ya àwòrán apanilẹ́rìn-ín fún ìtàn kọ̀ọ̀kan.",
+    "language": "Èdè",
+    "seatCountHint": "Òṣèré 2–7 lápapọ̀",
+    "playerNamePlaceholder": "Orúkọ",
+    "humanSeatLabel": "Orúkọ òṣèré",
+    "virtualSeatLabel": "Orúkọ òṣèré ẹ̀rọ",
+    "humanBadge": "Ìwọ",
+    "virtualBadge": "Ẹ̀rọ",
+    "removeSeat": "Yọ òṣèré kúrò",
+    "addPlayer": "+ Ṣàfikún òṣèré",
+    "addVirtual": "+ Ṣàfikún ẹ̀rọ",
+    "pictures": "Àwòrán",
+    "picturesBuiltIn": "Ti inú eré",
+    "picturesOnline": "Láti orí ẹ̀rọ ayélujára",
+    "picturesBuiltInHint": "A ó ya wọ́n lórí ẹ̀rọ yìí. Kò nílò ẹ̀rọ ayélujára.",
+    "picturesOnlineHint": "Àwòrán efe láti inú àkójọ àwòrán wa. Ó nílò ẹ̀rọ ayélujára; láìsí i, o máa rí àwọn àwòrán ti inú eré."
+  },
+  "thinking": {
+    "title": "{{name}} ń ronú…"
+  },
+  "handoff": {
+    "title": "Gbé fóònù fún {{name}}",
+    "subtitle": "Má ṣe yọjú wo ìdáhùn ẹlòmíràn.",
+    "ready": "Èmi ni {{name}} — ó yá"
+  },
+  "round": {
+    "progress": "Ìbéèrè {{current}} nínú {{total}}",
+    "pick": "Yan ìdáhùn rẹ",
+    "optionsLabel": "Àwọn ìdáhùn tí o lè yàn",
+    "scrollHint": "Fà á láti rí àwọn mìíràn",
+    "submit": "Fi ránṣẹ́",
+    "submitDisabled": "Kọ́kọ́ yan ìdáhùn kan",
+    "submitted": "A ti fi ránṣẹ́"
+  },
+  "gallery": {
+    "title": "Àwọn ìtàn náà",
+    "storyBy": "Ìtàn {{name}}",
+    "pictureAlt": "Àwòrán ìtàn {{name}}",
+    "prev": "Ìtàn tó ṣáájú",
+    "next": "Ìtàn tó kàn",
+    "counter": "{{index}} nínú {{total}}",
+    "download": "Ṣe ìgbàsílẹ̀",
+    "shareButton": "Pín"
+  },
+  "end": {
+    "title": "Àwọn ìtàn ti ṣetán!",
+    "playAgain": "Tún ṣeré",
+    "changePlayers": "Yí àwọn òṣèré padà"
+  },
+  "footer": {
+    "gameLink": "Líǹkì eré yìí",
+    "playYourself": "Ṣe eré yìí fúnra rẹ",
+    "contentNotice": "Eré yìí ń ṣiṣẹ́ lórí ẹ̀rọ rẹ pátápátá. Kò sí ohun tí o tẹ̀ tí yóò kúrò níbẹ̀ láé.",
+    "contentNoticeOnline": "Kò sí ohun tí o tẹ̀ tí yóò kúrò lórí ẹ̀rọ yìí láé. Tí o bá yan àwòrán láti orí ẹ̀rọ ayélujára, a ó ṣe ìgbàsílẹ̀ àwòrán efe ìtàn kọ̀ọ̀kan láti inú àkójọ àwòrán wa."
+  }
+}

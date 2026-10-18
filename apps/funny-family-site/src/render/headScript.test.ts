@@ -144,6 +144,12 @@ describe('the head script: the language, on / only', () => {
     ['zh-Hant-MO', 'yue'],
     ['yue-HK', 'yue'],
     ['zh-TW', 'zh'],
+    ['ar-MA', 'ar'],
+    ['ar-EG', 'ar'],
+    ['ar', 'ar'],
+    ['sw-KE', 'sw'],
+    ['sw-TZ', 'sw'],
+    ['yo-NG', 'yo'],
   ])('matches %s to %s', (tag, code) => {
     expect(run(true, { languages: [tag] }).replaced).toEqual([`/${code}/`]);
   });

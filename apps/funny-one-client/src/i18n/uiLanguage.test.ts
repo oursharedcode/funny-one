@@ -22,6 +22,12 @@ describe('matchLanguageTag (T-FO-5.1a)', () => {
     expect(matchLanguageTag('bn-IN')).toBe('bn');
     expect(matchLanguageTag('fa-IR')).toBe('fa');
     expect(matchLanguageTag('fa')).toBe('fa');
+    expect(matchLanguageTag('ar-MA')).toBe('ar');
+    expect(matchLanguageTag('ar-SA')).toBe('ar');
+    expect(matchLanguageTag('ar')).toBe('ar');
+    expect(matchLanguageTag('sw-KE')).toBe('sw');
+    expect(matchLanguageTag('sw-TZ')).toBe('sw');
+    expect(matchLanguageTag('yo-NG')).toBe('yo');
   });
 
   it('reads Hong Kong and Macau Chinese as Cantonese, Taiwan as Mandarin', () => {

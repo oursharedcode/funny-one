@@ -4279,6 +4279,153 @@ as is this session, since the file already carries another session's unrelated u
 session's changes land. As agreed in Step 54, the ABN, D-U-N-S number and signup account stay
 out of the repo — they live only in the agent's private memory.
 
+## Step 81 (task B-21) — Three African languages: Arabic, Swahili and Yoruba, 23 in all (2026-10-18)
+
+**Owner request 2026-10-17:** after that day's research on African languages, Arabic, Swahili and
+Yoruba in both games, the landing page and both privacy policies. In that day's interview the
+owner chose **Modern Standard Arabic**, labelled «العربية (المغرب)» under Morocco's flag; Swahili
+goes under Kenya's flag and Yoruba under Nigeria's. Started on the owner's "go" (2026-10-18). The
+RESUME note added three checks: the header's widths again (Step 76), the QR codes again (Step
+78), and Step 79's DB-IP bullet in the new privacy sections. Planned as Step 80; it is Step 81
+because another session's Step 80 (B-1e) was committed first.
+
+**Shipped:**
+
+- *Registry* (`packages/shared/src/languages.ts`): Arabic «العربية (المغرب)» (MA), Swahili
+  «Kiswahili (Kenya)» (KE) and Yoruba «Yorùbá (Nàìjíríà)» (NG) after Bengali, for 23 in all.
+- *Per language,* as in Step 73: a prose template (`packages/shared/src/i18n/<code>.ts`), the 106
+  pool texts (`pools/text/<code>.ts`), both clients' UI catalogues, the landing page's strings,
+  game names and gift-sheet strings, a section in each privacy policy — Funny Multi's with Step
+  79's DB-IP bullet — and a flag picture in each app's `public/flags/` (Twemoji, CC-BY 4.0, as
+  credited in the README). All of it is machine-drafted and marked `needs-<code>-review`.
+- *The names* (family / Funny Multi / Funny One):
+  - Arabic: «العائلة المرحة» ("the merry family") / «حكايات مضحكة» ("funny stories") / «حكاية
+    بالدور» ("a story told in turns");
+  - Swahili: «Familia ya Kicheko» ("family of laughter") / «Hadithi za Kuchekesha» ("funny
+    stories") / «Hadithi ya Kupokezana» ("the pass-around story");
+  - Yoruba: «Ìdílé Aláwàdà» ("the joking family") / «Ìtàn Àwàdà» ("joke stories") / «Ìtàn Yíká
+    Tábìlì» ("a story round the table").
+- *Arabic runs right to left* in both clients (`RTL_LANGUAGES`), on the landing page (`isRtl`)
+  and in both privacy policies (`dir="rtl"`; host names, the age and the address in `<bdi>`).
+- *Language matching:* a browser set to any Arabic gets Arabic, Tanzania's Swahili (`sw-TZ`) as
+  well as Kenya's gets Swahili, and `yo-NG` Yoruba — in Funny One's `uiLanguage.ts` and the
+  landing page's head script. Open Graph locales: `ar_AR` (Facebook's one Arabic), `sw_KE`,
+  `yo_NG`.
+- *Yoruba* carries every tone mark and its dot-below letters, in NFC: ẹ, ọ and ṣ are single
+  characters, and a tone on ẹ or ọ is a combining mark after it, since Unicode has no single
+  character for those.
+- *Yoruba's letters in fonts that have them.* Fredoka, the headings' font, has no ẹ, ọ or ṣ, and
+  Georgia, the stories' serif, has none of ẹ, ọ, ṣ or ǹ: Chromium drew such words in two fonts,
+  a letter at a time, and set «nǹkan» as "nn`kan". Yoruba's headings now take the system font
+  (`.font-display:lang(yo)` in both games' `styles/index.css`, `--display` on the landing page)
+  and its stories `Cambria, serif` — on the page (`.font-prose:lang(yo)`) and in all three
+  canvas exports, the notices included (`proseFontFamily` in both games' `i18n/index.ts`, used
+  by `downloadStory.ts`, `videoFooter.ts` and `rigExport.ts`).
+- *The games set `<html lang>`* to the interface's language, beside `dir` (`index.html` said
+  "en" for every language).
+- *Funny Multi's round question and options carry their own `lang`* — the language they come
+  in, which can differ from the interface's — so a screen reader reads them in the right voice
+  and Yoruba options get Yoruba's fonts under any interface. A story already carried its own
+  (reveal, gallery).
+- *Counts:* "20" became 23 in `LANGUAGES.md`, the README, comments, tests and every language's
+  landing-page description ("in 23 languages"). Funny Multi's catalogue comment now records the
+  size measured below.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *The three close the list,* after Bengali, as one block — not interleaved by script or region.
+2. *One Arabic for every Arabic browser,* Morocco's flag notwithstanding, and Swahili for
+   Tanzania too: a visitor gets the nearest language shipped, not English.
+3. *Funny Multi's catalogues stay in its main chunk:* 23 of them are 134 kB minified (English 4
+   kB, Tamil 10 kB, Arabic 6 kB); the PWA precaches every chunk for offline play anyway, so
+   loading one per language would spare only the parsing of the others. The main chunk is now
+   748 kB (238 kB gzipped).
+4. *Each template follows its language:* Arabic sets the scene first and makes «فريق» ("a team")
+   the subject of both verbs, so no verb has to agree with two actors of mixed gender and
+   number; Swahili keeps English's order; Yoruba opens with the time, and its verbs never
+   inflect.
+5. *Yoruba's names use only precomposed letters* (no ẹ or ọ), which Fredoka draws whole —
+   chosen before decision 8 took Yoruba's headings out of Fredoka; kept.
+6. *Arabic keeps "3–7" and "2–7"* in the player counts as Hebrew does (shown 7–3, read from the
+   right).
+7. *Funny One's policy keeps its date* (2026-10-05): only translations were added, as in Step 73.
+8. *Yoruba's headings in the system font.* Fredoka has no ẹ, ọ or ṣ: 24 Yoruba headings and
+   buttons across the games and the landing page came out in two fonts. The other options were
+   a second, rounded web font that has them (more to download and precache, and a look of its
+   own beside Fredoka) or leaving the mix.
+9. *Yoruba's stories in `Cambria, serif`.* Georgia has none of ẹ, ọ, ṣ, ǹ or ḿ and cannot place
+   a combining accent; Cambria has them all and places them. The list gives Windows Cambria and
+   every other system its own serif — Android has no Georgia, so its stories were always in its
+   serif. The other options were Times New Roman (complete too, and where Chromium found the
+   missing letters, but a plainer face), a web font such as Noto Serif (complete everywhere, but
+   hundreds of kB to precache for one language), or Georgia's mix.
+10. *`<html lang>` follows the interface* in both games: decision 8's hook and a screen reader's
+    voice; with it Chromium also draws Japanese in Yu Gothic and Chinese in Microsoft YaHei, each
+    script's own. Closes Step 73's "Funny Multi's `<html lang>` stays "en"".
+11. *The round's options and question get `lang`, its group's label does not:* the label is in
+    the interface's language.
+
+**Verified in a browser** (Chromium only; WebKit's executables are still missing here):
+
+- *Funny Multi on three phones, one multi-language game* (`.screens/step81-langs-check.mjs`,
+  against the production build on 3000 and the picture Worker stand-in on 5185): home in each
+  language at 390 and 320 px (subtitle, no sideways scroll, flags labelled MA, KE and NG); the
+  Arabic host's lobby; round 1's question and first option from each language's own pool; each
+  phone's reveal story in its own language (at least seven of its pool texts, its closing mark,
+  Arabic right to left); the gallery; each phone's downloaded still. No problems, no console
+  errors.
+- *Fonts, asked of Chromium (CDP `CSS.getPlatformFontsForNode`):* Yoruba's round question in
+  Segoe UI Semibold alone, its ten options and its reveal story in Cambria alone; the Arabic
+  host's gallery switched to the Yoruba story — Cambria alone, so the story's own `lang`
+  decides, not the interface's. Swahili's options and story in Georgia alone; an Arabic story's
+  letters in Times New Roman (Georgia has no Arabic), Georgia drawing only its spaces and stops.
+  Before the headings' rule, 24 Yoruba headings and buttons mixed Fredoka with another font;
+  after it, none is drawn in Fredoka (`.screens/step80-fonts.mjs`, both games and the landing
+  page).
+- *Seen:* both games' Yoruba stills — story and notice in Cambria, each tone mark over its dot
+  (Funny One's made again after the fix, `.screens/step73/fo-still-yo.png`); Funny One's Yoruba
+  end screen at 390 px (`.screens/step81-fo-390/`); the Arabic host's gallery with
+  the Yoruba story; five Yoruba sentences in Georgia, Cambria and the plain serif, on a page and
+  on a canvas, regular and bold (`.screens/step81-prose-fonts/`) — Georgia's "nn`kan" is there.
+- *Funny One* in the three at 390 and 320 px (`scripts/funny-one-screens.mjs`): no overflow, no
+  errors, Arabic right to left; its stills in each (`.screens/step73-fo-stills.mjs`).
+- *Fitted names* (`.screens/step74-titles.mjs`): all 138 fit, none broken inside a word. Its
+  first run stopped on a page that took over 30 s to load from its dev server; the re-run passed.
+- *The landing page:* one header row needs 643 px in Swahili, 557 in Yoruba and 495 in Arabic,
+  and every name is on one line at 1280 px; the ♥ and its sheet passed
+  (`.screens/step76-hub-support.mjs`); every QR code read back, with design B's two games on one
+  row from 900 px (`.screens/step78-hub-qr.mjs`, no problems); `.screens/ff-hub-check.mjs
+  --no-webkit` passed. One run of the header's check stopped on a ♥ that never settled — the
+  known `/api/config` delay; the re-run passed.
+
+**Not run:** WebKit, so what Safari draws Yoruba's stories in is unseen (Apple's systems have no
+Cambria; their serif takes over). **Not seen:** a native speaker's read of any of the three.
+
+**Owed:** a native reviewer for each language (B-3). The drafters' own doubts, to ask first:
+
+- *Arabic:* whether "a strange team gathered" («فريق») stays fresh over six stories in a row;
+  «خبز كعكة» unvocalized; the llama's gender; a few word choices (walrus, juggling, «عمدة
+  المدينة» or «رئيس البلدية», «الفواتير» or «الإيصالات»); "3–7" shown 7–3.
+- *Swahili:* wa- agreement with an object companion read as a person; loanword animal names;
+  tech words that lean Tanzanian (vidakuzi, hifadhidata, msimbo chanzo); both game names at 21
+  characters; «Roboti» for the virtual players.
+- *Yoruba:* whether the brand and Funny One's name are idiomatic; «òṣèré» (mostly "actor") for a
+  player and «òǹkọ̀wé» for the author; some tones («ya», «Tẹ “…”», «da … pọ̀»); loanword
+  spellings (sẹ́fà, búráúsà, áàpù…); the privacy terms (ìtọpinpin, ìtúpalẹ̀ ìlò, kóòdù àṣírí).
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean — its first run flagged the landing page's `page.ts`
+  and `landing.css`: setting Step 82's first edits aside, `git checkout` had written them back
+  with CRLF line ends (`core.autocrlf`); back to LF, their content unchanged.
+- `npm test` outside the sandbox: 1592 tests (416 + 373 + 308 + 179 + 263 + 53), 82 more than
+  Step 79's: 39 on the landing page, 24 in the shared package, 14 in Funny Multi's client and 5
+  in Funny One's — mostly the per-language tests running over three more languages, plus the
+  language matching, `<html lang>` and Yoruba's fonts; all passed.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf (13 entries); `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4309,10 +4456,18 @@ out of the repo — they live only in the agent's private memory.
 
 ~~RESUME HERE (2026-10-18, after Step 79, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-18, after Step 80).** **Step 80 (B-1e) is done — the Play Console
-organisation account MARK WEB TOOLS is fully verified (identity, website, phone) and can
-publish; the Equifax D-U-N-S rename is submitted,** due about 2026-11-17 — no action until then
-(Step 80's Owed). No game code changed this step.
+~~RESUME HERE (2026-10-18, after Step 80)~~ — carried into this note.
+
+**RESUME HERE (2026-10-18, after Step 81).** **Step 81 (B-21) is committed, not pushed: Arabic,
+Swahili and Yoruba in both games, the landing page and both privacy policies — 23 languages.**
+Arabic is Modern Standard Arabic under Morocco's flag, right to left; Yoruba's headings take the
+system font and its stories Cambria or the platform's serif, since Fredoka and Georgia lack its
+letters; both games now set `<html lang>`. All three are machine drafts awaiting native
+reviewers (B-3). Its push and deploy wait for the owner's word — the landing page and Funny
+Multi by their ship scripts; Funny One's deploy is the owner's (item 1 below). **Step 80 (B-1e)
+is done — the Play Console organisation account MARK WEB TOOLS is fully verified (identity,
+website, phone) and can publish; the Equifax D-U-N-S rename is submitted,** due about
+2026-11-17 — no action until then (Step 80's Owed).
 
 **Step 79 (B-20) is pushed, CI
 passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing page run it:**
@@ -4320,11 +4475,12 @@ passed (run `39038453891`, on `ubuntu-24.04`), and Funny Multi and the landing p
 by a country tally that Funny Multi's server keeps apart from its other counts. The server finds
 a visit's country in its own copy of DB-IP's free database, which it downloads once a month into
 the stats volume (`GEO_DIR=/data/geo`, set by `docker-compose.yml`), and keeps no address; the
-privacy policy says so in all 20 languages. On the VM the table loaded 3.6 s after the server
+privacy policy says so in all 20 languages (23 with Step 81). On the VM the table loaded 3.6 s after the server
 began listening (710,834 rows, read in 2.4 s); after a later deploy, the server's log should
 again have a `country table` line with about that many rows — a `country table` error means the
 download failed, and visits then count as "Not known" while it retries hourly. No visit had come
-in the minutes after the deploy, so `/stats/` still said that no country had been counted.
+in the minutes after the deploy; the first country counted since is Australia, with two
+landing-page visits (seen 2026-10-18).
 
 **Step 78 (B-19) is pushed, CI passed (run `39025578460`, on `ubuntu-24.04`), and the landing
 page runs it:** each game's
@@ -4341,23 +4497,19 @@ fit narrow phones (the family's name had run under the language picker in eight 
 Step 77 pinned CI to `ubuntu-24.04` (owner, 2026-10-17). Funny One's production still serves 15
 languages until the owner deploys it; its deploy carries B-16 too.
 
-**Next for the agent, in order** (all asked 2026-10-17; `steering/tasks.md` B-20–B-22; renumbered
-by one — Step 80 went to B-1e instead): a look at `/api/stats/summary` — its `countries` should
-have filled since the deploy, B-20's last check; Step 81 (B-21), Arabic, Swahili and Yoruba, 23
-languages — measure the header again for them (Step 76's one-row widths and fitted names),
-re-run `.screens/step78-hub-qr.mjs` (design B's two games on one row from 900 px, every code
-read back), and give their privacy sections Step 79's bullet too (a test counts one DB-IP per
-language) — check `git status` first: another session's uncommitted `ar`/`sw`/`yo` files were
-already in the working tree as of this note, so most of the work may be done; Step 82 (B-22),
-the ♥ and its sheet on `www.oursharedcode.com`, in that site's own repository, whose push
-deploys — so it waits for the owner's go-ahead.
+**Next for the agent, in order:** Step 82 (B-19a), the games' QR codes on phones and tablets
+too (owner request 2026-10-18, `steering/tasks.md`): each code as small as a phone's camera
+still reads, on its button's row — to its right, to its left in Hebrew, Persian and Arabic —
+never under it; a computer keeps Step 78's. Then Step 83 (B-22), the ♥ and its sheet on
+`www.oursharedcode.com`, in that site's own repository, whose push deploys — so it waits for the
+owner's go-ahead.
 
 **Three sites are live on hosts of their own:**
 Funny Multi at `https://www.funny37.oursharedcode.com/`, Funny One at
 `https://www.funny1.oursharedcode.com/` (the old `/funny37-game` and `/funny1-game` addresses
 only forward), and since Step 72 the landing page «Семейная Чепуха» at
 `https://www.funny-family.oursharedcode.com/` — both games, the repository and the trailer in
-20 languages since Step 73, designs A and B split per tab, with its visit counts and the funnel
+20 languages since Step 73 (23 once Step 81 is deployed), designs A and B split per tab, with its visit counts and the funnel
 to Funny Multi's gift sheet on the public `/stats/` page, since Step 76 the ♥ and a gift sheet
 of its own in the header, since Step 78 each game's QR code beside its buttons on a computer's
 screen, and since Step 79 a world map of its visitors' countries on `/stats/`;
@@ -4396,7 +4548,7 @@ Me a Coffee buttons; (6) now that Step 78 is live, a phone's camera on the landi
 codes on the PC, in design A and in design B (`?v=a`, `?v=b`): each opens its game, Funny Multi
 in the page's language.
 
-The agent's own queue is the look at B-20's first countries and Steps 81–82 above.
+The agent's own queue is Steps 82–83 above.
 
 Also waiting for the owner's eyes, none blocking another: Home in the Funny Multi Android app
 without the cartoons-per-day line (B-13 reopens if the line is still there); one 5-second video
@@ -4405,7 +4557,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six and Step 79's eleven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven and Step 81's eleven were the agent's — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
@@ -4491,9 +4643,9 @@ Firefox (Step 60); the library's pictures are ≈ 700 KB JPEGs under a `.png` na
 re-encoding now that Funny One downloads them too (Step 68 moved 7 GB fetching them once);
 Funny One's six new strings and its privacy policy outside English, Funny Multi's two B-15
 strings outside en/ru, the landing page's text and Step 76's privacy
-sentence and Step 79's privacy bullet outside en/ru, and everything in B-16's five languages are machine drafts; Funny Multi's `<html lang>` stays "en" whatever the language, and
-a still's file name is "funny-stories-<name>" when the title has no Latin letters (both seen in
-Step 73); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
+sentence and Step 79's privacy bullet outside en/ru, and everything in B-16's five languages and B-21's three are machine drafts; a still's file name
+is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73); what Safari
+draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real
 Funny One icons before any announcement or listing (also blocks A3 in
 `docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement — until

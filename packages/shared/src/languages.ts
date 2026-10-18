@@ -40,12 +40,14 @@ export interface LanguageOption {
 // Ordering follows the standard native-script + region pattern used by
 // Google/Apple/Netflix language pickers. English is the upstream default
 // (#1); Russian sits at #4 as the second first-class shipped language.
-// Slots 2-3 and 5-19 are stubs: registry + i18n JSON + pool display texts ship
+// Slots 2-3 and 5-22 are stubs: registry + i18n JSON + pool display texts ship
 // in each language at machine-translation quality with a `needs-<code>-review`
 // header in every file, awaiting native-speaker review (FM-POOL-5, OD-F5).
 // Cantonese (`yue`, written Cantonese in Traditional characters, Hong Kong)
 // sits beside Mandarin; Persian (right to left) follows Hebrew; Hindi, Telugu
-// and Bengali follow Tamil (Step 73).
+// and Bengali follow Tamil (Step 73). Arabic (Modern Standard, right to left,
+// under Morocco's flag), Swahili (Kenya) and Yoruba (Nigeria) close the list
+// as its African block (Step 81).
 // Three languages share India's flag, so their `country` label is the
 // language instead of the country — TA, HI, TE — to keep every row distinct.
 export const LANGUAGES = [
@@ -69,6 +71,9 @@ export const LANGUAGES = [
   { code: 'hi', name: 'हिन्दी (भारत)', flag: '🇮🇳', country: 'HI' },
   { code: 'te', name: 'తెలుగు (భారతదేశం)', flag: '🇮🇳', country: 'TE' },
   { code: 'bn', name: 'বাংলা (বাংলাদেশ)', flag: '🇧🇩', country: 'BD' },
+  { code: 'ar', name: 'العربية (المغرب)', flag: '🇲🇦', country: 'MA' },
+  { code: 'sw', name: 'Kiswahili (Kenya)', flag: '🇰🇪', country: 'KE' },
+  { code: 'yo', name: 'Yorùbá (Nàìjíríà)', flag: '🇳🇬', country: 'NG' },
 ] as const satisfies readonly LanguageOption[];
 
 export type Language = (typeof LANGUAGES)[number]['code'];

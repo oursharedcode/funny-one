@@ -35,7 +35,7 @@ import {
 } from '../pictureSource';
 
 // Room-content languages: every registry entry is authored (D-2/T-6.3), so
-// this is presently all 20 of LANGUAGES — filtered from the registry
+// this is presently all 23 of LANGUAGES — filtered from the registry
 // rather than hardcoded so flag artwork, order and labels stay in one place,
 // same pattern as Funny Multi's HomeScreen.
 const CONTENT_LANGUAGES = LANGUAGES;

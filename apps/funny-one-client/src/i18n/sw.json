@@ -1,0 +1,63 @@
+{
+  "_note": "needs-sw-review — machine-translated stub awaiting native Swahili review.",
+  "home": {
+    "title": "Hadithi ya Kupokezana",
+    "subtitle": "Pokezaneni kifaa na mtunge hadithi za ajabu pamoja, wachezaji 2 hadi 7, bila kuhitaji intaneti.",
+    "start": "Anza mchezo",
+    "gameRules": "Kanuni za mchezo",
+    "rules": "Pokezaneni kifaa. Kila raundi, kila mtu anajibu swali lile lile la kuchekesha kwa zamu yake. Majibu yenu yanachanganywa kuwa hadithi za ajabu, kisha picha ya kuchekesha inachorwa kwa kila moja.",
+    "language": "Lugha",
+    "seatCountHint": "Wachezaji 2–7 kwa jumla",
+    "playerNamePlaceholder": "Jina",
+    "humanSeatLabel": "Jina la mchezaji",
+    "virtualSeatLabel": "Jina la mchezaji roboti",
+    "humanBadge": "Wewe",
+    "virtualBadge": "Roboti",
+    "removeSeat": "Ondoa mchezaji",
+    "addPlayer": "+ Ongeza mchezaji",
+    "addVirtual": "+ Ongeza roboti",
+    "pictures": "Picha",
+    "picturesBuiltIn": "Za ndani ya mchezo",
+    "picturesOnline": "Kutoka intaneti",
+    "picturesBuiltInHint": "Zinachorwa kwenye kifaa hiki. Hazihitaji intaneti.",
+    "picturesOnlineHint": "Katuni kutoka maktaba ya picha. Zinahitaji intaneti; bila intaneti utapata picha za ndani ya mchezo."
+  },
+  "thinking": {
+    "title": "{{name}} anafikiri…"
+  },
+  "handoff": {
+    "title": "Mpe {{name}}",
+    "subtitle": "Usichungulie majibu ya wengine.",
+    "ready": "Mimi ni {{name}} — tuanze"
+  },
+  "round": {
+    "progress": "Swali {{current}} kati ya {{total}}",
+    "pick": "Chagua jibu lako",
+    "optionsLabel": "Majibu ya kuchagua",
+    "scrollHint": "Telezesha ili uone zaidi",
+    "submit": "Tuma",
+    "submitDisabled": "Chagua jibu kwanza",
+    "submitted": "Limetumwa"
+  },
+  "gallery": {
+    "title": "Hadithi zenu",
+    "storyBy": "Hadithi ya {{name}}",
+    "pictureAlt": "Picha ya hadithi ya {{name}}",
+    "prev": "Hadithi iliyotangulia",
+    "next": "Hadithi inayofuata",
+    "counter": "{{index}} kati ya {{total}}",
+    "download": "Pakua",
+    "shareButton": "Shiriki"
+  },
+  "end": {
+    "title": "Hadithi ziko tayari!",
+    "playAgain": "Cheza tena",
+    "changePlayers": "Badilisha wachezaji"
+  },
+  "footer": {
+    "gameLink": "Kiungo cha mchezo huu",
+    "playYourself": "Cheza mwenyewe",
+    "contentNotice": "Mchezo huu unaendeshwa kikamilifu kwenye kifaa chako. Hakuna chochote unachoandika kinachotoka humo.",
+    "contentNoticeOnline": "Hakuna chochote unachoandika kinachotoka kwenye kifaa hiki. Picha za intaneti zikiwashwa, katuni ya kila hadithi inapakuliwa kutoka maktaba ya picha."
+  }
+}

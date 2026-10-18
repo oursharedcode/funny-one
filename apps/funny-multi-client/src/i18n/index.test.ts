@@ -15,4 +15,15 @@ describe('i18n boot', () => {
     expect(own).toBeTruthy();
     expect(i18n.t('home.subtitle')).toBe(own);
   });
+
+  // Step 81: index.html says "en" for every language; `:lang(yo)` in
+  // styles/index.css needs the real one.
+  it('gives the document the language and its direction', async () => {
+    await i18n.changeLanguage('yo');
+    expect(document.documentElement.lang).toBe('yo');
+    expect(document.documentElement.dir).toBe('ltr');
+    await i18n.changeLanguage('ar');
+    expect(document.documentElement.lang).toBe('ar');
+    expect(document.documentElement.dir).toBe('rtl');
+  });
 });

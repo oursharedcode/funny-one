@@ -1,0 +1,134 @@
+{
+  "_note": "needs-yo-review — machine-translated stub awaiting native Yoruba review per CONTRIBUTING.md.",
+  "questions": [
+    "Ta ni?",
+    "Pẹ̀lú ta ni?",
+    "Níbo?",
+    "Nígbà wo?",
+    "Kí ni wọ́n ṣe?",
+    "Kí nìdí?",
+    "Kí ló ṣẹlẹ̀ níkẹyìn?"
+  ],
+  "home": {
+    "title": "Ìtàn Àwàdà",
+    "subtitle": "Ẹ jọ hun ìtàn tí kò lórí tí kò nídìí, òṣèré 3 sí 7. Ó rọrùn láti ṣe é lórí fóònù.",
+    "nicknamePlaceholder": "Yan orúkọ ìnagijẹ",
+    "gameRules": "Òfin eré",
+    "rules": "Ní ìyípo kọ̀ọ̀kan, yan ìdáhùn sí ìbéèrè alárinrin kan látinú àkójọ. A ó da àṣàyàn rẹ pọ̀ mọ́ ti àwọn yòókù láti hun ìtàn tí kò lórí tí kò nídìí. Lẹ́yìn náà, ìtàn kọ̀ọ̀kan á di àwòrán efe, a ó sì ṣí gbogbo wọn payá.",
+    "create": "Ṣẹ̀dá yàrá",
+    "join": "Wọ yàrá",
+    "joining": "O ń wọ yàrá",
+    "roomGone": "Yàrá yẹn kò sí mọ́ — ó lè jẹ́ pé eré ti parí, tàbí pé líǹkì náà ti pẹ́.",
+    "createNew": "Ṣẹ̀dá yàrá tuntun",
+    "openRooms": "Àwọn yàrá tó ṣí sílẹ̀: {{count}}",
+    "imagesToday": "Àwòrán efe tí kò ju {{total}} lọ lóòjọ́. Iye náà ń bẹ̀rẹ̀ padà ní 00:00 UTC lójoojúmọ́.",
+    "uiLanguage": "Tẹ̀ láti yí èdè ojú-ìwé yìí padà",
+    "unsupportedLanguage": "Ẹ̀dà áàpù yìí kò tíì lè ṣeré ní èdè tí yàrá yìí ń lò. Gbìyànjú láti tún ojú-ìwé náà ṣí, tàbí ṣẹ̀dá yàrá tuntun.",
+    "multiLanguage": "Yàrá onírúurú èdè",
+    "multiLanguageHint": "Òṣèré kọ̀ọ̀kan ń ṣeré ní èdè tó yàn pẹ̀lú àwọn àsíá lókè."
+  },
+  "lobby": {
+    "roomCodeLabel": "Kóòdù yàrá",
+    "copyLink": "Ṣàdàkọ líǹkì",
+    "copied": "A ti ṣàdàkọ rẹ̀!",
+    "qrCaption": "Fi kámẹ́rà ka kóòdù yìí láti darapọ̀",
+    "waitingForHost": "À ń dúró kí agbàlejò bẹ̀rẹ̀ eré…",
+    "startGame": "Bẹ̀rẹ̀ eré",
+    "startDisabled": "Ó kéré tán, òṣèré 3 ni a nílò láti bẹ̀rẹ̀",
+    "leave": "Jáde",
+    "host": "Agbàlejò",
+    "capReached": "A kò lè ṣe àwòrán fún bí wákàtí {{hours}} tó ń bọ̀. Ẹ ṣì lè ṣeré — àwọn òṣèré yóò rí ọ̀rọ̀ ìtàn dípò àwòrán efe.",
+    "capReachedHost": "Tẹ “Bẹ̀rẹ̀ eré” nígbà tí o bá ṣetán, tàbí dúró títí ìpín àwòrán efe òòjọ́ yóò fi bẹ̀rẹ̀ padà."
+  },
+  "round": {
+    "progress": "Ìyípo {{current}} nínú {{total}}",
+    "pick": "Yan ìdáhùn rẹ",
+    "optionsLabel": "Àwọn ìdáhùn tí o lè yàn",
+    "scrollHint": "Fà á láti rí àwọn mìíràn",
+    "submit": "Fi ránṣẹ́",
+    "submitDisabled": "Kọ́kọ́ yan ìdáhùn kan",
+    "submitted": "A ti fi ránṣẹ́",
+    "storyLanguage": "Èdè ìtàn"
+  },
+  "waiting": {
+    "title": "À ń dúró de àwọn yòókù",
+    "progress": "{{submitted}} / {{total}} ti fi ránṣẹ́",
+    "ellipsis": "Ṣe sùúrù díẹ̀."
+  },
+  "reveal": {
+    "title": "Ìtàn yín nìyí",
+    "spinner": "À ń pe wàhálà wá…",
+    "retry": "Tún gbìyànjú",
+    "error": "A kò rí àwòrán náà ṣe. Tún gbìyànjú.",
+    "capReached": "Ìkòkò àwòrán efe ti kún. Àwòrán efe tuntun yóò dé lẹ́yìn bí wákàtí {{hours}}.",
+    "pictureAlt": "Àwòrán efe ìtàn yín tí ọgbọ́n àtọwọ́dá ya",
+    "continue": "Tẹ̀síwájú"
+  },
+  "end": {
+    "title": "Eré ti parí",
+    "roundsOver": "Gbogbo ìyípo ti parí",
+    "oneMoreGame": "Eré kan sí i",
+    "finishGame": "Parí eré",
+    "ready": "Mo ti ṣetán fún eré tuntun",
+    "readyActive": "Mo ti ṣetán ✓",
+    "waitingForHost": "À ń dúró de agbàlejò…",
+    "needPlayers": "Ó kéré tán, òṣèré 3 ni a nílò fún eré mìíràn",
+    "waitingForReady": "À ń dúró kí gbogbo èèyàn ṣetán"
+  },
+  "endScreen": {
+    "supportServer": "Ti sẹ́fà yìí lẹ́yìn"
+  },
+  "support": {
+    "openLabel": "Ti òǹkọ̀wé lẹ́yìn",
+    "title": "Àtìlẹ́yìn",
+    "intro": "Ẹ̀bùn àtinúwá ni èyí — kò sí gbèsè kankan, kò sì sí ohun tí yóò ṣí sílẹ̀ fún ọ.",
+    "close": "Padé",
+    "payId": "PayID",
+    "payIdWhere": "Ní Ọsirélíà",
+    "payIdBankNote": "Báǹkì rẹ yóò fi hàn: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Yan ìpele ẹ̀bùn ẹ̀ẹ̀kan ṣoṣo",
+    "lightning": "Lightning",
+    "lightningWhat": "Owó kírípítò Bitcoin",
+    "kofi": "Ti mí lẹ́yìn lórí Ko-fi",
+    "bmc": "Ra kọfí fún mi",
+    "donate": "Ṣètọrẹ",
+    "copy": "Ṣàdàkọ",
+    "copied": "A ti ṣàdàkọ rẹ̀!"
+  },
+  "gallery": {
+    "share": "Pín àwọn àwòrán yàrá yìí",
+    "shareButton": "Pín",
+    "title": "Àkójọ àwòrán yàrá",
+    "storyBy": "Ìtàn {{nickname}}",
+    "noPicture": "Kò sí àwòrán fún ìtàn yìí",
+    "pictureAlt": "Àwòrán efe fún ìtàn {{nickname}}",
+    "counter": "{{index}} / {{total}}",
+    "prev": "Ìtàn tó ṣáájú",
+    "next": "Ìtàn tó kàn",
+    "download": "Ṣe ìgbàsílẹ̀ ìtàn àti àwòrán tí kì í rìn",
+    "downloadStoryOnly": "Ṣe ìgbàsílẹ̀ ìtàn",
+    "downloadVideo": "Ṣe ìgbàsílẹ̀ fídíò ìṣẹ́jú-àáyá 5",
+    "recording": "À ń ṣe fídíò…"
+  },
+  "playerLost": {
+    "label": "{{nickname}} ti jáde",
+    "ignore": "Fojú fò ó, máa bá eré lọ",
+    "newRoom": "Ṣẹ̀dá yàrá tuntun"
+  },
+  "footer": {
+    "source": "Kóòdù orísun lórí GitHub",
+    "contentNotice": "Àṣàyàn àwọn òṣèré àti àwòrán ọgbọ́n àtọwọ́dá jẹ́ ojúṣe ẹni tó ń bójú tó sẹ́fà yìí, kì í ṣe ti iṣẹ́ àkànṣe ìpilẹ̀ṣẹ̀."
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "A kò rí yàrá náà",
+    "ROOM_LOCKED": "Eré ti bẹ̀rẹ̀ tẹ́lẹ̀",
+    "ROOM_FULL": "Yàrá ti kún",
+    "NOT_HOST": "Agbàlejò nìkan ló lè ṣe ìyẹn",
+    "NOT_ENOUGH_PLAYERS": "Ó kéré tán, òṣèré 3 ni a nílò",
+    "INVALID_NICKNAME": "Orúkọ ìnagijẹ yìí kò ṣeé lò",
+    "INVALID_OPTION": "Ìdáhùn yẹn kò sí mọ́ — yan òmíràn",
+    "RATE_LIMITED": "Rọra díẹ̀",
+    "SERVER_BUSY": "Ọwọ́ sẹ́fà dí"
+  }
+}

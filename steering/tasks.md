@@ -122,8 +122,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   parallel with B-1 (owner decision 2026-10-04), as an **Individual** — Apple does not take sole
   traders as organizations, shows the personal legal name as seller, needs no D-U-N-S, and moves
   the account to an Organization later on request. Findings in Step 58.
-- **B-3** Native-speaker review of the 18 machine-drafted pool languages (OD-F5): T-6.3's 13 and
-  B-16's five.
+- **B-3** Native-speaker review of the 21 machine-drafted pool languages (OD-F5): T-6.3's 13,
+  B-16's five and B-21's three.
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared
   with future Funny One).
@@ -308,6 +308,11 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     `?v=b`).
   - *Kept on purpose:* no caption and not a link; a scan counts as a visit from the landing page
     with no click, so `/stats/` can show more opened games than clicks (its funnel note says so).
+- **B-19a** The games' QR codes on phones and tablets too (owner request 2026-10-18, after Step
+  78's: "still like the QR codes on phones and tablets. make the QR as small as possible,
+  location: just next to the button … Do not do two lines"): each code as small as a phone's
+  camera still reads, on its button's row after it — to its left in Hebrew, Persian and Arabic —
+  and never under it; a computer keeps Step 78's. *Planned: Step 82.*
 - **B-20** A map of where visitors come from, on `/stats/` (owner request 2026-10-17; modelled on
   `C:\Mark\Dev\promengi`'s; owner choice "own lookup + own map"). Funny Multi's server looks up
   each counted visit's address in DB-IP's free country database (CC BY 4.0) and keeps only the
@@ -317,21 +322,26 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   and counts each visit's country in a tally of its own; `/stats/` shows "Visits by country", an
   Equal Earth map of Natural Earth's shapes and a table, from the day countries were first
   counted.
-  - *Owed:* the first counted country on production's `/stats/` — no visit had come in the
-    minutes after the deploy. The privacy bullet is a machine draft outside en/ru (with B-3).
+  - *Seen:* the first counted country on production's `/stats/`, Australia, with two
+    landing-page visits (2026-10-18).
+  - *Owed:* the privacy bullet is a machine draft outside en/ru (with B-3).
   - *Kept on purpose:* only visits are placed, never clicks or gifts, and a country is never
     joined to a label; Funny One's policy is unchanged — it counts nothing, and Funny Multi's
     covers the landing page.
 - **B-21** Three African languages: Arabic, Swahili and Yoruba (owner request 2026-10-17, after
   that day's research), in both games, the landing page and both privacy policies, 23 in all.
   Arabic is Modern Standard Arabic (owner choice), labelled «العربية (المغرب)» under Morocco's
-  flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. *Planned: Step 80,
-  after B-18–B-20, so their new strings are drafted in the new languages at once.*
+  flag and right to left; Swahili under Kenya's flag, Yoruba under Nigeria's. **Code done
+  2026-10-18 (Step 81):** a browser set to any Arabic gets Arabic, and Tanzania's Swahili gets
+  Swahili; Yoruba's headings take the system font and its stories Cambria or the platform's serif,
+  since Fredoka and Georgia lack its letters; both games now set `<html lang>`.
+  - *Owed:* a native reviewer for each of the three (with B-3); what Safari draws Yoruba in is
+    unseen (no WebKit here).
 - **B-22** The ♥ and "Support Author" on `https://www.oursharedcode.com/` (owner request
   2026-10-17; owner choice "own sheet there"): top right, opening a sheet on that site with PayID,
   Sponsors, Lightning, Ko-fi and Buy Me a Coffee. It lives in that site's own repository
   (`oursharedcode.github.io`), where a push deploys, so it waits for the owner's go-ahead; the
-  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 81.*
+  site's "fifteen languages" is out of date and is fixed with it. *Planned: Step 83.*
 
 ## Dependency notes
 

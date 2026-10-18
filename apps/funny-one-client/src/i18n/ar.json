@@ -1,0 +1,63 @@
+{
+  "_note": "needs-ar-review — machine-translated stub awaiting native Arabic review.",
+  "home": {
+    "title": "حكاية بالدور",
+    "subtitle": "مرروا الجهاز واصنعوا معا حكايات عجيبة، من 2 إلى 7 لاعبين، دون حاجة إلى الإنترنت.",
+    "start": "ابدأ اللعبة",
+    "gameRules": "قواعد اللعبة",
+    "rules": "مرروا الجهاز بينكم. في كل جولة، يجيب الجميع بالدور عن السؤال الطريف نفسه. تمتزج إجاباتكم في حكايات عجيبة، ثم تحصل كل حكاية على صورة مضحكة.",
+    "language": "اللغة",
+    "seatCountHint": "من 2 إلى 7 لاعبين في المجموع",
+    "playerNamePlaceholder": "الاسم",
+    "humanSeatLabel": "اسم اللاعب",
+    "virtualSeatLabel": "اسم اللاعب الافتراضي",
+    "humanBadge": "أنت",
+    "virtualBadge": "روبوت",
+    "removeSeat": "إزالة اللاعب",
+    "addPlayer": "+ إضافة لاعب",
+    "addVirtual": "+ إضافة لاعب افتراضي",
+    "pictures": "الصور",
+    "picturesBuiltIn": "مدمجة",
+    "picturesOnline": "من الإنترنت",
+    "picturesBuiltInHint": "يرسمها هذا الجهاز بنفسه. لا حاجة إلى الإنترنت.",
+    "picturesOnlineHint": "رسوم كرتونية من مكتبة الصور. تحتاج إلى الإنترنت؛ ومن دونه تظهر الصور المدمجة."
+  },
+  "thinking": {
+    "title": "{{name}}: لحظة تفكير…"
+  },
+  "handoff": {
+    "title": "مرر الجهاز إلى {{name}}",
+    "subtitle": "لا تختلس النظر إلى إجابات الآخرين.",
+    "ready": "أنا {{name}}، لنبدأ"
+  },
+  "round": {
+    "progress": "السؤال {{current}} من {{total}}",
+    "pick": "اختر إجابتك",
+    "optionsLabel": "الإجابات المتاحة",
+    "scrollHint": "مرر لرؤية المزيد",
+    "submit": "تأكيد",
+    "submitDisabled": "اختر إجابة أولا",
+    "submitted": "تم التأكيد"
+  },
+  "gallery": {
+    "title": "الحكايات",
+    "storyBy": "حكاية {{name}}",
+    "pictureAlt": "صورة حكاية {{name}}",
+    "prev": "الحكاية السابقة",
+    "next": "الحكاية التالية",
+    "counter": "{{index}} من {{total}}",
+    "download": "تنزيل",
+    "shareButton": "مشاركة"
+  },
+  "end": {
+    "title": "الحكايات جاهزة!",
+    "playAgain": "لنلعب مجددا",
+    "changePlayers": "تغيير اللاعبين"
+  },
+  "footer": {
+    "gameLink": "رابط هذه اللعبة",
+    "playYourself": "العبها بنفسك",
+    "contentNotice": "تعمل هذه اللعبة بالكامل على جهازك. لا شيء مما تكتبه يغادره أبدا.",
+    "contentNoticeOnline": "لا شيء مما تكتبه يغادر هذا الجهاز أبدا. عند اختيار الصور «من الإنترنت»، يجري تنزيل الرسم الكرتوني لكل حكاية من مكتبة الصور."
+  }
+}

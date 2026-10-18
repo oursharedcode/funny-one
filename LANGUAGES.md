@@ -1,7 +1,7 @@
 # Languages
 
-The game ships 20 languages (`packages/shared/src/languages.ts`). Two — English and Russian
-— are hand-authored and native-speaker reviewed. The other 18 are machine-drafted at the pool
+The game ships 23 languages (`packages/shared/src/languages.ts`). Two — English and Russian
+— are hand-authored and native-speaker reviewed. The other 21 are machine-drafted at the pool
 and UI text layer and marked with a `needs-<code>-review` header wherever review is still
 outstanding (FM-POOL-5, B-3 in the backlog).
 
@@ -67,12 +67,16 @@ same structural and grammar rules regardless of authoring method — but hasn't 
 speaker confirm the pool sentences read naturally and the UI copy isn't stilted. To pick up
 B-3 (post-v1 backlog): remove the `needs-<code>-review` header comment from every file for
 that language once reviewed, and fix anything a native speaker flags. The privacy policy is
-outside that rule: English is its master text and all 19 other sections, Russian included, are
+outside that rule: English is its master text and all 22 other sections, Russian included, are
 machine translations that say the English version applies.
 
 Cantonese (`yue`) is written Cantonese in Traditional characters (Hong Kong), not standard
 written Chinese; Mandarin (`zh`) is Simplified. Bengali (`bn`) is listed under Bangladesh.
 Persian (`fa`) is written right to left, like Hebrew.
+
+Arabic (`ar`) is Modern Standard Arabic, not a dialect, written right to left and listed under
+Morocco's flag. Swahili (`sw`) is standard Swahili, listed under Kenya. Yoruba (`yo`) is listed
+under Nigeria and written with its full tone marks and dot-below letters (ẹ, ọ, ṣ), in NFC.
 
 es-419 and es-es are deliberately separate files (Latin-American vs. Iberian Spanish) — they
 may read identically today but are flagged for independent regional review, not merged.

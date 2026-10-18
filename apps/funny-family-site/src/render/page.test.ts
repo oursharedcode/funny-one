@@ -63,7 +63,9 @@ describe('renderPage', () => {
     const doc = parse(renderPage(code, ASSETS));
     const html = doc.documentElement;
     expect(html.getAttribute('lang')).toBe(HTML_LANG[code]);
-    expect(html.getAttribute('dir')).toBe(code === 'he' || code === 'fa' ? 'rtl' : 'ltr');
+    expect(html.getAttribute('dir')).toBe(
+      code === 'he' || code === 'fa' || code === 'ar' ? 'rtl' : 'ltr',
+    );
     expect(html.dataset.code).toBe(code);
     expect(html.dataset.variant).toBe('a');
     expect(doc.title).toBe(STRINGS[code].metaTitle);

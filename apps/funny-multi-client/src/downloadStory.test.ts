@@ -136,6 +136,33 @@ describe('buildStoryImageFile', () => {
       const urlCall = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === SOURCE_URL);
       expect(urlCall?.args[1]).toBe(RIGHT_EDGE);
     });
+
+    // Step 81: Georgia has none of Yoruba's ẹ, ọ, ṣ or ǹ — «nǹkan» came out
+    // "nn`kan" — so a Yoruba story and its notice take a font that has them.
+    it('draws a Yoruba story and its notice in Cambria or the serif, never Georgia', async () => {
+      const drawn: [string, string][] = [];
+      ctx.fillText = (text: string) => {
+        drawn.push([text, String(ctx.font)]);
+      };
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'nǹkan',
+        pictureUrl: null,
+        language: 'yo',
+      });
+      expect(drawn).toContainEqual(['nǹkan', '22px Cambria, serif']);
+      expect(drawn.map(([, font]) => font)).toContain('italic 13px Cambria, serif');
+      expect(drawn.filter(([, font]) => font.includes('Georgia'))).toEqual([]);
+
+      drawn.length = 0;
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'story',
+        pictureUrl: null,
+        language: 'en',
+      });
+      expect(drawn).toContainEqual(['story', '22px Georgia, serif']);
+    });
   });
 });
 

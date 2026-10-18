@@ -133,6 +133,19 @@ describe('options come from the shared pools (DD-2)', () => {
     // And specifically not the English ones.
     expect(optionTexts()).not.toContain(POOL_TEXTS.en[POOLS[0][0]!.id]);
   });
+
+  it("marks the question and the options with the room's language (Step 81)", () => {
+    // Under an English interface, a Yoruba room's text still says it is
+    // Yoruba: a screen reader's voice and the Yoruba fonts in
+    // styles/index.css go by it.
+    renderRound({ roundNumber: 0, question: 'Ta ni?' }, { language: 'yo' });
+    expect(screen.getByRole('heading', { name: 'Ta ni?' }).getAttribute('lang')).toBe('yo');
+    const radios = screen.getAllByRole('radio');
+    expect(radios.length).toBeGreaterThan(0);
+    expect(radios.filter((r) => r.getAttribute('lang') !== 'yo')).toEqual([]);
+    // The group's label is the interface's own.
+    expect(screen.getByRole('radiogroup').hasAttribute('lang')).toBe(false);
+  });
 });
 
 describe('FM-ANS-3: shuffle differs between players', () => {

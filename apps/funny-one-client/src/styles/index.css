@@ -59,6 +59,30 @@ body {
   color: #1f2937; /* brand-ink */
 }
 
+/* Step 81: Fredoka has no ẹ, ọ or ṣ, so a Yoruba heading came out in two
+   fonts, a letter at a time. Yoruba's display text takes the body's system
+   font, which has them all (<html lang> is set by i18n/index.ts). */
+.font-display:lang(yo) {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}
+
+/* Nor has Georgia, the stories' serif (font-prose): Chromium took ẹ, ọ and ṣ
+   from another font a letter at a time, and set ǹ as an n with its accent
+   beside it. A Yoruba story takes Cambria (Windows), which has them all, or
+   the platform's serif — as the exported still does (proseFontFamily in
+   i18n/index.ts). */
+.font-prose:lang(yo) {
+  font-family: Cambria, serif;
+}
+
 /* WaitingMascot's finger-tap loop (DESIGN_SYSTEM §5), copied from
    funny-multi-client/src/styles/index.css — only the one animation this
    product currently uses (T-FO-3.3), not the whole mascot set. */

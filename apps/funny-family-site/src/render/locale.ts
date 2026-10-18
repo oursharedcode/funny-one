@@ -33,9 +33,15 @@ export const HTML_LANG: Record<Language, string> = {
   hi: 'hi',
   te: 'te',
   bn: 'bn',
+  ar: 'ar',
+  sw: 'sw',
+  yo: 'yo',
 };
 
-/** Open Graph's locale (language_TERRITORY); es_LA is Facebook's Latin American Spanish. */
+/**
+ * Open Graph's locale (language_TERRITORY); es_LA is Facebook's Latin American Spanish and
+ * ar_AR its one Arabic.
+ */
 export const OG_LOCALE: Record<Language, string> = {
   en: 'en_GB',
   fr: 'fr_FR',
@@ -57,12 +63,15 @@ export const OG_LOCALE: Record<Language, string> = {
   hi: 'hi_IN',
   te: 'te_IN',
   bn: 'bn_BD',
+  ar: 'ar_AR',
+  sw: 'sw_KE',
+  yo: 'yo_NG',
 };
 
 export const LANGUAGE_CODES: readonly Language[] = LANGUAGES.map((option) => option.code);
 
 export function isRtl(code: Language): boolean {
-  return code === 'he' || code === 'fa';
+  return code === 'he' || code === 'fa' || code === 'ar';
 }
 
 /** A language's name as the games' pickers show it: "Deutsch (Deutschland)". */

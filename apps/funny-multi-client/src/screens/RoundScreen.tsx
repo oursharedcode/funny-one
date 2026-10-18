@@ -196,6 +196,11 @@ export default function RoundScreen({ round, language, multiLanguage = false, is
             }}
             type="button"
             role="radio"
+            // The options and the question are in `language`, which can differ
+            // from the interface's: their own `lang` gives a screen reader the
+            // right voice and styles/index.css the hook for Yoruba's fonts
+            // (Step 81). The group's label stays in the interface's.
+            lang={language}
             aria-checked={isSelected}
             disabled={submitted}
             // Roving tabindex: the group is one tab stop. The selected card
@@ -228,7 +233,9 @@ export default function RoundScreen({ round, language, multiLanguage = false, is
       <p className="text-xs text-gray-600">
         {t('round.progress', { current: round.roundNumber + 1, total: TOTAL_ROUNDS })}
       </p>
-      <h2 className="font-display text-3xl font-semibold">{question}</h2>
+      <h2 lang={language} className="font-display text-3xl font-semibold">
+        {question}
+      </h2>
       {questionGloss && <p className="text-base italic text-gray-500">{questionGloss}</p>}
 
       {/* Constant story-language indicator, joiners only (spec §8). The host

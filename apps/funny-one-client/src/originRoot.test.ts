@@ -63,9 +63,10 @@ describe('privacy.html', () => {
     expect(html.match(/<section /g)).toHaveLength(LANGUAGES.length);
   });
 
-  it('sets right-to-left on the Hebrew and Persian sections', () => {
+  it('sets right-to-left on the Hebrew, Persian and Arabic sections', () => {
     expect(html).toMatch(/<section[^>]* id="privacy-he"[^>]* dir="rtl"/);
     expect(html).toMatch(/<section[^>]* id="privacy-fa"[^>]* dir="rtl"/);
+    expect(html).toMatch(/<section[^>]* id="privacy-ar"[^>]* dir="rtl"/);
   });
 
   it('gives the contact address in every section', () => {

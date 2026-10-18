@@ -82,6 +82,14 @@ describe('drawStoryText', () => {
     const call = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'story');
     expect(call?.args[1]).toBe(720 - 40); // canvasWidth - PAD
   });
+
+  it('draws a Yoruba story in Cambria or the serif: Georgia has none of its ẹ, ọ, ṣ or ǹ (Step 81)', () => {
+    const opts = { topY: 0, canvasWidth: 720, maxHeight: 400 } as const;
+    drawStoryText(ctx as unknown as CanvasRenderingContext2D, 'nǹkan', { ...opts, language: 'yo' });
+    expect(ctx.font).toBe('24px Cambria, serif');
+    drawStoryText(ctx as unknown as CanvasRenderingContext2D, 'story', { ...opts, language: 'en' });
+    expect(ctx.font).toBe('24px Georgia, serif');
+  });
 });
 
 describe('drawAttribution', () => {
@@ -136,6 +144,21 @@ describe('drawAttribution', () => {
       expect(x(i18n.getFixedT('he')('footer.source'))).toBe(720 - 40); // canvasWidth - PAD
       expect(x(SOURCE_URL.replace(/^https?:\/\//, ''))).toBe(720 - 40);
       expect(ctx.textAlign).toBe('left'); // reset for the next frame's drawing
+    });
+
+    it('writes a Yoruba notice in Cambria or the serif, never Georgia (Step 81)', () => {
+      const drawn: [string, string][] = [];
+      ctx.fillText = (text: string) => {
+        drawn.push([text, String(ctx.font)]);
+      };
+      const qrCanvas = document.createElement('canvas');
+      drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
+        topY: 0,
+        canvasWidth: 720,
+        language: 'yo',
+      });
+      expect(drawn.map(([, font]) => font)).toContain('italic 20px Cambria, serif');
+      expect(drawn.filter(([, font]) => font.includes('Georgia'))).toEqual([]);
     });
   });
 });

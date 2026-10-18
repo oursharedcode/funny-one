@@ -122,7 +122,7 @@ describe('content-language gating (T-2.3 server constraint)', () => {
     expect(pickerCodes('Language')).toContain('de');
   });
 
-  it('still offers all 20 registry languages as the joiner UI language', () => {
+  it('still offers all 23 registry languages as the joiner UI language', () => {
     // The mirror of the test above: the narrowing must not leak onto the
     // interface picker, where any language is legitimate (i18next falls back
     // to English for the 13 catalogues Phase 6 adds).

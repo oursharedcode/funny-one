@@ -1,0 +1,134 @@
+{
+  "_note": "needs-sw-review — machine-translated stub awaiting native Swahili review per CONTRIBUTING.md.",
+  "questions": [
+    "Nani?",
+    "Na nani mwingine?",
+    "Wapi?",
+    "Lini?",
+    "Walifanya nini?",
+    "Kwa nini?",
+    "Mwishowe kulitokea nini?"
+  ],
+  "home": {
+    "title": "Hadithi za Kuchekesha",
+    "subtitle": "Tungeni hadithi za ajabu pamoja, wachezaji 3 hadi 7. Inafaa kwa simu.",
+    "nicknamePlaceholder": "Chagua jina la utani",
+    "gameRules": "Kanuni za mchezo",
+    "rules": "Kila raundi, chagua jibu la swali la kuchekesha kutoka kwenye orodha. Majibu yako yanachanganywa na ya wachezaji wengine wote kuwa hadithi za ajabu. Kisha kila hadithi inageuka kuwa katuni, na tunazifunua zote.",
+    "create": "Unda chumba",
+    "join": "Jiunge na chumba",
+    "joining": "Unajiunga na chumba",
+    "roomGone": "Chumba hicho hakipo tena — huenda mchezo umekwisha, au kiungo ni cha zamani.",
+    "createNew": "Unda chumba kipya",
+    "openRooms": "Vyumba vilivyo wazi: {{count}}",
+    "imagesToday": "Hadi katuni {{total}} kwa siku. Idadi huanza upya kila siku saa 00:00 UTC.",
+    "uiLanguage": "Gusa ili kubadilisha lugha ya programu",
+    "unsupportedLanguage": "Chumba hiki kinatumia lugha ambayo toleo hili la programu bado haliwezi kuicheza. Jaribu kupakia upya ukurasa, au unda chumba kipya.",
+    "multiLanguage": "Chumba cha lugha nyingi",
+    "multiLanguageHint": "Kila mchezaji anacheza kwa lugha aliyoichagua kwa bendera zilizo juu."
+  },
+  "lobby": {
+    "roomCodeLabel": "Msimbo wa chumba",
+    "copyLink": "Nakili kiungo",
+    "copied": "Imenakiliwa!",
+    "qrCaption": "Changanua ili ujiunge",
+    "waitingForHost": "Tunamsubiri mwenyeji aanzishe…",
+    "startGame": "Anzisha mchezo",
+    "startDisabled": "Wanahitajika angalau wachezaji 3 ili kuanza",
+    "leave": "Ondoka",
+    "host": "Mwenyeji",
+    "capReached": "Utengenezaji wa picha haupatikani kwa takriban saa {{hours}} zijazo. Bado mnaweza kucheza — wachezaji wataona maandishi ya hadithi badala ya katuni.",
+    "capReachedHost": "Gusa Anzisha mchezo ukiwa tayari, au subiri hadi kikomo cha katuni cha kila siku kianze upya."
+  },
+  "round": {
+    "progress": "Raundi {{current}} kati ya {{total}}",
+    "pick": "Chagua jibu lako",
+    "optionsLabel": "Majibu ya kuchagua",
+    "scrollHint": "Telezesha ili uone zaidi",
+    "submit": "Tuma",
+    "submitDisabled": "Chagua jibu kwanza",
+    "submitted": "Limetumwa",
+    "storyLanguage": "Lugha ya hadithi"
+  },
+  "waiting": {
+    "title": "Tunawasubiri wengine",
+    "progress": "{{submitted}} / {{total}} wametuma",
+    "ellipsis": "Subiri kidogo."
+  },
+  "reveal": {
+    "title": "Hii hapa hadithi yenu",
+    "spinner": "Tunaandaa vituko…",
+    "retry": "Jaribu tena",
+    "error": "Utengenezaji umeshindikana. Jaribu tena.",
+    "capReached": "Jiko la katuni limejaa. Katuni mpya baada ya takriban saa {{hours}}.",
+    "pictureAlt": "Katuni ya hadithi yenu iliyochorwa na akili bandia",
+    "continue": "Endelea"
+  },
+  "end": {
+    "title": "Mchezo umekwisha",
+    "roundsOver": "Raundi zimekwisha",
+    "oneMoreGame": "Mchezo mmoja zaidi",
+    "finishGame": "Maliza mchezo",
+    "ready": "Niko tayari kwa mchezo mpya",
+    "readyActive": "Tayari ✓",
+    "waitingForHost": "Tunamsubiri mwenyeji…",
+    "needPlayers": "Wanahitajika angalau wachezaji 3 kwa mchezo mwingine",
+    "waitingForReady": "Tunasubiri kila mtu awe tayari"
+  },
+  "endScreen": {
+    "supportServer": "Changia seva hii"
+  },
+  "support": {
+    "openLabel": "Mchangie mwandishi",
+    "title": "Mchango",
+    "intro": "Hii ni zawadi ya hiari — huna deni lolote, na hakuna kinachofunguliwa.",
+    "close": "Funga",
+    "payId": "PayID",
+    "payIdWhere": "Nchini Australia",
+    "payIdBankNote": "Benki yako itaonyesha: {{name}}",
+    "sponsors": "GitHub Sponsors",
+    "sponsorsHint": "Chagua kiwango cha mara moja",
+    "lightning": "Lightning",
+    "lightningWhat": "Sarafu ya kidijitali Bitcoin",
+    "kofi": "Niunge mkono kupitia Ko-fi",
+    "bmc": "Ninunulie kahawa",
+    "donate": "Changia",
+    "copy": "Nakili",
+    "copied": "Imenakiliwa!"
+  },
+  "gallery": {
+    "share": "Shiriki picha za chumba",
+    "shareButton": "Shiriki",
+    "title": "Matunzio ya chumba",
+    "storyBy": "Hadithi ya {{nickname}}",
+    "noPicture": "Hakuna picha ya hadithi hii",
+    "pictureAlt": "Katuni ya hadithi ya {{nickname}}",
+    "counter": "{{index}} / {{total}}",
+    "prev": "Hadithi iliyotangulia",
+    "next": "Hadithi inayofuata",
+    "download": "Pakua hadithi na picha tuli",
+    "downloadStoryOnly": "Pakua hadithi",
+    "downloadVideo": "Pakua video ya sekunde 5",
+    "recording": "Inarekodi…"
+  },
+  "playerLost": {
+    "label": "{{nickname}} ametoka",
+    "ignore": "Puuza, endelea na mchezo",
+    "newRoom": "Unda chumba kipya"
+  },
+  "footer": {
+    "source": "Msimbo chanzo kwenye GitHub",
+    "contentNotice": "Majibu ya wachezaji na picha za akili bandia ni jukumu la mwendeshaji wa seva hii, si la mradi wa asili."
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "Chumba hakijapatikana",
+    "ROOM_LOCKED": "Mchezo umeshaanza",
+    "ROOM_FULL": "Chumba kimejaa",
+    "NOT_HOST": "Ni mwenyeji pekee anayeweza kufanya hivyo",
+    "NOT_ENOUGH_PLAYERS": "Wanahitajika angalau wachezaji 3",
+    "INVALID_NICKNAME": "Jina la utani si sahihi",
+    "INVALID_OPTION": "Jibu hilo halipo tena — chagua jingine",
+    "RATE_LIMITED": "Punguza kasi kidogo",
+    "SERVER_BUSY": "Seva ina shughuli nyingi"
+  }
+}

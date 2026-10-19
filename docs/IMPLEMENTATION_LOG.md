@@ -5057,22 +5057,20 @@ and the source link at the foot of Home in the «Чепуха 37» app both open
 
 ~~RESUME HERE (2026-10-19, after Step 86)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 86, public).** **Step 86 (B-24) is pushed, CI passed (run
-`39227545935`), and `oursharedcode/funny-one` is public** — the repository and the exact link
-the landing page and Funny Multi carry answer 200 without signing in, and both open on the
-owner's phone. The owner's home IP (once, in this log) and the places of the Worker secret,
-the upload key's backup and the VM's `.env` backups are masked — those places are in the agent's memory
-(`funnyone-credential-locations`); `local_docs/` is no longer tracked. Earlier commits keep all
-of it (owner: leave history). **Step 85 (B-23, app parity) is pushed, CI passed (run
-`39223884389`), and deployed 2026-10-19** — `funny-multi:8a5fb85`, the landing page and Funny
-One: Home in both games links the privacy policy at its foot, on the web and so in both Android
-apps; Funny Multi's app counts its visits (only visits) as a source of its own, "Android app" on
-`/stats/`, and Funny Multi's privacy policy says so in all 23 languages; Funny One still counts
-nothing. Both apps are named in English, with a name per phone language that
-`scripts/android-labels.mjs` writes at the one rebuild, at listing time (owner: no signed
-rebuild now). The owner's phone pass is done: the privacy link opens in both apps, and
-`/stats/` has Funny Multi's first two visits under "Android app". Owed at listing time and for B-3: Step 85's
-"Owed". Then the same note as before:
+~~RESUME HERE (2026-10-19, after Step 86, public)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Steps 85–86 closed).** **Both steps' owed phone checks are
+done, confirmed by the owner 2026-10-19:** the privacy link opens at the foot of Home in both
+«Чепуха 37» and «Одна Чепуха»; `/stats/` shows Funny Multi's first two visits under "Android
+app"; the landing page's GitHub link and Funny Multi's own source link both open
+`oursharedcode/funny-one` without signing in. No code task is open. What is left in the backlog
+waits on the owner or a date, not on the agent: B-1e's Equifax D-U-N-S rename (submitted
+2026-10-18, due about 2026-11-17, then the owner confirms the new name in Payments Center →
+Review updates); B-3's native-speaker review of every machine-drafted string (B-11, B-15
+through B-23); the owner's own device passes (B-12's Android video, B-14's iPhone leg, B-18's
+and B-19/B-19a's WebKit or real-phone checks); B-23's rebuild at listing time. The next session
+starts from whichever of these the owner raises, or from a new request. Then the same note as
+before:
 
 **Step 84 (B-22) is pushed, CI
 passed (run `39138417241`), and live on `www.oursharedcode.com` — the site's commit `6917802`

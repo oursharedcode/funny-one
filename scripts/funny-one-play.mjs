@@ -18,8 +18,10 @@ export function fill(text, vars = {}) {
  * every round until the end screen shows. `onScreen(name)` fires once per
  * screen type the first time it appears ('1-home', '2-handoff', '3-thinking',
  * '4-round'); await it to screenshot. Throws if the end screen never shows.
+ * `botName` is the virtual seat's name, for a caller that renames it on
+ * '1-home' (store-screens.mjs).
  */
-export async function playToEnd(page, cat, onScreen = async () => {}) {
+export async function playToEnd(page, cat, onScreen = async () => {}, { botName = 'Bot 1' } = {}) {
   await page.getByText(cat.home.subtitle).waitFor();
   // A second human so the seat list shows both row kinds and the game shows
   // a real handoff between two people.
@@ -34,7 +36,7 @@ export async function playToEnd(page, cat, onScreen = async () => {}) {
     await onScreen(name);
   };
   // Default seat names are "Player 1", "Player 2", "Bot 1" (HomeScreen.tsx).
-  const thinking = page.getByText(fill(cat.thinking.title, { name: 'Bot 1' }));
+  const thinking = page.getByText(fill(cat.thinking.title, { name: botName }));
   const endTitle = page.getByText(cat.end.title);
   // Only while unsubmitted: after a pick the button reads round.submitted
   // until the next seat's screen replaces the round.

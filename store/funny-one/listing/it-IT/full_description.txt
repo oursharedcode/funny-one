@@ -1,0 +1,21 @@
+Storia a Catena è un gioco di storie da passarsi di mano, per 2 a 7 giocatori su un solo telefono o tablet — per bambini e adulti, al tavolo della cucina, in un lungo viaggio in auto o in un pomeriggio di pioggia.
+
+Come si gioca
+• Scrivete i nomi dei giocatori. Siete in pochi? Aggiungete giocatori virtuali e il gioco risponde al loro posto.
+• Passatevi il dispositivo. A ogni round, tutti rispondono a turno alla stessa domanda divertente: Chi? Con chi? Dove? Quando? Cosa hanno fatto? Per quale motivo? Com'è finita?
+• Nessuno vede la storia intera durante il gioco. Le risposte vengono mescolate in storie assurde, una per ogni giocatore.
+• Alla fine, ogni storia viene mostrata con un disegno buffo. Ridete, poi giocate ancora.
+
+Pensato per le famiglie
+• Non serve internet dopo il primo avvio: tutto il gioco funziona sul vostro dispositivo, disegni compresi.
+• Ogni risposta arriva dalle liste del gioco: non c'è nulla da scrivere tranne i nomi, e ogni storia resta amichevole.
+• Disegni a modo vostro: disegnati sul dispositivo, oppure cartoni animati dalla nostra libreria di disegni se scegliete "Da internet".
+• Salvate o condividete una storia insieme al suo disegno.
+• 23 lingue, da English e Español a Русский, 中文, 日本語, العربية e Kiswahili.
+• Nessun account, nessuna pubblicità, nessun acquisto in-app, nessun tracciamento.
+
+Privacy
+Nulla di ciò che scrivete lascia il vostro dispositivo. I nomi restano nella sua memoria e vengono dimenticati quando chiudete il gioco. A parte il caricamento del gioco stesso, la sua unica richiesta è il download facoltativo dei disegni, che non porta altro che l'indirizzo del disegno. Informativa sulla privacy: https://www.funny1.oursharedcode.com/privacy
+
+Open source
+Storia a Catena è software libero con licenza GNU AGPL 3.0. Il suo codice sorgente è su GitHub: https://github.com/oursharedcode/funny-one

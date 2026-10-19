@@ -25,7 +25,7 @@ Record the version shown in the page footer (e.g. `v0.1.0 · 2026-09-26`).
 | --- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | A1  | **iPhone install** (Safari → Share → Add to Home Screen).                              | Icon on the home screen, opens full-screen at the host's root. _Deferred — no iPhone._                        |
 | A2  | **Android install** (Chrome → ⋮ → Install app / the install banner).                   | Installs; the launcher icon opens the app standalone (no browser chrome) at the host's root. A Play Protect warning is known (B-8) — note it, tap _Install anyway_. |
-| A3  | **Maskable-icon clip check**: the launcher icon and the app-switcher tile.             | _Deferred until real icons_ — the current icons are placeholders (owner decision 2026-09-27).               |
+| A3  | **Maskable-icon clip check**: the launcher icon and the app-switcher tile.             | The creature's eye, mouth and antenna are whole inside the round or squircle mask; only the pink background is cut. Real icons since Step 87 (2026-10-19); deferred until then (owner decision 2026-09-27). |
 | A4  | **Jank check** during Part B's game: handoff screen, the rig picture's reveal, the gallery arrows. | Smooth to the eye — no stutter or layout jumps.                                                    |
 
 ## Part B — one full game (Russian, online)
@@ -95,7 +95,7 @@ review.
 | --- | ------------------------------- | ------------------------- |
 | A1  | deferred                        | no iPhone                 |
 | A2  |                                 |                           |
-| A3  | deferred                        | placeholder icons         |
+| A3  |                                 |                           |
 | A4  |                                 |                           |
 | B1  |                                 |                           |
 | B2  |                                 |                           |
@@ -117,7 +117,7 @@ review.
 | D5  |                                 |                           |
 | D6  |                                 |                           |
 
-**Sign-off:** T-FO-7.1 passes when A2, A4 and every B, C, D and E row is _pass_. Gate FO then
+**Sign-off:** T-FO-7.1 passes when A2, A3, A4 and every B, C, D and E row is _pass_. Gate FO then
 closes once the six gates are clean on the commit that records the results. Deferred, not
-blocking Gate FO (owner decision 2026-09-27): A1 (iPhone), A3 (real icons, still required
-before any announcement), the Hebrew export's LTR text, and native review of the `home.title`s.
+blocking Gate FO (owner decision 2026-09-27): A1 (iPhone), the Hebrew export's LTR text, and
+native review of the `home.title`s. A3 was deferred with them until the real icons came (Step 87).

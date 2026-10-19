@@ -1,0 +1,21 @@
+Funny One is a pass-and-play story game for 2 to 7 players on one phone or tablet — for kids and grown-ups, at the kitchen table, on a long car trip or on a rainy afternoon.
+
+How to play
+• Type the players' names. Not enough people? Add virtual players and the game answers for them.
+• Pass the device around. Each round, everyone answers the same playful question in turn: Who? And who else? Where? When? What did they do? What for? What happened in the end?
+• Nobody sees the whole story while playing. The answers get mixed into absurd stories, one for each player.
+• At the end, every story is shown with a silly picture of it. Laugh, then play again.
+
+Made for families
+• No internet needed after the first start: the whole game runs on your device, pictures included.
+• Every answer comes from the game's own lists, so there is nothing to type but names, and every story stays friendly.
+• Pictures your way: drawn on the device, or cartoons from our picture library if you choose "From the Internet".
+• Save or share a story together with its picture.
+• 23 languages, from English and Español to Русский, 中文, 日本語, العربية and Kiswahili.
+• No accounts, no ads, no in-app purchases, no tracking.
+
+Privacy
+Nothing you type leaves your device. Names stay in its memory and are forgotten when you close the game. Apart from loading the game itself, its only request is the optional picture download, which carries nothing but the picture's address. Privacy policy: https://www.funny1.oursharedcode.com/privacy
+
+Open source
+Funny One is free software under the GNU AGPL 3.0. Its source code is on GitHub: https://github.com/oursharedcode/funny-one

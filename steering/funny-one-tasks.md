@@ -245,8 +245,12 @@ the web app in Safari (`steering/tasks.md` B-14).*
         `assetlinks.json`; the owner installed the signed APK on the phone and reported it
         tested OK. *Not itemized by the owner:* URL bar, Play Protect warning (B-8),
         airplane-mode start — recorded when T-FO-7.1's pass runs, or when the owner says.
-  - [ ] **S-3c (M)** Funny One's Play listing. Waits on two things: the Play account (B-1e,
-        Equifax); real icons — the app carries the web game's placeholders. ~~The FO-ID-1
+  - [ ] **S-3c (M)** Funny One's Play listing. The Play account can publish (B-1e, Step 80; its
+        Equifax rename is pending, not blocking). ~~Real icons~~ and the listing's assets done 2026-10-19 (Step 87): the icon
+        (`apps/funny-one-client/public/icon.svg`, chosen by the owner from ten creatures), and
+        under `store/` the texts in 22 languages (en and ru written, 20 machine drafts with B-3),
+        graphics, screenshots and the App content answers (`store/funny-one/answers.md`). Owed:
+        the deploy that puts the icons live, then the entry in Play Console. ~~The FO-ID-1
         decision~~ taken 2026-10-06: the library was reviewed for a Families audience
         (T-FO-8.2, `docs/PICTURE_REVIEW.md`), so the store app keeps D-10's Internet pictures.
         Then the store assets, content rating (the review is the evidence behind the

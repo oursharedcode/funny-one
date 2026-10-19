@@ -1,0 +1,21 @@
+Unsinn im Kreis ist ein Geschichtenspiel zum Reihumgeben für 2 bis 7 Spieler auf einem Handy oder Tablet – für Kinder und Erwachsene, am Küchentisch, auf einer langen Autofahrt oder an einem Regennachmittag.
+
+So wird gespielt
+• Tippt die Namen der Spieler ein. Zu wenige Leute? Fügt virtuelle Spieler hinzu, das Spiel antwortet für sie.
+• Gebt das Gerät reihum weiter. In jeder Runde beantwortet jeder nacheinander dieselbe verspielte Frage: Wer? Mit wem? Wo? Wann? Was haben sie getan? Wozu? Wie endete es?
+• Während des Spiels sieht niemand die ganze Geschichte. Die Antworten werden zu absurden Geschichten vermischt, eine für jeden Spieler.
+• Am Ende wird jede Geschichte mit einem lustigen Bild dazu gezeigt. Lacht, dann spielt noch einmal.
+
+Für Familien gemacht
+• Nach dem ersten Start ist kein Internet nötig: Das ganze Spiel läuft auf eurem Gerät, Bilder inklusive.
+• Jede Antwort stammt aus den eigenen Listen des Spiels: Es gibt nichts einzutippen außer Namen, und jede Geschichte bleibt freundlich.
+• Bilder, wie ihr sie mögt: auf dem Gerät gezeichnet oder als Cartoons aus unserer Bildersammlung, wenn ihr „Aus dem Internet“ wählt.
+• Speichert oder teilt eine Geschichte zusammen mit ihrem Bild.
+• 23 Sprachen, von English und Español bis Русский, 中文, 日本語, العربية und Kiswahili.
+• Keine Konten, keine Werbung, keine In-App-Käufe, kein Tracking.
+
+Datenschutz
+Nichts, was ihr eintippt, verlässt euer Gerät. Namen bleiben im Speicher des Geräts und werden vergessen, wenn ihr das Spiel schließt. Abgesehen vom Laden des Spiels selbst ist der optionale Bilder-Download die einzige Anfrage; er übermittelt nichts außer der Adresse des Bildes. Datenschutzerklärung: https://www.funny1.oursharedcode.com/privacy
+
+Open Source
+Unsinn im Kreis ist freie Software unter der GNU AGPL 3.0. Der Quellcode ist auf GitHub: https://github.com/oursharedcode/funny-one

@@ -1,0 +1,21 @@
+Lustige Geschichten ist ein Partyspiel für 3 bis 7 Spieler, jeder mit dem eigenen Handy. Ein Spieler erstellt einen Raum, die anderen treten mit Code, Link oder QR-Code bei, und die Geschichten beginnen.
+
+So wird gespielt
+• In jeder Runde wählt jeder eine Antwort auf dieselbe verspielte Frage: Wer? Mit wem? Wo? Wann? Was haben sie getan? Wozu? Wie endete es?
+• Die Geschichten wandern in jeder Runde weiter, ihr ergänzt also immer eine Geschichte, die ihr nicht seht.
+• Nach sieben Runden wird jede Geschichte vollständig enthüllt, mit einem albernen Cartoon dazu.
+• Schaut euch gemeinsam die Galerie des Raums an und ladet eure Favoriten herunter oder teilt sie.
+
+Funktionen
+• 23 Sprachen. In einem mehrsprachigen Raum spielt jeder in seiner eigenen Sprache.
+• Jede Antwort stammt aus den eigenen Listen des Spiels: nichts einzutippen außer einem Spitznamen, und es gibt keinen Chat.
+• Keine Konten, keine Werbung, keine In-App-Käufe.
+• Internetverbindung erforderlich. Läuft auch im Browser jedes Handys unter www.funny37.oursharedcode.com
+
+Datenschutz
+Dein Spitzname wird nur im Speicher des Servers gehalten, den Spielern in deinem Raum angezeigt und vergessen, sobald der Raum geschlossen wird. Die App führt anonyme tägliche Besuchszahlen und nichts, was einen Spieler vom anderen unterscheidet. Datenschutzerklärung: https://www.funny37.oursharedcode.com/privacy
+
+Open Source
+Lustige Geschichten ist freie Software unter der GNU AGPL 3.0. Der Quellcode ist auf GitHub: https://github.com/oursharedcode/funny-one
+
+Nur ein Handy? Probiert Unsinn im Kreis, das Spiel zum Reihumgeben aus derselben Familie.

@@ -1,0 +1,21 @@
+Conta e Passa é um jogo de histórias para passar de mão em mão, para 2 a 7 jogadores em um só celular ou tablet — para crianças e adultos, na mesa da cozinha, numa viagem longa de carro ou numa tarde de chuva.
+
+Como jogar
+• Digite os nomes dos jogadores. Faltou gente? Adicione jogadores virtuais e o jogo responde por eles.
+• Passe o aparelho de mão em mão. A cada rodada, todos respondem, um de cada vez, à mesma pergunta divertida: Quem? Com quem? Onde? Quando? O que eles fizeram? Para quê? Como terminou?
+• Ninguém vê a história inteira durante o jogo. As respostas se misturam em histórias absurdas, uma para cada jogador.
+• No final, cada história aparece com uma imagem engraçada. Dê risada e jogue de novo.
+
+Feito para as famílias
+• Não precisa de internet depois da primeira abertura: o jogo inteiro roda no seu aparelho, imagens incluídas.
+• Toda resposta vem das listas do próprio jogo, então você só digita nomes e todas as histórias são sempre amigáveis.
+• Imagens do seu jeito: desenhadas no aparelho ou desenhos animados da nossa biblioteca de imagens, se você escolher "Da internet".
+• Salve ou compartilhe uma história junto com a imagem dela.
+• 23 idiomas, de English e Español a Русский, 中文, 日本語, العربية e Kiswahili.
+• Sem contas, sem anúncios, sem compras no app, sem rastreamento.
+
+Privacidade
+Nada do que você digita sai do seu aparelho. Os nomes ficam na memória dele e são esquecidos quando você fecha o jogo. Além de carregar o próprio jogo, a única requisição é o download opcional das imagens, que leva apenas o endereço da imagem. Política de privacidade: https://www.funny1.oursharedcode.com/privacy
+
+Código aberto
+Conta e Passa é software livre sob a GNU AGPL 3.0. O código-fonte está no GitHub: https://github.com/oursharedcode/funny-one

@@ -45,6 +45,12 @@ Thumbs.db
 # local — the whole folder since the repository went public (B-24, Step 86).
 local_docs/
 
+# Play store graphics and screenshots (Step 87): made by scripts/store-graphics.mjs
+# and store-screens.mjs, so regenerated rather than committed; the paste sheet is
+# made by store-listings.mjs from the tracked texts.
+/store/*/listing/*/images/
+/store/paste-sheet.html
+
 # Picture-library review (T-FO-8.2): venv, thumbnails, embeddings — regenerable, never committed
 .picture-review/
 __pycache__/

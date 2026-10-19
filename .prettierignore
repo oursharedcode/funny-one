@@ -3,6 +3,7 @@
 # breaks, which makes review diffs unreadable.
 docs/
 steering/
+store/
 
 # Build output and dependencies
 node_modules/

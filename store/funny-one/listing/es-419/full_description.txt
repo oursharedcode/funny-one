@@ -1,0 +1,21 @@
+Contá y Pasá es un juego de historias para pasarse el dispositivo, para 2 a 7 jugadores con un solo celular o tableta — para niños y mayores, en la mesa de la cocina, en un viaje largo en coche o en una tarde de lluvia.
+
+Cómo se juega
+• Escriban los nombres de los jugadores. ¿Falta gente? Agreguen jugadores virtuales y el juego responde por ellos.
+• Pasen el dispositivo. En cada ronda, todos responden por turnos a la misma pregunta divertida: ¿Quién? ¿Con quién? ¿Dónde? ¿Cuándo? ¿Qué hicieron? ¿Para qué? ¿Cómo terminó?
+• Nadie ve la historia completa mientras juega. Las respuestas se mezclan en historias absurdas, una para cada jugador.
+• Al final, cada historia se muestra con un dibujo divertido. Ríanse, y a jugar otra vez.
+
+Pensado para familias
+• No hace falta internet después del primer inicio: todo el juego funciona en su dispositivo, dibujos incluidos.
+• Cada respuesta sale de las listas del propio juego: no hay nada que escribir salvo los nombres, y todas las historias son amables.
+• Dibujos a su manera: dibujados en el dispositivo, o dibujos animados de nuestra biblioteca de dibujos si eligen «De internet».
+• Guarden o compartan una historia junto con su dibujo.
+• 23 idiomas, desde English y Español hasta Русский, 中文, 日本語, العربية y Kiswahili.
+• Sin cuentas, sin anuncios, sin compras dentro de la aplicación, sin rastreo.
+
+Privacidad
+Nada de lo que escriben sale de su dispositivo. Los nombres se quedan en su memoria y se olvidan al cerrar el juego. Aparte de cargar el propio juego, su única petición es la descarga opcional de dibujos, que no lleva más que la dirección del dibujo. Política de privacidad: https://www.funny1.oursharedcode.com/privacy
+
+Código abierto
+Contá y Pasá es software libre bajo la licencia GNU AGPL 3.0. Su código fuente está en GitHub: https://github.com/oursharedcode/funny-one

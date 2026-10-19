@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512" role="img" aria-label="Funny One">
+  <!--
+    Funny One's app icon (Step 87, S-3c): a one-eyed blob in the rig's art style
+    (stroke #1f2937, flat fills, wobbly curves — RIG_ART.md), coloured like Funny
+    Multi's monkey so the two games read as one family. Paths only, no text.
+    The PNGs beside it are made from this file by scripts/funny-one-icons.mjs;
+    the first <rect> is the background the maskable icon is padded with.
+    Everything that matters sits inside the inscribed circle, so a round mask
+    clips nothing but the background corners.
+  -->
+  <defs><clipPath id="mouth"><path d="M33 70 q17 18 34 0 q-17 5 -34 0 z"/></clipPath></defs>
+  <rect width="100" height="100" fill="#e25f9a"/>
+  <g stroke="#1f2937" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M50 23 q-1 -6 -4 -9" fill="none" stroke-width="2.4"/>
+    <circle cx="45" cy="12" r="3.8" fill="#f3c39e" stroke-width="2.2"/>
+    <path d="M50 22 q30 0 32 32 q2 20 6 32 q-10 7 -19 0 q-9 6 -19 0 q-10 6 -19 0 q-9 7 -19 0 q4 -12 6 -32 q2 -32 32 -32 z" fill="#f9c33f"/>
+    <circle cx="27" cy="68" r="3.5" fill="#e25f9a" stroke="none"/>
+    <circle cx="73" cy="68" r="3.5" fill="#e25f9a" stroke="none"/>
+    <path d="M36 30 q14 -6 28 0" fill="none"/>
+    <circle cx="50" cy="49" r="16" fill="#fff" stroke-width="2.6"/>
+    <circle cx="55" cy="51" r="7.5" fill="#1f2937" stroke="none"/>
+    <circle cx="57.5" cy="48" r="2.4" fill="#fff" stroke="none"/>
+    <path d="M33 70 q17 18 34 0 q-17 5 -34 0 z" fill="#1f2937"/>
+    <ellipse cx="51" cy="81" rx="10" ry="5.5" fill="#f472b6" stroke="none" clip-path="url(#mouth)"/>
+    <path d="M33 70 q17 18 34 0 q-17 5 -34 0 z" fill="none"/>
+    <path d="M45 72.3 h4.6 v4 h-4.6 z" fill="#fff" stroke-width="1.4"/>
+  </g>
+</svg>

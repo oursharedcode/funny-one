@@ -1,0 +1,21 @@
+Cerita Berputar adalah permainan cerita gilir-ponsel untuk 2 sampai 7 pemain di satu ponsel atau tablet — untuk anak-anak dan orang dewasa, di meja dapur, dalam perjalanan mobil yang panjang, atau di sore hari yang hujan.
+
+Cara bermain
+• Ketik nama para pemain. Kurang orang? Tambahkan pemain virtual dan permainan akan menjawab untuk mereka.
+• Gilir perangkatnya. Di setiap ronde, semua orang bergiliran menjawab pertanyaan jenaka yang sama: Siapa? Bersama siapa? Di mana? Kapan? Mereka melakukan apa? Untuk apa? Bagaimana akhirnya?
+• Tidak ada yang melihat seluruh cerita selama bermain. Jawaban-jawabannya dicampur menjadi cerita-cerita absurd, satu untuk setiap pemain.
+• Di akhir, setiap cerita ditampilkan bersama gambar lucunya. Tertawalah, lalu main lagi.
+
+Dibuat untuk keluarga
+• Tidak perlu internet setelah awal dibuka: seluruh permainan berjalan di perangkatmu, termasuk gambarnya.
+• Setiap jawaban berasal dari daftar milik permainan sendiri, jadi tidak ada yang perlu diketik selain nama, dan setiap cerita tetap ramah.
+• Gambar sesukamu: digambar di perangkat, atau kartun dari pustaka gambar kami jika kamu memilih "Dari internet".
+• Simpan atau bagikan cerita beserta gambarnya.
+• 23 bahasa, dari Bahasa Indonesia, English, dan Español hingga Русский, 中文, 日本語, العربية, dan Kiswahili.
+• Tanpa akun, tanpa iklan, tanpa pembelian dalam aplikasi, tanpa pelacakan.
+
+Privasi
+Apa pun yang kamu ketik tidak keluar dari perangkatmu. Nama tersimpan di memorinya dan dilupakan saat kamu menutup permainan. Selain memuat permainan itu sendiri, satu-satunya permintaan jaringannya adalah unduhan gambar yang bersifat opsional, yang hanya membawa alamat gambar. Kebijakan privasi: https://www.funny1.oursharedcode.com/privacy
+
+Sumber terbuka
+Cerita Berputar adalah perangkat lunak bebas di bawah GNU AGPL 3.0. Kode sumbernya ada di GitHub: https://github.com/oursharedcode/funny-one

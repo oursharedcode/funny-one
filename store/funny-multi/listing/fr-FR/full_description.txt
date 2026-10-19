@@ -1,0 +1,21 @@
+Histoires Drôles est un jeu de fête de 3 à 7 joueurs, chacun sur son propre téléphone. Un joueur crée une salle, les autres la rejoignent avec son code, son lien ou son QR code, et les histoires commencent.
+
+Comment jouer
+• À chaque manche, chacun choisit une réponse à la même question amusante : Qui ? Avec qui ? Où ? Quand ? Qu'ont-ils fait ? Pourquoi ? Comment ça s'est terminé ?
+• Les histoires circulent à chaque manche : vous complétez donc toujours une histoire que vous ne voyez pas.
+• Après sept manches, chaque histoire est dévoilée en entier, avec un dessin animé complètement loufoque.
+• Parcourez ensemble la galerie de la salle, puis téléchargez ou partagez vos préférées.
+
+Fonctionnalités
+• 23 langues. Dans une salle multilingue, chacun joue dans sa propre langue.
+• Chaque réponse vient des listes du jeu : rien à saisir à part un pseudo, et pas de chat.
+• Pas de compte, pas de publicité, pas d'achats intégrés.
+• Nécessite une connexion internet. Fonctionne aussi dans le navigateur de n'importe quel téléphone sur www.funny37.oursharedcode.com
+
+Confidentialité
+Votre pseudo n'est conservé que dans la mémoire du serveur, il est montré aux joueurs de votre salle et oublié à la fermeture de la salle. L'application tient un décompte anonyme des visites par jour, et rien qui permette de distinguer un joueur d'un autre. Politique de confidentialité : https://www.funny37.oursharedcode.com/privacy
+
+Open source
+Histoires Drôles est un logiciel libre sous licence GNU AGPL 3.0. Son code source est sur GitHub : https://github.com/oursharedcode/funny-one
+
+Un seul téléphone ? Essayez Une Histoire à la Ronde, le jeu à se passer l'appareil de la même famille.

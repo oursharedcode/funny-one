@@ -1,0 +1,21 @@
+Storie Divertenti è un party game per 3 a 7 giocatori, ognuno con il proprio telefono. Un giocatore crea una stanza, gli altri entrano con il suo codice, link o codice QR, e le storie hanno inizio.
+
+Come si gioca
+• A ogni round, tutti scelgono una risposta alla stessa domanda divertente: Chi? Con chi? Dove? Quando? Cosa hanno fatto? Per quale motivo? Com'è finita?
+• Le storie passano avanti a ogni round, quindi continuate sempre una storia che non potete vedere.
+• Dopo sette round, ogni storia viene svelata per intero, con un cartone animato stravagante.
+• Guardate insieme la galleria della stanza, poi scaricate o condividete i vostri preferiti.
+
+Funzionalità
+• 23 lingue. In una stanza multilingue, ognuno gioca nella propria lingua.
+• Ogni risposta arriva dalle liste del gioco: nulla da scrivere tranne un soprannome, e nessuna chat.
+• Nessun account, nessuna pubblicità, nessun acquisto in-app.
+• Serve una connessione a internet. Funziona anche nel browser di qualsiasi telefono su www.funny37.oursharedcode.com
+
+Privacy
+Il tuo soprannome viene conservato solo nella memoria del server, mostrato ai giocatori della tua stanza e dimenticato quando la stanza si chiude. L'app conserva conteggi anonimi delle visite giornaliere e nulla che distingua un giocatore dall'altro. Informativa sulla privacy: https://www.funny37.oursharedcode.com/privacy
+
+Open source
+Storie Divertenti è software libero con licenza GNU AGPL 3.0. Il suo codice sorgente è su GitHub: https://github.com/oursharedcode/funny-one
+
+Un solo telefono? Prova Storia a Catena, il gioco da passarsi di mano della stessa famiglia.

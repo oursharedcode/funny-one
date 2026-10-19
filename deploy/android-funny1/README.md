@@ -31,11 +31,12 @@ this README are tracked.
   — for one, to leave out pictures from the Internet if the Play Families listing needs that
   (FO-ID-1, an open owner decision) — without a new app build. The game's own footer link and
   QR code never carry it.
-- **Icons are the placeholders** the web game ships today (`icon-512.png`,
-  `icon-512-maskable.png`). `update` downloads them from the live site, so replace them there and
-  run `update` again before a store listing. That is the one rebuild (owner decision, Step 85),
-  with Google's app-signing fingerprint; the rest of Funny Multi's checklist (its README, Before
-  the store listing) applies too.
+- **Icons are the game's own** since Step 87 (`apps/funny-one-client/public/icon.svg` and the
+  PNGs made from it). `update` downloads `icon-512.png` and `icon-512-maskable.png` from the live
+  site, so deploy the game first (`deploy/ship-funny-one.sh`), then run `update`. That is the one
+  rebuild (owner decision, Step 85), with Google's app-signing fingerprint; the rest of Funny
+  Multi's checklist (its README, Before the store listing) applies too. The listing itself:
+  `store/README.md`.
 
 ## Signing key
 
@@ -56,7 +57,7 @@ app-signing fingerprint beside it.
 
 ```powershell
 npx.cmd -y "@bubblewrap/cli@1.25.0" update --skipVersionUpgrade
-node ..\..\scriptsndroid-labels.mjs
+node ..\..\scripts\android-labels.mjs
 npx.cmd -y "@bubblewrap/cli@1.25.0" build
 ```
 

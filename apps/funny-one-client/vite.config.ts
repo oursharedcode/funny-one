@@ -41,10 +41,17 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Placeholder icons only (funny-multi-client's, copied verbatim) — Funny
-      // One has no branding of its own yet. Swap for real artwork alongside
-      // the rig art (T-FO-4.1) before this product is announced anywhere.
-      includeAssets: ['icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png'],
+      // Funny One's own icon (Step 87): public/icon.svg, and the PNGs that
+      // scripts/funny-one-icons.mjs makes from it. The Android app's
+      // twa-manifest.json fetches icon-512 and icon-512-maskable from the live
+      // site, so they must be deployed before the app is rebuilt.
+      includeAssets: [
+        'icon.svg',
+        'icon-180.png',
+        'icon-192.png',
+        'icon-512.png',
+        'icon-512-maskable.png',
+      ],
       manifest: {
         name: 'Funny One «Семейная Чепуха»',
         short_name: 'Funny One',

@@ -1,0 +1,21 @@
+Funny Multi is a party game for 3 to 7 players, each on their own phone. One player creates a room, the others join with its code, link or QR code, and the stories begin.
+
+How to play
+• Each round, everyone picks an answer to the same playful question: Who? And who else? Where? When? What did they do? What for? What happened in the end?
+• The stories move on every round, so you always add to a story you cannot see.
+• After seven rounds, every story is revealed in full, with a goofy cartoon of it.
+• Look through the room's gallery together, then download or share your favourites.
+
+Features
+• 23 languages. In a multi-language room, everyone plays in their own language.
+• Every answer comes from the game's own lists: nothing to type but a nickname, and no chat.
+• No accounts, no ads, no in-app purchases.
+• Needs an internet connection. Also plays in any phone's browser at www.funny37.oursharedcode.com
+
+Privacy
+Your nickname is kept only in the server's memory, shown to the players in your room and forgotten when the room closes. The app keeps anonymous daily visit counts and nothing that tells one player from another. Privacy policy: https://www.funny37.oursharedcode.com/privacy
+
+Open source
+Funny Multi is free software under the GNU AGPL 3.0. Its source code is on GitHub: https://github.com/oursharedcode/funny-one
+
+Only one phone? Try Funny One, the pass-and-play game from the same family.

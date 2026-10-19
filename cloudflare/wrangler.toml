@@ -34,6 +34,11 @@ enabled = true
 # deploy again once the library is complete — and switch it back on for the
 # batch after any pool edit.
 #
+# Off also keeps Funny Multi's Play app outside Google Play's AI-Generated
+# Content policy, which leaves out apps that only host AI pictures. On, the app
+# draws from players' stories and needs an in-app "report this picture" first
+# (store/funny-multi/answers.md, item 7; Step 87).
+#
 # [ai]
 # binding = "AI"
 

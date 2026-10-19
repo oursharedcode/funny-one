@@ -5011,6 +5011,135 @@ Funny Multi's live bundle both link exactly `https://github.com/oursharedcode/fu
 **Seen on the phone 2026-10-19** (owner: "done, opened ok"): the landing page's GitHub link
 and the source link at the foot of Home in the «Чепуха 37» app both open the repository.
 
+## Step 87 (tasks S-3c, B-1e) — Funny One's own icon, and both games' Play listings (2026-10-19)
+
+**Owner request 2026-10-19** (/morning, the agent's proposal): Funny One's own app icon — its
+four icons were byte-identical copies of Funny Multi's monkey, and S-3c (its Play listing) and
+A3 of `docs/ACCEPTANCE_FUNNY_ONE.md` waited on real ones — and, by answer 4(b), everything the
+two Play listings need, in the same step.
+
+**Owner decisions 2026-10-19** (from the plan's options):
+
+1. *Who draws it:* (a) the agent, as SVG — taken; (b) AI generation (Workers AI is cancelled);
+   (c) a designer.
+2. *What it shows:* (a) one of the game's own creatures — taken, as "make 10 creatures to select
+   one": the agent drew ten (penguin, raccoon, dragon, llama, goose, one-eye, frog, owl, chick,
+   cat) on a contact sheet, each in a round and a squircle mask at full and launcher size, and
+   the owner chose **6, the one-eyed blob** (a pun on "Funny **One**"), "but apply colours like
+   Funny Multi"; (b) a Fredoka "1".
+3. *Funny Multi's icon:* (a) keeps SRC's monkey — taken; (b) a matched pair, redrawn.
+4. *The listing:* (a) icons now, the listing later; (b) everything in one step — taken.
+5. *Listing languages:* (a) en and ru written for the store, plus machine drafts in the games'
+   other languages for B-3 — taken; (b) en and ru only.
+6. *Funny One's age groups:* (a) 6–8 up to 18 and over — taken; (b) 9 and over.
+7. *Which listings:* (a) Funny One's only; (b) both games' — taken.
+
+**The icon** (`apps/funny-one-client/public/icon.svg`, 1.9 KB, paths only, no text): a yellow
+one-eyed blob with an antenna, in the rig's hand (ink `#1f2937`, flat fills, wobbly curves), on
+Funny Multi's pink `#e25f9a` in its monkey's yellow `#f9c33f` — one family, told apart at a
+glance. Everything that matters sits inside the inscribed circle. `scripts/funny-one-icons.mjs`
+renders the four PNGs from it in headless Chromium: `icon-512` and `icon-192` (the manifest's
+"any"), `icon-180` (apple-touch-icon) and `icon-512-maskable`, the art at 80 % on its own
+background — Step 15's safe-zone method. `index.html` names the SVG first and the 192 PNG as the
+fallback; `vite.config.ts` precaches the SVG too, and its comment no longer says "placeholder".
+
+**The listings** (`store/`; `store/README.md` is the upload checklist):
+
+- *Texts,* both games × 22 Play locales × three files: en-GB (the default) and ru-RU written for
+  the store, the other 20 machine drafts (B-3). Each title starts with the game's Home title in
+  that language — «Funny One: Silly Story Game», «Одна Чепуха: по кругу», «Funny Multi: Party
+  Story Game», «Чепуха 37 — игра для компании». Funny One's description names its "From the
+  Internet" option as the game does, and Funny Multi's names Funny One. Yoruba has no Play
+  locale; a Yoruba phone sees the default.
+- *Graphics* (`scripts/store-graphics.mjs`): the store icon, 512² 32-bit — Funny Multi's own
+  `icon-512.png` is palette-mode, so both are re-encoded through a canvas — and a 1024×500
+  feature graphic per game in en and ru: the maskable icon in a circle, the name, a tagline and
+  three of the game's questions, from its catalogs.
+- *Screenshots* (`scripts/store-screens.mjs`): five per game in en and ru, 1080×1920 (360×640
+  CSS px at 3×), from real games in headless Chromium. Funny One is played by
+  `funny-one-play.mjs` on an in-process Vite server — `playToEnd` takes a `botName` now, since
+  the screenshots rename the seats; Funny Multi by three players on the production build on
+  3000, its cartoons from the real `worker.js` on 5185 over the public library. In listing
+  order, Funny One: end, round, handoff, home, thinking; Funny Multi: gallery, reveal, round,
+  lobby, home.
+- *Answers* (`store/<game>/answers.md`): Store settings and every App content form — privacy
+  policy, app access, ads, the IARC questionnaire, target audience, Data safety, Play's
+  AI-generated content policy — drafted for the owner to enter, each answer with its reason.
+- *Checker* (`scripts/store-listings.mjs`): Play's limits in code points, line endings (a CRLF
+  checkout reads as LF), the titles, links and names above, and — where the images exist —
+  Play's image rules. It writes `store/paste-sheet.html`, every text with a Copy button, and
+  exits 1 on any problem.
+- The 26 images (6.2 MB) and the paste sheet are gitignored and regenerated; `store/` is in
+  `.prettierignore`, so prettier never rewraps a listing text.
+
+**Play's AI-Generated Content policy, checked on the way** (Play Console Help, answers 13985936
+and 14094294, read 2026-10-19): it covers "content that is created by generative AI models based
+on user prompts" and asks for "in-app user reporting or flagging features"; apps that "merely
+host AI-generated content and are unable to create content using AI" are out of scope. Both
+games are out of scope today: every picture is pre-drawn (D-7), and the Worker's generation
+switch is off (`[ai]` commented out in `cloudflare/wrangler.toml`; a miss answers 503). Switching
+it on would bring Funny Multi into scope, and the game has no in-app report — so the switch's
+comment in `wrangler.toml` and B-1e now say: a "report this picture" first, as a step of its
+own.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *Icons drawn by Chromium, not `sharp`* (the plan said a temporary `sharp`): the same
+   renderer as the phone, and no package to install and remove.
+2. *Play category Games › Word* (in the plan, not objected to).
+3. *The images are regenerated, not committed:* the scripts make them in minutes; the Russian
+   graphics take the system font (Fredoka has no Cyrillic), so they were made on Windows (Segoe
+   UI) and differ on another machine.
+4. *Graphics and screenshots in en and ru only;* the 20 drafts show the default's.
+5. *Locales:* Cantonese is zh-HK, Hebrew iw-IL, both Spanishes kept apart (es-ES, es-419).
+6. *Funny Multi's audience starts at 13:* Play has no 12+ group, and 13 matches the privacy
+   policy's "not directed at children under 13".
+7. *Content-rating answers:* No to violence (Funny One's knights carry costume props) and No to
+   blood for Funny Multi's two red puddles, with the honest Yes named beside each; Funny Multi
+   Yes to "users interact" (nicknames).
+8. *Data safety:* Funny One "No data collected"; Funny Multi declares the nickname, the country
+   and the visit count, with the cautious answers (not ephemeral, required) where Play's
+   wording leaves a doubt.
+9. *Made-up names on the screenshots;* the room codes are random.
+
+**Not changed:** no game behaviour, no deploy. Funny Multi's icon is the monkey still. Funny
+One's live site and its Android app keep the old icons until the deploy and the one rebuild
+(B-23, decision 4 of Step 85).
+
+**Verified here:**
+
+- The ten candidates, and the chosen one again after its recolouring, each as a large squircle
+  and circle and at launcher size (48 px) on a light and a dark wallpaper: nothing that matters
+  is clipped.
+- Funny One built and served: `icon.svg` and the four PNGs answer 200, and the manifest lists
+  192, 512 and the maskable 512.
+- All 26 images read back: the two store icons 512² with alpha; the four feature graphics
+  1024×500 and the twenty screenshots 1080×1920, all without alpha, each under 1.3 MB. Every
+  screenshot looked at: Funny Multi's round shot was first taken scrolled past its question
+  ("Round 1 of 7 / Who?"), so the script scrolls to the top before it.
+- `store-listings.mjs`: all 44 listings pass, images checked in 4; an RGBA image slipped among
+  the screenshots is caught, and a CRLF file passes.
+
+**Not seen:** a real launcher (A3, the owner's phone after the deploy); Safari (no WebKit here);
+Play Console's own preview.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test`: 1605 tests (418 + 378 + 313 + 180 + 263 + 53), all passed, the real-socket suites
+  included.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
+- CI: owed after the push.
+
+**Owed, in order, the owner's** (one op per message): (1) the push, then CI; (2) Funny One's
+deploy (`deploy/ship-funny-one.sh`), which puts the icons live; (3) A3 on the phone — the icon
+whole in the launcher's mask; (4) each game's Play Console entry from `store/README.md`
+(listing, translations, Store settings, App content); (5) the one rebuild of each app —
+`update`, `node scripts/android-labels.mjs`, `build` — then Google's app-signing fingerprint
+into `assetlinks.json`, and the copies installed by hand uninstalled before installing from
+Play.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -5059,8 +5188,21 @@ and the source link at the foot of Home in the «Чепуха 37» app both open
 
 ~~RESUME HERE (2026-10-19, after Step 86, public)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Steps 85–86 closed).** **Both steps' owed phone checks are
-done, confirmed by the owner 2026-10-19:** the privacy link opens at the foot of Home in both
+~~RESUME HERE (2026-10-19, after Steps 85–86 closed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Step 87).** **Step 87 (S-3c, B-1e) is committed, not pushed —
+the push waits for the owner's word, then CI.** Funny One has its own icon (the one-eyed blob,
+the owner's pick of ten, on Funny Multi's pink), and `store/` holds both games' Play listings:
+texts in 22 languages (en and ru written, 20 machine drafts for B-3), the App content answers,
+and the scripts that regenerate the gitignored graphics and screenshots and check it all
+(`store/README.md`). **Next, the owner's, one op per message:** the push; Funny One's deploy
+(`deploy/ship-funny-one.sh` — the icons go live, and Bubblewrap's `update` fetches them from
+the site, so it comes before any rebuild); A3 on the phone; then each game's Play Console entry
+and the one rebuild (Step 87's Owed). Both games are outside Play's AI-Generated Content policy
+only while the Worker's generation switch stays off — switching it on needs an in-app "report
+this picture" first (B-1e). Then the same note as before:
+
+**Steps 85 and 86's owed phone checks are done, confirmed by the owner 2026-10-19:** the privacy link opens at the foot of Home in both
 «Чепуха 37» and «Одна Чепуха»; `/stats/` shows Funny Multi's first two visits under "Android
 app"; the landing page's GitHub link and Funny Multi's own source link both open
 `oursharedcode/funny-one` without signing in. No code task is open. What is left in the backlog
@@ -5191,11 +5333,11 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six, Step 85's five and Step 86's three were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six, Step 85's five, Step 86's three and Step 87's nine were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
-key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
-icons — B-1e's account is ready (Step 80).
+key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) has its icons and assets
+(Step 87) and waits only on the deploy and the owner's entry — B-1e's account is ready (Step 80).
 
 B-1e (Play account) is done: MARK WEB TOOLS is signed up, paid and fully verified — identity, website and phone (Step 54, Step 80). Its Equifax D-U-N-S rename
 to match is submitted and pending (~30 days, due 2026-11-17); when it lands, the owner confirms
@@ -5284,9 +5426,9 @@ strings outside en/ru, the landing page's text and Step 76's privacy
 sentence and Step 79's privacy bullet outside en/ru, and everything in B-16's five languages and B-21's three are machine drafts; a still's file name
 is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73); what Safari
 draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
-direction (unit tests only); real
-Funny One icons before any announcement or listing (also blocks A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
+direction (unit tests only); ~~real
+Funny One icons~~ drawn in Step 87, live after Funny One's next deploy (A3 in
+`docs/ACCEPTANCE_FUNNY_ONE.md` then checks them on a phone); T-7.1's iPhone
 install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
 and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at

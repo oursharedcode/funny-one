@@ -113,6 +113,16 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Owed:* the Equifax D-U-N-S rename to MARK WEB TOOLS, submitted 2026-10-18, due about
     2026-11-17; when it lands, the owner confirms the new name in Payments Center → Review updates,
     before its deadline. Then the listing (assets, content rating 12+, Data Safety, release).
+  - *Listing assets done 2026-10-19 (Step 87), for both apps:* under `store/`, the texts in 22
+    languages (en and ru written, 20 machine drafts with B-3), graphics and screenshots
+    (regenerated, not committed), and the answers for Store settings and App content
+    (`store/<game>/answers.md`); `store/README.md` is the upload checklist.
+  - *Keep generation off while the apps are on Play:* Play's AI-Generated Content policy asks
+    apps that draw with AI from user prompts for an in-app way to report a picture; apps that
+    only host such pictures are out of scope. Both games are out of scope today — every picture
+    is pre-drawn (D-7) and the Worker's generation switch is off (`cloudflare/wrangler.toml`).
+    Switching it on for Funny Multi needs an in-app "report this picture" first, a step of its
+    own (`store/funny-multi/answers.md`, item 7).
   - Identifiers (ABN, D-U-N-S number, signup account) stay out of this repo (Step 54).
 - **B-2** ~~IOS37: Capacitor shell + App Store listing; 4.2-risk mitigation review~~ —
   **cancelled 2026-10-05 (owner decision): too costly** (the Apple Developer Program alone is
@@ -379,7 +389,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Owed at listing time (B-1e, S-3c):* the rebuild with `scripts/android-labels.mjs` between
     `update` and `build` (both READMEs); Data safety — Funny Multi declares the visit counts,
     Funny One collects nothing; Google's fingerprint in both `assetlinks.json`; uninstall the
-    copies installed by hand first.
+    copies installed by hand first. Funny One's real icons: drawn 2026-10-19 (Step 87), live
+    after its next deploy, which must come before the rebuild.
   - *Owed:* the privacy changes and the names outside en/ru are machine drafts (with B-3); some
     names are too long to show whole under an icon (Step 85 lists them).
 

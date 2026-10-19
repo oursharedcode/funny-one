@@ -1,0 +1,21 @@
+Hadithi ya Kupokezana ni mchezo wa hadithi wa kupokezana kwa wachezaji 2 hadi 7 kwenye simu au kompyuta kibao moja — kwa watoto na watu wazima, mezani jikoni, safarini kwa gari kwa muda mrefu au alasiri ya mvua.
+
+Jinsi ya kucheza
+• Andika majina ya wachezaji. Watu hawatoshi? Ongeza wachezaji pepe na mchezo utajibu kwa niaba yao.
+• Pokezaneni kifaa. Kila raundi, kila mtu anajibu swali lilelile la kuchekesha kwa zamu: Nani? Na nani mwingine? Wapi? Lini? Walifanya nini? Kwa nini? Mwishowe kulitokea nini?
+• Hakuna anayeona hadithi nzima wakati wa kucheza. Majibu huchanganywa na kuwa hadithi za ajabu, moja kwa kila mchezaji.
+• Mwishoni, kila hadithi huonyeshwa pamoja na picha ya kuchekesha yake. Cheka, kisha cheza tena.
+
+Imetengenezwa kwa ajili ya familia
+• Hakuna haja ya intaneti baada ya kuanza mara ya kwanza: mchezo mzima unaendeshwa kwenye kifaa chako, pamoja na picha.
+• Kila jibu linatoka kwenye orodha za mchezo wenyewe, kwa hiyo hakuna cha kuandika isipokuwa majina, na kila hadithi inabaki ya kirafiki.
+• Picha upendavyo: zilizochorwa kwenye kifaa, au katuni kutoka maktaba yetu ya picha ukichagua "Kutoka intaneti".
+• Hifadhi au shiriki hadithi pamoja na picha yake.
+• Lugha 23, kuanzia English na Español hadi Русский, 中文, 日本語, العربية na Kiswahili.
+• Hakuna akaunti, hakuna matangazo, hakuna manunuzi ndani ya programu, hakuna ufuatiliaji.
+
+Faragha
+Hakuna unachoandika kinachoondoka kwenye kifaa chako. Majina hubaki kwenye kumbukumbu yake na husahaulika ukifunga mchezo. Mbali na kupakia mchezo wenyewe, ombi lake pekee ni upakuaji wa picha wa hiari, usiobeba chochote isipokuwa anwani ya picha. Sera ya faragha: https://www.funny1.oursharedcode.com/privacy
+
+Chanzo wazi
+Hadithi ya Kupokezana ni programu huru chini ya GNU AGPL 3.0. Msimbo wake chanzo uko GitHub: https://github.com/oursharedcode/funny-one

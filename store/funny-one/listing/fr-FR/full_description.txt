@@ -1,0 +1,21 @@
+Une Histoire à la Ronde est un jeu d'histoires à se passer l'appareil, de 2 à 7 joueurs sur un seul téléphone ou une seule tablette — pour les enfants comme pour les grands, sur la table de la cuisine, pendant un long trajet en voiture ou par un après-midi pluvieux.
+
+Comment jouer
+• Saisissez les noms des joueurs. Pas assez de monde ? Ajoutez des joueurs virtuels et le jeu répond à leur place.
+• Faites circuler l'appareil. À chaque manche, chacun répond à tour de rôle à la même question amusante : Qui ? Avec qui ? Où ? Quand ? Qu'ont-ils fait ? Pourquoi ? Comment ça s'est terminé ?
+• Personne ne voit l'histoire entière pendant la partie. Les réponses sont mélangées en histoires absurdes, une pour chaque joueur.
+• À la fin, chaque histoire est présentée avec une image rigolote. Riez, puis rejouez.
+
+Pensé pour les familles
+• Pas besoin d'internet après le premier lancement : tout le jeu fonctionne sur votre appareil, images comprises.
+• Chaque réponse vient des listes du jeu : il n'y a rien à saisir à part les noms, et chaque histoire reste conviviale.
+• Des images à votre façon : dessinées sur l'appareil, ou dessins animés de notre bibliothèque d'images si vous choisissez « Depuis Internet ».
+• Enregistrez ou partagez une histoire avec son image.
+• 23 langues, d'English et Español à Русский, 中文, 日本語, العربية et Kiswahili.
+• Pas de compte, pas de publicité, pas d'achats intégrés, pas de suivi.
+
+Confidentialité
+Rien de ce que vous saisissez ne quitte votre appareil. Les noms restent dans sa mémoire et sont oubliés quand vous fermez le jeu. Hormis le chargement du jeu lui-même, sa seule requête est le téléchargement facultatif des images, qui ne transmet rien d'autre que l'adresse de l'image. Politique de confidentialité : https://www.funny1.oursharedcode.com/privacy
+
+Open source
+Une Histoire à la Ronde est un logiciel libre sous licence GNU AGPL 3.0. Son code source est sur GitHub : https://github.com/oursharedcode/funny-one

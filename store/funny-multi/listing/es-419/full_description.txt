@@ -1,0 +1,21 @@
+Historias Divertidas es un juego de fiesta para 3 a 7 jugadores, cada uno con su propio celular. Un jugador crea una sala, los demás se unen con su código, enlace o código QR, y empiezan las historias.
+
+Cómo se juega
+• En cada ronda, todos eligen una respuesta a la misma pregunta divertida: ¿Quién? ¿Con quién? ¿Dónde? ¿Cuándo? ¿Qué hicieron? ¿Para qué? ¿Cómo terminó?
+• Las historias avanzan en cada ronda, así que siempre continúan una historia que no pueden ver.
+• Después de siete rondas, cada historia se revela completa, con un dibujo animado disparatado.
+• Miren juntos la galería de la sala y luego descarguen o compartan sus favoritas.
+
+Funciones
+• 23 idiomas. En una sala multilingüe, cada uno juega en su propio idioma.
+• Cada respuesta sale de las listas del propio juego: nada que escribir salvo un apodo, y sin chat.
+• Sin cuentas, sin anuncios, sin compras dentro de la aplicación.
+• Necesita conexión a internet. También funciona en el navegador de cualquier celular en www.funny37.oursharedcode.com
+
+Privacidad
+Tu apodo solo se guarda en la memoria del servidor, se muestra a los jugadores de tu sala y se olvida cuando la sala se cierra. La aplicación guarda recuentos anónimos de visitas diarias y nada que distinga a un jugador de otro. Política de privacidad: https://www.funny37.oursharedcode.com/privacy
+
+Código abierto
+Historias Divertidas es software libre bajo la licencia GNU AGPL 3.0. Su código fuente está en GitHub: https://github.com/oursharedcode/funny-one
+
+¿Solo un celular? Prueba Contá y Pasá, el juego para pasarse el dispositivo de la misma familia.

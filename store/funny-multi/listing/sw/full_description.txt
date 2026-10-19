@@ -1,0 +1,21 @@
+Hadithi za Kuchekesha ni mchezo wa sherehe kwa wachezaji 3 hadi 7, kila mmoja kwenye simu yake. Mchezaji mmoja huunda chumba, wengine hujiunga kwa msimbo wake, kiungo au msimbo wa QR, na hadithi zinaanza.
+
+Jinsi ya kucheza
+• Kila raundi, kila mtu huchagua jibu kwa swali lilelile la kuchekesha: Nani? Na nani mwingine? Wapi? Lini? Walifanya nini? Kwa nini? Mwishowe kulitokea nini?
+• Hadithi zinasonga mbele kila raundi, kwa hiyo daima unaongeza kwenye hadithi usiyoweza kuiona.
+• Baada ya raundi saba, kila hadithi hufichuliwa nzima, pamoja na katuni ya kuchekesha yake.
+• Tazameni pamoja ghala la chumba, kisha pakua au shiriki unazozipenda.
+
+Vipengele
+• Lugha 23. Katika chumba cha lugha nyingi, kila mtu anacheza kwa lugha yake.
+• Kila jibu linatoka kwenye orodha za mchezo wenyewe: hakuna cha kuandika isipokuwa jina la utani, na hakuna soga.
+• Hakuna akaunti, hakuna matangazo, hakuna manunuzi ndani ya programu.
+• Inahitaji muunganisho wa intaneti. Pia inachezeka kwenye kivinjari cha simu yoyote kwenye www.funny37.oursharedcode.com
+
+Faragha
+Jina lako la utani huhifadhiwa tu kwenye kumbukumbu ya seva, huonyeshwa kwa wachezaji wa chumba chako na husahaulika chumba kikifungwa. Programu huhifadhi hesabu zisizo na majina za ziara za kila siku, na hakuna chochote kinachomtofautisha mchezaji mmoja na mwingine. Sera ya faragha: https://www.funny37.oursharedcode.com/privacy
+
+Chanzo wazi
+Hadithi za Kuchekesha ni programu huru chini ya GNU AGPL 3.0. Msimbo wake chanzo uko GitHub: https://github.com/oursharedcode/funny-one
+
+Una simu moja tu? Jaribu Hadithi ya Kupokezana, mchezo wa kupokezana kutoka familia hiyohiyo.

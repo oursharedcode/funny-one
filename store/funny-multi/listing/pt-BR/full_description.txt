@@ -1,0 +1,21 @@
+Histórias Engraçadas é um jogo de festa para 3 a 7 jogadores, cada um no seu próprio celular. Um jogador cria uma sala, os outros entram com o código, o link ou o QR code dela, e as histórias começam.
+
+Como jogar
+• A cada rodada, todos escolhem uma resposta para a mesma pergunta divertida: Quem? Com quem? Onde? Quando? O que eles fizeram? Para quê? Como terminou?
+• As histórias andam a cada rodada, então você sempre acrescenta algo a uma história que não consegue ver.
+• Depois de sete rodadas, cada história é revelada por inteiro, com um desenho animado bem bobo dela.
+• Vejam juntos a galeria da sala e depois baixem ou compartilhem suas favoritas.
+
+Recursos
+• 23 idiomas. Em uma sala multilíngue, cada um joga no seu próprio idioma.
+• Toda resposta vem das listas do próprio jogo: nada para digitar além de um apelido, e não há chat.
+• Sem contas, sem anúncios, sem compras no app.
+• Precisa de conexão com a internet. Também funciona no navegador de qualquer celular em www.funny37.oursharedcode.com
+
+Privacidade
+Seu apelido fica só na memória do servidor, aparece para os jogadores da sua sala e é esquecido quando a sala fecha. O app guarda contagens anônimas de visitas por dia e nada que distinga um jogador de outro. Política de privacidade: https://www.funny37.oursharedcode.com/privacy
+
+Código aberto
+Histórias Engraçadas é software livre sob a GNU AGPL 3.0. O código-fonte está no GitHub: https://github.com/oursharedcode/funny-one
+
+Só tem um celular? Experimente Conta e Passa, o jogo de passar de mão em mão da mesma família.

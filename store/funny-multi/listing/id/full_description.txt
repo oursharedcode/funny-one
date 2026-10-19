@@ -1,0 +1,21 @@
+Cerita Lucu adalah permainan pesta untuk 3 sampai 7 pemain, masing-masing dengan ponselnya sendiri. Satu pemain membuat ruangan, yang lain bergabung dengan kode, tautan, atau kode QR-nya, dan cerita pun dimulai.
+
+Cara bermain
+• Di setiap ronde, semua orang memilih jawaban untuk pertanyaan jenaka yang sama: Siapa? Bersama siapa? Di mana? Kapan? Mereka melakukan apa? Untuk apa? Bagaimana akhirnya?
+• Cerita-ceritanya berpindah tangan setiap ronde, jadi kamu selalu menambah cerita yang tidak bisa kamu lihat.
+• Setelah tujuh ronde, setiap cerita diungkap lengkap, bersama kartun konyolnya.
+• Lihat galeri ruangan bersama-sama, lalu unduh atau bagikan favoritmu.
+
+Fitur
+• 23 bahasa. Di ruangan multibahasa, semua orang bermain dalam bahasanya sendiri.
+• Setiap jawaban berasal dari daftar milik permainan sendiri: tidak ada yang perlu diketik selain nama panggilan, dan tanpa obrolan.
+• Tanpa akun, tanpa iklan, tanpa pembelian dalam aplikasi.
+• Perlu koneksi internet. Juga bisa dimainkan di browser ponsel mana pun di www.funny37.oursharedcode.com
+
+Privasi
+Nama panggilanmu hanya disimpan di memori server, ditampilkan kepada para pemain di ruanganmu, dan dilupakan saat ruangan ditutup. Aplikasi menyimpan hitungan kunjungan harian yang anonim dan tidak ada yang membedakan satu pemain dari pemain lain. Kebijakan privasi: https://www.funny37.oursharedcode.com/privacy
+
+Sumber terbuka
+Cerita Lucu adalah perangkat lunak bebas di bawah GNU AGPL 3.0. Kode sumbernya ada di GitHub: https://github.com/oursharedcode/funny-one
+
+Hanya punya satu ponsel? Coba Cerita Berputar, permainan gilir-ponsel dari keluarga yang sama.

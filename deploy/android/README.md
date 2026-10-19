@@ -124,5 +124,7 @@ The listing build is the one rebuild (owner decision, Step 85): `update` (withou
   in the app.
 - **The privacy policy link** in the listing is `https://www.funny37.oursharedcode.com/privacy`;
   the app links to it from Home already.
+- **The listing itself** — texts, graphics and the App content answers — is in `store/` (Step 87);
+  `store/README.md` is the upload checklist.
 - On Android 16 and later, a tablet or an unfolded phone ignores `"orientation": "portrait"`
   (the app targets SDK 36) and may show the game in landscape, as a browser on a tablet does.

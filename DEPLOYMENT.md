@@ -307,8 +307,9 @@ design B (a silent loop of it behind the top of the page), half and half at rand
 the visits that arrive from it and how many of them go on to open the Support screen and pick
 a way to give. Each count is a daily total per a few fixed labels — the design, the language,
 where the visit came from, a phone or not — with no IP address, cookie or identifier stored,
-and nothing is counted when the browser sends Do Not Track or Global Privacy Control, or inside
-the Android app. Funny Multi's server keeps the counts: Caddy forwards the page's two count
+and nothing is counted when the browser sends Do Not Track or Global Privacy Control. Funny
+Multi's Android app counts its visits under a source of their own, and nothing else, since it
+offers no gifts (Step 85); Funny One counts nothing. Funny Multi's server keeps the counts: Caddy forwards the page's two count
 addresses on `HUB_HOST` (`/api/stats` and `/api/stats/summary`) to it, and compose keeps the
 file in the `stats_data` volume, 400 days of it. `https://<HUB_HOST>/stats/` shows them, with
 a test of whether one design sends more of its visitors on to Funny Multi than the other; it

@@ -3,7 +3,14 @@
 // Copied verbatim from SRC/client/src/components/SourceFooter.tsx. `SOURCE_URL`
 // already points at this repo (T-3.1 adapted `sourceUrl.ts`), so the AGPL
 // source link resolves correctly without an edit here.
+//
+// Step 85 (B-23): Home's footer also links to the privacy policy, at the
+// section in the interface language. Google Play wants that link inside the
+// app itself, and the Android app is this page in a Trusted Web Activity, so
+// this link is the app's. Caddy serves the policy at the root of the game's
+// host (deploy/caddy/Caddyfile), whatever the build's base path.
 
+import { isLanguage } from '@funny/shared';
 import { useTranslation } from 'react-i18next';
 import { SOURCE_URL } from '../sourceUrl';
 import { APP_VERSION, BUILD_DATE } from '../version';
@@ -13,6 +20,8 @@ interface Props {
   // When true, render a small QR code of the source URL to the left of the
   // "Source on GitHub" link. Host-only on the Home screen; off elsewhere.
   sourceQr?: boolean;
+  // When true, link to the privacy policy. On the Home screen only.
+  privacyLink?: boolean;
 }
 
 // In-game source-and-responsibility footer (spec §27). Renders a small
@@ -21,8 +30,9 @@ interface Props {
 // this instance, and a tiny build-version line so a returning player /
 // the operator can tell which deploy is actually running. Used on the
 // Home and End screens.
-export default function SourceFooter({ sourceQr = false }: Props) {
-  const { t } = useTranslation();
+export default function SourceFooter({ sourceQr = false, privacyLink = false }: Props) {
+  const { t, i18n } = useTranslation();
+  const language = isLanguage(i18n.language) ? i18n.language : 'en';
   return (
     <footer className="mt-6 flex w-full flex-col items-center gap-1 text-center text-xs text-gray-500">
       <div className="flex items-center gap-2">
@@ -49,6 +59,16 @@ export default function SourceFooter({ sourceQr = false }: Props) {
           <span>{t('footer.source')}</span>
         </a>
       </div>
+      {privacyLink && (
+        <a
+          href={`/privacy#privacy-${language}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          {t('footer.privacy')}
+        </a>
+      )}
       <p className="px-2">{t('footer.contentNotice')}</p>
       <p className="text-gray-400">
         v{APP_VERSION} · {BUILD_DATE}

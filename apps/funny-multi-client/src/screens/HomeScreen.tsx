@@ -405,7 +405,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
         </>
       )}
 
-      <SourceFooter sourceQr={mode === 'create'} />
+      <SourceFooter sourceQr={mode === 'create'} privacyLink />
     </div>
   );
 }

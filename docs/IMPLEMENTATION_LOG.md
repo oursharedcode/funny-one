@@ -4783,6 +4783,135 @@ addresses. A browser was not pointed at the live site (the check above was again
 files, served locally). Owed, as above: the owner's read of the Sponsors bullet, the PayIDs,
 decision 6, and a real tap and scan on the live page.
 
+## Step 85 (task B-23) — App parity: the privacy link, the apps' names, and the Android app's visits counted (2026-10-19)
+
+**Owner request 2026-10-19:** bring the Android apps level with the web games, gifts excepted.
+Both apps are TWAs that load the live site, so every web change since Steps 59 and 66 already
+reaches them; what differed was the apps' own: no privacy link inside either (Google Play asks
+for one), one English-or-Russian name each, and Funny Multi's app counting nothing. Making the
+repository public was split off as **B-24**.
+
+**Owner decisions 2026-10-19** (from the plan's options):
+
+1. *Privacy link:* (a) at the foot of Home in both games, on the web and so in the apps — taken;
+   (b) only inside the apps; (c) in the menu of every screen.
+2. *App names:* (a) one name; (b) a name for each phone language — taken: English «Funny Multi»
+   and «Funny One» by default, «Чепуха 37» and «Одна Чепуха» in Russian, and (answer "Translate
+   all 21") the game's Home title in the 21 others, machine drafts for B-3.
+3. *Counting:* (a) the apps count nothing; (b) count app visits like the web — taken, for
+   **Funny Multi only** (Funny One stays uncounted), shown on `/stats/` as a third source,
+   "Android app"; the Data safety form then lists the counts, and Funny Multi's privacy page
+   changes.
+4. *Rebuild:* (a) a signed rebuild now; (b) once, at listing time, with Funny One's real icons
+   and Google's signing fingerprint — taken. No APK was rebuilt for the phone in this step.
+
+**Shipped:** committed, **not pushed and not deployed** — the owner's word is awaited for both.
+
+**Changed:**
+
+- *Privacy link, both games:* `SourceFooter` takes `privacyLink`, which only Home sets; the link
+  reads "Privacy policy" in the page's language (a `footer.privacy` string in all 46 catalogs,
+  machine drafts outside en/ru) and opens `/privacy#privacy-<language>` in a new tab, so a game
+  in progress is never left. Caddy already serves `/privacy` on both hosts. Funny One's service
+  worker answered every navigation with the precached game, so its `navigateFallbackDenylist`
+  now leaves `/privacy` to the network (`apps/funny-one-client/vite.config.ts`); Funny Multi's
+  has no navigation fallback and needed nothing.
+- *Funny Multi's app visits counted:* inside the app (`?shell=android` or the app's referrer,
+  kept for the tab) the funnel sends `fm_view` with source `app`, and nothing else — the app has
+  no gift sheet, and the server refuses a support or gift event with that source
+  (`VISIT_SOURCES` in `analytics.ts`; 73 keys per language a day at most, was 72). Like any
+  visit it gets a country (Step 79). Do Not Track and Global Privacy Control still stop it.
+- *`/stats/`:* Funny Multi's table has an "Android app" column between "From elsewhere" and
+  "All": its visits; a dash for the gift sheet and gift rows; and the per-visit rates count the
+  website's visits only. Its note says the app counts visits only since October 2026.
+- *Funny Multi's privacy policy* (`deploy/origin-root/funny37/privacy.html`, all 23 sections,
+  dated 2026-10-19): the summary says the website and the Android app keep only anonymous daily
+  visit counts; "Visit counts (website only)" is "Visit counts"; the game opened is counted on
+  the website or in the app, the Support page and gifts on the website only; a count notes
+  whether the visit came from the app; and the Do Not Track line no longer exempts the app,
+  saying instead that the app runs in the phone's browser, usually Chrome. A test asks every
+  section to name Chrome there. Funny One's policy is unchanged: its app still sends nothing.
+  `DEPLOYMENT.md` says the same.
+- *Apps' names:* both `twa-manifest.json` are English (`name` and `launcherName` «Funny Multi»
+  and «Funny One»). New `scripts/android-labels.mjs` writes `res/values-<qualifier>/
+  app_labels.xml` into each generated Gradle project — the app's label and the launcher's name
+  in each game language, from the game's own Home titles, Funny One's Russian launcher name
+  short (owner). It must run after `bubblewrap update` and before `bubblewrap build` (both
+  READMEs), and refuses a project whose `twa-manifest.json` changed since the last update
+  (`build` would then regenerate it and drop the names). A test runs it with `--dry-run`.
+- *READMEs:* `deploy/android/README.md` has a "Names" section, the script in the build steps and
+  a "Before the store listing (B-1e)" checklist (Google's fingerprint, uninstall the copy
+  installed by hand, Data safety, the privacy URL, tablets ignoring portrait under SDK 36);
+  `deploy/android-funny1/README.md` the same in brief, and "It counts nothing".
+- *`steering/tasks.md`:* B-23 and B-24.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *Which codes Android matches:* Hebrew and Indonesian are written under their old codes too
+   (`iw`, `in`); Cantonese also as Hong Kong's Chinese (`zh-rHK`), so a phone set to Taiwan's
+   Chinese gets the Cantonese name 無厘頭故事 (Traditional script), not the Simplified one;
+   Brazil's Portuguese is the plain `pt`, so Portugal's gets it too; Spain's Spanish is `es`,
+   Latin America's `b+es+419` (the US's Spanish resolves there).
+2. *A launcher name is the Home title* unless the owner names a short one (Russian Funny One).
+   Titles over 12 characters may be cut under an icon (below).
+3. *The link is on Home only,* not on the room or game screens, where it would compete with play.
+4. *App visits get a country* like web visits; the privacy text's DB-IP line already covers them.
+5. *The generated Android projects were updated, not built for release:* `bubblewrap update
+   --skipVersionUpgrade` ran in both folders after the manifests changed (they are gitignored);
+   versions are unchanged.
+
+**Seen:**
+
+- *Android, compile only:* Funny Multi's project built with `gradlew.bat assembleRelease`
+  (unsigned, 3 min 56 s) after the script; `aapt2 dump badging` showed the app's label per
+  locale and `aapt2 dump resources` the launcher name in every qualifier, the default «Funny
+  Multi»; `iw`+`he` and `in`+`id` compiled side by side without a duplicate error. Funny One's
+  project was not compiled (same script, its files checked).
+- *Browser* (headless Chromium, `.screens/step85-app-parity.mjs`, gitignored, local production
+  builds: the game server on 3000 with made-up rails, Funny One through `vite preview` on 5184,
+  the landing page's dev server on 5187; screenshots in `.screens/step85/`; all passed): Funny
+  Multi's Home links `/privacy#privacy-<code>` in all 23 languages at 390 and 320 px, inside the
+  screen, no sideways scroll; a plain visit counted `direct`; `?shell=android&lang=de` counted
+  one `app` visit in German, showed no ♥ and still the link, and the tab's next load counted
+  `app` again; Funny One's link in en and ru at both widths, and with its worker in control `/`
+  came from the worker and `/privacy` from the network; `dist/sw.js` has the denylist;
+  `/stats/` showed "Android app" with 2 visits and dashes for gifts. No script errors; no request
+  left the machine.
+
+**Not seen:** the link and the counting inside a real app on a phone (after the deploy — the
+owner's phone pass); the new names on a phone (only after the listing-time rebuild); Safari
+(no WebKit here); the live privacy pages.
+
+**Owed:**
+
+- The owner's word to deploy — `deploy/ship.sh` (game, server, privacy page), then
+  `deploy/ship-funny-family.sh` (`/stats/`), then `deploy/ship-funny-one.sh` — and to push.
+- At listing time (B-1e, S-3c): the rebuild with the script; Data safety — Funny Multi declares
+  the visit counts (day, language, from the app, a country from an address that is not kept),
+  Funny One collects nothing; Google's fingerprint; the privacy URL.
+- Names longer than 12 characters, which a launcher may cut (B-3 to give short forms if the owner
+  wants them): Funny Multi — fr Histoires Drôles 16, de Lustige Geschichten 19, it Storie
+  Divertenti 17, pt Histórias Engraçadas 20, es and es-419 Historias Divertidas 20, uk Кумедні
+  історії 15, he סיפורים מצחיקים 15, fa قصه‌های بامزه 13, ta வேடிக்கையான கதைகள் 18, hi मज़ेदार
+  कहानियाँ 16, sw Hadithi za Kuchekesha 21; Funny One — fr Une Histoire à la Ronde 23, de Unsinn
+  im Kreis 15, id Cerita Berputar 15, it Storia a Catena 15, pt Conta e Passa 13, es Cuenta y
+  Pasa 13, uk Історія по колу 15, fa قصهٔ دست‌به‌دست 15, hi बारी-बारी कहानी 15, bn হাতে হাতে গল্প
+  14, sw Hadithi ya Kupokezana 21, yo Ìtàn Yíká Tábìlì 16.
+- Machine drafts for B-3: the privacy changes in 21 languages — their drafter flagged de (a
+  heavy semicolon), zh 仅在网站上 and yue 淨係喺網站度 ("on the website only"), ja and ko (the
+  Chrome parenthetical a little long), te and bn (terse), fa, and bn, ar, sw and yo (the
+  subject changed to "we"; ar repeats مرات; yo's "ohun mẹ́ta", three things, became "ohun méjì",
+  two); and the "Privacy policy" label in the 21 other languages of both games.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test`: 1605 tests (418 + 378 + 313 + 180 + 263 + 53), all passed, the real-socket suites
+  included.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
+- CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4823,7 +4952,22 @@ decision 6, and a real tap and scan on the live page.
 
 ~~RESUME HERE (2026-10-18, after Step 83, pushed and deployed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 84, pushed and live).** **Step 84 (B-22) is pushed, CI
+~~RESUME HERE (2026-10-19, after Step 84, pushed and live)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Step 85).** **Step 85 (B-23, app parity) is committed — not
+pushed, not deployed; both wait for the owner's word.** Home in both games links the privacy
+policy at its foot, on the web and so in both Android apps; Funny Multi's app counts its visits
+(only visits) as a source of its own, "Android app" on `/stats/`, and Funny Multi's privacy
+policy says so in all 23 languages; Funny One still counts nothing. Both apps are named in
+English, with a name per phone language that `scripts/android-labels.mjs` writes at the one
+rebuild, at listing time (owner: no signed rebuild now). **To go live, in order:**
+`deploy/ship.sh` (the server must accept `app` before the client sends it; it also streams the
+privacy page), `deploy/ship-funny-family.sh` (`/stats/`), `deploy/ship-funny-one.sh`; then the
+owner opens Home in each app on the phone — the link, and for Funny Multi one visit under
+"Android app" on `/stats/`. Owed at listing time and for B-3: Step 85's "Owed". **B-24**
+(repository public) is filed, not started. Then the same note as before:
+
+**Step 84 (B-22) is pushed, CI
 passed (run `39138417241`), and live on `www.oursharedcode.com` — the site's commit `6917802`
 in `oursharedcode.github.io`, checked with curl against the repository's files.** The home page has the beating ♥ and hopping "Support Author" at the
 top right, opening a sheet with PayID, GitHub Sponsors, Bitcoin Lightning, Ko-fi and Buy Me a
@@ -4942,7 +5086,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two and Step 84's six were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six and Step 85's five were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
@@ -5037,8 +5181,9 @@ is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73);
 draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real
 Funny One icons before any announcement or listing (also blocks A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement — until
-then the landing page's GitHub link and Funny Multi's source link answer 404; T-7.1's iPhone
+`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement (B-24
+since Step 85) — until then the landing page's GitHub link and Funny Multi's source link answer
+404; T-7.1's iPhone
 install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
 and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at

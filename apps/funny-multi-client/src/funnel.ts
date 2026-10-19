@@ -9,10 +9,12 @@
 // the address bar, so a refreshed or shared link does not count as the
 // landing page's again.
 //
-// Nothing is sent inside the Android store app (it offers no gifts, and its
-// listing declares that no data is collected), when the browser asks not to
-// be tracked (Do Not Track, Global Privacy Control), or without sendBeacon.
-// deploy/origin-root/funny37/privacy.html says the same; change both together.
+// Step 85 (B-23): inside the Android store app the visit counts too, as its
+// own source `app` — and only the visit, since the app offers no gifts. The
+// app's Play listing declares it (Data Safety). Nothing is sent when the
+// browser asks not to be tracked (Do Not Track, Global Privacy Control), or
+// without sendBeacon. deploy/origin-root/funny37/privacy.html says the same;
+// change both together.
 
 import { isLanguage, type Language } from '@funny/shared';
 import i18n from './i18n';
@@ -21,7 +23,7 @@ import { isStoreShell } from './storeShell';
 
 export type GiftRail = 'payid' | 'sponsors' | 'lightning' | 'kofi' | 'bmc' | 'donate';
 
-type Origin = { s: 'direct' } | { s: 'hub'; v: 'a' | 'b' };
+type Origin = { s: 'direct' } | { s: 'app' } | { s: 'hub'; v: 'a' | 'b' };
 
 let origin: Origin = { s: 'direct' };
 let supportSent = false;
@@ -38,7 +40,8 @@ function currentLanguage(): Language {
 }
 
 function send(event: Record<string, string>, language: Language = currentLanguage()): void {
-  if (isStoreShell() || trackingRefused() || typeof navigator.sendBeacon !== 'function') return;
+  if (trackingRefused() || typeof navigator.sendBeacon !== 'function') return;
+  if (origin.s === 'app' && event.e !== 'fm_view') return;
   try {
     navigator.sendBeacon(
       serverOrigin() + withBase('api/stats'),
@@ -59,8 +62,9 @@ export function initFunnel(): void {
     url.searchParams.delete('hv');
     window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
   }
-  origin =
-    from === 'hub' && (variant === 'a' || variant === 'b')
+  origin = isStoreShell()
+    ? { s: 'app' }
+    : from === 'hub' && (variant === 'a' || variant === 'b')
       ? { s: 'hub', v: variant }
       : { s: 'direct' };
   // HomeScreen switches to `?lang=` only after the first render, so the

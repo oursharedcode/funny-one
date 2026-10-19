@@ -66,6 +66,13 @@ describe('privacy.html', () => {
     expect(html.match(/DB-IP/g)).toHaveLength(LANGUAGES.length);
   });
 
+  it('says in every section that the Android app’s visits are counted too (Step 85)', () => {
+    // Each section names the app's browser where it explains Do Not Track.
+    expect(html.match(/Chrome/g)).toHaveLength(LANGUAGES.length);
+    expect(html).not.toContain('Nothing is counted in the Android app');
+    expect(html).toContain('or from the Android app');
+  });
+
   it('loads nothing: no scripts, stylesheets, images, fonts or frames', () => {
     // The page states that the game makes no third-party requests; it must not
     // make any of its own, to anyone.

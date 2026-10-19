@@ -53,6 +53,14 @@ describe('statKey', () => {
     expect(statKey({ e: 'fm_view', s: 'direct', v: 'a', l: 'en' })).toBeNull();
   });
 
+  it('keys a visit from the Android app, and nothing else from it (Step 85)', () => {
+    expect(statKey({ e: 'fm_view', s: 'app', l: 'ru' })).toBe('fm_view||ru|app|||');
+    expect(statKey({ e: 'fm_view', s: 'app', v: 'a', l: 'ru' })).toBeNull();
+    // The app offers no gifts.
+    expect(statKey({ e: 'fm_support', s: 'app', l: 'ru' })).toBeNull();
+    expect(statKey({ e: 'fm_gift', s: 'app', l: 'ru', t: 'payid' })).toBeNull();
+  });
+
   it('keys a gift by its rail', () => {
     expect(statKey({ e: 'fm_gift', s: 'direct', l: 'ta', t: 'lightning' })).toBe(
       'fm_gift||ta|direct|lightning||',

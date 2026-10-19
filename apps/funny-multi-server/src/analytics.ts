@@ -12,7 +12,7 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (72 combinations per language a
+// into the file and the key space is closed (73 combinations per language a
 // day at most).
 //
 // Step 79 (B-20): a visit — hub_view or fm_view, not a click or a gift — also
@@ -43,6 +43,9 @@ const VARIANTS = ['a', 'b'] as const;
 const LANGUAGE_CODES: readonly string[] = LANGUAGES.map((option) => option.code);
 // Where a Funny Multi visit came from: the hub's "Play" link, or anywhere else.
 const SOURCES = ['hub', 'direct'] as const;
+// Step 85 (B-23): a visit may also come from the Android app. Only the visit:
+// the app offers no gifts, so a support or gift event from it is refused.
+const VISIT_SOURCES = [...SOURCES, 'app'] as const;
 // A hub visit's referrer, classified in the browser (no URL is ever sent).
 const REFERRERS = ['direct', 'search', 'social', 'oursharedcode', 'games', 'other'] as const;
 // Phone-sized screen or not.
@@ -61,7 +64,7 @@ const HUB_TARGETS = ['fm', 'fo', 'gh', 'video', 'root', 'support', ...GIFT_TARGE
 const SPEC: Record<StatEvent, Partial<Record<Field, readonly string[]>>> = {
   hub_view: { v: VARIANTS, l: LANGUAGE_CODES, r: REFERRERS, d: DEVICES },
   hub_click: { v: VARIANTS, l: LANGUAGE_CODES, t: HUB_TARGETS },
-  fm_view: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
+  fm_view: { v: VARIANTS, l: LANGUAGE_CODES, s: VISIT_SOURCES },
   fm_support: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   fm_gift: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: GIFT_TARGETS },
 };

@@ -483,7 +483,7 @@ function languageTable(rows: readonly Row[], names: Record<string, string>): HTM
       'Gift option chosen',
     ],
     body,
-    'Funny Multi columns count all its visitors, not only those from the landing page.',
+    'Funny Multi columns count all its visitors: from the landing page, from elsewhere and in its Android app.',
   );
 }
 
@@ -523,19 +523,28 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
     ),
   );
 
-  const sources = [
+  // Step 85: the Android app counts its visits and nothing else, since it
+  // offers no gifts. Its gift cells are a dash, not a nought, and a rate per
+  // visit is of the website's visits only.
+  const sources: readonly (readonly [string, Match])[] = [
     ['From the landing page', { s: 'hub' }],
     ['From elsewhere', { s: 'direct' }],
+    ['Android app', { s: 'app' }],
     ['All', {}],
-  ] as const;
+  ];
+  const appVisits = total(rows, { e: 'fm_view', s: 'app' });
+  const webVisits = (match: Match): number =>
+    total(rows, { e: 'fm_view', ...match }) - (match.s === undefined ? appVisits : 0);
   const fmRow = (label: string, e: string): Child[] => [
     label,
-    ...sources.map(([, match]) => num(total(rows, { e, ...match }))),
+    ...sources.map(([, match]) =>
+      match.s === 'app' && e !== 'fm_view' ? '—' : num(total(rows, { e, ...match })),
+    ),
   ];
-  const fmRate = (label: string, part: string, whole: string): Child[] => [
+  const fmRate = (label: string, part: string): Child[] => [
     label,
     ...sources.map(([, match]) =>
-      pct(rate(total(rows, { e: part, ...match }), total(rows, { e: whole, ...match }))),
+      match.s === 'app' ? '—' : pct(rate(total(rows, { e: part, ...match }), webVisits(match))),
     ),
   ];
   fragment.append(
@@ -547,7 +556,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
           fmRow('Visits', 'fm_view'),
           fmRow('Opened the gift sheet', 'fm_support'),
           fmRow('Chose a gift option', 'fm_gift'),
-          fmRate('Gift sheet opened, per visit', 'fm_support', 'fm_view'),
+          fmRate('Gift sheet opened, per visit', 'fm_support'),
         ],
       ),
       h('h3', {}, 'The gift option chosen first'),
@@ -679,7 +688,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
         h(
           'li',
           {},
-          'Nothing is counted from browsers that send Do Not Track or Global Privacy Control, from crawlers, or from Funny Multi’s Android app.',
+          'Nothing is counted from browsers that send Do Not Track or Global Privacy Control, or from crawlers. Funny Multi’s Android app counts its visits only, since October 2026: it offers no gifts.',
         ),
         h(
           'li',

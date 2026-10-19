@@ -165,3 +165,20 @@ describe('HomeScreen UI language (T-FO-5.1a)', () => {
     expect(pressed?.textContent).toContain('JP');
   });
 });
+
+// Step 85 (B-23): Google Play wants the privacy policy linked inside the app,
+// and the app is this page, so Home links to it, at the reader's language.
+describe('HomeScreen privacy link', () => {
+  it('links to the policy in the interface language, in a new tab', () => {
+    render(<HomeScreen onStart={vi.fn()} />);
+    const link = screen.getByRole('link', { name: 'Privacy policy' });
+    expect(link.getAttribute('href')).toBe('/privacy#privacy-en');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+
+    fireEvent.click(screen.getByTitle('Русский (Россия)'));
+    expect(
+      screen.getByRole('link', { name: 'Политика конфиденциальности' }).getAttribute('href'),
+    ).toBe('/privacy#privacy-ru');
+  });
+});

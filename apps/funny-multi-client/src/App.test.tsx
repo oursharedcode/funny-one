@@ -406,22 +406,62 @@ describe('support (T-9.4)', () => {
   });
 
   // B-1c (FM-APP-3): the Android store app offers no gifts, whatever the
-  // server's config says — neither entry point, on either screen.
+  // server's config says — neither entry point, on either screen. Step 85
+  // (B-23) sets every rail, so no single one can slip through.
+  const EVERY_RAIL = {
+    payId: 'me@bank',
+    payIdName: 'Me',
+    sponsorsUrl: 'https://github.com/sponsors/me',
+    lightningAddress: 'me@example.com',
+    kofiUrl: 'https://ko-fi.com/me',
+    bmcUrl: 'https://buymeacoffee.com/me',
+    donateUrl: 'https://example.com/give',
+  };
+
   it('offers no support entry point anywhere inside the Android store app', async () => {
     setUrl('?shell=android');
-    resolveConfig({ payId: 'me@bank', payIdName: 'Me', donateUrl: 'https://example.com/give' });
+    resolveConfig(EVERY_RAIL);
     renderInLobby();
     await act(async () => {});
     socketMock.fire('game:over', undefined);
     expect(screen.queryByText('Support this server')).toBeNull();
+    expect(screen.queryByText('me@bank')).toBeNull();
   });
 
-  it('shows no ♥ on Home inside the Android store app', async () => {
+  it('shows no ♥ on Home inside the Android store app, but the privacy link', async () => {
     setUrl('?shell=android');
-    resolveConfig({ payId: 'me@bank', payIdName: 'Me' });
+    resolveConfig(EVERY_RAIL);
     render(<App />);
     await act(async () => {});
     expect(screen.queryByLabelText('Support Author')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Privacy policy' }).getAttribute('href')).toBe(
+      '/privacy#privacy-en',
+    );
+  });
+});
+
+// Step 85 (B-23): Google Play wants the privacy policy linked inside the app,
+// and the app is this page, so Home links to it, at the reader's language.
+describe('privacy link', () => {
+  it('links Home to the policy in the interface language, in a new tab', async () => {
+    render(<App />);
+    const link = screen.getByRole('link', { name: 'Privacy policy' });
+    expect(link.getAttribute('href')).toBe('/privacy#privacy-en');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+
+    await act(async () => {
+      await i18n.changeLanguage('ru');
+    });
+    expect(
+      screen.getByRole('link', { name: 'Политика конфиденциальности' }).getAttribute('href'),
+    ).toBe('/privacy#privacy-ru');
+  });
+
+  it('is on Home only', async () => {
+    renderInLobby();
+    await settle();
+    expect(screen.queryByRole('link', { name: 'Privacy policy' })).toBeNull();
   });
 });
 

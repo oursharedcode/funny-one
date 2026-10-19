@@ -1,8 +1,8 @@
 {
   "packageId": "com.oursharedcode.funny1",
   "host": "www.funny1.oursharedcode.com",
-  "name": "Одна Чепуха: по кругу",
-  "launcherName": "Одна Чепуха",
+  "name": "Funny One",
+  "launcherName": "Funny One",
   "display": "standalone",
   "orientation": "portrait",
   "themeColor": "#FEF3C7",

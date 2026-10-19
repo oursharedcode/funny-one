@@ -74,6 +74,10 @@ export default defineConfig({
         // index.html is never precached and offline navigation has nothing
         // to fall back to; `woff2` is the self-hosted Fredoka.
         globPatterns: ['**/*.{html,js,css,png,svg,woff2,webmanifest}'],
+        // Step 85 (B-23): Home links to the privacy policy, which Caddy serves
+        // at /privacy beside the game (deploy/caddy/Caddyfile). Without this
+        // the precached index.html would answer that address with the game.
+        navigateFallbackDenylist: [/^\/privacy/],
       },
     }),
   ],

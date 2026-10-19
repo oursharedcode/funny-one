@@ -118,6 +118,7 @@
   },
   "footer": {
     "source": "GitHub 소스",
+    "privacy": "개인정보 처리방침",
     "contentNotice": "플레이어의 답변과 AI 그림은 상위 프로젝트가 아니라 이 서버 운영자의 책임입니다."
   },
   "errors": {

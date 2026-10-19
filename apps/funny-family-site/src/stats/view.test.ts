@@ -105,10 +105,10 @@ describe('renderStats', () => {
 
   it('splits Funny Multi’s own visits by where they came from', () => {
     expect(tableOf(render(), 'Funny Multi, every visitor')).toEqual([
-      ['Visits', '2', '7', '9'],
-      ['Opened the gift sheet', '1', '2', '3'],
-      ['Chose a gift option', '1', '0', '1'],
-      ['Gift sheet opened, per visit', '50%', '28.6%', '33.3%'],
+      ['Visits', '2', '7', '0', '9'],
+      ['Opened the gift sheet', '1', '2', '—', '3'],
+      ['Chose a gift option', '1', '0', '—', '1'],
+      ['Gift sheet opened, per visit', '50%', '28.6%', '—', '33.3%'],
     ]);
     expect(tableOf(render(), 'Funny Multi, every visitor', 1)).toEqual([
       ['PayID', '1'],
@@ -118,6 +118,28 @@ describe('renderStats', () => {
       ['Buy Me a Coffee', '0'],
       ['Donation page', '0'],
     ]);
+  });
+
+  it('shows the Android app’s visits apart, and rates gifts per website visit (Step 85)', () => {
+    const root = render({
+      ...SUMMARY,
+      days: { ...SUMMARY.days, '2026-10-02': { 'fm_view||en|app|||': 3 } },
+    });
+    expect(tableOf(root, 'Funny Multi, every visitor')).toEqual([
+      ['Visits', '2', '7', '3', '12'],
+      ['Opened the gift sheet', '1', '2', '—', '3'],
+      ['Chose a gift option', '1', '0', '—', '1'],
+      ['Gift sheet opened, per visit', '50%', '28.6%', '—', '33.3%'],
+    ]);
+    const header = [
+      ...([...root.querySelectorAll('section')]
+        .find(
+          (section) => section.querySelector('h2')?.textContent === 'Funny Multi, every visitor',
+        )
+        ?.querySelector('table')
+        ?.querySelectorAll('thead th') ?? []),
+    ].map((cell) => cell.textContent);
+    expect(header).toEqual(['', 'From the landing page', 'From elsewhere', 'Android app', 'All']);
   });
 
   it('lists what was clicked on the landing page, its own ♥ and gift sheet too', () => {

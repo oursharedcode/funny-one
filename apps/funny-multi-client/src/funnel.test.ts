@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Step 72: what Funny Multi reports to the visit funnel (funnel.ts), and when
-// it reports nothing at all.
+// it reports nothing at all. Step 85: what it reports inside the Android app.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from './i18n';
@@ -85,14 +85,42 @@ describe('support and gifts', () => {
   });
 });
 
-describe('sends nothing', () => {
-  it('inside the Android store app', () => {
-    setUrl('?shell=android&from=hub&hv=a');
+describe('inside the Android store app', () => {
+  it('counts the visit as the app’s, without a variant, whatever the link says', () => {
+    setUrl('?shell=android&from=hub&hv=a&lang=de');
     initFunnel();
-    trackSupportOpen();
-    expect(beacon).not.toHaveBeenCalled();
+    expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'de' }]);
+    expect(window.location.search).toBe('?shell=android&lang=de');
   });
 
+  it('counts the visit when the app is known only by its referrer', () => {
+    setUrl('');
+    Object.defineProperty(document, 'referrer', {
+      configurable: true,
+      get: () => 'android-app://com.oursharedcode.funny37/',
+    });
+    initFunnel();
+    delete (document as { referrer?: string }).referrer;
+    expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
+  });
+
+  it('counts nothing but the visit: the app offers no gifts', () => {
+    setUrl('?shell=android');
+    initFunnel();
+    trackSupportOpen();
+    trackGift('payid');
+    expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
+  });
+
+  it('counts nothing when the browser asks not to be tracked', () => {
+    Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
+    setUrl('?shell=android');
+    initFunnel();
+    expect(beacon).not.toHaveBeenCalled();
+  });
+});
+
+describe('sends nothing', () => {
   it('when the browser asks not to be tracked', () => {
     Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
     setUrl('');

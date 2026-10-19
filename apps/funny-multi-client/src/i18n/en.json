@@ -117,6 +117,7 @@
   },
   "footer": {
     "source": "Source on GitHub",
+    "privacy": "Privacy policy",
     "contentNotice": "Player picks and AI pictures are the responsibility of the operator of this server, not of the upstream project."
   },
   "errors": {

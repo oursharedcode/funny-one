@@ -248,7 +248,7 @@ export default function HomeScreen({ onStart }: Props) {
         {t('home.start')}
       </button>
 
-      <SourceFooter pictures={pictures} />
+      <SourceFooter pictures={pictures} privacyLink />
     </div>
   );
 }

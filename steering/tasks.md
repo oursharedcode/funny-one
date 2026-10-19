@@ -365,6 +365,27 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Not built, the plan's decision 6a:* counting presses of the sheet. The collector Worker has
     no `sponsors` rail and stores no page, so it needs a rail, a page column, a D1 migration and
     a deploy first — a task of its own if the owner asks.
+- **B-23** App parity: the two Android apps (TWAs) brought level with the web games, gifts
+  excepted (owner request 2026-10-19). Both apps load the live site, so the web's changes since
+  Steps 59 and 66 already reach them; what differed was the app's own. Owner decisions
+  2026-10-19: (1) a privacy-policy link at the foot of Home in both games, on the web and so in
+  the app — Google Play asks for one inside every app; (2) English app names, «Funny Multi» and
+  «Funny One», with a name for each phone language — «Чепуха 37» and «Одна Чепуха» in Russian,
+  the game's Home title in the 21 others (machine drafts, with B-3); (3) Funny Multi's app
+  counts its visits as a source of its own, "Android app" on `/stats/`, and only visits (no
+  gifts in the app); its privacy policy says so in all 23 languages; Funny One stays uncounted;
+  (4) no signed rebuild now: the APKs are rebuilt once, at listing time, with Funny One's real
+  icons and Google's app-signing fingerprint. **Code done 2026-10-19 (Step 85).**
+  - *Owed at listing time (B-1e, S-3c):* the rebuild with `scripts/android-labels.mjs` between
+    `update` and `build` (both READMEs); Data safety — Funny Multi declares the visit counts,
+    Funny One collects nothing; Google's fingerprint in both `assetlinks.json`; uninstall the
+    copies installed by hand first.
+  - *Owed:* the privacy changes and the names outside en/ru are machine drafts (with B-3); some
+    names are too long to show whole under an icon (Step 85 lists them).
+- **B-24** Make the repository public (owner request 2026-10-19, moved out of B-23): the
+  landing page's GitHub link and Funny Multi's source link answer 404 until it is. A pre-audit
+  found the owner's home IP in `docs/IMPLEMENTATION_LOG.md` and the VM's IP in the ship scripts'
+  comments; the history needs the same audit before the switch.
 
 ## Dependency notes
 

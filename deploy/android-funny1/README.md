@@ -1,4 +1,4 @@
-# Android store app (TWA) — «Одна Чепуха: по кругу»
+# Android store app (TWA) — Funny One «Одна Чепуха: по кругу»
 
 S-3b (FO-ID-1). A Trusted Web Activity built with
 [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap), the same way as Funny Multi's app
@@ -14,8 +14,13 @@ this README are tracked.
 ## What differs from Funny Multi's app
 
 - **Package** `com.oursharedcode.funny1`, **host** `www.funny1.oursharedcode.com`.
-- **Name** «Одна Чепуха: по кругу». The name under the home-screen icon is «Одна Чепуха»,
-  because Bubblewrap limits a launcher name to 12 characters.
+- **Name** «Funny One» by default (Step 85). A phone set to another of the game's languages
+  shows the game's Home title in it, written by `scripts/android-labels.mjs` (see Funny Multi's
+  README, Names): in Russian «Одна Чепуха: по кругу», and under the icon «Одна Чепуха», because
+  a launcher shows about 12 characters there.
+- **It counts nothing,** in the app as on the web (owner decision, Step 85). For Data safety:
+  no data collected. Home links to the privacy policy
+  (`https://www.funny1.oursharedcode.com/privacy`), which Google Play asks for inside the app.
 - **It is not an offline installer.** The first launch needs the network: Chrome loads the game
   once and its service worker stores all of it. From then on the app starts and plays with no
   network (checked in Chromium against a local build: a cold start at `/?shell=android` with the
@@ -28,7 +33,9 @@ this README are tracked.
   QR code never carry it.
 - **Icons are the placeholders** the web game ships today (`icon-512.png`,
   `icon-512-maskable.png`). `update` downloads them from the live site, so replace them there and
-  run `update` again before a store listing.
+  run `update` again before a store listing. That is the one rebuild (owner decision, Step 85),
+  with Google's app-signing fingerprint; the rest of Funny Multi's checklist (its README, Before
+  the store listing) applies too.
 
 ## Signing key
 
@@ -49,6 +56,7 @@ app-signing fingerprint beside it.
 
 ```powershell
 npx.cmd -y "@bubblewrap/cli@1.25.0" update --skipVersionUpgrade
+node ..\..\scriptsndroid-labels.mjs
 npx.cmd -y "@bubblewrap/cli@1.25.0" build
 ```
 

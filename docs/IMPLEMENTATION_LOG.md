@@ -4805,7 +4805,8 @@ repository public was split off as **B-24**.
 4. *Rebuild:* (a) a signed rebuild now; (b) once, at listing time, with Funny One's real icons
    and Google's signing fingerprint — taken. No APK was rebuilt for the phone in this step.
 
-**Shipped:** committed, **not pushed and not deployed** — the owner's word is awaited for both.
+**Shipped:** committed and pushed (owner: "push"), CI passed; **not deployed** — the owner's
+word is awaited.
 
 **Changed:**
 
@@ -4885,7 +4886,7 @@ owner's phone pass); the new names on a phone (only after the listing-time rebui
 **Owed:**
 
 - The owner's word to deploy — `deploy/ship.sh` (game, server, privacy page), then
-  `deploy/ship-funny-family.sh` (`/stats/`), then `deploy/ship-funny-one.sh` — and to push.
+  `deploy/ship-funny-family.sh` (`/stats/`), then `deploy/ship-funny-one.sh`.
 - At listing time (B-1e, S-3c): the rebuild with the script; Data safety — Funny Multi declares
   the visit counts (day, language, from the app, a country from an address that is not kept),
   Funny One collects nothing; Google's fingerprint; the privacy URL.
@@ -4910,7 +4911,9 @@ Gates:
   included.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39223884389`, about 3 min 45 s, on `ubuntu-24.04`).
+
+**Pushed 2026-10-19** (owner: "push"): `6fca7dc..98ff119`, one push; CI passed. Not deployed.
 
 ---
 
@@ -4954,8 +4957,8 @@ Gates:
 
 ~~RESUME HERE (2026-10-19, after Step 84, pushed and live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 85).** **Step 85 (B-23, app parity) is committed — not
-pushed, not deployed; both wait for the owner's word.** Home in both games links the privacy
+**RESUME HERE (2026-10-19, after Step 85, pushed).** **Step 85 (B-23, app parity) is pushed, CI
+passed (run `39223884389`); not deployed — that waits for the owner's word.** Home in both games links the privacy
 policy at its foot, on the web and so in both Android apps; Funny Multi's app counts its visits
 (only visits) as a source of its own, "Android app" on `/stats/`, and Funny Multi's privacy
 policy says so in all 23 languages; Funny One still counts nothing. Both apps are named in

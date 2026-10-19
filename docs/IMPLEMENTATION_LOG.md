@@ -5134,8 +5134,17 @@ Gates:
 
 **Pushed 2026-10-20** at the owner's word ("push"): `663ec9b..e93b86f`, CI passed (above).
 
-**Owed, in order, the owner's** (one op per message): (1) ~~the push, then CI~~ done; (2) Funny
-One's deploy (`deploy/ship-funny-one.sh`), which puts the icons live; (3) A3 on the phone — the
+**Deployed 2026-10-20, 00:10** at the owner's word ("deploy"): the agent ran
+`deploy/ship-funny-one.sh` (auto mode allowed it). Its checks all passed — the game, its service
+worker and manifest, the bare name's 301, `assetlinks.json`, the privacy page, the old
+address's forwarding, and Funny Multi's `/health`. Then curl, not signed in: the live
+`icon.svg` and the four PNGs are byte-identical to the commit's, the manifest lists 192, 512
+and the maskable 512, and the page names the SVG first. A phone that already has the game
+picks the icons up with its next service-worker update; a home-screen icon may keep the old
+art until the shortcut is added again.
+
+**Owed, in order, the owner's** (one op per message): (1) ~~the push, then CI~~ done; (2) ~~Funny
+One's deploy~~ done 2026-10-20; (3) A3 on the phone — the
 icon whole in the launcher's mask; (4) each game's Play Console entry from `store/README.md`
 (listing, translations, Store settings, App content); (5) the one rebuild of each app —
 `update`, `node scripts/android-labels.mjs`, `build` — then Google's app-signing fingerprint
@@ -5194,14 +5203,15 @@ Play.
 
 ~~RESUME HERE (2026-10-19, after Step 87)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 87, pushed).** **Step 87 (S-3c, B-1e) is pushed
-(`663ec9b..e93b86f`), CI passed (run `39256462673`); not deployed.** Funny One has its own icon (the one-eyed blob,
+~~RESUME HERE (2026-10-20, after Step 87, pushed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 87, pushed and live).** **Step 87 (S-3c, B-1e) is pushed
+(`663ec9b..e93b86f`), CI passed (run `39256462673`), and Funny One's new icons are live since
+2026-10-20 00:10.** Funny One has its own icon (the one-eyed blob,
 the owner's pick of ten, on Funny Multi's pink), and `store/` holds both games' Play listings:
 texts in 22 languages (en and ru written, 20 machine drafts for B-3), the App content answers,
 and the scripts that regenerate the gitignored graphics and screenshots and check it all
-(`store/README.md`). **Next, the owner's, one op per message:** Funny One's deploy
-(`deploy/ship-funny-one.sh` — the icons go live, and Bubblewrap's `update` fetches them from
-the site, so it comes before any rebuild); A3 on the phone; then each game's Play Console entry
+(`store/README.md`). **Next, the owner's, one op per message:** A3 on the phone; then each game's Play Console entry
 and the one rebuild (Step 87's Owed). Both games are outside Play's AI-Generated Content policy
 only while the Worker's generation switch stays off — switching it on needs an in-app "report
 this picture" first (B-1e). Then the same note as before:
@@ -5384,7 +5394,7 @@ the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–
 scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
 (Step 83), both ship scripts again (Steps 81–82) and, the owner asking for the op to be
 automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07), and on 2026-10-19 all three ship scripts
-(Step 85) — so try once when the owner
+(Step 85), and on 2026-10-20 `deploy/ship-funny-one.sh` (Step 87) — so try once when the owner
 asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production

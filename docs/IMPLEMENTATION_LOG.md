@@ -5130,11 +5130,13 @@ Gates:
   included.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
-- CI: owed after the push.
+- CI: passed (run `39256462673`, 2 min).
 
-**Owed, in order, the owner's** (one op per message): (1) the push, then CI; (2) Funny One's
-deploy (`deploy/ship-funny-one.sh`), which puts the icons live; (3) A3 on the phone — the icon
-whole in the launcher's mask; (4) each game's Play Console entry from `store/README.md`
+**Pushed 2026-10-20** at the owner's word ("push"): `663ec9b..e93b86f`, CI passed (above).
+
+**Owed, in order, the owner's** (one op per message): (1) ~~the push, then CI~~ done; (2) Funny
+One's deploy (`deploy/ship-funny-one.sh`), which puts the icons live; (3) A3 on the phone — the
+icon whole in the launcher's mask; (4) each game's Play Console entry from `store/README.md`
 (listing, translations, Store settings, App content); (5) the one rebuild of each app —
 `update`, `node scripts/android-labels.mjs`, `build` — then Google's app-signing fingerprint
 into `assetlinks.json`, and the copies installed by hand uninstalled before installing from
@@ -5190,12 +5192,14 @@ Play.
 
 ~~RESUME HERE (2026-10-19, after Steps 85–86 closed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 87).** **Step 87 (S-3c, B-1e) is committed, not pushed —
-the push waits for the owner's word, then CI.** Funny One has its own icon (the one-eyed blob,
+~~RESUME HERE (2026-10-19, after Step 87)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 87, pushed).** **Step 87 (S-3c, B-1e) is pushed
+(`663ec9b..e93b86f`), CI passed (run `39256462673`); not deployed.** Funny One has its own icon (the one-eyed blob,
 the owner's pick of ten, on Funny Multi's pink), and `store/` holds both games' Play listings:
 texts in 22 languages (en and ru written, 20 machine drafts for B-3), the App content answers,
 and the scripts that regenerate the gitignored graphics and screenshots and check it all
-(`store/README.md`). **Next, the owner's, one op per message:** the push; Funny One's deploy
+(`store/README.md`). **Next, the owner's, one op per message:** Funny One's deploy
 (`deploy/ship-funny-one.sh` — the icons go live, and Bubblewrap's `update` fetches them from
 the site, so it comes before any rebuild); A3 on the phone; then each game's Play Console entry
 and the one rebuild (Step 87's Owed). Both games are outside Play's AI-Generated Content policy

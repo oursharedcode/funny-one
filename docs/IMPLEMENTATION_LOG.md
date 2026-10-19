@@ -5144,12 +5144,17 @@ picks the icons up with its next service-worker update; a home-screen icon may k
 art until the shortcut is added again.
 
 **Owed, in order, the owner's** (one op per message): (1) ~~the push, then CI~~ done; (2) ~~Funny
-One's deploy~~ done 2026-10-20; (3) A3 on the phone — the
-icon whole in the launcher's mask; (4) each game's Play Console entry from `store/README.md`
+One's deploy~~ done 2026-10-20; (3) ~~A3 on the phone~~
+passed 2026-10-20 (below); (4) each game's Play Console entry from `store/README.md`
 (listing, translations, Store settings, App content); (5) the one rebuild of each app —
 `update`, `node scripts/android-labels.mjs`, `build` — then Google's app-signing fingerprint
 into `assetlinks.json`, and the copies installed by hand uninstalled before installing from
 Play.
+
+**A3 passed 2026-10-20** (owner: "pass"): Funny One added to the home screen from Chrome on the
+owner's Android phone — the blob's eye, mouth and antenna whole in the launcher's mask and on
+the recent-apps tile. Recorded in `docs/ACCEPTANCE_FUNNY_ONE.md`. The signed app installed by
+hand keeps the monkey until its rebuild (B-23).
 
 ---
 
@@ -5205,13 +5210,16 @@ Play.
 
 ~~RESUME HERE (2026-10-20, after Step 87, pushed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 87, pushed and live).** **Step 87 (S-3c, B-1e) is pushed
+~~RESUME HERE (2026-10-20, after Step 87, pushed and live)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 87, live, A3 passed).** **Step 87 (S-3c, B-1e) is pushed
 (`663ec9b..e93b86f`), CI passed (run `39256462673`), and Funny One's new icons are live since
 2026-10-20 00:10.** Funny One has its own icon (the one-eyed blob,
 the owner's pick of ten, on Funny Multi's pink), and `store/` holds both games' Play listings:
 texts in 22 languages (en and ru written, 20 machine drafts for B-3), the App content answers,
 and the scripts that regenerate the gitignored graphics and screenshots and check it all
-(`store/README.md`). **Next, the owner's, one op per message:** A3 on the phone; then each game's Play Console entry
+(`store/README.md`). A3 passed on the owner's phone the same night. **Next, the owner's, one op per message:** each
+game's Play Console entry
 and the one rebuild (Step 87's Owed). Both games are outside Play's AI-Generated Content policy
 only while the Worker's generation switch stays off — switching it on needs an in-app "report
 this picture" first (B-1e). Then the same note as before:

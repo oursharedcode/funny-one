@@ -550,7 +550,7 @@ comment. Otherwise compose, Caddyfile, ship script, docs, steering.*
 (Oracle Always-Free VM 152.69.166.212, Caddy + the two-stage image, `deploy/ship.sh` to
 redeploy). The Render service is deleted (owner decision 2026-09-15) — `render.yaml` stays
 only as the one-click Option B for strangers; the rotated `WORKER_SECRET` lives in
-`C:\Users\Misha\.cloudflare\worker-secret`, the Worker and the VM's `.env`.
+this PC (location in the agent's memory), the Worker and the VM's `.env`.
 
 T-8.1 is closed (Installability re-run passed on the new origin, 2026-09-15). No owner
 operation is pending.
@@ -638,7 +638,7 @@ configuration; a fresh room generated normally.
 **Harness limits hit and worked around:** the auto-mode classifier refuses any Bash write to a
 `*_SECRET=` line (even to a deliberately-wrong test value) and any read of `.env` content — both
 by design. C2's and C3's secret edits were done by the owner directly on the VM instead (one
-command per message). Separately, `~/.cloudflare/worker-secret` (needed to restore C3) had never
+command per message). Separately, this PC's copy of the secret (needed to restore C3) had never
 been copied to the VM — only this PC held it — so the owner `scp`'d it across first. Both lessons
 are now in memory (`mark-operation-style`, `funnyone-hosting-oracle`) for next time.
 
@@ -1870,7 +1870,7 @@ server's real-socket suite threw a different lone timing failure on two full run
 twice run alone (known flake; server untouched). CI runs on push.
 
 Also this session: SSH to the VM timed out — the owner's home IP had changed. Re-ran
-`deploy/oci/network.py 118.102.109.169` (idempotent) to update the port-22 rule. The deploy was
+`deploy/oci/network.py <home IP>` (idempotent) to update the port-22 rule. The deploy was
 run by the owner from a Git Bash terminal: the agent's attempt was refused by the auto-mode
 classifier, and the chat panel's `!` prefix doesn't execute in the VS Code extension.
 
@@ -2324,7 +2324,7 @@ funny-one-client 113/113, shared 190/190, cloudflare 50/50; `npm audit` 0 vulner
 (1) The owner ran `deploy/ship.sh ubuntu@152.69.166.212`: production now runs `11037cd` (Steps
 43–47, including `GET /config` and Step 45's `engine.io` fix); `/funny37-game/health` answered
 `{"ok":true}` and `/funny37-game/config` now answers JSON. (2) The agent added T-9.1's four
-rails to `~/funny/.env` on the VM over SSH (backup `~/funny/.env.bak-2026-10-01`, mode 600 kept;
+rails to `~/funny/.env` on the VM over SSH (backed up first, mode 600 kept;
 the empty `DEPLOYER_DONATE_URL=` line left as it was), recreated the container with `docker
 compose --profile caddy up -d`, and checked `/config` returns all four with `donateUrl: null`.
 Also checked from here: the Sponsors page answers 200 and offers $1/$3/$5 one-time tiers; the
@@ -2364,7 +2364,7 @@ blocks nothing here.~~ — the paid plan and the production run both landed, Ste
 
 **Shipped:** Phase 9's last code-adjacent task. (1) Owner enabled the Workers Paid plan
 ($5/month) in the Cloudflare dashboard — closes T-9.1. (2) Agent verified the production
-Worker secret already on this PC (`~/.cloudflare/worker-secret`) against `/stats` (200 with
+Worker secret already on this PC against `/stats` (200 with
 it, 403 with a wrong one) rather than SSH-reading it from the VM. (3) `--dry-run` against
 production: 10,000 prompts probed, 62 already in R2 from real games, 9,938 missing (free —
 `/exists` only). (4) `--limit 5` smoke: 5 images generated (≈$0.01), each checked to serve
@@ -2592,8 +2592,8 @@ _DNS._ The PC's Cloudflare token covered only `staging-oursharedcode.com`. The o
 agent created DNS-only `A` records for `www.funny37` and `funny37` pointing at the VM's reserved
 IP.
 
-_Deploy._ The owner set the VM's `.env` (`BASE_PATH=/`, `FM_HOST`, `FM_APEX`; backup
-`~/funny/.env.bak-b1a`) and ran `deploy/ship.sh` in Git Bash. The image is tagged
+_Deploy._ The owner set the VM's `.env` (`BASE_PATH=/`, `FM_HOST`, `FM_APEX`;
+backed up first) and ran `deploy/ship.sh` in Git Bash. The image is tagged
 `funny-multi:d22f484`, the previous commit, but was built from this step's working tree; the
 client and server changes are comments only, so the bundle differs from the old one by
 `BASE_PATH=/` alone. SSH had first timed out because the owner's home IP changed (a dynamic address); `deploy/oci/network.py` re-pointed the port-22 rule. The build's `npm ci`
@@ -2846,7 +2846,7 @@ gets its first fingerprint.
 
 A signing key was generated: RSA 2048, alias `funny37`, 20000-day validity, PKCS12, at
 `~/.android-keys/funny37-upload.jks` (never in the repo). Its SHA-256 fingerprint is the one now
-in `assetlinks.json`. A copy is on the external drive at `F:\Mark\android-keys\`, verified
+in `assetlinks.json`. A copy is on an external drive (location in the agent's memory), verified
 byte-identical by hash. The build produced `app-release-signed.apk` and
 `app-release-bundle.aab` (the latter for B-1e's eventual Play upload); `apksigner verify`
 confirms the APK's signer certificate hashes to the same SHA-256 as the generated key, and
@@ -2885,7 +2885,7 @@ this. The phone's sideloaded copy must be uninstalled before the Play-delivered 
 it, since the two are signed differently.
 
 **Owner decisions this session:** all four recommended options taken — Bubblewrap run via `npx`,
-never added as a dependency; the key at `~/.android-keys/` with a hash-verified `F:` backup;
+never added as a dependency; the key at `~/.android-keys/` with a hash-verified offline backup;
 launcher name «Чепуха 37»; the APK moved to the phone by hand rather than installing
 `adb`/platform-tools system-wide.
 
@@ -2929,7 +2929,7 @@ about 6 s later (`.screens/fo-old-address-check.mjs`, scratch).
 
 **Deployed, in the order `DEPLOYMENT.md` now gives:** two DNS-only `A` records
 (`www.funny1` and `funny1`, Cloudflare API), then `FO_HOST`/`FO_APEX` appended to the VM's
-`.env` (backup `~/funny/.env.bak-step60`), then `deploy/ship-funny-one.sh`, then
+`.env` (backed up first), then `deploy/ship-funny-one.sh`, then
 `deploy/ship.sh`. The agent ran all four; the owner had asked for the deploy in the request and
 auto mode allowed each. Caddy had the new certificates within seconds. Live, by curl: the new
 host's root, `sw.js` and manifest 200 with `no-cache`; the apex 301; `/privacy` the policy,
@@ -3576,7 +3576,7 @@ nicely designed jumping words "Support Author" next/below to the red heart". Fil
 **Deployed 2026-10-14, in the order `DEPLOYMENT.md` gives** (the request was the owner's go; the
 agent ran each step and auto mode allowed it): two DNS-only `A` records (`www.funny-family` and
 `funny-family`, Cloudflare API, comment "Funny Family landing page (Step 72)"); `HUB_HOST` and
-`HUB_APEX` appended to the VM's `.env` (backup `~/funny/.env.bak-step72`); `deploy/ship.sh` —
+`HUB_APEX` appended to the VM's `.env` (backed up first); `deploy/ship.sh` —
 `funny-multi:2bd01ab` built from the clean commit, the `funny_stats_data` volume created, both
 containers recreated once, its four checks passed (`/health`, `assetlinks.json`, `/privacy` the
 policy, the old address's 301), exit 0; then `deploy/ship-funny-family.sh` — the page swapped in
@@ -4012,7 +4012,7 @@ re-run clean, the rest as Step 76 recorded them. CI: passed (run `38998055486`, 
 
 **Pushed and deployed 2026-10-17** (owner: "Push and deploy"): Steps 75–77 pushed together. CI
 passed in 3 min 39 s on `ubuntu-24.04` (run `38998055486`), image version 20261012.334.1 — the
-one the last unpinned run had. Production's `.env` was copied to `~/funny/.env.bak-step75`, then
+one the last unpinned run had. Production's `.env` was backed up first, then
 got Step 75's two lines, each once. `deploy/ship.sh` put `funny-multi:42bafbc` live — health,
 privacy policy, `assetlinks.json` and the old address's 301 checked by the script, exit 0; then
 `deploy/ship-funny-family.sh` swapped in the landing page — its eight checks passed, exit 0.
@@ -4582,7 +4582,7 @@ https://ko-fi.com/markwebtools Please check and if neede - update".
 **Changed:**
 
 - *Production,* on the owner's "if needed — update": in the VM's `~/funny/.env`, the two lines
-  now name `markwebtools` — backup `~/funny/.env.bak-step83` first; no other line changed (21
+  now name `markwebtools` — backed up first; no other line changed (21
   lines before and after, mode 600 kept). The game's container was recreated on the image it
   ran (`funny-multi:bcc18b8`, `sha256:a7f43a8f…`, unchanged), so the server read them; Caddy
   stayed up. `/health` 200; both `https://www.funny37.oursharedcode.com/config` and
@@ -4915,6 +4915,95 @@ Gates:
 
 **Pushed 2026-10-19** (owner: "push"): `6fca7dc..98ff119`, one push; CI passed. Not deployed.
 
+**Deployed 2026-10-19** (owner: "deploy Step 85 first"): the agent ran the three ship scripts in
+the order above and auto mode allowed each. `deploy/ship.sh` put `funny-multi:8a5fb85` live —
+`/health` `{"ok":true}`, `assetlinks.json` 200 `application/json`, `/privacy` the policy, the old
+`/funny37-game` address 301 to the new host; `deploy/ship-funny-family.sh` — `/`, `/ru/`,
+`/stats/` 200, a missing page 404, the clip `video/mp4`, `/api/stats/summary` 200, the apex 301;
+`deploy/ship-funny-one.sh` — `/`, `sw.js`, the manifest, `assetlinks.json` and `/privacy` from
+Caddy, the apex and the old `/funny1-game` 301. Over SSH: the running container's image is
+`funny-multi:8a5fb85`'s, the server's log has `country table` with 710,834 rows (2.9 s), and
+`/api/stats/summary` still has every day since 2026-10-13 — the counts were kept. Caddy's
+"Caddyfile input is not formatted" warning as before. Not seen: the link and the app's visit
+inside the real apps on the phone (the owner's, below).
+
+## Step 86 (task B-24) — The repository made public, the owner's home IP and the credential locations masked first (2026-10-19)
+
+**Owner request 2026-10-19** (B-24, split from B-23): make `oursharedcode/funny-one` public, so
+that the landing page's GitHub link and Funny Multi's source link stop answering 404.
+
+**Owner decisions 2026-10-19** (answer "all recommended"):
+
+1. *History:* (a) leave it, clean only the current files — taken; (b) rewrite it with
+   `git filter-repo` and force-push — 52 commits change their SHA, which breaks this log's SHA
+   references and the running image's tag `funny-multi:8a5fb85`; (c) a fresh repository of one
+   squashed commit.
+2. *The VM's IP:* (a) leave it — taken: every `A` record is DNS-only, so the address resolves
+   from public DNS anyway; (b) mask it too.
+3. *Credential locations in the docs:* (a) mask them and keep the log public — taken; (b) take
+   the log and `steering/` off the repository; (c) publish as they are.
+4. *`local_docs/gift-payments-no-chargeback-research.md`, the owner's research notes:* (a) stop
+   tracking it — taken; (b) keep it public.
+
+**Audit** (the whole tree and all 117 commits, before any change):
+
+- `.env` was never committed, only `.env.example`; no keystore, key, certificate, token or
+  credential file was ever added; no GitHub, Google or OpenAI-style token or JWT in the tree; no
+  OCI id or Cloudflare account or zone id; no ABN or D-U-N-S number (the 11-digit hits are CI run
+  ids); the owner's home IP in no commit message.
+- One branch (`main`), no tags, no pull requests. `docs/source_project/` is untracked (0 files);
+  `.git` is 21 MB.
+- Every email address is a published contact (`privacy@`, `funny@`, `markwebtools@`, the
+  Lightning address) or an example.
+- CI (`ci.yml`) uses no secret and has no `pull_request_target`, so a fork's pull request reaches
+  nothing. `LICENSE` is AGPL-3.0, and the README reads for a stranger.
+- Found: the owner's home IP once, in this log (Steps 36–38, commit `25f7044`); the VM's IP in
+  the three ship scripts' comments, this log and `tasks-done.md`; and where the Worker secret,
+  the upload key's backup and the VM's `.env` backups are kept.
+
+**Changed:**
+
+- *The home IP* is `<home IP>` in its one line of this log. Earlier commits keep it (decision 1):
+  a dynamic address the owner's line had already left by 2026-10-04.
+- *Credential locations,* 19 lines in four files — this log, `steering/tasks-done.md`,
+  `deploy/android/README.md` and `docs/ACCEPTANCE.md` (C3, both rows): the Worker secret's place
+  on this PC, the upload key's backup on the external drive and the names of the VM's six `.env`
+  backups now read "backed up first" or "location in the agent's memory". The facts are in the
+  agent's private memory (`funnyone-credential-locations`), so a later session still finds them.
+- *`local_docs/`:* the research notes are no longer tracked and stay on the owner's disk;
+  `.gitignore` ignores the whole folder (was `local_docs/tests/`), and requirement D-6's citation
+  says the notes are kept off the repository. Earlier commits keep the file (decision 1).
+- *Visibility:* private → public, after this commit's push and CI (below).
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *The upload key's own path stays:* both `twa-manifest.json` need it for Bubblewrap's signed
+   build, so it is public either way; the READMEs keep naming it to match. Only its backup's
+   place is masked.
+2. *OCI's and SSH's default paths stay* (`~/.oci/config`, `~/.oci/funny-infra.json`,
+   `~/.ssh/id_ed25519`): `deploy/oci/*.py` read them, and they say nothing a reader of those
+   tools' manuals does not know.
+3. *"Go" covered the push and the switch:* the owner approved a plan whose outcome is a public
+   repository, and the switch needs this commit pushed first. Issues stay on (GitHub's default);
+   `.github/FUNDING.yml` now shows the Sponsor button.
+
+**Not changed:** no code, no deploy.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test`: 1605 tests (418 + 378 + 313 + 180 + 263 + 53), all passed, the real-socket suites
+  included.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
+- CI: after the push.
+
+**Owed:**
+
+- The switch, then a check that the repository, the landing page's GitHub link and Funny Multi's
+  source link answer without signing in.
+- The owner's click on both links, on a phone.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -4957,18 +5046,24 @@ Gates:
 
 ~~RESUME HERE (2026-10-19, after Step 84, pushed and live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 85, pushed).** **Step 85 (B-23, app parity) is pushed, CI
-passed (run `39223884389`); not deployed — that waits for the owner's word.** Home in both games links the privacy
-policy at its foot, on the web and so in both Android apps; Funny Multi's app counts its visits
-(only visits) as a source of its own, "Android app" on `/stats/`, and Funny Multi's privacy
-policy says so in all 23 languages; Funny One still counts nothing. Both apps are named in
-English, with a name per phone language that `scripts/android-labels.mjs` writes at the one
-rebuild, at listing time (owner: no signed rebuild now). **To go live, in order:**
-`deploy/ship.sh` (the server must accept `app` before the client sends it; it also streams the
-privacy page), `deploy/ship-funny-family.sh` (`/stats/`), `deploy/ship-funny-one.sh`; then the
-owner opens Home in each app on the phone — the link, and for Funny Multi one visit under
-"Android app" on `/stats/`. Owed at listing time and for B-3: Step 85's "Owed". **B-24**
-(repository public) is filed, not started. Then the same note as before:
+~~RESUME HERE (2026-10-19, after Step 85, pushed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Step 86).** **Step 86 (B-24) is committed: the repository goes
+public right after its push and CI** (`gh repo edit --visibility public`), then the repository,
+the landing page's GitHub link and Funny Multi's source link are checked without signing in. The
+owner's home IP (once, in this log) and the places of the Worker secret, the upload key's backup
+and the VM's `.env` backups are masked — those places are in the agent's memory
+(`funnyone-credential-locations`); `local_docs/` is no longer tracked. Earlier commits keep all
+of it (owner: leave history). **Step 85 (B-23, app parity) is pushed, CI passed (run
+`39223884389`), and deployed 2026-10-19** — `funny-multi:8a5fb85`, the landing page and Funny
+One: Home in both games links the privacy policy at its foot, on the web and so in both Android
+apps; Funny Multi's app counts its visits (only visits) as a source of its own, "Android app" on
+`/stats/`, and Funny Multi's privacy policy says so in all 23 languages; Funny One still counts
+nothing. Both apps are named in English, with a name per phone language that
+`scripts/android-labels.mjs` writes at the one rebuild, at listing time (owner: no signed
+rebuild now). **Owed by the owner:** Home in each app on the phone — the link, and for Funny
+Multi one visit under "Android app" on `/stats/`. Owed at listing time and for B-3: Step 85's
+"Owed". Then the same note as before:
 
 **Step 84 (B-22) is pushed, CI
 passed (run `39138417241`), and live on `www.oursharedcode.com` — the site's commit `6917802`
@@ -5089,7 +5184,7 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six and Step 85's five were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six, Step 85's five and Step 86's three were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
 key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) now waits only on real
@@ -5116,17 +5211,16 @@ block is in Funny One's client, Funny Multi still shows them.
 The owner wants owner-facing work run one small operation per message (≤50 words, who does
 what, wait for "done", automate first). Production's `.env` holds the support rails (Ko-fi and
 Buy Me a Coffee since Step 75's deploy, the owner's `markwebtools` pages since Step 83), `BASE_PATH=/` and eight host names — `SITE_HOST`, `SITE_APEX`, `FM_HOST`, `FM_APEX`, `FO_HOST`,
-`FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Backups on the
-VM: `~/funny/.env.bak-2026-10-01`, `.env.bak-b1a`, `.env.bak-step60`, `.env.bak-step72`,
-`.env.bak-step75` (taken before Step 75's two lines), `.env.bak-step83` (before Step 83's). The visit counts live in the volume
+`FO_APEX`, `HUB_HOST`, `HUB_APEX`; all three ship scripts stop if one is missing. Six backups of
+it sit on the VM, one taken before each change (names in the agent's memory). The visit counts live in the volume
 `funny_stats_data` (`/data/stats.json` in the game's container,
 written every 15 s when something changed and on shutdown), so a deploy keeps them; removing
 the volume loses them. Step 79 keeps DB-IP's country file in the same volume (`/data/geo`, about
-4.5 MB, replaced each month by the server); losing it costs one download. The production Worker secret is on this PC at
-`~/.cloudflare/worker-secret`. Cloudflare Email Routing for `privacy@oursharedcode.com` was
+4.5 MB, replaced each month by the server); losing it costs one download. The production Worker secret is on this PC and the VM
+(location in the agent's memory). Cloudflare Email Routing for `privacy@oursharedcode.com` was
 added by the owner by hand (Step 57) — the stored token cannot manage it. The Android signing
 key (Step 59, used for both apps) is `~/.android-keys/funny37-upload.jks`, alias `funny37`; a
-hash-verified copy is on the external drive at `F:\Mark\android-keys\`. Losing both means the
+hash-verified copy is on an external drive (location in the agent's memory). Losing both means the
 installed apps can never be updated.
 
 Who deploys: auto mode allowed both ship scripts on 2026-10-05, refused
@@ -5136,7 +5230,8 @@ the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–
 2026-10-17 two `.env` lines and both ship scripts (Steps 75–77), and on 2026-10-18 both ship
 scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
 (Step 83), both ship scripts again (Steps 81–82) and, the owner asking for the op to be
-automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07) — so try once when the owner
+automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07), and on 2026-10-19 all three ship scripts
+(Step 85) — so try once when the owner
 asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
@@ -5184,9 +5279,8 @@ is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73);
 draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real
 Funny One icons before any announcement or listing (also blocks A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md`); making the repo public before any launch announcement (B-24
-since Step 85) — until then the landing page's GitHub link and Funny Multi's source link answer
-404; T-7.1's iPhone
+`docs/ACCEPTANCE_FUNNY_ONE.md`); the switch to public (B-24, Step 86), right after its push — until
+then the landing page's GitHub link and Funny Multi's source link answer 404; T-7.1's iPhone
 install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
 and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at

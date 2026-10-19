@@ -45,8 +45,8 @@ SHA-256. Bubblewrap is pointed at it with
 
 `C:/Users/Misha/.android-keys/funny37-upload.jks`, alias `funny37`, RSA 2048. Never in this repo.
 It is PKCS12, so the key password is the keystore password. Keep the password in the owner's
-password manager. A copy of the `.jks` file (and the public `.pem`) is on the external drive
-at `F:\Mark\android-keys\`. Without the file and the password, the installed app cannot be
+password manager. A copy of the `.jks` file (and the public `.pem`) is on an external drive
+(location in the agent's memory). Without the file and the password, the installed app cannot be
 updated. Under Play App Signing (B-1e) this key
 becomes the upload key, and Google signs what users install with a key of its own.
 

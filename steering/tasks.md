@@ -385,7 +385,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-24** Make the repository public (owner request 2026-10-19, moved out of B-23): the
   landing page's GitHub link and Funny Multi's source link answer 404 until it is. A pre-audit
   found the owner's home IP in `docs/IMPLEMENTATION_LOG.md` and the VM's IP in the ship scripts'
-  comments; the history needs the same audit before the switch.
+  comments; the history needs the same audit before the switch. **Done 2026-10-19 (Step 86),
+  the switch right after its push:** owner decisions — history left as it is; the VM's IP
+  stays (DNS-only records publish it anyway); credential locations masked, kept in the
+  agent's memory; `local_docs/` untracked.
 
 ## Dependency notes
 

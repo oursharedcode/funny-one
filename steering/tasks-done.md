@@ -1468,8 +1468,8 @@ unless they carry advisories:
       Bubblewrap's generated Gradle project and build outputs are ignored. Launch URL
       `/?shell=android`, host `www.funny37.oursharedcode.com`, launcher name «Чепуха 37», target
       SDK 36 / min SDK 21. Signing key (RSA 2048, alias `funny37`) at
-      `~/.android-keys/funny37-upload.jks`, never in the repo, backed up hash-verified to
-      `F:\Mark\android-keys\`; its SHA-256 fingerprint is now in `assetlinks.json`. Bubblewrap's
+      `~/.android-keys/funny37-upload.jks`, never in the repo, backed up hash-verified offline
+      (location in the agent's memory); its SHA-256 fingerprint is now in `assetlinks.json`. Bubblewrap's
       own JDK on Windows is 32-bit and cannot reserve the build's heap — fixed by fetching
       Adoptium's 64-bit build of the same version directly, checksum-verified, and pointing
       Bubblewrap at it. `apksigner verify` confirmed the built APK is signed with the generated

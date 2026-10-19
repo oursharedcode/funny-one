@@ -4924,8 +4924,11 @@ the order above and auto mode allowed each. `deploy/ship.sh` put `funny-multi:8a
 Caddy, the apex and the old `/funny1-game` 301. Over SSH: the running container's image is
 `funny-multi:8a5fb85`'s, the server's log has `country table` with 710,834 rows (2.9 s), and
 `/api/stats/summary` still has every day since 2026-10-13 — the counts were kept. Caddy's
-"Caddyfile input is not formatted" warning as before. Not seen: the link and the app's visit
-inside the real apps on the phone (the owner's, below).
+"Caddyfile input is not formatted" warning as before.
+
+**Seen on the phone 2026-10-19** (owner: "done"): in the installed apps «Чепуха 37» and «Одна
+Чепуха», Home's privacy link opens the policy. `/api/stats/summary` then had Funny Multi's
+first visits from the app — `fm_view` with source `app`, language `en`, two on 2026-10-19.
 
 ## Step 86 (task B-24) — The repository made public, the owner's home IP and the credential locations masked first (2026-10-19)
 
@@ -5005,8 +5008,8 @@ on. Checked with curl, not signed in: `github.com/oursharedcode/funny-one`, its 
 the raw README answer 200, and the research notes 404 on `main`; the live landing page and
 Funny Multi's live bundle both link exactly `https://github.com/oursharedcode/funny-one`.
 
-**Owed:** the owner's tap on both links, on a phone (the landing page's GitHub link, Funny
-Multi's source link at the foot of Home).
+**Seen on the phone 2026-10-19** (owner: "done, opened ok"): the landing page's GitHub link
+and the source link at the foot of Home in the «Чепуха 37» app both open the repository.
 
 ---
 
@@ -5056,8 +5059,9 @@ Multi's source link at the foot of Home).
 
 **RESUME HERE (2026-10-19, after Step 86, public).** **Step 86 (B-24) is pushed, CI passed (run
 `39227545935`), and `oursharedcode/funny-one` is public** — the repository and the exact link
-the landing page and Funny Multi carry answer 200 without signing in. The owner's home IP (once, in this log) and the places of the Worker secret, the upload key's backup
-and the VM's `.env` backups are masked — those places are in the agent's memory
+the landing page and Funny Multi carry answer 200 without signing in, and both open on the
+owner's phone. The owner's home IP (once, in this log) and the places of the Worker secret,
+the upload key's backup and the VM's `.env` backups are masked — those places are in the agent's memory
 (`funnyone-credential-locations`); `local_docs/` is no longer tracked. Earlier commits keep all
 of it (owner: leave history). **Step 85 (B-23, app parity) is pushed, CI passed (run
 `39223884389`), and deployed 2026-10-19** — `funny-multi:8a5fb85`, the landing page and Funny
@@ -5066,8 +5070,8 @@ apps; Funny Multi's app counts its visits (only visits) as a source of its own, 
 `/stats/`, and Funny Multi's privacy policy says so in all 23 languages; Funny One still counts
 nothing. Both apps are named in English, with a name per phone language that
 `scripts/android-labels.mjs` writes at the one rebuild, at listing time (owner: no signed
-rebuild now). **Owed by the owner:** Home in each app on the phone — the link, and for Funny
-Multi one visit under "Android app" on `/stats/`. Owed at listing time and for B-3: Step 85's
+rebuild now). The owner's phone pass is done: the privacy link opens in both apps, and
+`/stats/` has Funny Multi's first two visits under "Android app". Owed at listing time and for B-3: Step 85's
 "Owed". Then the same note as before:
 
 **Step 84 (B-22) is pushed, CI

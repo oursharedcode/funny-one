@@ -4996,13 +4996,17 @@ Gates:
   included.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39227545935`, 3 min 46 s, on `ubuntu-24.04`).
 
-**Owed:**
+**Pushed and public 2026-10-19:** `98ff119..11f81d4`, one push — it also carried `8a5fb85`,
+Step 85's RESUME note, which had been committed but never pushed. CI passed, then
+`gh repo edit --visibility public` (auto mode allowed it): the repository is public, Issues
+on. Checked with curl, not signed in: `github.com/oursharedcode/funny-one`, its `LICENSE` and
+the raw README answer 200, and the research notes 404 on `main`; the live landing page and
+Funny Multi's live bundle both link exactly `https://github.com/oursharedcode/funny-one`.
 
-- The switch, then a check that the repository, the landing page's GitHub link and Funny Multi's
-  source link answer without signing in.
-- The owner's click on both links, on a phone.
+**Owed:** the owner's tap on both links, on a phone (the landing page's GitHub link, Funny
+Multi's source link at the foot of Home).
 
 ---
 
@@ -5048,10 +5052,11 @@ Gates:
 
 ~~RESUME HERE (2026-10-19, after Step 85, pushed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-19, after Step 86).** **Step 86 (B-24) is committed: the repository goes
-public right after its push and CI** (`gh repo edit --visibility public`), then the repository,
-the landing page's GitHub link and Funny Multi's source link are checked without signing in. The
-owner's home IP (once, in this log) and the places of the Worker secret, the upload key's backup
+~~RESUME HERE (2026-10-19, after Step 86)~~ — carried into this note.
+
+**RESUME HERE (2026-10-19, after Step 86, public).** **Step 86 (B-24) is pushed, CI passed (run
+`39227545935`), and `oursharedcode/funny-one` is public** — the repository and the exact link
+the landing page and Funny Multi carry answer 200 without signing in. The owner's home IP (once, in this log) and the places of the Worker secret, the upload key's backup
 and the VM's `.env` backups are masked — those places are in the agent's memory
 (`funnyone-credential-locations`); `local_docs/` is no longer tracked. Earlier commits keep all
 of it (owner: leave history). **Step 85 (B-23, app parity) is pushed, CI passed (run
@@ -5279,8 +5284,7 @@ is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73);
 draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); real
 Funny One icons before any announcement or listing (also blocks A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md`); the switch to public (B-24, Step 86), right after its push — until
-then the landing page's GitHub link and Funny Multi's source link answer 404; T-7.1's iPhone
+`docs/ACCEPTANCE_FUNNY_ONE.md`); T-7.1's iPhone
 install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
 and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at

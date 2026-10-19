@@ -1494,3 +1494,13 @@ unless they carry advisories:
       also ends Step 58's `npm test` flake. Not seen by the agent in a browser on production;
       the owner's look at Home in the app is the confirmation, and the task reopens if the line
       is still there.
+- [x] **B-24 (S)** Make the repository public (owner request 2026-10-19, moved out of B-23): the
+      landing page's GitHub link and Funny Multi's source link answered 404 until it was.
+      _Closed 2026-10-19 (Step 86)._ An audit of the tree and all 117 commits found no `.env`,
+      key, token or cloud id ever committed; it found the owner's home IP once in the log, the
+      VM's IP in the ship scripts' comments and the places of the Worker secret, the upload key's
+      backup and the VM's `.env` backups. Owner decisions: history left as it is; the VM's IP
+      stays (DNS-only records publish it anyway); the home IP and those places masked in four
+      docs, kept in the agent's memory; `local_docs/` untracked. Pushed (`11f81d4`, CI run
+      `39227545935`), then switched to public; the repository, its `LICENSE` and README, and the
+      exact link both live sites carry answer 200 without signing in.

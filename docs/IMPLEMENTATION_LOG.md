@@ -5305,9 +5305,12 @@ Gates:
   passed alone, in its workspace and in the full run.
 - `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
   GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
-- CI: after the push.
+- CI: passed (run `39412829297`, 3 min).
 
-**Owed, in order** (one op per message): (1) the push, at the owner's word, then CI; (2) the
+**Pushed 2026-10-20, 22:08** at the owner's word ("push"): `ffe8f75..812adcd`, Step 87's two
+record commits (`d53277b`, `9854704`) with it; CI passed (above).
+
+**Owed, in order** (one op per message): (1) ~~the push, then CI~~ done 2026-10-20; (2) the
 deploy of both games at the owner's word — `deploy/ship.sh` and `deploy/ship-funny-one.sh` —
 which puts 1a and 3a live; (3) the owner's Op 71: Production → Create new release, the AAB, the
 release's name and notes, Save — not yet sent for review; (4) the owner's service account (2a,
@@ -5375,12 +5378,14 @@ Multi's entry, with its 60.
 
 ~~RESUME HERE (2026-10-20, after Step 87, live, A3 passed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 88).** **Step 88 (B-25) is committed, not pushed or
-deployed.** Both games have their Play pictures in ten more languages (the owner's pick), Korean
+~~RESUME HERE (2026-10-20, after Step 88)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 88, pushed).** **Step 88 (B-25) is pushed
+(`ffe8f75..812adcd`) and CI passed (run `39412829297`); not deployed.** Both games have their Play pictures in ten more languages (the owner's pick), Korean
 lines break only between words in both games, and Funny Multi starts in the device's language,
 as Funny One does. Funny One's Play Console entry was made 2026-10-20 (Ops 4–69, recorded in
 `store/funny-one/answers.md`), and its signed AAB, version 1, is built. **Next, one op per
-message:** Step 88's Owed — the push and the deploy at the owner's word, then the owner's Op 71
+message:** Step 88's Owed — the deploy of both games at the owner's word, then the owner's Op 71
 (the first release, saved, not sent), the service account for the API upload, the AI labels,
 Send for review, the fingerprint. Then the same note as before:
 

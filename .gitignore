@@ -50,6 +50,7 @@ local_docs/
 # made by store-listings.mjs from the tracked texts.
 /store/*/listing/*/images/
 /store/paste-sheet.html
+/store/*/translations.json
 
 # Picture-library review (T-FO-8.2): venv, thumbnails, embeddings — regenerable, never committed
 .picture-review/

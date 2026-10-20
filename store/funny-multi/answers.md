@@ -64,3 +64,19 @@ Positioning: 12+, never in the Families program (FM-ID-2, FM-APP-1).
      browser, not the app. Both are the cautious answers.
    - Not declared: the server's error log may hold an IP address when a request fails, used only
      to fix the fault (privacy policy); an IP address alone is not one of Play's data types.
+
+## Learned from Funny One's entry (2026-10-20)
+
+- **App access** is called "Sign-in details", and Play counts "actions on another device" as
+  access to describe: give item 2's three players there, with how a reviewer opens the room's
+  link on a second and third device or tab.
+- **Store presence:** no Expert Approved — that programme is for apps aimed at children, and
+  Funny Multi is 13 and over (item 5).
+- **Government apps:** No. **Financial features:** "My app doesn't provide any financial
+  features" (the gifts are on the website only). **Health:** "My app doesn't have any health
+  features".
+- **AI asset declaration:** label the feature graphics (drawn by the agent, as Funny One's were —
+  owner decision (b)) and the reveal and gallery screenshots, which show Flux cartoons. Whether
+  the monkey icon (from SRC) was drawn with AI is not known here: ask the owner first.
+- **Translations:** import `translations.json` from this folder, then add the pictures of the
+  eleven locales that have their own (`store/README.md`, Upload).

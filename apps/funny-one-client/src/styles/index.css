@@ -83,6 +83,17 @@ body {
   font-family: Cambria, serif;
 }
 
+/* Step 88: Korean puts spaces between its words, but the browser broke its
+   lines between any two syllables, in the middle of a word. keep-all breaks
+   them only at the spaces, and a word wider than its line still wraps. The
+   stories here are in the interface's language, so <html lang>
+   (i18n/index.ts) is the one element to look at. :where() weighs nothing, so a
+   break-* utility still wins. Funny Multi's styles/index.css says the same. */
+:where([lang|='ko']) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 /* WaitingMascot's finger-tap loop (DESIGN_SYSTEM §5), copied from
    funny-multi-client/src/styles/index.css — only the one animation this
    product currently uses (T-FO-3.3), not the whole mascot set. */

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
+// Moved from apps/funny-one-client/src/i18n/ with the functions (Step 88).
+
 import { describe, expect, it } from 'vitest';
-import { matchLanguageTag, pickInitialLanguage } from './uiLanguage';
+import { matchLanguageTag, pickInitialLanguage } from './uiLanguage.js';
 
 describe('matchLanguageTag (T-FO-5.1a)', () => {
   it('matches registry codes exactly, case-insensitively', () => {

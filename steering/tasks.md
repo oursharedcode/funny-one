@@ -116,7 +116,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Listing assets done 2026-10-19 (Step 87), for both apps:* under `store/`, the texts in 22
     languages (en and ru written, 20 machine drafts with B-3), graphics and screenshots
     (regenerated, not committed), and the answers for Store settings and App content
-    (`store/<game>/answers.md`); `store/README.md` is the upload checklist.
+    (`store/<game>/answers.md`); `store/README.md` is the upload checklist. Ten more languages'
+    graphics and screenshots made 2026-10-20 (Step 88, B-25); Funny Multi's wait for its entry.
   - *Keep generation off while the apps are on Play:* Play's AI-Generated Content policy asks
     apps that draw with AI from user prompts for an in-app way to report a picture; apps that
     only host such pictures are out of scope. Both games are out of scope today — every picture
@@ -389,10 +390,28 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Owed at listing time (B-1e, S-3c):* the rebuild with `scripts/android-labels.mjs` between
     `update` and `build` (both READMEs); Data safety — Funny Multi declares the visit counts,
     Funny One collects nothing; Google's fingerprint in both `assetlinks.json`; uninstall the
-    copies installed by hand first. Funny One's real icons: drawn 2026-10-19 (Step 87), live
-    after its next deploy, which must come before the rebuild.
+    copies installed by hand first. Funny One's part is done but the last two: its real icons
+    drawn 2026-10-19 (Step 87) and live since 2026-10-20, its Data safety entered 2026-10-20,
+    and its rebuild run 2026-10-20 — the owner's signed AAB, version 1 (Step 88).
   - *Owed:* the privacy changes and the names outside en/ru are machine drafts (with B-3); some
     names are too long to show whole under an icon (Step 85 lists them).
+- **B-25** Play pictures in ten more languages, and two faults they showed up (owner request
+  2026-10-20, before Funny One's first release). Step 87 gave only en and ru their own feature
+  graphic and screenshots. Owner decisions 2026-10-20: (c) ten more, in both games — fr-FR,
+  it-IT, hi-IN, ta-IN, te-IN, zh-CN, zh-HK, bn-BD, ko-KR and fa; the other ten listings keep the
+  default's; (1a) Korean broke its lines in the middle of a word in both games — one `keep-all`
+  rule per game, then the Korean pictures retaken; (2a) the images go up through the Play
+  Developer API, from a service account the owner sets up once, limited to store listings, and
+  the owner ticks the AI label on the ten new feature graphics; (3a) Funny Multi opened in
+  English on every device, its Android app included — it now starts in the device's language,
+  as Funny One does. **Code done 2026-10-20 (Step 88).**
+  - *Decided on the way:* Funny Multi remembers no pick (its privacy policy keeps nothing on the
+    device); a link's `?lang=` still wins, an invite's included; the create screen's flag starts
+    on the interface's language.
+  - *Owed:* the deploy of both games; the service account, then the agent's upload of Funny
+    One's 60 images and the owner's AI labels (Funny Multi's 60 wait for its entry); the ten
+    taglines are machine drafts (with B-3); a real Korean or Persian phone, unseen; in Tamil's
+    reveal shot the Continue button covers the story's last two lines (accepted).
 
 ## Dependency notes
 

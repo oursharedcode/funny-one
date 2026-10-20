@@ -231,6 +231,57 @@ describe('room:create payload', () => {
   });
 });
 
+describe("the device's language (Step 88)", () => {
+  // The interface now starts in the device's language (i18n/uiLanguage.ts).
+  // The reset above stands for an English phone; this stands for a Korean one.
+  beforeEach(async () => {
+    await act(async () => {
+      await i18n.changeLanguage('ko');
+    });
+  });
+
+  it('starts the create flag on it, and creates the room in it when the host taps none', () => {
+    const { onJoined } = renderHome();
+    const picker = screen.getByRole('group', { name: 'Language' });
+    expect(within(picker).getByRole('button', { pressed: true }).getAttribute('title')).toBe(
+      LANGUAGES.find((l) => l.code === 'ko')?.name,
+    );
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText(i18n.t('home.create')));
+
+    expect(socketMock.onlyEmitOf('room:create').args[0]).toMatchObject({ language: 'ko' });
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ language: 'ko', myLanguage: 'ko' });
+  });
+
+  it("lets a link's language win over it", async () => {
+    setUrl('?lang=de');
+    renderHome();
+    await act(async () => {});
+    expect(i18n.language).toBe('de');
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText(i18n.t('home.create')));
+
+    expect(socketMock.onlyEmitOf('room:create').args[0]).toMatchObject({ language: 'de' });
+  });
+
+  it('is the own language of a joiner whose multi-language invite names none (B-15)', () => {
+    setUrl('?room=abcd&multi=1');
+    const { onJoined } = renderHome();
+    typeNickname('joiner');
+    fireEvent.click(screen.getByText(i18n.t('home.join')));
+    socketMock.ackFor('room:join')({
+      socketId: 's2',
+      hostId: 's1',
+      language: 'ru',
+      multiLanguage: true,
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+    });
+
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ language: 'ru', myLanguage: 'ko' });
+  });
+});
+
 describe('nickname bounds (server rejects outside 3–20)', () => {
   // Gate 2 found this the expensive way: a 2-character fixture nickname passed
   // every in-process test and failed on the wire. The button is the client-side

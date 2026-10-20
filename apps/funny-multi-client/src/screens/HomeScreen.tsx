@@ -31,6 +31,11 @@
 // on screen when they tap Join — so a joiner's interface is not switched to the
 // room language on join. Both flag lists are `LanguageList`, the same list the
 // story-language switch opens on the reveal screen and in the gallery.
+//
+// Step 88: the interface starts in the device's language (i18n/uiLanguage.ts),
+// not always in English, and the create screen's flag starts on it, so a host
+// who taps no flag creates the room in the language they read. A link's
+// `?lang=` still wins — an invite's room language, or the landing page's.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,9 +76,15 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   const [nickname, setNickname] = useState('');
   // Typed `AuthoredLanguage`, not `Language`: this value becomes the room's
   // content language, so the narrower type makes the server's constraint a
-  // compile-time one on this screen.
+  // compile-time one on this screen. It starts on the link's language, else on
+  // the interface's (the device's since Step 88), so the flag shown pressed is
+  // the language on screen.
   const [language, setLanguage] = useState<AuthoredLanguage>(
-    isAuthoredLanguage(urlLang) ? urlLang : 'en',
+    isAuthoredLanguage(urlLang)
+      ? urlLang
+      : isAuthoredLanguage(i18n.language)
+        ? i18n.language
+        : 'en',
   );
   const [multiLanguage, setMultiLanguage] = useState(false);
   const [error, setError] = useState<string | null>(null);

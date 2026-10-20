@@ -5146,15 +5146,176 @@ art until the shortcut is added again.
 **Owed, in order, the owner's** (one op per message): (1) ~~the push, then CI~~ done; (2) ~~Funny
 One's deploy~~ done 2026-10-20; (3) ~~A3 on the phone~~
 passed 2026-10-20 (below); (4) each game's Play Console entry from `store/README.md`
-(listing, translations, Store settings, App content); (5) the one rebuild of each app —
-`update`, `node scripts/android-labels.mjs`, `build` — then Google's app-signing fingerprint
-into `assetlinks.json`, and the copies installed by hand uninstalled before installing from
-Play.
+(listing, translations, Store settings, App content) — Funny One's made 2026-10-20 (Step 88);
+(5) the one rebuild of each app — `update`, `node scripts/android-labels.mjs`, `build` — then
+Google's app-signing fingerprint into `assetlinks.json`, and the copies installed by hand
+uninstalled before installing from Play — Funny One's built 2026-10-20, its fingerprint and
+uninstall now in Step 88's Owed.
 
 **A3 passed 2026-10-20** (owner: "pass"): Funny One added to the home screen from Chrome on the
 owner's Android phone — the blob's eye, mouth and antenna whole in the launcher's mask and on
 the recent-apps tile. Recorded in `docs/ACCEPTANCE_FUNNY_ONE.md`. The signed app installed by
 hand keeps the monkey until its rebuild (B-23).
+
+## Step 88 (task B-25) — Play pictures in ten more languages; Korean kept whole; Funny Multi in the phone's language (2026-10-20)
+
+**Owner request 2026-10-20,** at 13:46, the signed build just done: "why we did not uploaded to
+the Google Play Console for other (in addition to Eng, Rus) languages, the pictures?" Only en
+and ru had their own feature graphic and screenshots — Step 87's decision 4, the agent's. The
+options: (a) release now and add the others later, as a step of their own — recommended; (b)
+all 20 before the release, about 240 uploads; (c) the biggest markets now — Spanish, Portuguese
+(Brazil), German, French, Hindi. The owner: "Make languages before the release. (c) Only now:
+French, India all 3, Chinese all, Bangladesh, Korean, Farsi Iran, Italian." — (c), with a list
+of their own: fr-FR, it-IT, hi-IN, ta-IN, te-IN, zh-CN, zh-HK, bn-BD, ko-KR and fa. Asked in the
+same hour whether the Android app opens in the phone's language: Funny One's does (T-FO-5.1a,
+Step 32); Funny Multi's opened in English on every device, and only a link's `?lang=` changed
+it.
+
+**Owner decisions 2026-10-20** ("1a 2a 3a"), on the agent's report of the pictures:
+
+1. *Korean broke its lines in the middle of a word, in both games* — «지우에게 전달하세 / 요»,
+   «이야 / 기를», «+ 가상 플레이어 추 / 가»: (a) one style rule per game, a deploy, the Korean
+   pictures retaken — taken; (b) upload them as they are.
+2. *How the pictures reach Play:* (a) the owner sets up a Google service account once, about six
+   ops, limited to store listings, and the agent uploads through the Play Developer API — which
+   takes edits only once the app's first AAB is in Play Console; the owner still ticks "AI" on
+   the ten new feature graphics — taken; (b) by hand, as Russian was, about 30 ops.
+3. *Funny Multi's start language:* (a) the phone's, as Funny One's; a deploy and no rebuild,
+   since the app's start URL `/?shell=android` names no language — taken; (b) leave it.
+
+**The pictures:** 120 new images — ten locales × two games × a feature graphic and five
+screenshots, made from real games in each language. The 146 under `store/` (37 MB) stay
+gitignored.
+
+- `scripts/store-graphics.mjs`: the twelve locales and a tagline for each, the ten new ones
+  machine drafts (B-3) worded after each listing's short description. French and Italian take
+  Fredoka, as English does; the others the system font, as the games set them. The page names
+  its language — zh-CN, or zh-HK so that Cantonese takes Hong Kong's glyphs — and Persian runs
+  right to left. `word-break: keep-all` breaks Chinese at its punctuation and Korean at its
+  spaces. `fitTitle` now checks the whole text block too: Tamil's two-line title at 80 px had
+  overflowed its box.
+- `scripts/store-screens.mjs`: the twelve locales, each with the browser's locale (Play's bare
+  `fa` is `fa-IR` there), and made-up names per language — Tamil's end in -ā, which takes the
+  games' "{{name}}க்கு" as written; the Chinese, Cantonese and Korean ones carry a surname,
+  since Funny Multi's nicknames take 3–20 characters. Funny Multi's players each pick the
+  shortest answer on screen, and its reveal is shot from the player with the shortest story, so
+  the floating Continue button covers the cartoon rather than the story's end. The round shot
+  resets each screen's own scroll box (`[data-phase]`), not the window: Telugu's had been taken
+  scrolled past its question. A game or locale argument retakes only those
+  (`node scripts/store-screens.mjs funny-one ko-KR`).
+- `scripts/store-listings.mjs` also writes `store/<game>/translations.json` (gitignored): the 21
+  translations, each under Play's code and name, for Play Console's *Import a file* (below).
+
+**Korean (1a):** `:where([lang|='ko']) { word-break: keep-all; overflow-wrap: break-word; }` in
+both clients' `styles/index.css` — a line breaks only at Korean's spaces, and a word wider than
+its line still wraps; `:where()` weighs nothing, so a `break-*` utility still wins. Funny One's
+stories are in the interface's language, so `<html lang>` is the one element that counts. Funny
+Multi's stories carry their own `lang` (RevealScreen, RoomGallery, RoundScreen), so it also sets
+`:where([lang]) { word-break: normal; }`: a Chinese or Japanese story on a Korean screen still
+breaks between its characters.
+
+**Start language (3a):** `matchLanguageTag` and `pickInitialLanguage` moved from Funny One's
+`i18n/uiLanguage.ts` to `packages/shared/src/uiLanguage.ts`, their tests with them (`git mv`);
+Funny One keeps its remembered pick (`funny-one.language`). Funny Multi's new
+`i18n/uiLanguage.ts` starts i18next in the first of `navigator.languages` the game ships, else
+English, and HomeScreen's create flag starts on the link's `?lang=`, else on the interface's
+language, else English. Comments follow in `funnel.ts`, the landing page's `headScript.ts`
+(whose match is the same rule) and LANGUAGES.md item 10. Six new tests: three for
+`initialLanguage`, three on HomeScreen — the flag and the room in the device's language; a
+link's language over it; a joiner's own language when a multi-language invite names none
+(B-15). A side effect: Funny Multi's visit count (`fm_view`) carries the interface's language,
+so after the deploy a direct visit counts under the device's language instead of English, and
+`/stats/`'s languages shift; the privacy policy's "the interface language" holds as written.
+
+**Funny One's Play Console entry, 2026-10-20, 00:19–02:05** (Ops 4–69, the owner's, one per
+message, after A3): the app created; every App content form; Store settings; the listing in 22
+languages; all 178 countries. What the console asked beyond `answers.md`, or named differently,
+is now at the foot of `store/funny-one/answers.md`, and what it teaches Funny Multi's entry at
+the foot of `store/funny-multi/answers.md`. Two owner decisions on the way:
+
+- *Expert Approved:* (a) include — free; teachers' approval would bring a badge and a place in
+  Play's Kids tab, and without it nothing changes but the badge — taken; (b) leave it out, to
+  opt in later.
+- *The AI asset declaration* (Play Console Help, answer 17262077: a self-declaration per image,
+  changeable later in the Asset library): (a) label none; (b) the icon and the feature graphics,
+  drawn by the agent as code, and not the screenshots of the running game — taken. Funny
+  Multi's reveal and gallery screenshots show Flux cartoons, so they carry the label too.
+
+The texts went in through *Import a file* ("Import translations with AI", which takes "a file
+containing your store listing translations in any format"), zh-HK compared character for
+character first; Russian's pictures by hand. `store/README.md`'s Upload is five steps now, with
+the first AAB by hand and the other languages' pictures through the API.
+
+**The Android project** (`deploy/android-funny1/`, gitignored but for `twa-manifest.json` and
+its README) was regenerated by the agent at 02:05 with Bubblewrap CLI 1.25.0's `update
+--skipVersionUpgrade`, which downloads the icons from the live site, then `node
+scripts/android-labels.mjs` (25 names per project). The owner's signed build at 13:45:
+`app-release-bundle.aab`, 1,460,322 bytes (the old one 2 MB), version 1, and
+`app-release-signed.apk`, 1,339,564 bytes. No tracked file changed.
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. *Funny Multi remembers no pick,* although 3a's first offer said "your last pick first": its
+   privacy policy says the game keeps nothing on the device but its own program files.
+2. *A link's `?lang=` still wins* over the device's language — an invite's room language, or the
+   landing page's.
+3. *The create flag starts on the interface's language* (it was English), so a host who taps no
+   flag creates the room in the language they read.
+4. *Ten taglines,* machine drafts like the listings (B-3).
+5. *Funny Multi's screenshots play the shortest answers and show the shortest story.*
+6. *Chinese, Cantonese and Korean names with a surname,* three characters each.
+
+**Not changed:** the listing texts; the other ten listings keep the default's pictures; the
+landing page's Korean (Still open, at the foot); nothing deployed or uploaded yet; Funny Multi's
+Play entry not begun.
+
+**Verified here:**
+
+- All 120 new images looked at. `store-listings.mjs`: all 44 listings pass, images checked in 24.
+- Korean before and after, in both games: the words above broke mid-word before the rule and
+  stay whole after it. The Korean pictures were retaken at 21:26, after the rule (21:15) and
+  Funny Multi's build (21:25).
+- 3a on Funny Multi's local production build on 3000, in headless Chromium with the browser's
+  locale set:
+
+  | Browser | Address | Interface | `word-break` | Flag pressed |
+  | --- | --- | --- | --- | --- |
+  | ko-KR | `/` | ko | keep-all | 한국어 (대한민국) |
+  | ko-KR | `/?shell=android` | ko | keep-all | 한국어 (대한민국) |
+  | ko-KR | `/?lang=de` | de | normal | Deutsch (Deutschland) |
+  | nl-NL | `/` | en | normal | English (United Kingdom) |
+  | fa-IR | `/?shell=android` | fa, right to left | normal | فارسی (ایران) |
+  | zh-HK | `/` | yue | normal | 粵語 (香港) |
+
+- Ports 3000 and 5185 free before and after.
+
+**Not seen:** a real Korean or Persian phone; Safari (no WebKit here); the deployed games; the
+apps after the deploy.
+
+**Accepted:** in Tamil's reveal shot the Continue button covers the story's last two lines —
+even the shortest Tamil story is that long, and a small phone shows the same.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test`: 1611 tests (418 + 384 + 313 + 170 + 273 + 53), all passed, the real-socket suites
+  included. The first full run failed in every suite ("Vitest failed to find the runner"): its
+  working directory was spelled `c:/Mark/...`; from `C:/Mark/Dev/funnyone` all passed. An earlier
+  run's one failure, Funny Multi's `App.test.tsx` "starts on Home" timing out at 5.8 s against 5,
+  passed alone, in its workspace and in the full run.
+- `npm audit --omit=dev` 0; the full `npm audit` lists only GHSA-vfj7-8cjw-p6xm and
+  GHSA-rj75-hqrm-r3gf; `npm view braces version` 3.0.3.
+- CI: after the push.
+
+**Owed, in order** (one op per message): (1) the push, at the owner's word, then CI; (2) the
+deploy of both games at the owner's word — `deploy/ship.sh` and `deploy/ship-funny-one.sh` —
+which puts 1a and 3a live; (3) the owner's Op 71: Production → Create new release, the AAB, the
+release's name and notes, Save — not yet sent for review; (4) the owner's service account (2a,
+about six ops), then the agent's upload of Funny One's 60 images through the API; (5) the
+owner's AI labels on the ten new feature graphics, then Send for review; (6) Google's
+app-signing fingerprint into `deploy/origin-root/funny1/.well-known/assetlinks.json`, a deploy,
+and the copy installed by hand uninstalled before installing from Play; (7) later, Funny
+Multi's entry, with its 60.
 
 ---
 
@@ -5212,15 +5373,24 @@ hand keeps the monkey until its rebuild (B-23).
 
 ~~RESUME HERE (2026-10-20, after Step 87, pushed and live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 87, live, A3 passed).** **Step 87 (S-3c, B-1e) is pushed
-(`663ec9b..e93b86f`), CI passed (run `39256462673`), and Funny One's new icons are live since
-2026-10-20 00:10.** Funny One has its own icon (the one-eyed blob,
+~~RESUME HERE (2026-10-20, after Step 87, live, A3 passed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 88).** **Step 88 (B-25) is committed, not pushed or
+deployed.** Both games have their Play pictures in ten more languages (the owner's pick), Korean
+lines break only between words in both games, and Funny Multi starts in the device's language,
+as Funny One does. Funny One's Play Console entry was made 2026-10-20 (Ops 4–69, recorded in
+`store/funny-one/answers.md`), and its signed AAB, version 1, is built. **Next, one op per
+message:** Step 88's Owed — the push and the deploy at the owner's word, then the owner's Op 71
+(the first release, saved, not sent), the service account for the API upload, the AI labels,
+Send for review, the fingerprint. Then the same note as before:
+
+**Step 87 (S-3c, B-1e) is pushed (`663ec9b..e93b86f`), CI passed (run `39256462673`), and Funny
+One's new icons are live since 2026-10-20 00:10.** Funny One has its own icon (the one-eyed blob,
 the owner's pick of ten, on Funny Multi's pink), and `store/` holds both games' Play listings:
 texts in 22 languages (en and ru written, 20 machine drafts for B-3), the App content answers,
 and the scripts that regenerate the gitignored graphics and screenshots and check it all
-(`store/README.md`). A3 passed on the owner's phone the same night. **Next, the owner's, one op per message:** each
-game's Play Console entry
-and the one rebuild (Step 87's Owed). Both games are outside Play's AI-Generated Content policy
+(`store/README.md`). A3 passed on the owner's phone the same night. Funny One's Play Console
+entry and its rebuild are done (Step 88); Funny Multi's wait. Both games are outside Play's AI-Generated Content policy
 only while the Worker's generation switch stays off — switching it on needs an in-app "report
 this picture" first (B-1e). Then the same note as before:
 
@@ -5355,11 +5525,12 @@ verdict once each has 100 visits, and keeping one of them is then the owner's ca
 and S-3a/S-3b ran ahead of Gate FO because the owner asked for them; the gate itself is
 unchanged and still open.
 
-Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six, Step 85's five, Step 86's three and Step 87's nine were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
+Step 72's thirteen decisions, Step 75's three, Step 76's seven, Step 78's six, Step 79's eleven, Step 81's eleven, Step 82's nine, Step 83's two, Step 84's six, Step 85's five, Step 86's three, Step 87's nine and Step 88's six were the agent's (its seven plan decisions were the owner's "go") — each is in its entry with its options, and any of them can be reversed. **B-2 (Apple)
 is cancelled** — do not raise the Individual-or-company question again; an iPhone plays the web
 app (B-14), and the four fixes found there are deferred until the owner asks. The shared upload
-key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) has its icons and assets
-(Step 87) and waits only on the deploy and the owner's entry — B-1e's account is ready (Step 80).
+key stays (decision 3 of 2026-10-06). S-3c (Funny One's Play listing) is entered (Step 88) and
+waits on its first release, the other languages' pictures through the API (B-25), their AI labels
+and Google's review — B-1e's account is ready (Step 80).
 
 B-1e (Play account) is done: MARK WEB TOOLS is signed up, paid and fully verified — identity, website and phone (Step 54, Step 80). Its Equifax D-U-N-S rename
 to match is submitted and pending (~30 days, due 2026-11-17); when it lands, the owner confirms
@@ -5416,7 +5587,11 @@ from the owner's home IP; when it times out, re-run `deploy/oci/network.py <ip>`
 from `curl https://api.ipify.org`).
 
 Notes for whoever runs things here: `npm test` wants the machine to itself — re-run any lone
-timing failure in isolation before treating it as a regression. Multi-line commit messages go
+timing failure in isolation before treating it as a regression — and runs from
+`C:/Mark/Dev/funnyone`: from a working directory spelled `c:/...` every Vitest suite fails with
+"Vitest failed to find the runner" (Step 88). Dates and times here are local (AEDT, UTC+11); a
+session transcript's timestamps are UTC (Step 88 moved the Play entry from 10-19 to 10-20).
+Multi-line commit messages go
 through `git commit -F <file>`. In a script under `set -o pipefail`, never pipe a large page
 into `grep -q` (Step 60). Never name a source folder `build`: the root `.gitignore` and
 `.prettierignore` skip every `build/`, so its files pass every local check and never reach a
@@ -5449,8 +5624,7 @@ sentence and Step 79's privacy bullet outside en/ru, and everything in B-16's fi
 is "funny-stories-<name>" when the title has no Latin letters (seen in Step 73); what Safari
 draws Yoruba's headings and stories in (Step 81, no WebKit here); the 5 s video of a Hebrew or Persian story is unseen since Step 73 gave it the story's
 direction (unit tests only); ~~real
-Funny One icons~~ drawn in Step 87, live after Funny One's next deploy (A3 in
-`docs/ACCEPTANCE_FUNNY_ONE.md` then checks them on a phone); T-7.1's iPhone
+Funny One icons~~ drawn in Step 87, live and A3 passed 2026-10-20; T-7.1's iPhone
 install leg (closes Gate 7), now run together with B-14's device list on a borrowed iPhone; B-8
 — answered for Funny Multi's TWA (no warning, Step 59), open for a direct PWA/WebAPK install
 and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-bit JDK at
@@ -5466,5 +5640,11 @@ for GHSA-rj75-hqrm-r3gf); B-1b — whether the landing page should host one priv
 instead of each game's own root; a `GET /api/stats` on the landing page's host answers with
 Funny Multi's app (harmless, Step 72); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step
 47); a player's report of an unfit library picture goes on `BLOCKED_PICTURES` the same way
-(Step 68).
+(Step 68); since Step 88 either game can start in a language low in its flag list, and the
+pressed flag is not scrolled into view; the landing page has no Korean `keep-all` rule, so its
+Korean may still break mid-word (Step 88 changed only the games); a multi-language room's
+invite (`&multi=1`) also names the room's language (`LobbyScreen.tsx:52`), which wins over the
+joiner's phone, so a Korean phone opens the join screen in the room's language and its player
+picks Korean by hand — whether such an invite should leave the joiner's phone language instead
+(Step 88).
 

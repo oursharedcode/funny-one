@@ -30,10 +30,10 @@ if (v !== 'a' && v !== 'b') v = Math.random() < 0.5 ? 'a' : 'b';
 try { sessionStorage.setItem('${VARIANT_KEY}', v); } catch (e) {}
 d.setAttribute('data-variant', v);`;
 
-// The browser-language match is the one Funny One makes (its uiLanguage.ts
-// matchLanguageTag): an exact code, then Spanish and Portuguese by region,
-// Hebrew's old code, Hong Kong and Macau Chinese as Cantonese, then the
-// primary subtag.
+// The browser-language match is the one both games make (matchLanguageTag in
+// packages/shared/src/uiLanguage.ts): an exact code, then Spanish and
+// Portuguese by region, Hebrew's old code, Hong Kong and Macau Chinese as
+// Cantonese, then the primary subtag.
 const REDIRECT = `
 var codes = ${JSON.stringify(LANGUAGE_CODES)};
 function match(tag) {

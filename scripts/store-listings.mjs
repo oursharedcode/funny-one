@@ -2,9 +2,12 @@
 
 // Checks the Google Play listing texts under store/<game>/listing/<locale>/
 // (Step 87, S-3c / B-1e) and writes a paste sheet for entering them in Play
-// Console, one copy button per field:
+// Console, one copy button per field, plus one file per game of every
+// translation for Play Console's "Import translations with AI" (Step 88), which
+// takes "a file containing your store listing translations in any format":
 //
-//   node scripts/store-listings.mjs     → store/paste-sheet.html (gitignored)
+//   node scripts/store-listings.mjs     → store/paste-sheet.html,
+//                                         store/<game>/translations.json (gitignored)
 //
 // Checks, per game and locale: the three files exist; Play's limits, counted in
 // code points (title 30, short description 80, full description 4000); no
@@ -50,6 +53,31 @@ const LOCALES = {
   'te-IN': 'te',
   'bn-BD': 'bn',
   sw: 'sw',
+};
+// Play Console's names for the locales, so the import cannot mistake one for
+// another (the two Spanishes; Cantonese in traditional characters is zh-HK).
+const NAMES = {
+  'ru-RU': 'Russian',
+  'fr-FR': 'French (France)',
+  'de-DE': 'German',
+  'it-IT': 'Italian',
+  'es-ES': 'Spanish (Spain)',
+  'es-419': 'Spanish (Latin America)',
+  'pt-BR': 'Portuguese (Brazil)',
+  id: 'Indonesian',
+  uk: 'Ukrainian',
+  'iw-IL': 'Hebrew',
+  fa: 'Persian',
+  ar: 'Arabic',
+  'zh-CN': 'Chinese (Simplified)',
+  'zh-HK': 'Chinese (Hong Kong)',
+  'ja-JP': 'Japanese',
+  'ko-KR': 'Korean',
+  'hi-IN': 'Hindi',
+  'ta-IN': 'Tamil',
+  'te-IN': 'Telugu',
+  'bn-BD': 'Bangla',
+  sw: 'Swahili',
 };
 const GAMES = {
   'funny-one': {
@@ -222,6 +250,27 @@ ${Object.keys(GAMES)
 `;
 await writeFile(join(STORE, 'paste-sheet.html'), html);
 
+// Every locale but the default, each named twice and its texts verbatim.
+for (const game of Object.keys(GAMES)) {
+  const rows = sheet.filter((s) => s.game === game);
+  const translations = rows
+    .filter((s) => s.locale !== 'en-GB')
+    .map(({ locale, fields: [title, short, full] }) => ({
+      languageCode: locale,
+      language: NAMES[locale],
+      appName: title.value,
+      shortDescription: short.value,
+      fullDescription: full.value,
+    }));
+  const file = {
+    note: 'Google Play store listing translations, one per language. Use every text verbatim.',
+    defaultLanguage: 'en-GB',
+    defaultAppName: rows.find((s) => s.locale === 'en-GB')?.fields[0].value,
+    translations,
+  };
+  await writeFile(join(STORE, game, 'translations.json'), `${JSON.stringify(file, null, 2)}\n`);
+}
+
 for (const game of Object.keys(GAMES)) {
   const rows = sheet.filter((s) => s.game === game);
   console.log(`${game}: ${rows.length} locales`);
@@ -233,6 +282,7 @@ for (const game of Object.keys(GAMES)) {
 }
 console.log(`images checked in ${imagesChecked} listings`);
 console.log('paste sheet: store/paste-sheet.html');
+console.log('import files: store/<game>/translations.json');
 if (problems.length > 0) {
   console.log(`\n${problems.length} problem(s):`);
   problems.forEach((p) => console.log(`  ${p}`));

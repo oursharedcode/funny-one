@@ -6,48 +6,13 @@
 // language.
 //
 // Precedence: a remembered pick (localStorage) → the device's preferred
-// languages (navigator.languages) → English. Funny Multi has no equivalent:
-// it takes `?lang=` from an invite link, which an installed pass-and-play PWA
-// never has.
+// languages (navigator.languages) → English. The matching lives in
+// @funny/shared since Step 88, when Funny Multi began starting in the device's
+// language too; it remembers no pick, and a link's `?lang=` wins there.
 
-import { isLanguage, type Language } from '@funny/shared';
+import { pickInitialLanguage, type Language } from '@funny/shared';
 
 const STORAGE_KEY = 'funny-one.language';
-
-/**
- * Map one BCP 47 tag (e.g. `pt-BR`, `es-MX`, `zh-Hant-TW`) onto a registry
- * code, or `undefined` if we ship nothing close. The registry mixes bare
- * codes (`fr`) with region variants (`pt-br`, `es-419`, `es-es`), so an exact
- * match is tried first, then the primary subtag with the variant rules below.
- */
-export function matchLanguageTag(tag: string): Language | undefined {
-  const lower = tag.toLowerCase();
-  if (isLanguage(lower)) return lower;
-  const primary = lower.split('-')[0]!;
-  // Spain's Spanish is `es-es`; every other region (and 419 itself) is
-  // Latin-American. A bare `es` carries no region — Spain's variant is the
-  // conventional default.
-  if (primary === 'es') return lower === 'es' ? 'es-es' : 'es-419';
-  // Brazilian is the only Portuguese variant shipped.
-  if (primary === 'pt') return 'pt-br';
-  // `iw` is the pre-1989 code for Hebrew that some older Android builds
-  // still report.
-  if (primary === 'iw') return 'he';
-  // A Hong Kong or Macau phone (`zh-HK`, `zh-Hant-MO`) reads Cantonese;
-  // every other Chinese — Taiwan's included — stays on Mandarin.
-  if (primary === 'zh' && /-(hk|mo)$/.test(lower)) return 'yue';
-  return isLanguage(primary) ? primary : undefined;
-}
-
-/** The first of the device's preferred languages we ship, else English. */
-export function pickInitialLanguage(stored: string | null, preferred: readonly string[]): Language {
-  if (isLanguage(stored)) return stored;
-  for (const tag of preferred) {
-    const match = matchLanguageTag(tag);
-    if (match) return match;
-  }
-  return 'en';
-}
 
 // Storage can throw (private browsing, blocked site data) — a lost preference
 // is fine, a crash at boot is not.

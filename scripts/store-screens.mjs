@@ -2,11 +2,11 @@
 
 // Takes the Google Play phone screenshots of both games (Step 87, S-3c / B-1e):
 // a real game in a phone-sized headless Chromium, 360×640 CSS px at 3× — so
-// 1080×1920, 9:16, a 24-bit PNG, as Play asks — in English and Russian:
+// 1080×1920, 9:16, a 24-bit PNG, as Play asks — in the twelve languages below:
 //
-//   store/<game>/listing/<en-GB|ru-RU>/images/phoneScreenshots/<n>-<screen>.png
+//   store/<game>/listing/<locale>/images/phoneScreenshots/<n>-<screen>.png
 //
-//   npm run build && node scripts/store-screens.mjs [funny-one] [funny-multi]
+//   npm run build && node scripts/store-screens.mjs [funny-one] [funny-multi] [<locale>…]
 //
 // Funny One runs on an in-process Vite dev server (a free port the OS picks),
 // played by funny-one-play.mjs; its pictures are the built-in ones, drawn on
@@ -44,12 +44,41 @@ const SERVER_ORIGIN = 'http://localhost:3000';
 const WORKER_PORT = 5185;
 const WORKER_ORIGIN = `http://127.0.0.1:${WORKER_PORT}`;
 
-// Play locale → catalog code. Other listing languages show the default's.
-const LOCALES = { 'en-GB': 'en', 'ru-RU': 'ru' };
+// Play locale → catalog code, as in store-graphics.mjs (Step 88 added the ten
+// after Russian). Other listing languages show the default's.
+const LOCALES = {
+  'en-GB': 'en',
+  'ru-RU': 'ru',
+  'fr-FR': 'fr',
+  'it-IT': 'it',
+  'hi-IN': 'hi',
+  'ta-IN': 'ta',
+  'te-IN': 'te',
+  'zh-CN': 'zh',
+  'zh-HK': 'yue',
+  'bn-BD': 'bn',
+  'ko-KR': 'ko',
+  fa: 'fa',
+};
+// The browser's own locale; Play's bare `fa` names no region.
+const browserLocale = (locale) => (locale === 'fa' ? 'fa-IR' : locale);
 const NAMES = {
   en: { people: ['Anna', 'Ben', 'Chloe'], bot: 'Robo' },
   // Indeclinable, so the games' "Передай телефон {{name}}" reads right.
   ru: { people: ['Элли', 'Тео', 'Мими'], bot: 'Робик' },
+  fr: { people: ['Léa', 'Hugo', 'Chloé'], bot: 'Robo' },
+  it: { people: ['Giulia', 'Luca', 'Sofia'], bot: 'Robo' },
+  hi: { people: ['अनु', 'रवि', 'मीरा'], bot: 'रोबो' },
+  // Ending in -ā, which takes Tamil's "{{name}}க்கு" as written.
+  ta: { people: ['மீரா', 'ராதா', 'கீதா'], bot: 'ரோபோ' },
+  te: { people: ['అను', 'రవి', 'మీరా'], bot: 'రోబో' },
+  // Funny Multi's nicknames take 3–20 characters (HomeScreen.tsx), so the
+  // Chinese and Korean names carry a surname.
+  zh: { people: ['李小美', '王小明', '张乐乐'], bot: '小机' },
+  yue: { people: ['陳小欣', '黃家明', '李樂樂'], bot: '機械人' },
+  bn: { people: ['অনু', 'রবি', 'মীরা'], bot: 'রোবো' },
+  ko: { people: ['김지우', '이민준', '박서연'], bot: '로봇' },
+  fa: { people: ['سارا', 'آرش', 'نیلو'], bot: 'ربات' },
 };
 const ORDER = {
   'funny-one': ['end', 'round', 'handoff', 'home', 'thinking'],
@@ -95,10 +124,10 @@ async function funnyOne(browser) {
   });
   await vite.listen();
   try {
-    for (const [locale, code] of Object.entries(LOCALES)) {
+    for (const [locale, code] of locales) {
       const cat = await catalog(FO_CLIENT, code);
       const { people, bot } = NAMES[code];
-      const context = await browser.newContext({ ...PHONE, locale: code });
+      const context = await browser.newContext({ ...PHONE, locale: browserLocale(locale) });
       await context.addInitScript((lang) => {
         try {
           localStorage.setItem('funny-one.language', lang);
@@ -237,13 +266,15 @@ async function funnyMulti(browser) {
   let server;
   try {
     server = await startGameServer(standIn.secret);
-    for (const [locale, code] of Object.entries(LOCALES)) {
+    for (const [locale, code] of locales) {
       const cat = await catalog(FM_CLIENT, code);
       const { people } = NAMES[code];
       const errors = [];
       const pages = [];
       for (const name of people) {
-        const page = await (await browser.newContext({ ...PHONE, locale: code })).newPage();
+        const page = await (
+          await browser.newContext({ ...PHONE, locale: browserLocale(locale) })
+        ).newPage();
         watch(page, errors, name);
         pages.push(page);
       }
@@ -270,18 +301,30 @@ async function funnyMulti(browser) {
       shots.lobby = await host.screenshot();
       await start.click();
 
-      // Seven rounds: everyone picks the first answer and submits.
+      // Seven rounds: everyone picks the shortest answer on screen and submits.
+      // Short stories keep the reveal's floating Continue button over the
+      // cartoon rather than over the story's last lines (Tamil, Telugu).
       const playRounds = async (page) => {
         const reveal = page.getByText(cat.reveal.title);
         const submit = page.getByRole('button', { name: cat.round.submit, exact: true });
+        const radios = page.getByRole('radio');
         const deadline = Date.now() + 240_000;
         while (Date.now() < deadline) {
           if (await reveal.isVisible()) return;
-          if ((await submit.isVisible()) && (await page.getByRole('radio').first().isEnabled())) {
-            await page.getByRole('radio').first().click();
+          if ((await submit.isVisible()) && (await radios.first().isEnabled())) {
+            const shortest = await radios.evaluateAll((els) => {
+              const seen = els.filter((el) => el.getBoundingClientRect().bottom <= innerHeight);
+              const pool = seen.length > 0 ? seen : els;
+              const pick = pool.reduce((a, b) => (b.innerText.length < a.innerText.length ? b : a));
+              return els.indexOf(pick);
+            });
+            await radios.nth(shortest).click();
             if (page === host && !shots.round) {
-              // The click scrolls the question off the top; bring it back.
-              await page.evaluate(() => window.scrollTo(0, 0));
+              // A click can scroll the question off the top; bring it back. Each
+              // screen scrolls in its own box (App.tsx), not the window.
+              await page.evaluate(() => {
+                for (const box of document.querySelectorAll('[data-phase]')) box.scrollTop = 0;
+              });
               await page.waitForTimeout(300);
               shots.round = await page.screenshot();
             }
@@ -293,11 +336,16 @@ async function funnyMulti(browser) {
       };
       await Promise.all(pages.map(playRounds));
 
-      const cartoon = host.locator('img[alt]').first();
+      // The shot shows the shortest of the three stories: the Continue button
+      // floats at a fixed height, over the end of a long one.
+      const story = (page) => page.locator('div[lang][dir]').first().innerText();
+      const lengths = (await Promise.all(pages.map(story))).map((text) => text.length);
+      const teller = pages[lengths.indexOf(Math.min(...lengths))];
+      const cartoon = teller.locator('img[alt]').first();
       await cartoon.waitFor({ timeout: 45_000 });
       await cartoon.evaluate((img) => img.decode());
-      await host.waitForTimeout(1500);
-      shots.reveal = await host.screenshot();
+      await teller.waitForTimeout(1500);
+      shots.reveal = await teller.screenshot();
       for (const page of pages) {
         await page.getByRole('button', { name: cat.reveal.continue, exact: true }).click();
         await page.getByText(cat.end.roundsOver).waitFor();
@@ -323,8 +371,12 @@ async function funnyMulti(browser) {
   }
 }
 
-const games = process.argv.slice(2);
+const args = process.argv.slice(2);
+const games = args.filter((a) => a.startsWith('funny-'));
 const run = games.length > 0 ? games : ['funny-one', 'funny-multi'];
+// Named locales only, else all of them.
+const only = args.filter((a) => a in LOCALES);
+const locales = Object.entries(LOCALES).filter(([l]) => only.length === 0 || only.includes(l));
 const browser = await chromium.launch();
 try {
   if (run.includes('funny-one')) await funnyOne(browser);

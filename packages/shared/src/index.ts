@@ -11,6 +11,10 @@
 export { LANGUAGES, isLanguage } from './languages.js';
 export type { Language, LanguageOption } from './languages.js';
 
+// T-FO-5.1a — the interface's start language from the device's, moved here
+// from Funny One in Step 88 when Funny Multi took it up.
+export { matchLanguageTag, pickInitialLanguage } from './uiLanguage.js';
+
 // T-1.2 — story rotation (FM-CORE-6)
 export { storyIndex } from './rotation.js';
 

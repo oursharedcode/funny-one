@@ -68,7 +68,8 @@ export function initFunnel(): void {
       ? { s: 'hub', v: variant }
       : { s: 'direct' };
   // HomeScreen switches to `?lang=` only after the first render, so the
-  // link's language is read here rather than i18next's start-up English.
+  // link's language is read here rather than the one i18next started in (the
+  // device's, Step 88).
   const urlLanguage = url.searchParams.get('lang');
   send({ e: 'fm_view' }, isLanguage(urlLanguage) ? urlLanguage : currentLanguage());
 }

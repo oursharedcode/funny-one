@@ -53,3 +53,34 @@ Positioning: Google Play Families, "Everyone" (FO-ID-1), the opposite of Funny M
      does; we receive nothing, and an IP address alone is not one of Play's data types.
    - The game's own server keeps no access logs (the privacy policy, Service providers).
    - The form then skips its remaining questions, and the listing shows "No data collected".
+
+## Entered 2026-10-20
+
+The owner entered all of the above in Play Console, one op at a time (recorded in Step 88). What
+the console asked beyond this file, or named differently:
+
+- **Create app:** name "Funny One: Silly Story Game", default language English (United
+  Kingdom), Game, Free, package `com.oursharedcode.funny1`; all three declarations ticked
+  (Developer Programme Policies, Play App Signing, US export laws); automatic protection left on.
+- **App access** is called "Sign-in details": nothing is restricted.
+- **Content rating:** No to every question, the four Miscellaneous ones included. Ratings given:
+  PEGI 3, ESRB Everyone, USK 0, IARC 3+, Australia G.
+- **Target audience:** the five age groups of item 5; the certification that the app, its SDKs
+  and ads included, complies with the laws on children ticked — it has no SDKs or ads and
+  collects nothing; the Ads page repeated item 3. **Store presence:** included in the Expert
+  Approved programme (owner decision (a)): free, and teachers' approval would bring a badge and
+  a place in Play's Kids tab; without it nothing changes but the badge.
+- **Data safety:** No; "Let users know about this commitment" (Families): Yes; no additional
+  badges. The preview showed no data collected or shared, the Families commitment and the
+  privacy link.
+- **Government apps:** No. **Financial features:** "My app doesn't provide any financial
+  features". **Health:** "My app doesn't have any health features".
+- **Store settings:** Game › Word, no tags; the email and website above (the website typed with
+  its `https://`), no phone; External marketing left on.
+- **Listing:** name 27/30 characters, full description 1647/4000; Play put the uploaded
+  screenshots in its own order, dragged back to end, round, handoff, home, thinking.
+- **AI asset declaration** (owner decision (b)): the icon and the en and ru feature graphics
+  labelled, the screenshots not — they show the running game.
+- **Translations:** all 21 imported from `translations.json`, zh-HK compared character for
+  character first; Russian's feature graphic and screenshots added by hand.
+- **Countries:** all 178.

@@ -56,9 +56,9 @@ means touching both:
    `apps/funny-family-site/src/render/locale.ts`. Every description that says how many
    languages the games have says the new number, in every language.
 10. If browsers report the language under a tag the primary-subtag rule misses, map it in
-    Funny One's `matchLanguageTag` (`src/i18n/uiLanguage.ts`) and the same rule in the landing
-    page's `render/headScript.ts` — e.g. `zh-HK`/`zh-MO` go to Cantonese (`yue`), while
-    `zh-TW` stays on Mandarin.
+    `matchLanguageTag` (`packages/shared/src/uiLanguage.ts`, which both games start from) and
+    the same rule in the landing page's `render/headScript.ts` — e.g. `zh-HK`/`zh-MO` go to
+    Cantonese (`yue`), while `zh-TW` stays on Mandarin.
 
 ## What review means
 

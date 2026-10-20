@@ -12,10 +12,10 @@
 // Play asks for a 32-bit PNG and Funny Multi's is palette-mode. The feature
 // graphic is the game's maskable icon in a circle, its name, a tagline and three
 // of the game's questions, taken from the catalogs; a screenshot of an opaque
-// page is 24-bit with no alpha, which is what Play asks for there. English is set
-// in Fredoka, the games' display font; Russian in the system font, as the games
-// set it (Fredoka has no Cyrillic) — so the Russian graphic depends on the
-// machine; these were made on Windows (Segoe UI).
+// page is 24-bit with no alpha, which is what Play asks for there. English,
+// French and Italian are set in Fredoka, the games' display font; the other
+// languages in the system font, as the games set them (Fredoka is Latin only) —
+// so those graphics depend on the machine; these were made on Windows.
 //
 // The images/ folders are gitignored: regenerate rather than commit.
 // Screenshots are scripts/store-screens.mjs; the texts, store/README.md.
@@ -34,6 +34,17 @@ const GAMES = {
     tagline: {
       en: 'Pass the phone. Build a silly story together.',
       ru: 'Один телефон по кругу — и нелепая история готова.',
+      // Machine drafts (B-3), worded after each listing's short description.
+      fr: 'Passez le téléphone. Inventez ensemble une histoire absurde.',
+      it: 'Passa il telefono. Inventate insieme una storia assurda.',
+      hi: 'फ़ोन बारी-बारी घुमाएँ। मिलकर बनाएँ एक अजीब कहानी।',
+      ta: 'ஃபோனைக் கைமாற்றி, ஒன்றாக அபத்தக் கதை உருவாக்குங்கள்.',
+      te: 'ఫోన్ చేతులు మార్చండి. కలిసి తమాషా కథ చేయండి.',
+      zh: '一部手机传着玩，一起编个荒唐故事。',
+      yue: '一部手機傳住玩，一齊作個荒唐故事。',
+      bn: 'ফোনটা হাতে হাতে দিন। সবাই মিলে বানান উদ্ভট গল্প।',
+      ko: '폰 하나를 돌려 가며 함께 엉뚱한 이야기를 만들어요.',
+      fa: 'گوشی را دست‌به‌دست کنید و با هم قصه‌ای عجیب بسازید.',
     },
   },
   'funny-multi': {
@@ -41,12 +52,40 @@ const GAMES = {
     tagline: {
       en: 'A phone each. Absurd stories and cartoons.',
       ru: 'У каждого свой телефон. Нелепые истории и картинки.',
+      fr: 'Un téléphone chacun. Histoires absurdes et dessins rigolos.',
+      it: 'Un telefono a testa. Storie assurde e vignette.',
+      hi: 'सबका अपना फ़ोन। अजीब कहानियाँ और कार्टून।',
+      ta: 'ஆளுக்கொரு ஃபோன். அபத்தக் கதைகளும் கார்ட்டூன்களும்.',
+      te: 'ఎవరి ఫోన్ వారిది. తమాషా కథలు, కార్టూన్లు.',
+      zh: '每人一部手机，荒唐故事配卡通。',
+      yue: '一人一部手機，荒唐故事配卡通。',
+      bn: 'প্রত্যেকের নিজের ফোন। উদ্ভট গল্প আর কার্টুন।',
+      ko: '한 사람에 폰 하나. 엉뚱한 이야기와 만화.',
+      fa: 'هر نفر یک گوشی. قصه‌های عجیب و کارتون.',
     },
   },
 };
-// Play locale → the catalog code its text comes from. The other listing
-// languages fall back to the default (en-GB) graphics.
-const LOCALES = { 'en-GB': 'en', 'ru-RU': 'ru' };
+// Play locale → the catalog code its text comes from (Step 88: the owner's pick
+// of ten more). The other listing languages fall back to the default (en-GB)
+// graphics.
+const LOCALES = {
+  'en-GB': 'en',
+  'ru-RU': 'ru',
+  'fr-FR': 'fr',
+  'it-IT': 'it',
+  'hi-IN': 'hi',
+  'ta-IN': 'ta',
+  'te-IN': 'te',
+  'zh-CN': 'zh',
+  'zh-HK': 'yue',
+  'bn-BD': 'bn',
+  'ko-KR': 'ko',
+  fa: 'fa',
+};
+const LATIN = new Set(['en', 'fr', 'it']);
+const RTL = new Set(['ar', 'fa', 'he']);
+// The page's lang picks the CJK glyphs: Cantonese is written in Hong Kong's.
+const HTML_LANG = { zh: 'zh-CN', yue: 'zh-HK' };
 // Who? Where? When? — short enough for one row in every language drawn here.
 const QUESTIONS = [0, 2, 3];
 const CHIP_COLOURS = [
@@ -68,7 +107,7 @@ const fredoka = await dataUri(
   'font/woff2',
 );
 
-function featureHtml({ badge, title, tagline, questions, latin }) {
+function featureHtml({ badge, title, tagline, questions, latin, lang, rtl }) {
   const chips = questions
     .map((q, i) => {
       const [bg, fg] = CHIP_COLOURS[i % CHIP_COLOURS.length];
@@ -76,13 +115,15 @@ function featureHtml({ badge, title, tagline, questions, latin }) {
       return `<span style="background:${bg};color:${fg};transform:rotate(${tilt}deg)">${escape(q)}</span>`;
     })
     .join('');
-  return `<!doctype html><html><head><meta charset="utf-8"><style>
+  return `<!doctype html><html lang="${lang}"${rtl ? ' dir="rtl"' : ''}><head><meta charset="utf-8"><style>
     @font-face {
       font-family: 'Fredoka'; font-weight: 500 700; src: url(${fredoka}) format('woff2');
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; width: 1024px; height: 500px; overflow: hidden; }
-    body { background: #fef3c7; color: #1f2937; position: relative;
+    /* keep-all: Chinese breaks at its punctuation, Korean at its spaces, not
+       mid-word; other scripts are unaffected. */
+    body { background: #fef3c7; color: #1f2937; position: relative; word-break: keep-all;
       font-family: ${latin ? "'Fredoka', " : ''}system-ui, sans-serif; }
     .dot { position: absolute; border-radius: 50%; }
     .badge { position: absolute; left: 64px; top: 50px; width: 400px; height: 400px;
@@ -111,11 +152,13 @@ function featureHtml({ badge, title, tagline, questions, latin }) {
 
 /**
  * Sizes the title: one line at 96–64 px if it fits, else the largest size
- * (≤ 80 px) that fits in two. False when the text block overflows its box.
+ * (≤ 80 px) that fits in two — each only while the whole text block fits its
+ * box too (Tamil's two-line title at 80 px did not). False when nothing fits.
  */
 function fitTitle() {
   const h1 = document.querySelector('h1');
-  const fits = () => h1.scrollWidth <= h1.clientWidth;
+  const text = document.querySelector('.text');
+  const fits = () => h1.scrollWidth <= h1.clientWidth && text.scrollHeight <= text.clientHeight;
   let done = false;
   h1.style.whiteSpace = 'nowrap';
   for (let size = 96; size >= 64 && !done; size -= 2) {
@@ -127,8 +170,7 @@ function fitTitle() {
     h1.style.fontSize = `${size}px`;
     done = fits() && h1.getBoundingClientRect().height <= size * 1.02 * 2 + 1;
   }
-  const text = document.querySelector('.text');
-  return done && text.scrollHeight <= text.clientHeight;
+  return done;
 }
 
 const browser = await chromium.launch();
@@ -165,7 +207,9 @@ try {
           title: own.home.title,
           tagline: tagline[code],
           questions: QUESTIONS.map((i) => questions[i]),
-          latin: code === 'en',
+          latin: LATIN.has(code),
+          lang: HTML_LANG[code] ?? code,
+          rtl: RTL.has(code),
         }),
         { waitUntil: 'load' },
       );

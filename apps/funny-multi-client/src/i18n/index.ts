@@ -13,6 +13,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { LANGUAGES, isLanguage } from '@funny/shared';
+import { initialLanguage } from './uiLanguage';
 
 // Auto-discovery via Vite's `import.meta.glob`: every `<code>.json` next to
 // this file is registered as an i18next resource. Eager mode bundles all of
@@ -45,7 +46,8 @@ if (missing.length > 0) {
 
 void i18n.use(initReactI18next).init({
   resources,
-  lng: 'en',
+  // The device's language, else English (uiLanguage.ts, Step 88).
+  lng: initialLanguage(),
   fallbackLng: 'en',
   // Our codes are lowercase (`pt-br`, `es-es`). Without this, i18next
   // rewrites them to `pt-BR`/`es-ES`, misses the resource key and silently

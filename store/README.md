@@ -9,8 +9,9 @@ content forms.
 | `<game>/listing/<locale>/title.txt`, `short_description.txt`, `full_description.txt` | the listing texts | yes |
 | `<game>/answers.md` | Store settings and App content answers, drafted for the owner | yes |
 | `<game>/listing/en-GB/images/icon.png` | the store icon | no — regenerate |
-| `<game>/listing/<en-GB, ru-RU>/images/featureGraphic.png`, `phoneScreenshots/` | the graphics | no — regenerate |
+| `<game>/listing/<locale>/images/featureGraphic.png`, `phoneScreenshots/`, for the 12 locales below | the graphics | no — regenerate |
 | `paste-sheet.html` | every text with a Copy button, for pasting into Play Console | no — regenerate |
+| `<game>/translations.json` | the 21 translations in one file, for Play Console's import | no — regenerate |
 
 `<game>` is `funny-one` or `funny-multi`.
 
@@ -21,13 +22,15 @@ From the repository's root:
 ```sh
 node scripts/funny-one-icons.mjs                 # Funny One's PNG icons, only after editing icon.svg
 node scripts/store-graphics.mjs                  # store icons and feature graphics
-npm run build && node scripts/store-screens.mjs  # phone screenshots, a few minutes
+npm run build && node scripts/store-screens.mjs  # phone screenshots, several minutes
 node scripts/store-listings.mjs                  # checks texts and images, writes paste-sheet.html
+                                                 # and <game>/translations.json
 ```
 
 `store-screens.mjs` runs Funny Multi's production server on port 3000 (the Docker app must not be
 running) and a picture stand-in on 5185; both are in the machine's port register. Funny One runs
-in-process. Names on the screenshots are made up; the room codes are random.
+in-process. Names on the screenshots are made up; the room codes are random. To retake some only,
+name the game, the Play locales or both: `node scripts/store-screens.mjs funny-one ko-KR`.
 
 ## Languages
 
@@ -45,12 +48,14 @@ listing starts with the game's Home title in that language, as the game shows it
 | es-419 | es-419 | zh-HK | yue | sw | sw |
 | pt-BR | pt-br | | | | |
 
-- **en-GB and ru-RU** were written for the store. They have their own feature graphic and
-  screenshots.
+- **en-GB and ru-RU** were written for the store.
 - **The other 20 are machine drafts** awaiting a native reader (B-3), uploaded all the same
-  (owner decision 2026-10-19: the games already ship these languages as drafts). They show the
-  default's graphics. Known points for the reader: Persian and Bengali use their own digits; the
-  Ukrainian Funny One title reads awkwardly.
+  (owner decision 2026-10-19: the games already ship these languages as drafts). Known points for
+  the reader: Persian and Bengali use their own digits; the Ukrainian Funny One title reads
+  awkwardly.
+- **Graphics:** en-GB, ru-RU and ten more have their own feature graphic and screenshots — fr-FR,
+  it-IT, hi-IN, ta-IN, te-IN, zh-CN, zh-HK, bn-BD, ko-KR and fa, the owner's pick of 2026-10-20
+  (Step 88); the ten taglines are machine drafts too. The other ten listings show the default's.
 - **Yoruba** has no Play locale, so a Yoruba phone sees the default, English.
 
 ## Play's rules
@@ -73,10 +78,22 @@ texts.
 
 1. **Main store listing**, default language English (United Kingdom): app name, short and full
    description; the app icon, the feature graphic, phone screenshots 1–5 in their numbered order.
-2. **Translations:** Manage translations → Add your own translations → the 21 other languages;
-   paste each one's three texts. Russian also gets its own feature graphic and screenshots.
-3. **Store settings and App content:** `answers.md` of that game.
-4. **Release:** the one rebuild of the app (`deploy/android*/README.md`, *Build*); for Funny One,
+2. **Translations:** on the default listing, *Import a file* (Play's "Import translations with
+   AI") and upload `<game>/translations.json`: the 21 other languages, each text verbatim under
+   Play's code and name. Play's AI only sorts the file into languages; before importing, open one
+   language's *Review* and compare it with the file (Funny One's zh-HK matched character for
+   character, 2026-10-20).
+3. **The other languages' pictures:** the eleven locales after en-GB in *Languages* (Graphics)
+   each get their own feature graphic and screenshots 1–5, in order. Through the Play Developer
+   API (B-25: the agent uploads them with the owner's service account, which works only once the
+   app's first AAB is in Play Console), or by hand as Russian was: pick the language, *Add
+   assets* → *Upload*, then drag into order. Then *Label AI-generated assets*: tick each new
+   feature graphic (owner decision (b), 2026-10-20: the icon and the feature graphics carry the
+   label, screenshots of the running game do not; Funny Multi's reveal and gallery screenshots
+   show Flux cartoons, so they carry it too).
+4. **Store settings and App content:** `answers.md` of that game.
+5. **Release:** the one rebuild of the app (`deploy/android*/README.md`, *Build*); for Funny One,
    deploy the site first (`deploy/ship-funny-one.sh`), because Bubblewrap's `update` downloads the
-   icons from it. Then Google's app-signing fingerprint into the app's `assetlinks.json`, and
-   uninstall the copy installed by hand before installing from Play.
+   icons from it. The first AAB goes in by hand: Test and release → Production → Create new
+   release. Then Google's app-signing fingerprint into the app's `assetlinks.json`, and uninstall
+   the copy installed by hand before installing from Play.

@@ -131,7 +131,9 @@ external wait time, elapsed time rather than effort).
   - [x] **T-FO-5.1a (S)** UI-language wiring: the Home picker switches the UI too (one picker,
         no UI/content split) and remembers the pick in `localStorage`; first boot takes the
         device locale (`navigator.languages`), else English. `i18n/uiLanguage.ts`.
-        *Step 32 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 32.*
+        *Step 32 (2026-09-25). See `docs/IMPLEMENTATION_LOG.md` Step 32.* *Step 88
+        (2026-10-20): the matching moved to `packages/shared/src/uiLanguage.ts`, which Funny
+        Multi now starts from too; the remembered pick stays here.*
   - [x] **T-FO-5.1b (M)** The 14 missing catalogs: 13 keys lifted verbatim (or near-verbatim) per
         language from Funny Multi's catalogs, 26 drafted and flagged `needs-<code>-review`;
         ported `catalogs.test.ts`. In-browser check across all 15 languages found and fixed two
@@ -249,13 +251,20 @@ the web app in Safari (`steering/tasks.md` B-14).*
         Equifax rename is pending, not blocking). ~~Real icons~~ and the listing's assets done 2026-10-19 (Step 87): the icon
         (`apps/funny-one-client/public/icon.svg`, chosen by the owner from ten creatures), and
         under `store/` the texts in 22 languages (en and ru written, 20 machine drafts with B-3),
-        graphics, screenshots and the App content answers (`store/funny-one/answers.md`). Owed:
-        the deploy that puts the icons live, then the entry in Play Console. ~~The FO-ID-1
+        graphics, screenshots and the App content answers (`store/funny-one/answers.md`).
+        ~~The deploy that puts the icons live~~ done 2026-10-20. ~~The entry in Play Console~~
+        done 2026-10-20 (Step 88; what was entered is in `answers.md`): the app, every App
+        content form, Store settings, the listing in 22 languages and all 178 countries; the
+        Android project regenerated with the new icons and 25 names, and the owner's signed AAB
+        built 2026-10-20. Ten more languages' graphics and screenshots made 2026-10-20 (B-25).
+        Owed: the release (Production → Create new release, the AAB), the ten languages'
+        pictures through the API and their AI labels (B-25), Send for review. ~~The FO-ID-1
         decision~~ taken 2026-10-06: the library was reviewed for a Families audience
         (T-FO-8.2, `docs/PICTURE_REVIEW.md`), so the store app keeps D-10's Internet pictures.
-        Then the store assets, content rating (the review is the evidence behind the
+        ~~Then the store assets, content rating (the review is the evidence behind the
         questionnaire's violence/blood/fear answers), Data
-        Safety form and release, as B-1e does for Funny Multi. With Play App Signing on, add
+        Safety form~~ entered 2026-10-20, and the release, as B-1e does for Funny Multi. With
+        Play App Signing on (its declaration ticked when the app was created, 2026-10-20), add
         Google's fingerprint to `deploy/origin-root/funny1/.well-known/assetlinks.json` and
         uninstall the sideloaded copy before the Play one replaces it (Step 59).
 

@@ -5310,9 +5310,22 @@ Gates:
 **Pushed 2026-10-20, 22:08** at the owner's word ("push"): `ffe8f75..812adcd`, Step 87's two
 record commits (`d53277b`, `9854704`) with it; CI passed (above).
 
+**Deployed 2026-10-20, 22:21, Funny One only** (owner: "deploy"): the agent ran
+`deploy/ship-funny-one.sh` (auto mode allowed it), and its checks all passed — the game, its
+service worker and manifest, the bare name's 301, `assetlinks.json`, the privacy page, the old
+address's forwarding and its retired service worker, Funny Multi's `/health`. Then curl: the
+live stylesheet is byte-identical to the build's and carries the Korean rule. **Funny Multi's
+deploy did not run:** `deploy/ship.sh` builds the image in the local Docker, and Docker Desktop
+has been down since 04:06 that morning. The external SSD that holds Docker's disk image had a
+USB reset and I/O errors then (System log: `disk` 153 and 51, `UASPStor` 129); Docker's WSL
+engine stopped with SIGBUS and does not start again, and Windows marks the drive's volume
+dirty, "Full Repair Needed". How to go on is the owner's decision (repair the drive, or restart
+Docker without it, or wait).
+
 **Owed, in order** (one op per message): (1) ~~the push, then CI~~ done 2026-10-20; (2) the
-deploy of both games at the owner's word — `deploy/ship.sh` and `deploy/ship-funny-one.sh` —
-which puts 1a and 3a live; (3) the owner's Op 71: Production → Create new release, the AAB, the
+deploy of both games at the owner's word — Funny One's done 2026-10-20 (above); Funny Multi's
+(`deploy/ship.sh`, which puts 3a and its half of 1a live) waits on the drive and Docker
+(above); (3) the owner's Op 71: Production → Create new release, the AAB, the
 release's name and notes, Save — not yet sent for review; (4) the owner's service account (2a,
 about six ops), then the agent's upload of Funny One's 60 images through the API; (5) the
 owner's AI labels on the ten new feature graphics, then Send for review; (6) Google's
@@ -5380,12 +5393,16 @@ Multi's entry, with its 60.
 
 ~~RESUME HERE (2026-10-20, after Step 88)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 88, pushed).** **Step 88 (B-25) is pushed
-(`ffe8f75..812adcd`) and CI passed (run `39412829297`); not deployed.** Both games have their Play pictures in ten more languages (the owner's pick), Korean
+~~RESUME HERE (2026-10-20, after Step 88, pushed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-20, after Step 88, pushed, Funny One live).** **Step 88 (B-25) is pushed
+(`ffe8f75..812adcd`), CI passed (run `39412829297`), and Funny One runs it since 22:21; Funny
+Multi's deploy waits on the local Docker, down since 04:06 when the external SSD holding its
+disk image had I/O errors — the owner's decision (Step 88's Deployed).** Both games have their Play pictures in ten more languages (the owner's pick), Korean
 lines break only between words in both games, and Funny Multi starts in the device's language,
 as Funny One does. Funny One's Play Console entry was made 2026-10-20 (Ops 4–69, recorded in
 `store/funny-one/answers.md`), and its signed AAB, version 1, is built. **Next, one op per
-message:** Step 88's Owed — the deploy of both games at the owner's word, then the owner's Op 71
+message:** Step 88's Owed — Funny Multi's deploy once Docker runs again, then the owner's Op 71
 (the first release, saved, not sent), the service account for the API upload, the AI labels,
 Send for review, the fingerprint. Then the same note as before:
 
@@ -5578,7 +5595,7 @@ the deploy (Step 72), on 2026-10-16 allowed both ship scripts again (Steps 73–
 scripts again (Step 79), then two `.env` lines and the game's container recreated on its image
 (Step 83), both ship scripts again (Steps 81–82) and, the owner asking for the op to be
 automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07), and on 2026-10-19 all three ship scripts
-(Step 85), and on 2026-10-20 `deploy/ship-funny-one.sh` (Step 87) — so try once when the owner
+(Step 85), and on 2026-10-20 `deploy/ship-funny-one.sh` (Steps 87 and 88) — so try once when the owner
 asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production

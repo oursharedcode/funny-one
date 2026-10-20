@@ -408,9 +408,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Decided on the way:* Funny Multi remembers no pick (its privacy policy keeps nothing on the
     device); a link's `?lang=` still wins, an invite's included; the create screen's flag starts
     on the interface's language.
-  - *Owed:* the deploy of both games; the service account, then the agent's upload of Funny
-    One's 60 images and the owner's AI labels (Funny Multi's 60 wait for its entry); the ten
-    taglines are machine drafts (with B-3); a real Korean or Persian phone, unseen; in Tamil's
+  - *Owed:* ~~the deploy of both games~~ done 2026-10-20 (Step 88); the service account, then
+    the agent's upload of Funny One's 60 images and the owner's AI labels (Funny Multi's 60 wait
+    for its entry); the ten taglines are machine drafts (with B-3); a real Korean or Persian
+    phone, unseen; in Tamil's
     reveal shot the Continue button covers the story's last two lines (accepted).
 
 ## Dependency notes

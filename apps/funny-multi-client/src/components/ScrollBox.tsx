@@ -80,6 +80,23 @@ export default function ScrollBox({
     // rather than left as decoration.)
   }, []);
 
+  // Step 91: a list that opens with one row pressed (the flag lists, which
+  // start in the phone's language) brings that row into view, centred. The
+  // viewport's own scrollTop is set, not scrollIntoView(), which would also
+  // scroll the page. Once, on mount: a later pick is on screen already, and a
+  // list that moved under a thumb would be worse.
+  useLayoutEffect(() => {
+    const view = viewportRef.current;
+    const row = view?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!view || !row) return;
+    const v = view.getBoundingClientRect();
+    const r = row.getBoundingClientRect();
+    if (r.top >= v.top && r.bottom <= v.bottom) return;
+    view.scrollTop += r.top - v.top - (v.height - r.height) / 2;
+    recompute();
+    // Mount only, like the observer above.
+  }, []);
+
   return (
     <div className={`relative ${className}`}>
       <div

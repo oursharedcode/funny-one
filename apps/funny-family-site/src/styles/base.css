@@ -70,6 +70,20 @@
   --display: var(--text);
 }
 
+/* Step 91: Korean puts spaces between its words, but the browser broke its
+   lines between any two syllables. keep-all breaks them only at the spaces,
+   and a word wider than its line still wraps. The language picker's links
+   name their own language, so every other named language is put back to
+   normal — Chinese and Japanese still break between characters. :where()
+   weighs nothing. The games' styles/index.css say the same (Step 88). */
+:where([lang]) {
+  word-break: normal;
+}
+:where([lang|='ko']) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 *,
 *::before,
 *::after {

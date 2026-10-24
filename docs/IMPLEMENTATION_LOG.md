@@ -5422,7 +5422,7 @@ the whole step: one tiny op at a time, explained in ≤ 50 words, automate first
   countries and the rest of the world, the 22 store listings, App content, form factors and the
   category. Publishing overview then read "Changes in review", with Play's quick checks (up to 14
   minutes) running first. The Console's Home, opened afterwards, still said "Changes not yet sent
-  for review": **whether the changes reached Google's reviewers is not confirmed.**
+  for review": **the owner confirmed 2026-10-25 that Publishing overview reads "In review".**
 
 **Decided on the way** (the agent's; any can be reversed):
 
@@ -5452,8 +5452,8 @@ Gates:
 - `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (Step 89).
 - CI: passed (run `40103040026`), pushed 2026-10-25 at the owner's word: `67b783c..816678f`.
 
-**Owed:** (1) the owner confirms on Publishing overview that the changes are "In review", then
-waits for Google (hours to days; mail comes to the developer account); (2) after approval: the
+**Owed:** (1) ~~the owner confirms on Publishing overview that the changes are "In review"~~ done
+2026-10-25; the owner waits for Google (hours to days; mail comes to the developer account); (2) after approval: the
 copy installed by hand is uninstalled, Funny One installed from Play, and it must open full
 screen with no URL bar (the fingerprint check); (3) Funny Multi's entry with its 60 pictures,
 its labels on the Review page again; (4) B-3's native review of the ten taglines and listings.
@@ -5530,9 +5530,7 @@ listings, with the ten languages' pictures put in through the API and the 14 fea
 and the icon labelled as AI-made; Google's app-signing fingerprint is in `assetlinks.json` and
 live.** Step 89 is the audit bump of the same night: six advisories fixed in range, lockfile
 only; production audit 0, the full audit lists only GHSA-rj75-hqrm-r3gf (the `braces` exception
-is gone). **Next, one op per message, the owner's:** (1) Play Console → Publishing overview:
-confirm the changes read "In review" — the Console's Home still said "Changes not yet sent for
-review" after the submit; if so, send them again; (2) wait for Google's decision (mail to the
+is gone). **Next, one op per message, the owner's:** (1) ~~Publishing overview: "In review"~~ confirmed by the owner 2026-10-25; (2) wait for Google's decision (mail to the
 developer account); (3) once approved: uninstall the copy installed by hand, install Funny One
 from Play, check it opens full screen with no URL bar. **The agent's, after that:** Funny
 Multi's Play entry with its 60 pictures (its labels go on the Review page again; a re-run of

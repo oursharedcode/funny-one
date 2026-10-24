@@ -5450,7 +5450,7 @@ Gates:
 - `npm test` outside the sandbox from `C:/Mark/Dev/funnyone`: 1611 passed (418, 384, 313, 170,
   273 and 53 by workspace), before and after Step 89's bump.
 - `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (Step 89).
-- CI: after the push.
+- CI: passed (run `40103040026`), pushed 2026-10-25 at the owner's word: `67b783c..816678f`.
 
 **Owed:** (1) the owner confirms on Publishing overview that the changes are "In review", then
 waits for Google (hours to days; mail comes to the developer account); (2) after approval: the
@@ -5524,7 +5524,7 @@ its labels on the Review page again; (4) B-3's native review of the ten taglines
 
 ~~RESUME HERE (2026-10-20, after Step 88, pushed, both games live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-25, after Steps 89–90).** **Funny One's first release is submitted to
+**RESUME HERE (2026-10-25, after Steps 89–90, pushed).** **Steps 89–90 are pushed (`67b783c..816678f`), CI passed (run `40103040026`).** **Funny One's first release is submitted to
 Google Play (Step 90, B-25): the AAB, version 1, in Production for 178 countries; the 22
 listings, with the ten languages' pictures put in through the API and the 14 feature graphics
 and the icon labelled as AI-made; Google's app-signing fingerprint is in `assetlinks.json` and

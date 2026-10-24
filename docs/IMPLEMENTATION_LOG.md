@@ -5348,6 +5348,116 @@ app-signing fingerprint into `deploy/origin-root/funny1/.well-known/assetlinks.j
 and the copy installed by hand uninstalled before installing from Play; (7) later, Funny
 Multi's entry, with its 60.
 
+## Step 89 — Audit: advisories published since Step 88 fixed in range, lockfile only (2026-10-25)
+
+`/endsession`'s `npm audit` listed 10 advisories (2 low, 6 moderate, 2 high), none from this
+session's work: fastify 5.12.2–5.12.5 (header validation bypass, GHSA-389g-gv7q-r4x8) and
+fast-uri in production; undici, vite, serialize-javascript and vitest's `@vitest/mocker` in
+development; and Tailwind 3's `postcss-selector-parser` (GHSA-rj75-hqrm-r3gf, accepted by ID
+since Step 67). The owner's word was "commit and push", taken as the go for the routine of Steps
+42 and 67 — a lockfile-only commit of its own before the task's.
+
+`npm audit fix` and `npm update` crash npm 10.9.3's arborist here (`edgesOut` of null in
+`#loadPeerSet`), as an earlier bump found, so the fix ran as `npx npm@11 audit fix`, in range, no
+`--force`. **No `package.json` changed.** The lockfile's 40 entries moved: fastify 5.12.5 →
+5.12.7, fast-uri 3.1.8 → 3.1.9 and 4.2.1 → 4.2.3, undici 7.30.0 → 7.30.1, vite 8.2.1 → 8.3.5
+(rolldown 1.2.3 → 1.2.15 with it), serialize-javascript 7.1.0 → 7.1.4, vitest and its six
+`@vitest/*` packages 4.1.11 → 4.1.12, postcss 8.5.26 → 8.5.31, and chai, nanoid, picomatch,
+tinyrainbow, postcss-selector-parser by a patch or minor each. Wider than the advisories alone:
+npm re-resolved what sat under them.
+
+**Verified:** `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (three
+entries: `postcss-selector-parser`, `postcss-nested`, `tailwindcss`; the fix is Tailwind 4).
+GHSA-vfj7-8cjw-p6xm is no longer reported although `braces` is still 3.0.3 — the exception it
+had can be dropped. Typecheck, lint, `format:check` clean; `npm test` outside the sandbox 1611
+passed (418 + 384 + 313 + 170 + 273 + 53) on the bumped tree. Commit `1245068`.
+
+## Step 90 (task B-25) — Funny One's first Play release: the ten languages' pictures through the API, the AI labels, Google's fingerprint, submitted (2026-10-21 → 24)
+
+**Owner decisions** (all "(a)" except where said): D1 release notes in English (UK) only, one line;
+D2 the service account gets store-presence permission only, releases stay with the owner; D3 Send
+for review only after the AI labels are on the ten new feature graphics; D4 Google's app-signing
+SHA-256 goes beside the upload key's in `assetlinks.json`, deployed before any install from Play;
+D5 commit the API upload although Play then sends the changes for review on its own; and the
+agent makes the Cloud project and the service account with gcloud. The owner's standing rule for
+the whole step: one tiny op at a time, explained in ≤ 50 words, automate first, wait for "done".
+
+**Shipped:**
+
+- *The service account* (2026-10-21): Cloud project `funny-play-listings`, account
+  `play-listings@…`, made by the agent with gcloud; its key is outside the repo (location in the
+  agent's memory). In Play Console it has View app information and View app quality (read
+  only), Manage store presence, and, from Op 74, Edit and delete draft apps — **removed again by
+  the owner 2026-10-25**, so it is back to store presence only.
+- *`scripts/store-upload.mjs`* (new): `GOOGLE_APPLICATION_CREDENTIALS=<key.json> node
+  scripts/store-upload.mjs <game> [--dry-run|--allow-review] [<locale>…]`. In one edit, for each
+  of the ten locales, it removes the feature graphic and phone screenshots Play holds, uploads
+  the local ones in numbered order, reads Play's list back and compares by hash, and commits
+  only when all match; an uncommitted edit is deleted. No dependency: the token is a JWT signed
+  with `node:crypto`. Commits first with `changesNotSentForReview=true`; Play refuses that for a
+  draft app ("must not be set"), and `--allow-review` then commits plainly (D5).
+- *The upload:* Funny One's 60 images (ten locales × a feature graphic and five screenshots) are
+  in Play, hashes matching. Two refusals on the way: the commit was 403 until the account had
+  Edit and delete draft apps; then 400 "must not be set", hence `--allow-review`.
+- *Google's fingerprint* (D4): the app-signing SHA-256 from Play Console's App signing page sits
+  beside the upload key's in `deploy/origin-root/funny1/.well-known/assetlinks.json`, deployed
+  with `bash deploy/ship-funny-one.sh`; Google's Digital Asset Links check for the app answers
+  `"linked": true` for it. The copy installed by hand is still the upload key's.
+- *The AI labels* (D3): there is no API for them (the Developer API's Image has only id, url,
+  sha1 and sha256), and the control is not where Help or the Asset library suggest. It is on the
+  store-listing edit page: Default store listing → Edit default listing → **Next** to the Review
+  page → **Label AI-generated assets**, a dialog with every asset, then **Label assets and
+  submit** and **Save**. Play had ticked eight graphics itself (they reuse the icon); the owner
+  ticked the other four (hi, ta, te, bn). All 14 feature graphics and the icon are labelled; the
+  screenshots are not (Step 87's decision b). Verified by reopening the dialog. Play shows the
+  label to EU users only, so far.
+- *The first release:* the AAB (version 1, 1,460,322 bytes, target SDK 36) is in Production,
+  178 countries, full rollout, with an en-GB release note. Three things stood in the way:
+  **Play automatic protection** wants minSdk 24 and this Bubblewrap app has 21 — the owner
+  switched it off for the release (rebuilding at 24 would drop Android 5 and 6); a first "Save as
+  draft" had kept a release with no bundle, so the bundle went in again by Edit release; and
+  Submit stayed grey on "1 issue", the **Advertising ID declaration**, answered **No** (no ads,
+  no SDK, no AD_ID permission; it fits an audience of 6 and over).
+- *Submitted 2026-10-24* by the owner: "Submit 33 changes for review" — Production 1 (1), 177
+  countries and the rest of the world, the 22 store listings, App content, form factors and the
+  category. Publishing overview then read "Changes in review", with Play's quick checks (up to 14
+  minutes) running first. The Console's Home, opened afterwards, still said "Changes not yet sent
+  for review": **whether the changes reached Google's reviewers is not confirmed.**
+
+**Decided on the way** (the agent's; any can be reversed):
+
+1. The script touches only the ten locales and only the feature graphic and phone screenshots;
+   en-GB and ru-RU, entered by hand, are not on its list.
+2. `--allow-review` is a flag, not a default: without it a draft app's edit is dropped, never
+   committed unlabelled.
+3. The hand-installed APK stays until Play's copy can be installed (it has the upload key's
+   signature, which `assetlinks.json` lists too).
+
+**Not changed:** the listing texts; Funny Multi's Play entry (not begun); the AAB; no app code.
+
+**Not seen:** Google's review; an install from Play; the app full-screen under Google's signing
+key (the DAL answer says it should be); the labels on an EU phone.
+
+**Learned, for the next game's release:** the AI label's real place (above); an API re-run
+re-creates the images and **drops their labels**, so tick them again afterwards; Play automatic
+protection must be off while minSdk is 21; a first release cannot be saved empty — upload the
+bundle before Save; the Advertising ID declaration blocks Submit for an app targeting Android 13
+and above. `store/README.md` and `store/funny-one/answers.md` now say so.
+
+Gates:
+
+- typecheck 0, lint 0, `format:check` clean.
+- `npm test` outside the sandbox from `C:/Mark/Dev/funnyone`: 1611 passed (418, 384, 313, 170,
+  273 and 53 by workspace), before and after Step 89's bump.
+- `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (Step 89).
+- CI: after the push.
+
+**Owed:** (1) the owner confirms on Publishing overview that the changes are "In review", then
+waits for Google (hours to days; mail comes to the developer account); (2) after approval: the
+copy installed by hand is uninstalled, Funny One installed from Play, and it must open full
+screen with no URL bar (the fingerprint check); (3) Funny Multi's entry with its 60 pictures,
+its labels on the Review page again; (4) B-3's native review of the ten taglines and listings.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -5412,7 +5522,24 @@ Multi's entry, with its 60.
 
 ~~RESUME HERE (2026-10-20, after Step 88, pushed, Funny One live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-20, after Step 88, pushed, both games live).** **Step 88 (B-25) is pushed
+~~RESUME HERE (2026-10-20, after Step 88, pushed, both games live)~~ — carried into this note.
+
+**RESUME HERE (2026-10-25, after Steps 89–90).** **Funny One's first release is submitted to
+Google Play (Step 90, B-25): the AAB, version 1, in Production for 178 countries; the 22
+listings, with the ten languages' pictures put in through the API and the 14 feature graphics
+and the icon labelled as AI-made; Google's app-signing fingerprint is in `assetlinks.json` and
+live.** Step 89 is the audit bump of the same night: six advisories fixed in range, lockfile
+only; production audit 0, the full audit lists only GHSA-rj75-hqrm-r3gf (the `braces` exception
+is gone). **Next, one op per message, the owner's:** (1) Play Console → Publishing overview:
+confirm the changes read "In review" — the Console's Home still said "Changes not yet sent for
+review" after the submit; if so, send them again; (2) wait for Google's decision (mail to the
+developer account); (3) once approved: uninstall the copy installed by hand, install Funny One
+from Play, check it opens full screen with no URL bar. **The agent's, after that:** Funny
+Multi's Play entry with its 60 pictures (its labels go on the Review page again; a re-run of
+`scripts/store-upload.mjs` drops them). The service account is back to store presence only.
+Then the same note as before:
+
+**Step 88 (B-25) is pushed
 (`ffe8f75..812adcd`), CI passed (run `39412829297`), and both games run it: Funny One since
 22:21 and Funny Multi since 23:21, after a repair of the external SSD that holds Docker's disk
 image (Step 88's Deployed).** Both games have their Play pictures in ten more languages (the owner's pick), Korean

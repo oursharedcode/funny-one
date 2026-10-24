@@ -15,7 +15,9 @@ Positioning: Google Play Families, "Everyone" (FO-ID-1), the opposite of Funny M
 1. **Privacy policy:** `https://www.funny1.oursharedcode.com/privacy`. The app links to it from
    Home (Step 85).
 2. **App access:** all functionality is available without special access (no login).
-3. **Ads:** No, the app contains no ads.
+3. **Ads:** No, the app contains no ads. **Advertising ID** (App content, required for an app
+   targeting Android 13 and above; Submit stays grey without it): No — no ads, no SDK, no AD_ID
+   permission.
 4. **Content rating** (the IARC questionnaire), category *Game*. The evidence for the content
    answers is `docs/PICTURE_REVIEW.md`: 1,245 library pictures read, 10,000 machine-scored, ten
    blocked in Funny One, and the built-in art judged fit for a Families audience as drawn.
@@ -84,3 +86,5 @@ the console asked beyond this file, or named differently:
 - **Translations:** all 21 imported from `translations.json`, zh-HK compared character for
   character first; Russian's feature graphic and screenshots added by hand.
 - **Countries:** all 178.
+- **Release** (2026-10-24): the AAB, version 1, in Production, full rollout; *Play automatic
+  protection* switched off (minSdk 21 < 24); release note in English (UK) only; Advertising ID No.

@@ -85,15 +85,22 @@ texts.
    character, 2026-10-20).
 3. **The other languages' pictures:** the eleven locales after en-GB in *Languages* (Graphics)
    each get their own feature graphic and screenshots 1–5, in order. Through the Play Developer
-   API (B-25: the agent uploads them with the owner's service account, which works only once the
-   app's first AAB is in Play Console), or by hand as Russian was: pick the language, *Add
-   assets* → *Upload*, then drag into order. Then *Label AI-generated assets*: tick each new
-   feature graphic (owner decision (b), 2026-10-20: the icon and the feature graphics carry the
-   label, screenshots of the running game do not; Funny Multi's reveal and gallery screenshots
-   show Flux cartoons, so they carry it too).
+   API (B-25: `scripts/store-upload.mjs`, the agent's, with the owner's service account — store
+   presence plus, while the app is a draft, *Edit and delete draft apps*; it works only once the
+   app's first AAB is in Play Console; `--allow-review` is needed while the app is a draft, since
+   Play then refuses to hold the changes back), or by hand as Russian was: pick the language,
+   *Add assets* → *Upload*, then drag into order. Then the AI labels, which **the API cannot
+   set** and which an API re-run **drops**: *Default store listing* → *Edit default listing* →
+   **Next** to the Review page → *Label AI-generated assets*, tick each feature graphic, *Label
+   assets and submit*, *Save* (owner decision (b), 2026-10-20: the icon and the feature graphics
+   carry the label, screenshots of the running game do not; Funny Multi's reveal and gallery
+   screenshots show Flux cartoons, so they carry it too). The Asset library has no such control.
 4. **Store settings and App content:** `answers.md` of that game.
 5. **Release:** the one rebuild of the app (`deploy/android*/README.md`, *Build*); for Funny One,
    deploy the site first (`deploy/ship-funny-one.sh`), because Bubblewrap's `update` downloads the
    icons from it. The first AAB goes in by hand: Test and release → Production → Create new
-   release. Then Google's app-signing fingerprint into the app's `assetlinks.json`, and uninstall
-   the copy installed by hand before installing from Play.
+   release. Before it saves: *Play automatic protection* off (it wants minSdk 24, a Bubblewrap app
+   has 21), the bundle uploaded before the first *Save* (an empty first release does not keep),
+   and App content's **Advertising ID** answered No. Then Google's app-signing fingerprint into
+   the app's `assetlinks.json`, and uninstall the copy installed by hand before installing from
+   Play.

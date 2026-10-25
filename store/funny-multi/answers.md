@@ -136,3 +136,45 @@ asked beyond this file, or named differently:
   of its cartoon, legible in the gallery and half under the 37 badge on the reveal. Retaken (owner
   decision (b)): the new reveal's cartoon ends below the screen; the gallery's keeps an
   illegible white scribble, mostly under the badge — kept (owner, 2026-10-25).
+
+## Entered 2026-10-25, second part (Step 93)
+
+- **Default listing:** *Grow users → Store presence → Store listings → Default store listing*
+  (there is no "Main store listing"); the texts from `paste-sheet.html#funny-multi-en-GB`, the
+  icon, the feature graphic, screenshots 1–5. **Save it through Next → Review → *Save*:** *Save
+  as draft* left it in Draft, and the release's preview then failed with "Add a full description
+  to save" and "Your app cannot be published yet", every text being in. Saved through Review,
+  with the AI radios still empty, it became "Ready to send for review".
+- **Translations:** *Import a file* on the listing page, `translations.json`. Russian's *Review*
+  matched the file word for word before the import (owner decision (a), Step 93); Play found
+  all 21 languages.
+- **Release:** Production → Create new release. *Play automatic protection* was **off** (the
+  point left open at Create app): the one enhancement active was "Releases are signed by Google
+  Play", and the protection tile offered *Get started*. Bundle version 1 (1), API 21+, target
+  SDK 36, 1.08 MB. Release note, drafted by the agent (owner decision (a), Step 93):
+  `<en-GB>First release: a party story game for 3 to 7 players, each on their own phone. Silly
+  answers become absurd stories and cartoons.</en-GB>`. All 178 countries. *Preview and confirm*
+  → *Save* put it in Publishing overview, not sent.
+- **Catalog Access:** the release page carries a banner on Play's catalogue access for other
+  app stores, on unless the developer opts out. Owner decision before *Submit*; recommended:
+  leave it on.
+- **Service account:** its permissions are set per app. Funny Multi was added beside Funny One
+  with store presence plus *Edit and delete draft apps* for the upload, which was then taken back
+  off: 4 permissions each.
+- **The eleven locales' pictures**, Russian's included (owner decision (b), Step 93):
+  `store-upload.mjs funny-multi`. The dry run found the 11 listings, all without pictures; the
+  run with `--allow-review` put up 66 images, each matching the local file by hash, and committed.
+  **That commit sent the whole app for review** (Publishing overview: "Changes in review" —
+  Production 1 (1), 177 countries and the rest of the world, the store listings), unlabelled and
+  before Funny One's verdict: unlike Funny One's in Step 90, this upload came after the release
+  was saved. The owner took it back with *Remove changes* (owner decision (a), Step 93); the 33
+  changes then waited under "Changes not yet submitted for review".
+- **AI labels:** 37 — the icon and the 12 feature graphics, which Play had ticked itself, and the
+  owner's 24 screenshots, the gallery and the reveal of every language (the two with a cartoon).
+  *Label assets and submit* saved them on its own (*Save* stayed grey) and sent nothing: the 33
+  changes stayed unsubmitted. Reopening the dialog showed all 37 kept.
+- **Google's app-signing fingerprint** (`E7:E3:…:28:98`) is in
+  `deploy/origin-root/funny37/.well-known/assetlinks.json` beside the upload key's. Read through
+  the Developer API, not copied from the console: `generatedApks` of version 1 names it as
+  `certificateSha256Hash`; the same call for Funny One returns the fingerprint Step 90 copied from
+  its App signing page.

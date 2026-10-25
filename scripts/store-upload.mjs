@@ -2,27 +2,32 @@
 
 // Uploads one game's per-language Play graphics through the Google Play
 // Developer API (Step 90, B-25): the feature graphic and phone screenshots of
-// the ten locales Step 88 added, which store-graphics.mjs and store-screens.mjs
-// make under store/<game>/listing/<locale>/images/:
+// the ten locales Step 88 added, and Funny Multi's Russian (Step 93), which
+// store-graphics.mjs and store-screens.mjs make under
+// store/<game>/listing/<locale>/images/:
 //
 //   GOOGLE_APPLICATION_CREDENTIALS=<key.json> node scripts/store-upload.mjs <game> [--dry-run|--allow-review] [<locale>…]
 //
 // The key is a service account's JSON key, kept outside the repository; the
 // account is a Play Console user with this one app's store-listing permission
-// only. Everything runs in one edit. Each named locale (else all ten) must have
+// only. Everything runs in one edit. Each named locale (else all the game's) must have
 // a listing and its files first, or nothing changes. Then, per locale and image
 // type, the images there are removed, the local ones uploaded in their numbered
 // order, and Play's list read back and compared with the local files by hash.
 // The edit is committed only when every one matches, and only if Play holds it
 // back from review: the owner labels the new feature graphics as AI-made in Play
 // Console and sends the app for review there. --allow-review commits it even
-// when Play would send it for review on its own, which it does for Funny One
-// while that is still a draft app (the owner's choice, Step 90). The service
+// when Play would send it for review on its own, which it does while the app is
+// a draft (the owner's choice, Step 90). Play then sends every change waiting in
+// the Console with it: with no release saved yet, as Funny One's, nothing could
+// go; with one, as Funny Multi's, the whole app went for review (Step 93), and
+// the owner took it back in Publishing overview with Remove changes. The service
 // account then also needs Play's "Edit and delete draft apps" permission while
 // the app is a draft. --dry-run changes nothing: it
 // shows what each listing holds now and whether that matches the local files.
-// en-GB and ru-RU are not on the list: they went in by hand and carry the
-// owner's labels.
+// en-GB is not on the list: it is the default listing, put in by hand. Nor is
+// Funny One's ru-RU: it went in by hand and carries the owner's labels, which a
+// run here drops. Funny Multi's ru-RU goes up here, before its labels (Step 93).
 //
 // The API takes edits only once the app's first bundle is in Play Console, and
 // an edit open here goes stale if the app is changed in Play Console meanwhile.
@@ -40,7 +45,7 @@ const UPLOAD = 'https://androidpublisher.googleapis.com/upload/androidpublisher/
 
 // Game → its Android project, whose twa-manifest.json names the package.
 const GAMES = { 'funny-one': 'deploy/android-funny1', 'funny-multi': 'deploy/android' };
-// Step 88's ten, in store-graphics.mjs's order.
+// Step 88's ten, in store-graphics.mjs's order, then Russian.
 const LOCALES = [
   'fr-FR',
   'it-IT',
@@ -52,27 +57,31 @@ const LOCALES = [
   'bn-BD',
   'ko-KR',
   'fa',
+  'ru-RU',
 ];
+// Locales a game's owner put in by hand and labelled: never touched here.
+const BY_HAND = { 'funny-one': ['ru-RU'], 'funny-multi': [] };
 const TYPES = ['featureGraphic', 'phoneScreenshots'];
 
 const args = process.argv.slice(2);
 const game = args.find((a) => a in GAMES);
+const own = LOCALES.filter((l) => !BY_HAND[game]?.includes(l));
 const dryRun = args.includes('--dry-run');
 const allowReview = args.includes('--allow-review');
-const only = args.filter((a) => LOCALES.includes(a));
+const only = args.filter((a) => own.includes(a));
 const unknown = args.filter(
-  (a) => !(a in GAMES) && a !== '--dry-run' && a !== '--allow-review' && !LOCALES.includes(a),
+  (a) => !(a in GAMES) && a !== '--dry-run' && a !== '--allow-review' && !own.includes(a),
 );
 const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 if (!game || unknown.length > 0 || !keyFile || (dryRun && allowReview)) {
   if (unknown.length > 0) console.error(`not a game, locale or flag here: ${unknown.join(' ')}`);
   if (!keyFile) console.error("GOOGLE_APPLICATION_CREDENTIALS must name the service account's key");
   console.error(
-    `usage: node scripts/store-upload.mjs ${Object.keys(GAMES).join('|')} [--dry-run|--allow-review] [${LOCALES.join('|')}…]`,
+    `usage: node scripts/store-upload.mjs ${Object.keys(GAMES).join('|')} [--dry-run|--allow-review] [${own.join('|')}…]`,
   );
   process.exit(2);
 }
-const locales = only.length > 0 ? only : LOCALES;
+const locales = only.length > 0 ? only : own;
 const { packageId } = JSON.parse(
   await readFile(join(ROOT, GAMES[game], 'twa-manifest.json'), 'utf8'),
 );
@@ -230,7 +239,9 @@ try {
         throw new Error(`${e.message}\nnot committed: Play would send it for review on its own`);
       }
       await api('POST', `${packageId}/edits/${edit.id}:commit`);
-      note = 'Play said it sends changes for review on its own: label the feature graphics now';
+      note =
+        'Play sends changes for review on its own: if Publishing overview shows the app in review, ' +
+        'Remove changes there, label the feature graphics, then send';
     }
     committed = true;
     console.log(`committed — ${note}`);

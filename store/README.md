@@ -76,8 +76,10 @@ From Play Console Help, *Add preview assets to showcase your app* (answer 986615
 The owner's, one op at a time, after the commit. Open `paste-sheet.html` in a browser for the
 texts.
 
-1. **Main store listing**, default language English (United Kingdom): app name, short and full
-   description; the app icon, the feature graphic, phone screenshots 1–5 in their numbered order.
+1. **Default store listing** (*Store presence → Store listings*), English (United Kingdom): app
+   name, short and full description; the app icon, the feature graphic, phone screenshots 1–5 in
+   their numbered order. Save it through **Next** → Review → *Save*: *Save as draft* leaves it in
+   Draft, and the release then fails with "Add a full description to save" (Step 93).
 2. **Translations:** on the default listing, *Import a file* (Play's "Import translations with
    AI") and upload `<game>/translations.json`: the 21 other languages, each text verbatim under
    Play's code and name. Play's AI only sorts the file into languages; before importing, open one
@@ -88,11 +90,13 @@ texts.
    API (B-25: `scripts/store-upload.mjs`, the agent's, with the owner's service account — store
    presence plus, while the app is a draft, *Edit and delete draft apps*; it works only once the
    app's first AAB is in Play Console; `--allow-review` is needed while the app is a draft, since
-   Play then refuses to hold the changes back), or by hand as Russian was: pick the language,
-   *Add assets* → *Upload*, then drag into order. Then the AI labels, which **the API cannot
+   Play then refuses to hold the changes back, and once a release is saved it sends the whole app
+   for review — *Remove changes* in Publishing overview takes it back (Step 93); Funny Multi's
+   Russian goes up the same way), or by hand as Funny One's Russian was: pick the language, *Add assets* → *Upload*, then
+   drag into order. Then the AI labels, which **the API cannot
    set** and which an API re-run **drops**: *Default store listing* → *Edit default listing* →
    **Next** to the Review page → *Label AI-generated assets*, tick each feature graphic, *Label
-   assets and submit*, *Save* (owner decision (b), 2026-10-20: the icon and the feature graphics
+   assets and submit*, then *Save* unless it is grey (owner decision (b), 2026-10-20: the icon and the feature graphics
    carry the label, screenshots of the running game do not; Funny Multi's reveal and gallery
    screenshots show Flux cartoons, so they carry it too). The Asset library has no such control.
 4. **Store settings and App content:** `answers.md` of that game.
@@ -102,5 +106,6 @@ texts.
    release. Before it saves: *Play automatic protection* off (it wants minSdk 24, a Bubblewrap app
    has 21), the bundle uploaded before the first *Save* (an empty first release does not keep),
    and App content's **Advertising ID** answered No. Then Google's app-signing fingerprint into
-   the app's `assetlinks.json`, and uninstall the copy installed by hand before installing from
+   the app's `assetlinks.json` (the App signing page, or the Developer API's `generatedApks` of
+   the version, its `certificateSha256Hash` — Step 93), and uninstall the copy installed by hand before installing from
    Play.

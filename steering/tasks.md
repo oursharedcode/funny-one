@@ -413,9 +413,12 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     upload of Funny One's 60 images, the AI labels, Google's fingerprint, the first release~~
     done and submitted 2026-10-21 → 24 (Step 90) — still owed: Google's decision, then the copy
     installed by hand swapped for Play's and the full-screen check; Funny Multi's entry — ~~the
-    app, App content, Store settings, its pictures retaken~~ done 2026-10-25 (Step 92) — still
-    owed: its listing, translations, release, 60 pictures, AI labels, fingerprint and Submit
-    (Step 92's Owed, in order); the ten taglines are machine drafts (with B-3); a real Korean or Persian
+    app, App content, Store settings, its pictures retaken~~ done 2026-10-25 (Step 92); ~~its
+    listing, translations, release, 66 pictures, AI labels, fingerprint~~ done 2026-10-26
+    (Step 93) — still owed: D5 (Catalog Access, decide before Submit) and Submit itself, both
+    held back until Google decides on Funny One; after approval, the copy installed by hand
+    swapped for Play's and the full-screen check, visits counted as "Android app" on `/stats/`;
+    the ten taglines are machine drafts (with B-3); a real Korean or Persian
     phone, unseen; in Tamil's
     reveal shot the Continue button covers the story's last two lines (accepted).
   - *Seen on the way, older than B-25, fixed in Step 91:* since Step 88 either game can start in

@@ -5596,6 +5596,68 @@ app-signing SHA-256 into `deploy/origin-root/funny37/.well-known/assetlinks.json
 once Google has decided on Funny One; (9) after approval: installed from Play, full screen with
 no URL bar, and its visits counted as "Android app" on `/stats/`.
 
+## Step 93 (task B-25) — Funny Multi's Play entry, second part: 66 pictures, AI labels, Google's fingerprint (2026-10-26)
+
+Picked up from Step 92's Owed, item (2) onward, in order. Owner decisions on the way: (a)
+Russian's translation compared with the file before importing; (b) the agent drafts the release
+note.
+
+**Shipped — the owner's, one op per message:**
+
+- *Default store listing:* English (United Kingdom), the texts, icon, feature graphic,
+  screenshots 1–5, saved through *Next → Review → Save* with both AI radios still empty. **Found
+  this session:** *Save as draft* leaves the listing in Draft and the release's preview then fails
+  with "Add a full description to save", every text being in; saving through Review is what the
+  console actually requires.
+- *Translations:* *Import a file*, `translations.json`; Russian's *Review* matched the file word
+  for word first (decision (a)); Play found all 21 languages.
+- *The release:* Production → Create new release, bundle version 1 (1), API 21+, target SDK 36,
+  1.08 MB, the agent's en-GB release note (decision (b)), all 178 countries. *Play automatic
+  protection* was already off — the only active enhancement was "Releases are signed by Google
+  Play". *Preview and confirm → Save* put it in Publishing overview, not sent.
+- *Service account:* Funny Multi given *Edit and delete draft apps* beside store presence, taken
+  back afterward — 4 permissions, as Funny One's.
+- *The AI labels,* after the pictures (below): Default store listing → Edit → Next → Review →
+  *Label AI-generated assets*. Play had ticked the icon and all 12 feature graphics itself; the
+  owner ticked 24 screenshots, the gallery and the reveal of every language (the two with a Flux
+  cartoon). *Label assets and submit* saved the 37 labels on its own — *Save* stayed grey — and
+  sent nothing; reopening the dialog showed all 37 kept.
+
+**Shipped — the agent's:**
+
+- *`scripts/store-upload.mjs`:* Funny Multi's Russian added to the ten locales the API upload
+  touches (Funny One's Russian, put in by hand and labelled, stays off the list).
+- *The upload:* `--allow-review`, all 11 locales, 66 images (a feature graphic and 5 screenshots
+  each), hashes matching, committed. **Fault found:** this commit sent the whole app for review —
+  Publishing overview read "Changes in review" (Production 1 (1), 177 countries and the rest of
+  the world, the 22 listings) — unlabelled and before Funny One's verdict. Unlike Funny One's
+  upload in Step 90, which landed before any release was saved and so had nothing to send, this
+  one landed after the release was saved, and Play's commit then sends everything waiting. The
+  owner took it back with *Remove changes* in Publishing overview (decision), which returned the
+  33 changes to "not yet submitted for review". The script's header comment and its closing
+  message now say so, and point to *Remove changes*.
+- *Google's fingerprint:* read through the Developer API rather than copied from the
+  Console — `generatedApks` of version 1 names `certificateSha256Hash`; the same call for Funny
+  One returns the fingerprint Step 90 took from its App signing page. Placed beside the upload
+  key's in `deploy/origin-root/funny37/.well-known/assetlinks.json`, deployed with
+  `bash deploy/ship.sh ubuntu@152.69.166.212` (the owner's, Docker and F: already up). The live
+  file matches the repo byte for byte; Google's Digital Asset Links check answers `"linked": true`
+  for both keys.
+- `store/funny-multi/answers.md`, `store/README.md`: this session's findings, including the
+  Save-path fault and the review fault above.
+
+**D5 (Catalog Access)** surfaced mid-session: a banner on the release page about Play's catalogue
+access for third-party app stores, on by default. Not yet decided; recommended: leave it on.
+
+**Owed:** D5 (Catalog Access) — decide before *Submit*; *Submit for review*, once Google has
+decided on Funny One; after approval, uninstall the hand-installed copy, install from Play, check
+full screen with no URL bar, check "Android app" visits on `/stats/`.
+
+**Verified:** typecheck, lint, `format:check` clean. `npm test` outside the sandbox: one
+`disconnect.socket.test.ts` flake (known, Steps 27 etc.), the server workspace rerun alone clean,
+313/313. `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (Step 67's
+exception; `braces`'s is gone). CI: after the push.
+
 ---
 
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
@@ -5666,16 +5728,25 @@ no URL bar, and its visits counted as "Android app" on `/stats/`.
 
 ~~RESUME HERE (2026-10-25, after Step 91)~~ — carried into this note.
 
-**RESUME HERE (2026-10-25, after Step 92).** **Step 92 (B-25) is the first part of Funny Multi's
-Play entry: the app "Funny Multi: Party Story Game" is created, all ten App content declarations
-and Store settings are entered (recorded in `store/funny-multi/answers.md`), the 12 languages'
-pictures are fresh, and the owner's signed AAB, version 1, is checked.** Pushed
-(`c1d8bbc..f8cae9b`), CI passed (run `40180228481`). The owner kept the new English screenshots
-(Owed (1)). **Next, one op per message:** Op 11, the main store listing in English (asked); then
-the rest of Step 92's Owed, in its order — translations, the release, the agent's upload of
-ten languages' pictures, the AI labels, the fingerprint and `ship.sh` — and *Submit for review*
-only once Google has decided on Funny One (still in review; mail comes to the developer
-account). Then the same note as before:
+~~RESUME HERE (2026-10-25, after Step 92)~~ — carried into this note.
+
+**RESUME HERE (2026-10-26, after Step 93).** **Step 93 (B-25) is the second part of Funny
+Multi's Play entry: the default store listing (English), the 21 translations imported and
+Russian compared first, the release saved (178 countries, full rollout, one en-GB note, automatic
+protection off), the eleven languages' pictures (Russian included) put up through the API, all 37
+AI labels (icon, 12 feature graphics, 24 screenshots), and Google's app-signing fingerprint live
+in `assetlinks.json`.** Committed as `818e2aa` plus this log's commit, pushed 2026-10-26 on the
+owner's word; CI: after the push. The listing must be saved through *Next → Review → Save*, not *Save as draft* (found this
+session: a draft default listing fails the release's preview). The agent's `--allow-review` upload
+sent the whole app for review once the release was already saved — unlike Funny One's in Step 90,
+before any release existed — and the owner took it back with *Remove changes* in Publishing
+overview before the labels went on; `store-upload.mjs`'s comment and closing message now warn of
+this. **D5 (Catalog Access) is still open** — recommended: leave the default (included) — and
+**decide it before *Submit for review***, which stays held back until Google decides on Funny One
+(still in review as of 2026-10-26). **Next, the owner's, once Google decides on Funny One:** (1)
+decide D5; (2) press *Submit*; (3) after approval — uninstall the hand-installed copy, install
+from Play, check full screen with no URL bar, check "Android app" visits on `/stats/`. Then the
+same note as before:
 
 **Step 91 fixed both faults Step 88 left behind: the
 pressed flag now scrolls into view in a 23-flag list in both games, and the landing page's Korean

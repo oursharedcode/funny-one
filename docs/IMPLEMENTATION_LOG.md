@@ -5519,6 +5519,85 @@ unseen; Funny Multi's Play entry, which waits on Google's decision for Funny One
 
 ---
 
+## Step 92 (task B-25) — Funny Multi's Play entry, first part: the app created, App content and Store settings entered, its pictures retaken (2026-10-25)
+
+Proposed by the agent at session start and brought forward: the RESUME note had Funny Multi's
+entry wait for Google's decision on Funny One, and the owner's decision (1) enters everything now
+and holds back only *Submit for review*. Taken on the owner's word ("all recommended / 3 - (b)
+fact").
+
+**Owner decisions** (in `store/funny-multi/answers.md`): (1) prepare and enter everything now,
+*Submit for review* only once Google has decided on Funny One; (2) and (3) the AI label on the
+icon (the monkey from SRC was drawn with AI — the owner's fact), on every feature graphic and on
+the reveal and gallery screenshots; (4) No to blood; (5) the release as Funny One's — Production,
+178 countries, full rollout, one release note in English (UK); (6) *Play automatic protection*
+off (minSdk 21), not a rebuild at minSdk 24. Two more on the way: (a) Content rating's "users
+interact" stays **Yes**, at the cost of USK 16 in Germany; (b) the English screenshots retaken
+for a made-up signature in the cartoon.
+
+**Shipped — the agent's:**
+
+- *Pictures:* both games' store icons and feature graphics remade, and Funny Multi's phone
+  screenshots retaken in all 12 languages, since Step 91 changed the client; `store-listings.mjs`
+  passes for every listing. English was retaken twice more — once for a reveal caught mid-fade
+  (below), once for the signature (decision (b)).
+- *`scripts/store-screens.mjs`, two faults the retake found.* (1) The run crashed after 7 of the
+  12 languages: three players asked the picture stand-in for the same uncached cartoon at once,
+  and one read the cache file while another's download was still writing it. Now one download
+  serves every request for a key, and the file is written aside and renamed into place. (2)
+  English's reveal was caught mid-fade, pale and slightly shrunk: the Android project's update
+  ran alongside and slowed the page past the fixed 1.5 s wait. The script now waits until the
+  cartoon's opacity is 1 with no animation running, then 1 s more for the 0.9 s flourish.
+- *Android project* regenerated for Funny Multi at version 1 (target SDK 36, minSdk 21, all 25
+  language names) — gitignored, and `twa-manifest.json` unchanged. The owner's signed AAB (built
+  12:37, 2,028,956 bytes) checked: version 1, signed with the upload key already in
+  `assetlinks.json`, no permission but its own receiver permission — no AD_ID, no ad SDK.
+- `store/funny-multi/answers.md`: the decisions, and what the console asked beyond the file
+  ("Entered 2026-10-25").
+
+**Entered by the owner in Play Console, Ops 1–10** (each in `answers.md`): the signed build;
+Create app; the privacy policy; Sign-in details ("Three players" — restricted, as QR codes and
+actions on other devices); Ads No; Content rating — every rating 3+ or all ages but **USK 16**
+("Increased communication risks"), all with "Users interact"; Target audience 13–15, 16–17 and
+18 and over; Data safety (collected, none shared: the name, ephemeral, for App functionality;
+approximate location and app interactions, kept, for Analytics; encrypted in transit; no
+accounts; deletion requests plain No); Advertising ID No; Government, Financial and Health none
+— all ten App content declarations actioned; Store settings (Game › Word, the privacy address,
+the website, no phone, External marketing on).
+
+**Corrected on the way:** two wrong steers of the agent's, put right in the session and in
+`answers.md` — the Advertising ID declaration waits under *App content → Need attention* before
+any bundle, not after the upload; Store settings is under *Grow users → Store presence*, not the
+tag icon (*Monetise with Play*). Two of the owner's first answers changed back to `answers.md`'s:
+"users interact" No → Yes, and app interactions' "ephemeral" Yes → No.
+
+**Not seen:** that Create app's *Turn off* for automatic protection was pressed — the release
+shows the switch again (Owed (4)).
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1617 passed** (418, 387, 313, 173, 273 and 53 by workspace; the script
+has no test of its own); `npm audit --omit=dev` 0; full `npm audit` only GHSA-rj75-hqrm-r3gf.
+CI: after the push.
+
+**Owed**, in order, one op per message: (1) the owner keeps the new English screenshots — the
+reveal's cartoon ends below the screen; the gallery's keeps an illegible white scribble, mostly
+under the 37 badge (keep, recommended) — or asks for a retake; (2) Op 11, the main store listing
+in English (UK): name, short and full description from `store/paste-sheet.html`, then the icon,
+the feature graphic and screenshots 1–5, dragged back into order if Play moves them, no AI
+labels yet; (3) the 21 translations from `store/funny-multi/translations.json`, one language
+compared first; Russian's pictures by hand; (4) the release: Production, the AAB uploaded before
+the first *Save*, automatic protection off, the release note, 178 countries, full rollout; (5)
+the agent's: the ten other languages' pictures through `scripts/store-upload.mjs` — the service
+account first gets *Edit and delete draft apps*, then a `--dry-run`, the run with
+`--allow-review`, and the permission taken back; (6) the owner's: the AI labels on the Review
+page — icon, every feature graphic, the reveal and gallery screenshots; (7) the agent's: Google's
+app-signing SHA-256 into `deploy/origin-root/funny37/.well-known/assetlinks.json`,
+`deploy/ship.sh` (Docker, so F:), the Digital Asset Links check; (8) *Submit for review* only
+once Google has decided on Funny One; (9) after approval: installed from Play, full screen with
+no URL bar, and its visits counted as "Android app" on `/stats/`.
+
+---
+
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
 
 ~~RESUME HERE (2026-10-14, after Step 72)~~ — carried into this note.
@@ -5585,7 +5664,20 @@ unseen; Funny Multi's Play entry, which waits on Google's decision for Funny One
 
 ~~RESUME HERE (2026-10-25, after Steps 89–90, pushed)~~ — carried into this note.
 
-**RESUME HERE (2026-10-25, after Step 91).** **Step 91 fixed both faults Step 88 left behind: the
+~~RESUME HERE (2026-10-25, after Step 91)~~ — carried into this note.
+
+**RESUME HERE (2026-10-25, after Step 92).** **Step 92 (B-25) is the first part of Funny Multi's
+Play entry: the app "Funny Multi: Party Story Game" is created, all ten App content declarations
+and Store settings are entered (recorded in `store/funny-multi/answers.md`), the 12 languages'
+pictures are fresh, and the owner's signed AAB, version 1, is checked.** Not yet pushed: Step 92
+waits for the owner's word. **Next, one op per message:** the owner keeps the new English
+screenshots (recommended) or asks for a retake, then Op 11, the main store listing in English;
+then the rest of Step 92's Owed, in its order — translations, the release, the agent's upload of
+ten languages' pictures, the AI labels, the fingerprint and `ship.sh` — and *Submit for review*
+only once Google has decided on Funny One (still in review; mail comes to the developer
+account). Then the same note as before:
+
+**Step 91 fixed both faults Step 88 left behind: the
 pressed flag now scrolls into view in a 23-flag list in both games, and the landing page's Korean
 keeps whole words, as both games' have since Step 88.** Step 91 is pushed (`6990396..a4fc2c5`),
 CI passed (run `40148477307`).

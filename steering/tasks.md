@@ -405,15 +405,17 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   the owner ticks the AI label on the ten new feature graphics; (3a) Funny Multi opened in
   English on every device, its Android app included — it now starts in the device's language,
   as Funny One does. **Code done 2026-10-20 (Step 88); Funny One's release submitted
-  2026-10-24 (Step 90).**
+  2026-10-24 (Step 90); Funny Multi's entry begun 2026-10-25 (Step 92).**
   - *Decided on the way:* Funny Multi remembers no pick (its privacy policy keeps nothing on the
     device); a link's `?lang=` still wins, an invite's included; the create screen's flag starts
     on the interface's language.
   - *Owed:* ~~the deploy of both games~~ done 2026-10-20 (Step 88); ~~the service account, the
     upload of Funny One's 60 images, the AI labels, Google's fingerprint, the first release~~
     done and submitted 2026-10-21 → 24 (Step 90) — still owed: Google's decision, then the copy
-    installed by hand swapped for Play's and the full-screen check; Funny Multi's entry and its
-    60 pictures; the ten taglines are machine drafts (with B-3); a real Korean or Persian
+    installed by hand swapped for Play's and the full-screen check; Funny Multi's entry — ~~the
+    app, App content, Store settings, its pictures retaken~~ done 2026-10-25 (Step 92) — still
+    owed: its listing, translations, release, 60 pictures, AI labels, fingerprint and Submit
+    (Step 92's Owed, in order); the ten taglines are machine drafts (with B-3); a real Korean or Persian
     phone, unseen; in Tamil's
     reveal shot the Continue button covers the story's last two lines (accepted).
   - *Seen on the way, older than B-25, fixed in Step 91:* since Step 88 either game can start in

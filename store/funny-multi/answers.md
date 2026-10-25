@@ -76,7 +76,63 @@ Positioning: 12+, never in the Families program (FM-ID-2, FM-APP-1).
   features" (the gifts are on the website only). **Health:** "My app doesn't have any health
   features".
 - **AI asset declaration:** label the feature graphics (drawn by the agent, as Funny One's were —
-  owner decision (b)) and the reveal and gallery screenshots, which show Flux cartoons. Whether
-  the monkey icon (from SRC) was drawn with AI is not known here: ask the owner first.
+  owner decision (b)) and the reveal and gallery screenshots, which show Flux cartoons. The
+  monkey icon (from SRC) was drawn with AI (the owner, 2026-10-25): label it too.
 - **Translations:** import `translations.json` from this folder, then add the pictures of the
   eleven locales that have their own (`store/README.md`, Upload).
+
+## Owner decisions for the entry (2026-10-25, Step 92)
+
+All as recommended in the session's plan: (1) prepare and enter everything now, and press
+*Submit for review* only once Google has decided on Funny One; (2) and (3) the AI labels above —
+icon, every feature graphic, the reveal and gallery screenshots; (4) content rating: **No** to
+blood (item 4); (5) the release as Funny One's — Production, all 178 countries, full rollout, one
+release note in English (UK); (6) *Play automatic protection* off for the release (minSdk 21 <
+24), not a rebuild at minSdk 24, which would drop Android 5 and 6.
+
+## Entered 2026-10-25
+
+The owner is entering the above in Play Console, one op at a time (Step 92). What the console
+asked beyond this file, or named differently:
+
+- **Create app:** name "Funny Multi: Party Story Game", English (United Kingdom), Game, Free.
+  The form now has two declarations, Developer Programme Policies and US export laws (Funny One's
+  had three): both ticked. Its *automatic protection* box has a **Turn off** link (decision 6);
+  that it was pressed is not yet seen — check it at the release.
+- **Sign-in details** (item 2): "Is any part of your app restricted?" **Yes** — Play's list names
+  "referral codes and/or QR codes" and "actions to be carried out on another device". One entry,
+  "Three players", no user name or password, and in "Any other information": "No account or
+  login. A game needs 3 players. Phone 1: open the app, type a name, tap Create room, then Copy
+  link (or let others scan the QR code). Open that link on 2 more phones or browser tabs, type a
+  name, tap Join room. Phone 1 taps Start Game." The first *Add* answered "Your changes couldn't
+  be saved", with a field higher in the dialog marked; the second went through. The toggle that
+  lets Google's test devices use the details was left on.
+- **Ads:** No. The *Advertising ID* declaration is not on the Dashboard's list; it waits under
+  *App content → Need attention*, before any bundle is uploaded: No.
+- **Content rating:** No to every question but the first Miscellaneous one, "interact or exchange
+  content with other users through … text": **Yes** — the nickname is free text, up to 20
+  characters, unfiltered, seen by everyone in the room. Ratings given: PEGI 3, ESRB Everyone,
+  IARC 3+, Australia G ("Online interactivity and chat"), Brazil L, South Korea All ages, Taiwan
+  General public, Saudi Arabia 3, Russia 3+ — and **USK 16** in Germany ("Increased
+  communication risks"), the one cost of the Yes: a German teen under 16 whose parents set an age
+  limit cannot install. Every rating carries "Users interact". Kept as Yes (owner decision (a),
+  2026-10-25): a No would understate what the app does, and Play may reject an app for
+  misrepresenting its content.
+- **Target audience:** 13–15, 16–17, 18 and over (item 5). With no group under 13, Play skipped
+  its App details, Ads and Store presence pages and went straight to the summary — no question
+  about appeal to children was asked.
+- **Data safety:** as item 8. Account creation: "My app does not allow users to create an
+  account", and no login with outside accounts. Deletion: plain No — not "No, but user data is
+  automatically deleted within 90 days", which the 13-month totals would make false. No badges.
+  Each data type has a dialog: collected (not shared), ephemeral, required, purpose. The preview
+  shows no data shared; Location and App activity collected; encrypted in transit. The name is
+  absent, as Play hides data processed ephemerally from the listing.
+- **Advertising ID:** No. **Government apps:** No. **Financial features:** none. **Health:**
+  none. App content then listed all ten declarations as actioned.
+- **Store settings** are under *Grow users → Store presence → Store settings* (the tag icon is
+  *Monetise with Play*, not this). Game › Word was already set at Create app; the email and
+  website above, no phone; External marketing left on.
+- **Screenshots:** the first en-GB set showed a made-up signature, "@Luinhapzzq", in the corner
+  of its cartoon, legible in the gallery and half under the 37 badge on the reveal. Retaken (owner
+  decision (b)): the new reveal's cartoon ends below the screen; the gallery's keeps an
+  illegible white scribble, mostly under the badge.

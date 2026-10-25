@@ -26,7 +26,7 @@
 
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { createServer as createHttpServer } from 'node:http';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -177,7 +177,7 @@ async function funnyOne(browser) {
 async function startPictureStandIn() {
   const { default: worker } = await import(pathToFileURL(join(ROOT, 'cloudflare/worker.js')).href);
   await mkdir(PICTURE_CACHE, { recursive: true });
-  const bytes = async (key) => {
+  const load = async (key) => {
     const file = join(PICTURE_CACHE, key.replace(/^i\//, ''));
     try {
       return await readFile(file);
@@ -185,9 +185,21 @@ async function startPictureStandIn() {
       const res = await fetch(`${LIBRARY}/${key}`);
       if (!res.ok) return null;
       const body = Buffer.from(await res.arrayBuffer());
-      await writeFile(file, body);
+      // Written aside and renamed, so no read ever sees half a file (Step 92).
+      await writeFile(`${file}.part`, body);
+      await rename(`${file}.part`, file);
       return body;
     }
+  };
+  // Three players ask for the same new cartoon at once: one fetch serves them all.
+  const loading = new Map();
+  const bytes = (key) => {
+    let pending = loading.get(key);
+    if (!pending) {
+      pending = load(key).finally(() => loading.delete(key));
+      loading.set(key, pending);
+    }
+    return pending;
   };
   // A PNG's width and height are the IHDR chunk's first two fields.
   const stored = (key, body, withBody) => ({
@@ -344,7 +356,19 @@ async function funnyMulti(browser) {
       const cartoon = teller.locator('img[alt]').first();
       await cartoon.waitFor({ timeout: 45_000 });
       await cartoon.evaluate((img) => img.decode());
-      await teller.waitForTimeout(1500);
+      // The cartoon fades and grows in once loaded; a busy machine can still be
+      // mid-fade after a fixed wait (Step 92's first en-GB shot), so wait for its end.
+      await cartoon.evaluate(
+        (img) =>
+          new Promise((done) => {
+            const check = () =>
+              getComputedStyle(img).opacity === '1' && img.getAnimations().length === 0
+                ? done()
+                : requestAnimationFrame(check);
+            check();
+          }),
+      );
+      await teller.waitForTimeout(1000); // the flourish's 0.9 s burst, begun with the fade, is gone
       shots.reveal = await teller.screenshot();
       for (const page of pages) {
         await page.getByRole('button', { name: cat.reveal.continue, exact: true }).click();

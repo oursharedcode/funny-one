@@ -5460,6 +5460,64 @@ its labels on the Review page again; (4) B-3's native review of the ten taglines
 
 ---
 
+## Step 91 (task B-25) — Two faults Step 88 left behind: the pressed flag scrolled into view, the landing page's Korean kept whole (2026-10-25)
+
+Proposed by the agent at session start — both already named on the "Still open" list since Step
+88 — and taken on the owner's word ("Decisions for you as owner: all recommended / go").
+
+**Shipped:**
+
+- *Pressed flag in view:* since Step 88 either game can start in the phone's own language, and
+  the flag list is a scroll box over 23 languages, a Korean, Swahili or Yoruba phone opened with
+  its own flag below the fold — no sign it was picked. `ScrollBox.tsx` (both clients) now centres
+  the pressed row into view once, when the list mounts, through the box's own `scrollTop` so the
+  page itself never moves; it runs only if the row starts out of view, so picking a different
+  flag later never yanks the list.
+- *Landing page Korean:* Step 88 gave both games' `styles/index.css` a `keep-all` rule for Korean
+  but not `apps/funny-family-site/`, so `www.funny-family.oursharedcode.com` still broke Korean
+  mid-syllable. The same rule, same comment, now in `apps/funny-family-site/src/styles/base.css`;
+  the language picker's own Chinese and Japanese names are put back to normal breaking, so they
+  still wrap between characters.
+- Tests: a new `ScrollBox.test.tsx` in each client — a row below the fold, a row already visible,
+  nothing pressed.
+
+**Decided on the way** (the agent's; either can be reversed):
+
+1. Fix both now, before anything on Funny Multi's Play entry — a rejection on Funny One's review
+   would cost the same roughly 70 Console operations twice on Funny Multi, so better to learn it
+   first.
+2. The flag list centres the pressed row only when it opens, not on every later pick — centring
+   on every pick could yank the list under a thumb mid-scroll.
+
+**Verified in a browser** (Chromium, 390 px wide, `.screens/step91-check.mjs`, gitignored): a
+Korean phone opens with KR already in view in both games (the list scrolled 466 px); a Swahili
+phone opens with KE in view (scrolled 1162 px) — Yoruba sits last in the same list, so this
+covers it too; the landing page in Korean computes `keep-all` on the page and its heading, and
+the picker's Chinese and Japanese links compute `normal`. Ports 5183, 5184 and 5187 stopped
+afterward. **Not seen:** Safari — `Playwright.exe` and `WebKitWebProcess.exe` are still missing
+from `webkit-2359`, most likely in Avast's quarantine (Step 72).
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1617 passed** (418, 387, 313, 173, 273 and 53 by workspace, the 6 new
+tests included); `npm audit --omit=dev` 0; full `npm audit` only GHSA-rj75-hqrm-r3gf (Step 89's
+exception). CI: after the push. Commit `232a6fc`.
+
+**Deployed 2026-10-25, about 10:20–10:41 AEDT** (the owner's word: deploy all three): Funny One
+and the landing page first, by `deploy/ship-funny-one.sh` and `deploy/ship-funny-family.sh` —
+neither needs Docker — and every check through Caddy passed; the live JavaScript and stylesheet
+carry the flag-list fix and the Korean rule. Funny Multi's `ship.sh` builds an image named after
+the last commit, so it waited for Step 91 to be committed (`232a6fc`) before running: `/health`
+`{"ok":true}`, the privacy page and `assetlinks.json` served by Caddy, the old `/funny37-game`
+address still forwards, the country table reloaded (710,834 rows, 2.8 s), the visit counts kept
+(every day since 2026-10-13), and the running image is `funny-multi:232a6fc` — the deployed code
+matches the committed name.
+
+**Owed:** none from this step — both faults are fixed, tested, deployed and checked live.
+Unrelated and already open: a native reviewer for Korean, Swahili and Yoruba (B-3); Safari, still
+unseen; Funny Multi's Play entry, which waits on Google's decision for Funny One.
+
+---
+
 ~~RESUME HERE (2026-10-13, after Step 71)~~ — carried into this note.
 
 ~~RESUME HERE (2026-10-14, after Step 72)~~ — carried into this note.
@@ -5524,7 +5582,23 @@ its labels on the Review page again; (4) B-3's native review of the ten taglines
 
 ~~RESUME HERE (2026-10-20, after Step 88, pushed, both games live)~~ — carried into this note.
 
-**RESUME HERE (2026-10-25, after Steps 89–90, pushed).** **Steps 89–90 are pushed (`67b783c..816678f`), CI passed (run `40103040026`).** **Funny One's first release is submitted to
+~~RESUME HERE (2026-10-25, after Steps 89–90, pushed)~~ — carried into this note.
+
+**RESUME HERE (2026-10-25, after Step 91).** **Step 91 fixed both faults Step 88 left behind: the
+pressed flag now scrolls into view in a 23-flag list in both games, and the landing page's Korean
+keeps whole words, as both games' have since Step 88.** Commit `232a6fc`, not yet pushed.
+**Deployed 2026-10-25, about 10:20–10:41 AEDT, all three** (the owner's word: deploy all three):
+Funny One and the landing page first, Funny Multi last once Step 91 was committed, so its image
+is named `232a6fc`; all three checked live (`/health`, the privacy page, `assetlinks.json`, the
+old address's forwarding, the country table's 710,834 rows in 2.8 s, the visit counts kept since
+2026-10-13). **Next, the owner's:** wait for Google's decision on Funny One's review (mail to the
+developer account); once approved, uninstall the hand-installed copy, install Funny One from
+Play, check it opens full screen with no URL bar. **The agent's, after that:** Funny Multi's Play
+entry with its 60 pictures — the AI labels go back on the Review page (an API re-run drops them),
+and the service account needs *Edit and delete draft apps* again, then back to store presence
+only afterward. Then the same note as before:
+
+**Steps 89–90 are pushed (`67b783c..816678f`), CI passed (run `40103040026`).** **Funny One's first release is submitted to
 Google Play (Step 90, B-25): the AAB, version 1, in Production for 178 countries; the 22
 listings, with the ten languages' pictures put in through the API and the 14 feature graphics
 and the icon labelled as AI-made; Google's app-signing fingerprint is in `assetlinks.json` and
@@ -5804,11 +5878,11 @@ for GHSA-rj75-hqrm-r3gf); B-1b — whether the landing page should host one priv
 instead of each game's own root; a `GET /api/stats` on the landing page's host answers with
 Funny Multi's app (harmless, Step 72); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step
 47); a player's report of an unfit library picture goes on `BLOCKED_PICTURES` the same way
-(Step 68); since Step 88 either game can start in a language low in its flag list, and the
-pressed flag is not scrolled into view; the landing page has no Korean `keep-all` rule, so its
-Korean may still break mid-word (Step 88 changed only the games); a multi-language room's
-invite (`&multi=1`) also names the room's language (`LobbyScreen.tsx:52`), which wins over the
-joiner's phone, so a Korean phone opens the join screen in the room's language and its player
-picks Korean by hand — whether such an invite should leave the joiner's phone language instead
-(Step 88).
+(Step 68); since Step 88 either game can start in a language low in its flag list, and ~~the
+pressed flag is not scrolled into view~~ fixed in Step 91; ~~the landing page has no Korean
+`keep-all` rule, so its Korean may still break mid-word (Step 88 changed only the games)~~ fixed
+in Step 91; a multi-language room's invite (`&multi=1`) also names the room's language
+(`LobbyScreen.tsx:52`), which wins over the joiner's phone, so a Korean phone opens the join
+screen in the room's language and its player picks Korean by hand — whether such an invite should
+leave the joiner's phone language instead (Step 88).
 

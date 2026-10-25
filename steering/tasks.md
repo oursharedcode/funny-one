@@ -416,6 +416,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     60 pictures; the ten taglines are machine drafts (with B-3); a real Korean or Persian
     phone, unseen; in Tamil's
     reveal shot the Continue button covers the story's last two lines (accepted).
+  - *Seen on the way, older than B-25, fixed in Step 91:* since Step 88 either game can start in
+    a language low in the 23-flag list, with the pressed flag below the fold and no sign it was
+    picked — `ScrollBox.tsx` (both clients) now centres it into view once, when the list opens.
+    The landing page's Korean (Step 88 changed only the games) now has the same `keep-all` rule.
 
 ## Dependency notes
 

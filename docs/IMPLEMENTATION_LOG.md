@@ -5500,7 +5500,8 @@ from `webkit-2359`, most likely in Avast's quarantine (Step 72).
 Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
 `C:/Mark/Dev/funnyone`: **1617 passed** (418, 387, 313, 173, 273 and 53 by workspace, the 6 new
 tests included); `npm audit --omit=dev` 0; full `npm audit` only GHSA-rj75-hqrm-r3gf (Step 89's
-exception). CI: after the push. Commit `232a6fc`.
+exception). CI: passed (run `40148477307`), pushed 2026-10-25 at the owner's word:
+`6990396..a4fc2c5`.
 
 **Deployed 2026-10-25, about 10:20–10:41 AEDT** (the owner's word: deploy all three): Funny One
 and the landing page first, by `deploy/ship-funny-one.sh` and `deploy/ship-funny-family.sh` —
@@ -5586,7 +5587,8 @@ unseen; Funny Multi's Play entry, which waits on Google's decision for Funny One
 
 **RESUME HERE (2026-10-25, after Step 91).** **Step 91 fixed both faults Step 88 left behind: the
 pressed flag now scrolls into view in a 23-flag list in both games, and the landing page's Korean
-keeps whole words, as both games' have since Step 88.** Commit `232a6fc`, not yet pushed.
+keeps whole words, as both games' have since Step 88.** Step 91 is pushed (`6990396..a4fc2c5`),
+CI passed (run `40148477307`).
 **Deployed 2026-10-25, about 10:20–10:41 AEDT, all three** (the owner's word: deploy all three):
 Funny One and the landing page first, Funny Multi last once Step 91 was committed, so its image
 is named `232a6fc`; all three checked live (`/health`, the privacy page, `assetlinks.json`, the

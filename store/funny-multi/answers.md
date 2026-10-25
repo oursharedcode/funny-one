@@ -135,4 +135,4 @@ asked beyond this file, or named differently:
 - **Screenshots:** the first en-GB set showed a made-up signature, "@Luinhapzzq", in the corner
   of its cartoon, legible in the gallery and half under the 37 badge on the reveal. Retaken (owner
   decision (b)): the new reveal's cartoon ends below the screen; the gallery's keeps an
-  illegible white scribble, mostly under the badge.
+  illegible white scribble, mostly under the badge — kept (owner, 2026-10-25).

@@ -5577,11 +5577,11 @@ shows the switch again (Owed (4)).
 Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
 `C:/Mark/Dev/funnyone`: **1617 passed** (418, 387, 313, 173, 273 and 53 by workspace; the script
 has no test of its own); `npm audit --omit=dev` 0; full `npm audit` only GHSA-rj75-hqrm-r3gf.
-CI: after the push.
+CI: passed (run `40180228481`), pushed 2026-10-25 at the owner's word: `c1d8bbc..f8cae9b`.
 
-**Owed**, in order, one op per message: (1) the owner keeps the new English screenshots — the
+**Owed**, in order, one op per message: (1) ~~the owner keeps the new English screenshots — the
 reveal's cartoon ends below the screen; the gallery's keeps an illegible white scribble, mostly
-under the 37 badge (keep, recommended) — or asks for a retake; (2) Op 11, the main store listing
+under the 37 badge (keep, recommended) — or asks for a retake~~ kept (owner, 2026-10-25); (2) Op 11, the main store listing
 in English (UK): name, short and full description from `store/paste-sheet.html`, then the icon,
 the feature graphic and screenshots 1–5, dragged back into order if Play moves them, no AI
 labels yet; (3) the 21 translations from `store/funny-multi/translations.json`, one language
@@ -5669,10 +5669,10 @@ no URL bar, and its visits counted as "Android app" on `/stats/`.
 **RESUME HERE (2026-10-25, after Step 92).** **Step 92 (B-25) is the first part of Funny Multi's
 Play entry: the app "Funny Multi: Party Story Game" is created, all ten App content declarations
 and Store settings are entered (recorded in `store/funny-multi/answers.md`), the 12 languages'
-pictures are fresh, and the owner's signed AAB, version 1, is checked.** Not yet pushed: Step 92
-waits for the owner's word. **Next, one op per message:** the owner keeps the new English
-screenshots (recommended) or asks for a retake, then Op 11, the main store listing in English;
-then the rest of Step 92's Owed, in its order — translations, the release, the agent's upload of
+pictures are fresh, and the owner's signed AAB, version 1, is checked.** Pushed
+(`c1d8bbc..f8cae9b`), CI passed (run `40180228481`). The owner kept the new English screenshots
+(Owed (1)). **Next, one op per message:** Op 11, the main store listing in English (asked); then
+the rest of Step 92's Owed, in its order — translations, the release, the agent's upload of
 ten languages' pictures, the AI labels, the fingerprint and `ship.sh` — and *Submit for review*
 only once Google has decided on Funny One (still in review; mail comes to the developer
 account). Then the same note as before:

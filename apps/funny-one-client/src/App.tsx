@@ -39,6 +39,7 @@ import {
   type Seat,
 } from './game/roundRobin';
 import type { PictureSource } from './pictureSource';
+import { setReloadSafe } from './swReload';
 import type { AuthoredLanguage, OptionId } from '@funny/shared';
 
 export default function App() {
@@ -68,6 +69,13 @@ export default function App() {
     }, pickThinkingDelayMs());
     return () => clearTimeout(timer);
   }, [game]);
+
+  // B-26: a new version reloads the page only on Home — anywhere else the
+  // reload would wipe the game, which lives only in this page.
+  const onHome = game === null;
+  useEffect(() => {
+    setReloadSafe(onHome);
+  }, [onHome]);
 
   function handleStart(
     seats: readonly Seat[],

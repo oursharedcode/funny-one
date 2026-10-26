@@ -5656,7 +5656,65 @@ full screen with no URL bar, check "Android app" visits on `/stats/`.
 **Verified:** typecheck, lint, `format:check` clean. `npm test` outside the sandbox: one
 `disconnect.socket.test.ts` flake (known, Steps 27 etc.), the server workspace rerun alone clean,
 313/313. `npm audit --omit=dev` 0; the full audit lists only GHSA-rj75-hqrm-r3gf (Step 67's
-exception; `braces`'s is gone). CI: after the push.
+exception; `braces`'s is gone). CI: passed (run `40235472895`), pushed 2026-10-26 on the owner's
+word.
+
+---
+
+## Step 94 (task B-26) — A new version no longer reloads a game in progress (2026-10-27)
+
+Proposed by the agent at session start — the oldest fault on the "Still open" list the agent
+could close alone, owed since Step 37 ("a mid-game reload on a *real* update still wipes a game
+in progress, in both clients") — and taken on the owner's word ("I agree with the
+recommendations, go"). Filed as **B-26**.
+
+**The fault.** Both clients' `swReload.ts` reloaded the page the moment a new service worker took
+over. Funny Multi's client keeps no room code or seat, so a reloaded player lands on Home with no
+way back into the room — the server's 60 s grace window (Socket.IO connection-state recovery)
+lives in page memory and does not survive a reload. Funny One's game lives only in the page, so a
+reload wipes it. The likeliest moment is not a tab left open through a deploy — no navigation
+happens, so the browser does not look for the new service worker — but a page opened just after
+one: it already runs the new code (NetworkFirst), yet the new service worker finishes precaching
+a minute later, takes over, and reloaded the page out of the game for nothing.
+
+**Shipped:**
+
+- `swReload.ts` (both clients): a new `setReloadSafe(safe)`. An update that takes over while a
+  reload is not safe is held, and the page reloads as soon as it becomes safe. The first claim on
+  a first visit still never reloads, and a page still reloads at most once.
+- `App.tsx` (both clients) reports it from the state it already has: Funny Multi — safe on Home
+  with the support sheet shut, held from the lobby to the end screen; Funny One — safe on Home
+  only (no game), held from the first turn to the end screen.
+- Tests: four new cases in each `swReload.test.ts` (held then reloaded once safe; a held update
+  reloads only once; nothing to reload on becoming safe; the first claim is never held for
+  later); the App suites mock `./swReload` and check the reported state — Funny Multi on Home,
+  through every phase, back on Home after *Leave*, and with the support sheet open and shut;
+  Funny One on Home, from the first turn, on the end screen and after *Change players*. With
+  the hold taken out of `swReload.ts`, the held-update test fails.
+
+**Decided** (the owner, 2026-10-27, all as recommended): (1) safe means Home only — the end
+screen holds the finished stories and Funny Multi's cartoon, which a reload would lose; (2) unit
+tests are the gate, no scripted two-version browser check; (3) deploy right after the push;
+(4) file it as B-26. **The agent's, on the way:** Funny Multi also holds the reload while the
+support sheet is open — a reload would shut it under someone copying a PayID.
+
+**Seen on the way:** Funny Multi's client is served by the game server's own container
+(`@fastify/static`), so `deploy/ship.sh` replacing the container ends every room in progress
+anyway — this fix cannot help that. The rooms live in memory; keeping them across a deploy would
+be a task of its own. Until then, deploy Funny Multi at a quiet hour. The full `npm audit` now
+reports 0: GitHub revised GHSA-rj75-hqrm-r3gf on 2026-10-26 to count `postcss-selector-parser`
+6.1.5 as fixed, and that is the version installed under Tailwind 3 — Step 67's exception is
+retired with no lockfile change, and Tailwind 4 is no longer needed for it.
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1630 passed** (418, 395, 313, 178, 273 and 53 by workspace — 8 new in
+Funny Multi's client, 5 in Funny One's); `npm audit --omit=dev` 0; full `npm audit` 0. Not seen in
+a browser: a real update needs two versions live (decision 2); the next deploy after this one is
+the first that exercises it.
+
+**Owed:** the push and CI; then the deploy of both games, Funny One first (`ship-funny-one.sh`,
+no Docker), Funny Multi last at a quiet hour (`ship.sh`, Docker, so F:). This deploy is itself the
+last that can reload a game, because the old code is what receives it.
 
 ---
 
@@ -5730,13 +5788,25 @@ exception; `braces`'s is gone). CI: after the push.
 
 ~~RESUME HERE (2026-10-25, after Step 92)~~ — carried into this note.
 
-**RESUME HERE (2026-10-26, after Step 93).** **Step 93 (B-25) is the second part of Funny
+~~RESUME HERE (2026-10-26, after Step 93)~~ — carried into this note.
+
+**RESUME HERE (2026-10-27, after Step 94).** **Step 94 (B-26): a new version no longer reloads a
+game in progress — both clients hold the service worker's reload until Home.** Gates clean
+(1630 tests; both audits 0 — Step 67's last exception is retired, the advisory revised upstream).
+**Next, the agent's, one op per message:** the commit and push on the owner's word, CI; then the
+deploy — Funny One first (`deploy/ship-funny-one.sh`, no Docker), Funny Multi last and at a quiet
+hour (`deploy/ship.sh`, Docker, so F:), since replacing its container ends every room in
+progress; checks live as in Step 91; B-26's block then moves to `tasks-done.md`. **The owner's,
+unchanged:** once Google decides on Funny One — D5 (recommended: leave Catalog Access on),
+*Submit* for Funny Multi, then the Play installs and checks. Then the same note as before:
+
+**Step 93 (B-25) is the second part of Funny
 Multi's Play entry: the default store listing (English), the 21 translations imported and
 Russian compared first, the release saved (178 countries, full rollout, one en-GB note, automatic
 protection off), the eleven languages' pictures (Russian included) put up through the API, all 37
 AI labels (icon, 12 feature graphics, 24 screenshots), and Google's app-signing fingerprint live
 in `assetlinks.json`.** Committed as `818e2aa` plus this log's commit, pushed 2026-10-26 on the
-owner's word; CI: after the push. The listing must be saved through *Next → Review → Save*, not *Save as draft* (found this
+owner's word; CI passed (run `40235472895`). The listing must be saved through *Next → Review → Save*, not *Save as draft* (found this
 session: a draft default listing fails the release's preview). The agent's `--allow-review` upload
 sent the whole app for review once the release was already saved — unlike Funny One's in Step 90,
 before any release existed — and the owner took it back with *Remove changes* in Publishing
@@ -5939,13 +6009,13 @@ to match is submitted and pending (~30 days, due 2026-11-17); when it lands, the
 the new name in Payments Center → Review updates, before its deadline. Enrollment identifiers
 are not in this repo (Step 54).
 
-`npm audit` gate since Step 53: `npm audit --omit=dev` must report 0, and the full `npm audit`
-may list only **two IDs** — GHSA-vfj7-8cjw-p6xm (`braces`, Step 53) and GHSA-rj75-hqrm-r3gf
-(`postcss-selector-parser` via Tailwind 3, Step 67). Anything else fails the gate — stop and
-ask. Each session run `npm view braces version`: above 3.0.3 means a fix is out — take it in
-range as its own lockfile commit and delete that exception. The second exception goes when
-Tailwind 4 is taken up (its only fix). An in-range fix that npm offers (`npm audit fix` without
-`--force`) is taken as its own lockfile step once the owner says so, as Step 67 did.
+`npm audit` gate since Step 94: both `npm audit --omit=dev` and the full `npm audit` must
+report 0 — no exception is left. Step 53's `braces` exception went in Step 89; Step 67's
+GHSA-rj75-hqrm-r3gf went when GitHub revised the advisory on 2026-10-26 to count
+`postcss-selector-parser` 6.1.5, the version Tailwind 3 already has here, as fixed. Anything
+listed fails the gate — stop and ask. An in-range fix that npm offers (`npm audit fix` without
+`--force`) is taken as its own lockfile step once the owner says so, as Steps 67 and 89 did; a
+dev-only advisory with no fix is accepted by its ID only on the owner's word (Step 53).
 
 The paid Workers AI plan is cancelled; production generation is off (`[ai]` commented out in
 `wrangler.toml`), which is what B-13's `liveGeneration: false` reports. The picture library's
@@ -6034,12 +6104,14 @@ and for Funny One's app (T-FO-7.1 records it); whether to delete the unused 32-b
 `~/.bubblewrap/jdk/` (1.1 GB; asked twice, no answer — leave it until the owner brings it up);
 the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt` would settle
 it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
-`packages/shared/src/prompt.ts:81`; a mid-game reload-on-update risk in both clients'
-`swReload.ts`; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
+`packages/shared/src/prompt.ts:81`; ~~a mid-game reload-on-update risk in both clients'
+`swReload.ts`~~ fixed in Step 94 (B-26); a Funny Multi deploy still ends every room in
+progress, since rooms live in the server's memory and `ship.sh` replaces its container (Step
+94) — deploy it at a quiet hour; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
 whether CI should run `npm audit` (owner decision — a local gate today); a script enforcing
 Step 53's audit rule (optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of
-their own (Tailwind 4 raises the browser floor — a product decision; it is also the only fix
-for GHSA-rj75-hqrm-r3gf); B-1b — whether the landing page should host one privacy policy
+their own (Tailwind 4 raises the browser floor — a product decision; since Step 94 no audit
+finding depends on it); B-1b — whether the landing page should host one privacy policy
 instead of each game's own root; a `GET /api/stats` on the landing page's host answers with
 Funny Multi's app (harmless, Step 72); design §10.2's 2 s vs the code's 1.5 s "Copied!" (Step
 47); a player's report of an unfit library picture goes on `BLOCKED_PICTURES` the same way

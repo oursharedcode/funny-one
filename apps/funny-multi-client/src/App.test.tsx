@@ -25,6 +25,8 @@ import i18n from './i18n';
 
 const socketMock = createSocketMock();
 vi.mock('./socket', () => ({ socket: socketMock }));
+const setReloadSafe = vi.fn();
+vi.mock('./swReload', () => ({ setReloadSafe }));
 
 const { default: App } = await import('./App');
 
@@ -395,6 +397,17 @@ describe('support (T-9.4)', () => {
     expect(screen.queryByText('me@bank')).toBeNull();
   });
 
+  // B-26: a reload on update would shut the sheet on someone copying a PayID.
+  it('holds a reload on update while the support screen is open', async () => {
+    resolveConfig({ payId: 'me@bank', payIdName: 'Me' });
+    render(<App />);
+    await act(async () => {});
+    fireEvent.click(screen.getByLabelText('Support Author'));
+    expect(setReloadSafe).toHaveBeenLastCalledWith(false);
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
+  });
+
   it('offers the same support entry point from the end screen', async () => {
     resolveConfig({ donateUrl: 'https://example.com/give' });
     renderInLobby();
@@ -462,6 +475,38 @@ describe('privacy link', () => {
     renderInLobby();
     await settle();
     expect(screen.queryByRole('link', { name: 'Privacy policy' })).toBeNull();
+  });
+});
+
+// B-26 (Step 94): a new version reloads the page only on Home. The client
+// keeps no room or seat to come back to, so anywhere else a reload drops the
+// player out of the room.
+describe('reload on update', () => {
+  beforeEach(() => {
+    setReloadSafe.mockClear();
+  });
+
+  it('is allowed on Home', () => {
+    render(<App />);
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
+  });
+
+  it('is held in every phase from the lobby to the end screen', () => {
+    renderInLobby();
+    expect(setReloadSafe).toHaveBeenLastCalledWith(false);
+    setReloadSafe.mockClear();
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    socketMock.fire('round:waiting', { submitted: 2, total: 3 });
+    socketMock.fire('reveal:start', REVEAL);
+    socketMock.fire('game:over', undefined);
+    expect(setReloadSafe).toHaveBeenCalledWith(false);
+    expect(setReloadSafe).not.toHaveBeenCalledWith(true);
+  });
+
+  it('is allowed again once the player leaves the lobby for Home', () => {
+    renderInLobby();
+    fireEvent.click(screen.getByText('Leave'));
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
   });
 });
 

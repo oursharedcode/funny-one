@@ -16,9 +16,9 @@ async function install(controller: object | null) {
   const reload = vi.fn();
   Object.defineProperty(window, 'location', { configurable: true, value: { reload } });
   vi.resetModules();
-  const { installSwReloadListener } = await import('./swReload');
+  const { installSwReloadListener, setReloadSafe } = await import('./swReload');
   installSwReloadListener();
-  return { fire: () => listeners.forEach((fn) => fn()), reload };
+  return { fire: () => listeners.forEach((fn) => fn()), reload, setReloadSafe };
 }
 
 describe('installSwReloadListener', () => {
@@ -40,5 +40,42 @@ describe('installSwReloadListener', () => {
     fire();
     fire();
     expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  // B-26 (Step 94): an update that lands mid-game waits for Home.
+  it('holds an update while a reload is not safe, then reloads once it is', async () => {
+    const { fire, reload, setReloadSafe } = await install({});
+    setReloadSafe(false);
+    fire();
+    expect(reload).not.toHaveBeenCalled();
+    setReloadSafe(true);
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('reloads a held update only once', async () => {
+    const { fire, reload, setReloadSafe } = await install({});
+    setReloadSafe(false);
+    fire();
+    fire();
+    setReloadSafe(true);
+    setReloadSafe(false);
+    setReloadSafe(true);
+    fire();
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not reload on becoming safe when no update is held', async () => {
+    const { reload, setReloadSafe } = await install({});
+    setReloadSafe(false);
+    setReloadSafe(true);
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('does not hold the first claim for later either', async () => {
+    const { fire, reload, setReloadSafe } = await install(null);
+    setReloadSafe(false);
+    fire();
+    setReloadSafe(true);
+    expect(reload).not.toHaveBeenCalled();
   });
 });

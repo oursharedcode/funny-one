@@ -24,6 +24,7 @@ import { hasAnyRail } from './support';
 import { trackSupportOpen } from './funnel';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
+import { setReloadSafe } from './swReload';
 import { baseUrl, withBase, serverOrigin } from './basePath';
 import { APP_VERSION } from './version';
 import type {
@@ -187,6 +188,12 @@ export default function App() {
       socket.off('error', onError);
     };
   }, []);
+
+  // B-26: a new version reloads the page only on Home, with the support sheet
+  // shut — anywhere else the reload would drop this player out of the room.
+  useEffect(() => {
+    setReloadSafe(phase === 'home' && !supportOpen);
+  }, [phase, supportOpen]);
 
   // "Create a new room" on the host notice (spec §12): end the current game
   // for everyone (game:end → game:over → room deleted), then reload to a fresh

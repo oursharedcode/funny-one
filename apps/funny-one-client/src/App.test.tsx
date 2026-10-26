@@ -14,6 +14,9 @@ import App from './App';
 import { THINKING_DELAY_MAX_MS } from './game/thinkingDelay';
 import './i18n';
 
+const setReloadSafe = vi.hoisted(() => vi.fn());
+vi.mock('./swReload', () => ({ setReloadSafe }));
+
 beforeAll(() => {
   vi.useFakeTimers();
 });
@@ -84,8 +87,20 @@ describe('App', () => {
       await settle();
     }
 
+    // B-26: the end screen still holds a reload on update — it shows the stories.
+    expect(setReloadSafe).toHaveBeenLastCalledWith(false);
     fireEvent.click(screen.getByRole('button', { name: 'Change players' }));
     expect(screen.getByText('Funny One')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Start game' })).toBeTruthy();
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
+  });
+
+  // B-26 (Step 94): a new version reloads the page only on Home — a game lives
+  // only in this page, so anywhere else a reload wipes it.
+  it('allows a reload on update on Home and holds it from the first turn', () => {
+    render(<App />);
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Start game' }));
+    expect(setReloadSafe).toHaveBeenLastCalledWith(false);
   });
 });

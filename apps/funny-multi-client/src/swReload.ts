@@ -13,8 +13,23 @@
 // Without this, registerType: 'autoUpdate' would update the SW silently
 // but leave the currently-loaded page on the old code until the user
 // manually refreshed — the symptom that drove backlog item 16.
+//
+// B-26 (Step 94): the reload waits for Home. The client keeps no room or seat
+// to come back to, so a reload anywhere else drops the player out of the
+// room — and the likeliest moment for one is a page opened just after a
+// deploy, whose new SW finishes precaching after the player has joined.
+// App.tsx reports through setReloadSafe whether a reload would cost anything;
+// an update that arrives while it would is held until Home.
 
 let refreshing = false;
+let pending = false;
+// Every page starts on Home, so a reload is safe until App.tsx says otherwise.
+let safe = true;
+
+function reloadNow(): void {
+  refreshing = true;
+  window.location.reload();
+}
 
 export function installSwReloadListener(): void {
   if (typeof navigator === 'undefined') return;
@@ -27,7 +42,13 @@ export function installSwReloadListener(): void {
   const hadController = navigator.serviceWorker.controller != null;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!hadController || refreshing) return;
-    refreshing = true;
-    window.location.reload();
+    if (safe) reloadNow();
+    else pending = true;
   });
+}
+
+/** Whether a reload now would cost the player nothing; a held update reloads once it does. */
+export function setReloadSafe(value: boolean): void {
+  safe = value;
+  if (safe && pending && !refreshing) reloadNow();
 }

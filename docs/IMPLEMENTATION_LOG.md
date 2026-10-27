@@ -5712,9 +5712,22 @@ Funny Multi's client, 5 in Funny One's); `npm audit --omit=dev` 0; full `npm aud
 a browser: a real update needs two versions live (decision 2); the next deploy after this one is
 the first that exercises it.
 
-**Owed:** the push and CI; then the deploy of both games, Funny One first (`ship-funny-one.sh`,
-no Docker), Funny Multi last at a quiet hour (`ship.sh`, Docker, so F:). This deploy is itself the
-last that can reload a game, because the old code is what receives it.
+CI: passed (run `40422235804`), pushed 2026-10-27 on the owner's word: `b2e27fb..a36fa9c`.
+
+**Deployed 2026-10-27** (the owner's word: do the deploy): Funny One at 10:53 AEDT by
+`deploy/ship-funny-one.sh` — every check through Caddy passed, and the live bundle
+(`index-D4VtUSGE.js`) is the one just built. Funny Multi at 11:02 by `deploy/ship.sh`, after its
+server's log showed no game connection in the past hour (4 plain HTTP requests); Docker's first
+`docker info` hung for a minute, then the engine answered. `/health` `{"ok":true}`, the privacy
+page, `assetlinks.json` and the old address's forwarding through Caddy; the running image is
+`funny-multi:a36fa9c` and the live bundle (`index-BH_1w0Cx.js`) is the one inside it; the
+country table reloaded (710,834 rows, 4.5 s); the visit counts kept (11 days, 2026-10-13 →
+2026-10-25). A local `apps/funny-multi-client/dist` is a stale build — `ship.sh` builds inside
+Docker, so compare the live bundle with the image's, not with `dist`.
+
+**Owed:** none from this step — fixed, tested, pushed, deployed, checked live. Filed on the way,
+at the owner's request: **B-27**, keeping Funny Multi's rooms alive across a deploy (options in
+`steering/tasks.md`), not scheduled.
 
 ---
 
@@ -5790,15 +5803,18 @@ last that can reload a game, because the old code is what receives it.
 
 ~~RESUME HERE (2026-10-26, after Step 93)~~ — carried into this note.
 
-**RESUME HERE (2026-10-27, after Step 94).** **Step 94 (B-26): a new version no longer reloads a
-game in progress — both clients hold the service worker's reload until Home.** Gates clean
-(1630 tests; both audits 0 — Step 67's last exception is retired, the advisory revised upstream).
-**Next, the agent's, one op per message:** the commit and push on the owner's word, CI; then the
-deploy — Funny One first (`deploy/ship-funny-one.sh`, no Docker), Funny Multi last and at a quiet
-hour (`deploy/ship.sh`, Docker, so F:), since replacing its container ends every room in
-progress; checks live as in Step 91; B-26's block then moves to `tasks-done.md`. **The owner's,
-unchanged:** once Google decides on Funny One — D5 (recommended: leave Catalog Access on),
-*Submit* for Funny Multi, then the Play installs and checks. Then the same note as before:
+~~RESUME HERE (2026-10-27, after Step 94)~~ — carried into this note.
+
+**RESUME HERE (2026-10-27, after Step 94, pushed and deployed).** **Step 94 (B-26): a new
+version no longer reloads a game in progress — both clients hold the service worker's reload
+until Home.** Pushed (`b2e27fb..a36fa9c`), CI passed (run `40422235804`), both games deployed
+and checked live (Funny One 10:53, Funny Multi 11:02 AEDT, image `funny-multi:a36fa9c`). Both
+audits now report 0 — Step 67's last exception is retired, the advisory revised upstream. Filed
+on the way: **B-27**, Funny Multi's rooms kept alive across a deploy — options in
+`steering/tasks.md`, not scheduled; until then deploy Funny Multi at a quiet hour. **Next, the
+owner's, unchanged:** once Google decides on Funny One — D5 (recommended: leave Catalog Access
+on), *Submit* for Funny Multi, then the Play installs and checks. The agent has no open task;
+B-27 is the next one if the owner wants it. Then the same note as before:
 
 **Step 93 (B-25) is the second part of Funny
 Multi's Play entry: the default store listing (English), the 21 translations imported and
@@ -6046,7 +6062,7 @@ scripts again (Step 79), then two `.env` lines and the game's container recreate
 (Step 83), both ship scripts again (Steps 81–82) and, the owner asking for the op to be
 automated, `deploy/ship-funny-one.sh` (refused on 2026-10-07), and on 2026-10-19 all three ship scripts
 (Step 85), and on 2026-10-20 `deploy/ship-funny-one.sh` (Steps 87 and 88) and `deploy/ship.sh`
-(Step 88) — so try once when the owner
+(Step 88), and on 2026-10-27 both (Step 94) — so try once when the owner
 asks for a deploy, and if it is refused, hand
 it to the owner without trying another route. Still refused earlier, and not to be routed
 around: a headless browser run against production (Step 49), a local run with the production
@@ -6106,8 +6122,9 @@ the Arm VM retry; Caddy's "Caddyfile input is not formatted" warning (`caddy fmt
 it); a cosmetic "Render" sweep in code comments; the stray T-4.2 comment, now at
 `packages/shared/src/prompt.ts:81`; ~~a mid-game reload-on-update risk in both clients'
 `swReload.ts`~~ fixed in Step 94 (B-26); a Funny Multi deploy still ends every room in
-progress, since rooms live in the server's memory and `ship.sh` replaces its container (Step
-94) — deploy it at a quiet hour; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
+progress, since rooms live in the server's memory and `ship.sh` replaces its container — filed
+as **B-27** (Step 94), not scheduled; until then deploy it at a quiet hour, read from the
+server's log first; all non-`en`/`ru` `home.title`s in both clients await native-speaker review;
 whether CI should run `npm audit` (owner decision — a local gate today); a script enforcing
 Step 53's audit rule (optional, not approved); Tailwind 4 and typescript-eslint 8 as tasks of
 their own (Tailwind 4 raises the browser floor — a product decision; since Step 94 no audit

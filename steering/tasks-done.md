@@ -1504,3 +1504,13 @@ unless they carry advisories:
       docs, kept in the agent's memory; `local_docs/` untracked. Pushed (`11f81d4`, CI run
       `39227545935`), then switched to public; the repository, its `LICENSE` and README, and the
       exact link both live sites carry answer 200 without signing in.
+- [x] **B-26 (S)** A new version must not reload a game in progress (agent proposal 2026-10-27,
+      owed since Step 37; T-7.1's `swReload.ts`). Both clients reloaded the page the moment a new
+      service worker took over, which dropped a Funny Multi player out of the room and wiped a
+      Funny One game. Owner decisions 2026-10-27: (1a) reload on Home only; (2a) unit tests are
+      the gate; (3a) deploy right after the push; (4a) this id.
+      _Closed 2026-10-27 (Step 94)._ `setReloadSafe()` in both `swReload.ts` holds the reload
+      until `App.tsx` reports Home (Funny Multi: Home with the support sheet shut). Pushed
+      (`a36fa9c`, CI run `40422235804`); deployed the same morning, Funny One at 10:53 and Funny
+      Multi at 11:02 AEDT after an hour with no game connections, both checked live. Seen on the
+      way and filed as B-27: a Funny Multi deploy still ends every room in progress.

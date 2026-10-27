@@ -425,14 +425,24 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     a language low in the 23-flag list, with the pressed flag below the fold and no sign it was
     picked — `ScrollBox.tsx` (both clients) now centres it into view once, when the list opens.
     The landing page's Korean (Step 88 changed only the games) now has the same `keep-all` rule.
-- **B-26** A new version must not reload a game in progress (agent proposal 2026-10-27, owed since
-  Step 37; T-7.1's `swReload.ts`). Both clients reloaded the page the moment a new service worker
-  took over, which drops a Funny Multi player out of the room and wipes a Funny One game. Owner
-  decisions 2026-10-27: (1a) reload on Home only; (2a) unit tests are the gate; (3a) deploy right
-  after the push; (4a) this id. **Code done 2026-10-27 (Step 94).**
-  - *Owed:* the push and CI; the deploy of both games, Funny Multi's at a quiet hour — replacing
-    its container ends every room in progress, which this task cannot help (rooms live in the
-    server's memory).
+- **B-26** — **closed 2026-10-27 (Step 94)**, block in `steering/tasks-done.md`. A new version
+  no longer reloads a game in progress, in either game.
+- **B-27** Keep Funny Multi's rooms alive across a deploy (agent finding 2026-10-27, Step 94;
+  filed at the owner's request). Rooms live only in the game server's memory, and
+  `deploy/ship.sh` replaces the server's container, so every deploy of Funny Multi ends every room
+  in progress. The players' sockets reconnect to a server that has never heard of their room —
+  Socket.IO's connection-state recovery was held in the old process. What a player sees then is
+  unchecked. Not scheduled; until it lands, deploy Funny Multi at a quiet hour, read from the
+  server's log first (Step 94 found an hour with no game connections).
+  - *Options to weigh when it is taken up:* (a) drain — the server reports its live rooms and
+    `ship.sh` waits, up to a limit, until none is left: the cheapest, keeps nothing; (b) a notice
+    — on shutdown the server tells every room it is restarting, so the screens say so instead of
+    going dead: small, pairs with (a); (c) snapshot and rejoin — rooms written to the
+    `funny_stats_data` volume on shutdown and read back on start, plus a rejoin path, which needs
+    each player's seat remembered on the device, so the privacy policy changes too (B-25: Funny
+    Multi keeps nothing on the device); (d) two containers side by side, new rooms on the new one
+    while the old drains — Caddy and sticky sockets, the most work. The agent's lean: (a) with
+    (b) first, (c) only if players still lose games.
 
 ## Dependency notes
 

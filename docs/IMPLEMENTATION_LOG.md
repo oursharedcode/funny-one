@@ -5808,6 +5808,8 @@ at the owner's request: **B-27**, keeping Funny Multi's rooms alive across a dep
 ~~RESUME HERE (2026-10-27, after Step 94, pushed and deployed)~~ — carried into Step 95's note
 below.
 
+~~RESUME HERE (2026-10-29, after Step 95, not yet pushed)~~ — carried into Step 96's note below.
+
 
 ---
 
@@ -5854,15 +5856,53 @@ landing page's count unchanged at 418, its content changed, not its test count);
 
 ---
 
-**RESUME HERE (2026-10-29, after Step 95, not yet pushed).** **Step 95 (B-11): the landing page's
-open-source card now shows the family photo beside it and links both `funny-one` and
-`funny-stories`.** Not yet pushed or deployed — pending the owner's confirmation on the commit.
-`npm audit` carries one new accepted exception: GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via
-`vite-plugin-pwa`) — drop it once a non-breaking fix exists (`npm view deepmerge versions`,
-`npm view vite-plugin-pwa versions`). **Next, the owner's, unchanged from Step 94:** once Google
-decides on Funny One — D5 (recommended: leave Catalog Access on), *Submit* for Funny Multi, then
-the Play installs and checks. The agent has no open task; B-27 is the next one if the owner wants
-it. Then the same note as before:
+## Step 96 (task B-28) — Funny Multi's downloaded picture and video: the QR now leads to the landing page (2026-10-29)
+
+Owner request: the QR code on a downloaded story picture and on the 5 s share video, until now
+the upstream repository's address (`SOURCE_URL`, also still used by the in-game "Source on GitHub"
+footer link, unchanged — that one meets the AGPL's source-offer duty, which an exported file isn't
+subject to), now leads to the Funny Family landing page instead.
+
+**Shipped:**
+
+- New `landingUrl.ts` (`LANDING_URL`, `LANDING_URL_TEXT`); `downloadStory.ts`, `videoFooter.ts`
+  and `recordWobble.ts` read it in place of `sourceUrl.ts`.
+- The bold label beside the QR, "Source on GitHub" (`footer.source`), would have named the wrong
+  thing pointed at the landing page, so a new `footer.family` string takes its place — copied from
+  the landing page's own existing `brand` name in all 23 languages (`apps/funny-family-site/src/strings.ts`),
+  so no new translation is owed.
+- Two new tests (`downloadStory.test.ts`, `recordWobble.test.ts`) assert the QR's literal payload
+  — nothing checked that before.
+- Checked by rendering the real exports in headless Chromium (not just reading the code) and
+  decoding each QR with `jsQR`: the picture in English, Russian and Hebrew, and the video — all
+  four decode to `https://www.funny-family.oursharedcode.com/`; the Hebrew and Russian footers
+  were also read by eye.
+
+**Seen on the way, not fixed:** `funny-one`'s GitHub repository has no description (About box),
+unlike `funny-stories`, which does — left for the owner's wording and go-ahead (public-facing).
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1632 passed** (418, 397, 313, 178, 273 and 53 by workspace — one
+`funny-multi-server` run showed a lone `index.test.ts` failure, re-run alone 3/3 clean, the known
+timing flake); `npm audit --omit=dev` 0; full `npm audit` lists only GHSA-gcqx-w48m-w2h4
+(Step 95's accepted exception — re-checked this session, still no non-breaking fix upstream).
+
+**Owed:** push, deploy, then one more live check — download a picture from Funny Multi and scan
+the code with a phone.
+
+---
+
+**RESUME HERE (2026-10-29, after Step 96, not yet pushed).** **Step 96 (B-28): the QR code on
+Funny Multi's downloaded picture and 5 s video now leads to the landing page, under its own name
+in 23 languages, instead of the GitHub repository.** Not yet pushed or deployed — pending the
+owner's confirmation on the commit. `npm audit` still carries Step 95's one accepted exception,
+GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`) — re-checked this session, still
+no non-breaking fix (`npm view deepmerge versions`, `npm view vite-plugin-pwa versions`). Left for
+the owner, not scheduled: `funny-one`'s empty GitHub description (`gh repo edit`, needs the
+owner's wording). **Next, the owner's, unchanged from Step 94:** once Google decides on Funny One
+— D5 (recommended: leave Catalog Access on), *Submit* for Funny Multi, then the Play installs and
+checks. The agent has no open task; B-27 is the next one if the owner wants it. Then the same note
+as before:
 
 **Step 94 (B-26): a new
 version no longer reloads a game in progress — both clients hold the service worker's reload
@@ -6199,5 +6239,6 @@ in Step 91; a multi-language room's invite (`&multi=1`) also names the room's la
 screen in the room's language and its player picks Korean by hand — whether such an invite should
 leave the joiner's phone language instead (Step 88); `npm audit`'s new exception,
 GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) — drop it once a
-non-breaking `vite-plugin-pwa` exists.
+non-breaking `vite-plugin-pwa` exists; `funny-one`'s GitHub repository has no description, unlike
+`funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's wording.
 

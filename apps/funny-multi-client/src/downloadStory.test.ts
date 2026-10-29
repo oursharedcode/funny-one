@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
 import i18n from './i18n/index';
-import { SOURCE_URL } from './sourceUrl';
+import { LANDING_URL, LANDING_URL_TEXT } from './landingUrl';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -51,6 +51,26 @@ describe('buildStoryImageFile', () => {
     expect(file.name).toBe('funny-stories-Mika.png');
     // Only the QR gets drawn — no picture to composite.
     expect(ctx.calls.filter((c) => c.method === 'drawImage')).toHaveLength(1);
+  });
+
+  // Owner decision 2026-10-29: the code leads to the landing page, which
+  // links both games and both repositories — no longer to the repository.
+  it('encodes the landing page in the QR code and prints its address under it', async () => {
+    toCanvas.mockClear();
+    await buildStoryImageFile({
+      nickname: 'Mika',
+      prose: 'a pirate did stuff.',
+      pictureUrl: null,
+      language: 'en',
+    });
+    expect(toCanvas).toHaveBeenCalledWith(
+      expect.any(HTMLCanvasElement),
+      LANDING_URL,
+      expect.anything(),
+    );
+    const drawn = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
+    expect(drawn).toContain('www.funny-family.oursharedcode.com');
+    expect(drawn).not.toContain('Source on GitHub');
   });
 
   it('fetches the picture URL and decodes it via createImageBitmap, never via <img>', async () => {
@@ -111,7 +131,7 @@ describe('buildStoryImageFile', () => {
         language: 'en',
       });
       expect(
-        ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'Source on GitHub'),
+        ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'Funny Family'),
       ).toBeDefined();
     });
 
@@ -129,11 +149,13 @@ describe('buildStoryImageFile', () => {
         (c) => c.method === 'fillText' && (c.args[0] as string) === '— Mika',
       );
       expect(nameCall?.args[1]).toBe(RIGHT_EDGE);
-      const sourceLabelCall = ctx.calls.find(
-        (c) => c.method === 'fillText' && c.args[0] === 'קוד המקור ב-GitHub',
+      const familyLabelCall = ctx.calls.find(
+        (c) => c.method === 'fillText' && c.args[0] === 'משפחה מצחיקה',
       );
-      expect(sourceLabelCall?.args[1]).toBe(RIGHT_EDGE);
-      const urlCall = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === SOURCE_URL);
+      expect(familyLabelCall?.args[1]).toBe(RIGHT_EDGE);
+      const urlCall = ctx.calls.find(
+        (c) => c.method === 'fillText' && c.args[0] === LANDING_URL_TEXT,
+      );
       expect(urlCall?.args[1]).toBe(RIGHT_EDGE);
     });
 

@@ -449,6 +449,22 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     Multi keeps nothing on the device); (d) two containers side by side, new rooms on the new one
     while the old drains — Caddy and sticky sockets, the most work. The agent's lean: (a) with
     (b) first, (c) only if players still lose games.
+- **B-28** Funny Multi's downloaded picture and 5 s video QR code now leads to the landing page
+  instead of the source repository (owner request 2026-10-29). The in-game "Source on GitHub"
+  footer link is unchanged — that one meets the AGPL's source-offer duty; an exported file isn't
+  the running program, so its code is free to invite people to play instead. The bold label beside
+  the QR, "Source on GitHub", would have been wrong pointed at the landing page, so it now shows
+  the landing page's own name (`footer.family`, one new string, copied from
+  `apps/funny-family-site/src/strings.ts`'s existing `brand` in all 23 languages — no new
+  translation owed). New `landingUrl.ts` holds the address; `downloadStory.ts`, `videoFooter.ts`
+  and `recordWobble.ts` read it. **Code done 2026-10-29 (Step 96)**, checked by rendering the real
+  picture (en/ru/he) and video in Chromium and decoding each QR — all four read
+  `https://www.funny-family.oursharedcode.com/`.
+  - *Owed:* deploy, then one more live check (download a picture from `https://funny37…` and scan
+    the code with a phone, any language).
+  - *Not done, owner to decide:* `funny-one`'s GitHub repository has no description (About box),
+    unlike `funny-stories`; a one-line `gh repo edit` fix, public-facing, left for the owner's
+    wording and go-ahead.
 
 ## Dependency notes
 

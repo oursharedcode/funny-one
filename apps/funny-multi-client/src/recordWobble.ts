@@ -26,7 +26,7 @@
 // overlay). Still wrapped in a try/catch: a deployer who removes the file
 // without replacing it degrades to "no stamp" rather than a broken export.
 
-import { SOURCE_URL } from './sourceUrl';
+import { LANDING_URL } from './landingUrl';
 import { withBase } from './basePath';
 import { downloadFile } from './share';
 import {
@@ -150,7 +150,7 @@ export async function buildWobbleVideoFile(opts: {
     monkey = null;
   }
   // QR code rendered once, then blitted onto every recorded frame.
-  const qrCanvas = await renderQrCanvas(SOURCE_URL);
+  const qrCanvas = await renderQrCanvas(LANDING_URL);
 
   const canvas = document.createElement('canvas');
   canvas.width = W;

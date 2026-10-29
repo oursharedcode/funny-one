@@ -133,6 +133,22 @@ describe('buildWobbleVideoFile', () => {
     expect(file.type).toBe('video/webm;codecs=vp9');
   });
 
+  // Owner decision 2026-10-29: the clip's code leads to the landing page too.
+  it('encodes the landing page in the QR code', async () => {
+    toCanvas.mockClear();
+    await buildWobbleVideoFile({
+      nickname: 'Mika',
+      prose: 'a pirate did stuff.',
+      pictureUrl: 'https://img.example/i/abc.png',
+      language: 'en',
+    });
+    expect(toCanvas).toHaveBeenCalledWith(
+      expect.any(HTMLCanvasElement),
+      'https://www.funny-family.oursharedcode.com/',
+      expect.anything(),
+    );
+  });
+
   it('loads the picture via a real <img>, unlike the CORS-sensitive still download', async () => {
     await buildWobbleVideoFile({
       nickname: 'Mika',

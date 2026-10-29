@@ -9,13 +9,15 @@
 // Shared attribution footer for the share-as-video recorder. Mirrors the
 // footer baked into the downloadable still (downloadStory.ts):
 //   - content-responsibility notice (italic, gray, wrapped)
-//   - QR code on the left, source label + URL stacked to its right
+//   - QR code on the left, label + URL stacked to its right — the landing
+//     page under its name since 2026-10-29 (landingUrl.ts), SRC's source
+//     repository before
 // Keeps the i18n notice in sync with the in-app SourceFooter via the same
 // `footer.contentNotice` key, fixed to the story's own language (B-15) via
 // `i18n.getFixedT`, not the active UI locale — same fix as the still's footer.
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
-import { SOURCE_URL } from './sourceUrl';
+import { LANDING_URL_TEXT } from './landingUrl';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
 const QR_SIZE = 120;
@@ -165,7 +167,7 @@ export function drawAttribution(
   opts: { topY: number; canvasWidth: number; language: AuthoredLanguage },
 ): void {
   const { topY, canvasWidth, language } = opts;
-  const sourceLabel = i18n.getFixedT(language)('footer.source');
+  const familyLabel = i18n.getFixedT(language)('footer.family');
   const dir = textDirection(language);
 
   // The notice and label keep the story's direction, as on the still
@@ -194,10 +196,10 @@ export function drawAttribution(
   const sourceLabelY = topY + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(sourceLabel, colX, sourceLabelY);
+  ctx.fillText(familyLabel, colX, sourceLabelY);
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(SOURCE_URL.replace(/^https?:\/\//, ''), colX, sourceLabelY + URL_LINE_HEIGHT + 6);
+  ctx.fillText(LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 6);
   ctx.textAlign = 'left';
 }

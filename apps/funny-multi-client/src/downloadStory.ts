@@ -12,15 +12,16 @@
 // route sending `Access-Control-Allow-Origin: *` is what makes the `fetch`
 // itself succeed at all.
 //
-// Item 6 of BUGS_AND_IMPROVEMENTS_02.md (SRC) adds a "scan-to-clone" footer
-// to the downloaded image: the upstream-project QR code, its URL printed
-// below, and the verbatim content-responsibility notice
-// (`footer.contentNotice` from the active locale). The disclaimer must
-// travel with the image because the downloaded asset moves out of the
-// in-app context where the source footer would otherwise carry it.
+// Item 6 of BUGS_AND_IMPROVEMENTS_02.md (SRC) adds a footer to the downloaded
+// image: a QR code, its URL printed below, and the verbatim
+// content-responsibility notice (`footer.contentNotice` from the active
+// locale). The disclaimer must travel with the image because the downloaded
+// asset moves out of the in-app context where the source footer would
+// otherwise carry it. SRC's code led to the source repository; since
+// 2026-10-29 it leads to the landing page, under its name (landingUrl.ts).
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
-import { SOURCE_URL } from './sourceUrl';
+import { LANDING_URL, LANDING_URL_TEXT } from './landingUrl';
 import { downloadFile } from './share';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
@@ -100,7 +101,7 @@ export async function buildStoryImageFile(opts: {
   // carries the notice in the language its prose is written in.
   const fixedT = i18n.getFixedT(language);
   const notice = fixedT('footer.contentNotice');
-  const sourceLabel = fixedT('footer.source');
+  const familyLabel = fixedT('footer.family');
   const dir = textDirection(language);
   const proseFont = `${PROSE_SIZE} ${proseFontFamily(language)}`;
   const noticeFont = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
@@ -109,9 +110,9 @@ export async function buildStoryImageFile(opts: {
   const picture = await loadPictureBitmap(pictureUrl);
   const pictureHeight = picture ? WIDTH : 0;
 
-  // QR code for the upstream repo — rendered to an offscreen canvas, then
+  // QR code for the landing page — rendered to an offscreen canvas, then
   // drawn onto the composite below.
-  const qrCanvas = await renderQrCanvas(SOURCE_URL);
+  const qrCanvas = await renderQrCanvas(LANDING_URL);
 
   // Right-column geometry: the notice and the source label/URL sit to the
   // right of the QR. The notice stacks at the top of the column; the source
@@ -201,11 +202,11 @@ export async function buildStoryImageFile(opts: {
   const sourceLabelY = rowTop + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(sourceLabel, colX, sourceLabelY);
+  ctx.fillText(familyLabel, colX, sourceLabelY);
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(SOURCE_URL, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
   ctx.textAlign = 'left';
 
   const blob = await new Promise<Blob | null>((resolve) => {

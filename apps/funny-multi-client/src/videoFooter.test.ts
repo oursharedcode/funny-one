@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
-import { SOURCE_URL } from './sourceUrl';
+import { LANDING_URL, LANDING_URL_TEXT } from './landingUrl';
 import i18n from './i18n/index';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
@@ -18,10 +18,10 @@ describe('renderQrCanvas', () => {
   });
 
   it('renders the given value onto a 120px canvas', async () => {
-    await renderQrCanvas(SOURCE_URL);
+    await renderQrCanvas(LANDING_URL);
     expect(toCanvas).toHaveBeenCalledWith(
       expect.any(HTMLCanvasElement),
-      SOURCE_URL,
+      LANDING_URL,
       expect.objectContaining({ width: 120 }),
     );
   });
@@ -99,7 +99,7 @@ describe('drawAttribution', () => {
     ctx = installCanvasStub();
   });
 
-  it('draws the QR image and the source label/URL text', () => {
+  it('draws the QR image and the landing page’s name and address', () => {
     const qrCanvas = document.createElement('canvas');
     drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
       topY: 0,
@@ -111,8 +111,9 @@ describe('drawAttribution', () => {
     expect(drawImageCalls[0]?.args[0]).toBe(qrCanvas);
 
     const fillTextArgs = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
-    // URL is drawn without its protocol prefix.
-    expect(fillTextArgs).toContain(SOURCE_URL.replace(/^https?:\/\//, ''));
+    expect(fillTextArgs).toContain('Funny Family');
+    // The address is drawn without its scheme or trailing slash.
+    expect(fillTextArgs).toContain('www.funny-family.oursharedcode.com');
   });
 
   describe('footer language (B-15)', () => {
@@ -120,7 +121,7 @@ describe('drawAttribution', () => {
       await i18n.changeLanguage('en');
     });
 
-    it('writes the source label in the language passed, not the active UI locale', async () => {
+    it('writes the label in the language passed, not the active UI locale', async () => {
       await i18n.changeLanguage('he');
       const qrCanvas = document.createElement('canvas');
       drawAttribution(ctx as unknown as CanvasRenderingContext2D, qrCanvas, {
@@ -129,7 +130,7 @@ describe('drawAttribution', () => {
         language: 'en',
       });
       const fillTextArgs = ctx.calls.filter((c) => c.method === 'fillText').map((c) => c.args[0]);
-      expect(fillTextArgs).toContain('Source on GitHub');
+      expect(fillTextArgs).toContain('Funny Family');
     });
 
     it('right-anchors the label and URL of a right-to-left story (Step 73)', () => {
@@ -141,8 +142,8 @@ describe('drawAttribution', () => {
       });
       const x = (text: string) =>
         ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === text)?.args[1];
-      expect(x(i18n.getFixedT('he')('footer.source'))).toBe(720 - 40); // canvasWidth - PAD
-      expect(x(SOURCE_URL.replace(/^https?:\/\//, ''))).toBe(720 - 40);
+      expect(x('משפחה מצחיקה')).toBe(720 - 40); // canvasWidth - PAD
+      expect(x(LANDING_URL_TEXT)).toBe(720 - 40);
       expect(ctx.textAlign).toBe('left'); // reset for the next frame's drawing
     });
 

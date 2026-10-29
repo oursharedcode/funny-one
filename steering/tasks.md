@@ -459,12 +459,12 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   translation owed). New `landingUrl.ts` holds the address; `downloadStory.ts`, `videoFooter.ts`
   and `recordWobble.ts` read it. **Code done 2026-10-29 (Step 96)**, checked by rendering the real
   picture (en/ru/he) and video in Chromium and decoding each QR — all four read
-  `https://www.funny-family.oursharedcode.com/`.
-  - *Owed:* deploy, then one more live check (download a picture from `https://funny37…` and scan
-    the code with a phone, any language).
-  - *Not done, owner to decide:* `funny-one`'s GitHub repository has no description (About box),
-    unlike `funny-stories`; a one-line `gh repo edit` fix, public-facing, left for the owner's
-    wording and go-ahead.
+  `https://www.funny-family.oursharedcode.com/`. **Pushed and deployed 2026-10-29 (Step 97)** —
+  `0dc503f..114012b`, CI green, live bundle `index-zVXzSouG.js` inside image
+  `funny-multi:114012b`. `funny-one`'s GitHub About box (owner's wording) now carries a
+  description and a website link to the landing page — also Step 97.
+  - *Owed, the owner's:* one live check — download a picture from `https://funny37…` and scan
+    the code with a phone, any language. Close the task once confirmed.
 
 ## Dependency notes
 

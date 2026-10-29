@@ -5892,17 +5892,41 @@ the code with a phone.
 
 ---
 
-**RESUME HERE (2026-10-29, after Step 96, not yet pushed).** **Step 96 (B-28): the QR code on
-Funny Multi's downloaded picture and 5 s video now leads to the landing page, under its own name
-in 23 languages, instead of the GitHub repository.** Not yet pushed or deployed — pending the
-owner's confirmation on the commit. `npm audit` still carries Step 95's one accepted exception,
-GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`) — re-checked this session, still
-no non-breaking fix (`npm view deepmerge versions`, `npm view vite-plugin-pwa versions`). Left for
-the owner, not scheduled: `funny-one`'s empty GitHub description (`gh repo edit`, needs the
-owner's wording). **Next, the owner's, unchanged from Step 94:** once Google decides on Funny One
-— D5 (recommended: leave Catalog Access on), *Submit* for Funny Multi, then the Play installs and
-checks. The agent has no open task; B-27 is the next one if the owner wants it. Then the same note
-as before:
+## Step 97 (task B-28) — Funny Multi's QR change pushed and deployed; funny-one gets a GitHub description (2026-10-29)
+
+**Shipped:**
+
+- Pushed `0dc503f..114012b` (Step 96's commit); CI passed (run `40865403226`).
+- Deployed Funny Multi, 22:27 AEDT, by `deploy/ship.sh` — the server's log showed no game
+  connection in the hour before (only page loads and `robots.txt`), so no live room was ended.
+  Every check the script runs passed: `/health` `{"ok":true}`, the privacy page, `assetlinks.json`
+  and the old `/funny37-game` address's forwarding through Caddy. Running image
+  `funny-multi:114012b`/`:latest`; the live bundle (`index-zVXzSouG.js`) is the one inside it.
+- `funny-one`'s GitHub About box, empty since the repository existed, now carries a one-line
+  description and a website link to the landing page (`gh repo edit oursharedcode/funny-one`,
+  owner's wording): "Two free party story games — Funny Multi (3–7 phones) and Funny One (one
+  phone, passed round) — in 23 languages, each story drawn as a cartoon. AGPL-3.0." /
+  `https://www.funny-family.oursharedcode.com/`.
+
+No code changed this step — a push, a deploy and a GitHub repository setting — so the six gates
+don't re-apply; Step 96's run still stands.
+
+**Owed:** one live check, the owner's: download a picture from Funny Multi and scan the printed
+code with a phone.
+
+---
+
+~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
+
+**RESUME HERE (2026-10-29, after Step 97, pushed and deployed).** **Step 97 (B-28): the QR-to-
+landing-page change is live, and `funny-one`'s GitHub repository now has a description and
+website link.** `npm audit` still carries Step 95's one accepted exception, GHSA-gcqx-w48m-w2h4
+(`deepmerge`, dev-only via `vite-plugin-pwa`) — no non-breaking fix exists yet. **Owed, the
+owner's:** scan the printed code under a downloaded Funny Multi picture with a phone; it should
+open the landing page. Once confirmed, B-28 is fully closed. **Next, the owner's, unchanged from
+Step 94:** once Google decides on Funny One — D5 (recommended: leave Catalog Access on), *Submit*
+for Funny Multi, then the Play installs and checks. The agent has no open task; B-27 is the next
+one if the owner wants it. Then the same note as before:
 
 **Step 94 (B-26): a new
 version no longer reloads a game in progress — both clients hold the service worker's reload

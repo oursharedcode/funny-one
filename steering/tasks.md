@@ -178,7 +178,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   (Step 72)**; `https://www.oursharedcode.com/` links to the page from a "Games" card.
   **The open-source card redesigned 2026-10-29 (Step 95, owner request):** the family
   (`local_docs/family_sil.jpg`) now stands beside the card, and it links both `funny-one` and the
-  new `funny-stories` repository, as two tiles. **Code done, not yet pushed or deployed.**
+  new `funny-stories` repository, as two tiles. **Each tile got a hopping external-link arrow
+  2026-10-29 (Step 98, owner request).** **Code done, not yet pushed or deployed.**
   - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); design B's loop on
     a real iPhone (Chrome plays it; on this PC Avast blocked Playwright's WebKit — Step 72's note
     of 2026-10-15).

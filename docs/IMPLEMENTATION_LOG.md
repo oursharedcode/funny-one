@@ -5916,17 +5916,53 @@ code with a phone.
 
 ---
 
+## Step 98 (task B-11) — The open-source card's two tiles get an external-link arrow (2026-10-29)
+
+Owner request: beside each repository name on the "Free and open source" card (Step 95's two
+tiles), a hopping external-link arrow where the owner's mockup marked it with a red "P" — each
+tile's whole area stays the one link to its repository, so the arrow sits inside the existing
+`<a>`, not as a link of its own.
+
+**Shipped:**
+
+- `render/art.ts`'s new `EXTERNAL_ICON` (an arrow out of a box, matching the owner's reference
+  picture); `source()` in `render/page.ts` places it at the end of each `.repo` tile, after the
+  name.
+- `landing.css`: the icon sits flush to the tile's trailing edge (so it flips sides with the
+  tile under RTL) and hops up and out on a 2.6 s loop, the second tile's hop a beat after the
+  first's; both stop under `prefers-reduced-motion: reduce`, joining the card's existing list of
+  animations that do.
+- Checked live-built (`vite preview` on its own port, 5187): screenshots of the card in English
+  and in Hebrew (the arrow correctly moves to the tile's left edge) and of both tiles at phone
+  width.
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1632 passed** (418, 397, 313, 178, 273 and 53 by workspace — the
+landing page's count unchanged at 418, its content changed, not its test count); `npm audit
+--omit=dev` 0; full `npm audit` lists only Step 95's accepted GHSA-gcqx-w48m-w2h4 (re-checked
+this session — still no non-breaking fix upstream).
+
+**Owed:** push, deploy. B-11's other owed items are unchanged (the page's strings in 13
+languages are machine drafts; design B's loop unseen on a real iPhone).
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
-**RESUME HERE (2026-10-29, after Step 97, pushed and deployed).** **Step 97 (B-28): the QR-to-
-landing-page change is live, and `funny-one`'s GitHub repository now has a description and
-website link.** `npm audit` still carries Step 95's one accepted exception, GHSA-gcqx-w48m-w2h4
+~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
+below.
+
+**RESUME HERE (2026-10-29, after Step 98, not yet pushed).** **Step 98 (B-11): the open-source
+card's two repository tiles now carry a hopping external-link arrow, matching the owner's
+mockup.** `npm audit` still carries Step 95's one accepted exception, GHSA-gcqx-w48m-w2h4
 (`deepmerge`, dev-only via `vite-plugin-pwa`) — no non-breaking fix exists yet. **Owed, the
-owner's:** scan the printed code under a downloaded Funny Multi picture with a phone; it should
-open the landing page. Once confirmed, B-28 is fully closed. **Next, the owner's, unchanged from
-Step 94:** once Google decides on Funny One — D5 (recommended: leave Catalog Access on), *Submit*
-for Funny Multi, then the Play installs and checks. The agent has no open task; B-27 is the next
-one if the owner wants it. Then the same note as before:
+agent's:** push and deploy Step 98 (`deploy/ship-funny-family.sh`) once the owner confirms.
+**Owed, the owner's, unchanged from Step 97:** scan the printed code under a downloaded Funny
+Multi picture with a phone — it should open the landing page; once confirmed, B-28 is fully
+closed. **Next, the owner's, unchanged from Step 94:** once Google decides on Funny One — D5
+(recommended: leave Catalog Access on), *Submit* for Funny Multi, then the Play installs and
+checks. The agent has no other open task; B-27 is the next one if the owner wants it. Then the
+same note as before:
 
 **Step 94 (B-26): a new
 version no longer reloads a game in progress — both clients hold the service worker's reload

@@ -15,7 +15,15 @@
 // buttons are drawn here, at build time, and cost the page no script.
 
 import type { Language } from '@funny/shared';
-import { CODE_ART, FM_ART, FO_ART, GITHUB_ICON, PAUSE_PLAY_ICONS, PLAY_ICON } from './art.ts';
+import {
+  CODE_ART,
+  EXTERNAL_ICON,
+  FM_ART,
+  FO_ART,
+  GITHUB_ICON,
+  PAUSE_PLAY_ICONS,
+  PLAY_ICON,
+} from './art.ts';
 import { esc, withLink } from './html.ts';
 import { headScript } from './headScript.ts';
 import { supportButton, supportSheet } from './support.ts';
@@ -234,7 +242,7 @@ function source(code: Language): string {
   const s = STRINGS[code];
   const repos = GITHUB_REPOS.map(
     (repo) =>
-      `<a class="repo" href="${githubUrl(repo)}" data-track="gh">${GITHUB_ICON}<span class="sr-only">${esc(GAME_NAMES[code].source)}: </span><span class="repo-name" dir="ltr"><small>${GITHUB_ORG}/</small><b>${repo}</b></span></a>`,
+      `<a class="repo" href="${githubUrl(repo)}" data-track="gh">${GITHUB_ICON}<span class="sr-only">${esc(GAME_NAMES[code].source)}: </span><span class="repo-name" dir="ltr"><small>${GITHUB_ORG}/</small><b>${repo}</b></span>${EXTERNAL_ICON}</a>`,
   );
   return `<section class="source" aria-labelledby="gh-title">
 <div class="source-wrap">

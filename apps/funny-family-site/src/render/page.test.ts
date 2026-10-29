@@ -11,7 +11,8 @@ import { hopParts } from './support.ts';
 import {
   FO_URL,
   fmUrl,
-  GITHUB_URL,
+  GITHUB_REPOS,
+  githubUrl,
   pagePath,
   privacyUrl,
   ROOT_URL,
@@ -97,14 +98,16 @@ describe('renderPage', () => {
       );
     expect(tracked('fm')).toEqual([fmUrl(code, 'a'), fmUrl(code, 'a')]);
     expect(tracked('fo')).toEqual([FO_URL, FO_URL]);
-    expect(tracked('gh')).toEqual([GITHUB_URL]);
+    expect(tracked('gh')).toEqual(GITHUB_REPOS.map(githubUrl));
     expect(tracked('video')).toEqual(['/media/clip.mp4']);
     expect(tracked('root')).toEqual([ROOT_URL]);
     expect(doc.querySelector(`a[href="${privacyUrl(code)}"]`)).not.toBeNull();
 
     const fmButton = doc.querySelector('.hero a[data-track="fm"]');
     expect(fmButton?.textContent).toBe(GAME_NAMES[code].fm);
-    expect(doc.querySelector('a[data-track="gh"]')?.textContent).toBe(GAME_NAMES[code].source);
+    expect([...doc.querySelectorAll('a[data-track="gh"]')].map((a) => a.textContent)).toEqual(
+      GITHUB_REPOS.map((repo) => `${GAME_NAMES[code].source}: oursharedcode/${repo}`),
+    );
   });
 
   it.each(CODES)('%s: the picker and the footer list every language', (code) => {

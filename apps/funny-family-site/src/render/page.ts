@@ -15,7 +15,7 @@
 // buttons are drawn here, at build time, and cost the page no script.
 
 import type { Language } from '@funny/shared';
-import { CODE_ART, FM_ART, FO_ART, PAUSE_PLAY_ICONS, PLAY_ICON } from './art.ts';
+import { CODE_ART, FM_ART, FO_ART, GITHUB_ICON, PAUSE_PLAY_ICONS, PLAY_ICON } from './art.ts';
 import { esc, withLink } from './html.ts';
 import { headScript } from './headScript.ts';
 import { supportButton, supportSheet } from './support.ts';
@@ -30,7 +30,9 @@ import {
 import {
   FO_URL,
   fmUrl,
-  GITHUB_URL,
+  GITHUB_ORG,
+  GITHUB_REPOS,
+  githubUrl,
   pagePath,
   privacyUrl,
   ROOT_LABEL,
@@ -224,15 +226,28 @@ ${steps.join('\n')}
 </section>`;
 }
 
+// The open-source card, with the family standing in an amber sun beside it
+// (owner's pick of five designs, 2026-10-29). Each repository is a tile that
+// shows its name; a screen reader hears "Source on GitHub" before it. Both
+// tiles count as the one `gh` click target.
 function source(code: Language): string {
   const s = STRINGS[code];
+  const repos = GITHUB_REPOS.map(
+    (repo) =>
+      `<a class="repo" href="${githubUrl(repo)}" data-track="gh">${GITHUB_ICON}<span class="sr-only">${esc(GAME_NAMES[code].source)}: </span><span class="repo-name" dir="ltr"><small>${GITHUB_ORG}/</small><b>${repo}</b></span></a>`,
+  );
   return `<section class="source" aria-labelledby="gh-title">
+<div class="source-wrap">
+<div class="family"><img src="/media/family.webp" alt="" width="480" height="656" loading="lazy" decoding="async"></div>
 <div class="source-card">
 ${CODE_ART}
 <div>
 <h2 id="gh-title">${esc(s.ghTitle)}</h2>
 <p>${esc(s.ghText)}</p>
-<a class="btn btn-light" href="${GITHUB_URL}" data-track="gh">${esc(GAME_NAMES[code].source)}</a>
+<div class="repos">
+${repos.join('\n')}
+</div>
+</div>
 </div>
 </div>
 </section>`;

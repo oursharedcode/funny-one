@@ -781,9 +781,44 @@ html[data-variant='b'] .cta-tag {
   padding: 72px 16px;
 }
 
+/* The family in an amber sun: above the card, beside it from 900px. Their
+   heads rise out of the circle on purpose. */
+.source-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
+.family {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: 230px;
+  aspect-ratio: 1;
+}
+
+.family::before {
+  content: '';
+  position: absolute;
+  inset: 10% 6% 0;
+  border: var(--edge);
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 6px 6px 0 var(--pink);
+}
+
+.family img {
+  position: relative;
+  width: 74%;
+  height: auto;
+}
+
 .source-card {
   display: grid;
   gap: 18px;
+  width: 100%;
   max-width: 820px;
   margin-inline: auto;
   padding: 32px 28px;
@@ -807,21 +842,66 @@ html[data-variant='b'] .cta-tag {
   color: var(--amber);
 }
 
-.btn-light {
-  border-color: var(--cream);
+/* A tile per repository: GitHub's mark, the owner small, the name large. */
+.repos {
+  display: grid;
+  gap: 14px;
+}
+
+.repo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 18px;
+  border: 2px solid var(--cream);
+  border-radius: 16px;
   background: var(--cream);
   color: var(--ink);
   box-shadow: 0 5px 0 var(--pink);
+  text-decoration: none;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background-color 0.12s;
 }
 
-.btn-light:hover {
+.repo:hover {
   background: var(--amber);
   color: var(--ink);
   box-shadow: 0 7px 0 var(--pink);
+  transform: translateY(-2px);
 }
 
-.btn-light:active {
+.repo:active {
   box-shadow: 0 1px 0 var(--pink);
+  transform: translateY(4px);
+}
+
+.gh-mark {
+  flex: none;
+}
+
+.repo-name {
+  display: grid;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.repo-name small {
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+}
+
+.repo-name b {
+  font-family: var(--display);
+  font-size: 1.25rem;
+}
+
+@media (min-width: 560px) {
+  .repos {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (min-width: 640px) {
@@ -829,6 +909,18 @@ html[data-variant='b'] .cta-tag {
     grid-template-columns: auto 1fr;
     gap: 24px;
     padding: 40px;
+  }
+}
+
+@media (min-width: 900px) {
+  .source-wrap {
+    grid-template-columns: 260px 1fr;
+    align-items: center;
+    gap: 36px;
+  }
+
+  .family {
+    width: 260px;
   }
 }
 
@@ -1112,7 +1204,10 @@ html.sheet-open {
 @media (prefers-reduced-motion: reduce) {
   .trailer-play,
   .trailer-play:hover,
-  .trailer-play:focus-visible {
+  .trailer-play:focus-visible,
+  .repo,
+  .repo:hover,
+  .repo:active {
     transition: none;
     transform: none;
   }

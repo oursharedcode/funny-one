@@ -53,7 +53,7 @@ export interface GameNames {
   fm: string;
   /** Funny One's home.title. */
   fo: string;
-  /** Funny Multi's footer.source: the GitHub link's label. */
+  /** Funny Multi's footer.source: what a screen reader hears before each repository tile. */
   source: string;
 }
 

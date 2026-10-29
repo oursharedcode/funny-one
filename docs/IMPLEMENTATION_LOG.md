@@ -5805,7 +5805,66 @@ at the owner's request: **B-27**, keeping Funny Multi's rooms alive across a dep
 
 ~~RESUME HERE (2026-10-27, after Step 94)~~ — carried into this note.
 
-**RESUME HERE (2026-10-27, after Step 94, pushed and deployed).** **Step 94 (B-26): a new
+~~RESUME HERE (2026-10-27, after Step 94, pushed and deployed)~~ — carried into Step 95's note
+below.
+
+
+---
+
+## Step 95 (task B-11) — The open-source card: the family photo, and a second repository (2026-10-29)
+
+Owner request: add `local_docs/family_sil.jpg` to the landing page's "Free and open source" card,
+and link `https://github.com/oursharedcode/funny-stories` beside the existing `funny-one` link.
+Five design variants were mocked up against the site's real styles and screenshotted at computer
+and phone width; the owner picked **Variant 5** — the family in an amber sun beside the card, the
+two repositories as tiles.
+
+**Shipped:**
+
+- `public/media/family.webp` (39 KB): `family_sil.jpg`'s white background dropped to transparency,
+  cropped to the figures and resized to 480 px wide, so the thin interior lines read against
+  whatever sits behind them.
+- `source()` in `render/page.ts` now renders the family inside an amber circle (`.family`,
+  `landing.css`) beside the card, and `GITHUB_REPOS`/`githubUrl()` (`links.ts`) replace the single
+  `GITHUB_URL` constant — one tile per repository (`render/art.ts`'s new `GITHUB_ICON`), each
+  showing `oursharedcode/<repo>` and carrying the existing `data-track="gh"`, so both count as the
+  one click target Funny Multi's analytics already expects (`page.test.ts` updated to expect both
+  hrefs and both accessible labels). No string changed; a screen reader still hears each
+  language's "Source on GitHub" (`ghTitle`'s translation) before the repository name.
+- Checked live-built (`vite preview` on its own port, 5187) in English at computer and phone
+  width, in Hebrew (right-to-left tile order) and in Tamil (longest text) at tablet width — the
+  family, the card and both tiles hold their layout in all four.
+
+**Seen on the way, not part of this task:** `npm audit` surfaces a new low-severity advisory,
+unrelated to this change — **GHSA-gcqx-w48m-w2h4**, `deepmerge` prototype poisoning, pulled in by
+`funny-multi-client`'s `vite-plugin-pwa` → `workbox-build` → `@rollup/plugin-node-resolve`.
+`npm audit --omit=dev` is 0 (dev-only, never reaches production); the only fix npm offers is
+`npm audit fix --force`, which downgrades `vite-plugin-pwa` to 0.2.1 (breaking). The owner chose
+to accept it by ID, Step 53's pattern — no lockfile change, so it rides in this step rather than
+a commit of its own. Gate rule until a non-breaking fix ships: full `npm audit` lists only
+GHSA-gcqx-w48m-w2h4; re-check `npm view deepmerge versions` and `npm view vite-plugin-pwa
+versions` each session and drop the exception once one exists.
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: **1630 passed** (418, 395, 313, 178, 273 and 53 by workspace — the
+landing page's count unchanged at 418, its content changed, not its test count); `npm audit
+--omit=dev` 0; full `npm audit` lists only GHSA-gcqx-w48m-w2h4 (accepted above).
+
+**Owed:** none — shipped, tested, not yet pushed or deployed.
+
+---
+
+**RESUME HERE (2026-10-29, after Step 95, not yet pushed).** **Step 95 (B-11): the landing page's
+open-source card now shows the family photo beside it and links both `funny-one` and
+`funny-stories`.** Not yet pushed or deployed — pending the owner's confirmation on the commit.
+`npm audit` carries one new accepted exception: GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via
+`vite-plugin-pwa`) — drop it once a non-breaking fix exists (`npm view deepmerge versions`,
+`npm view vite-plugin-pwa versions`). **Next, the owner's, unchanged from Step 94:** once Google
+decides on Funny One — D5 (recommended: leave Catalog Access on), *Submit* for Funny Multi, then
+the Play installs and checks. The agent has no open task; B-27 is the next one if the owner wants
+it. Then the same note as before:
+
+**Step 94 (B-26): a new
 version no longer reloads a game in progress — both clients hold the service worker's reload
 until Home.** Pushed (`b2e27fb..a36fa9c`), CI passed (run `40422235804`), both games deployed
 and checked live (Funny One 10:53, Funny Multi 11:02 AEDT, image `funny-multi:a36fa9c`). Both
@@ -6138,5 +6197,7 @@ pressed flag is not scrolled into view~~ fixed in Step 91; ~~the landing page ha
 in Step 91; a multi-language room's invite (`&multi=1`) also names the room's language
 (`LobbyScreen.tsx:52`), which wins over the joiner's phone, so a Korean phone opens the join
 screen in the room's language and its player picks Korean by hand — whether such an invite should
-leave the joiner's phone language instead (Step 88).
+leave the joiner's phone language instead (Step 88); `npm audit`'s new exception,
+GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) — drop it once a
+non-breaking `vite-plugin-pwa` exists.
 

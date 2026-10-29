@@ -14,8 +14,15 @@ export const FM_ORIGIN = 'https://www.funny37.oursharedcode.com';
 // one its player picked last time.
 export const FO_URL = 'https://www.funny1.oursharedcode.com/';
 
-// The repository Funny Multi's footer already links (its SOURCE_URL).
-export const GITHUB_URL = 'https://github.com/oursharedcode/funny-one';
+export const GITHUB_ORG = 'oursharedcode';
+
+// The open-source card's repositories: this one, which Funny Multi's footer
+// already links (its SOURCE_URL), and funny-stories (added 2026-10-29).
+export const GITHUB_REPOS = ['funny-one', 'funny-stories'] as const;
+
+export function githubUrl(repo: string): string {
+  return `https://github.com/${GITHUB_ORG}/${repo}`;
+}
 
 export const ROOT_URL = 'https://www.oursharedcode.com/';
 export const ROOT_LABEL = 'oursharedcode.com';

@@ -176,9 +176,15 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   request: the jumping words "Support Author" beside the heart on «Чепуха 37»'s home screen
   (under it, a long label wrapped and ran into the title). **Code done and deployed 2026-10-14
   (Step 72)**; `https://www.oursharedcode.com/` links to the page from a "Games" card.
-  - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); the GitHub link
-    answers 404 while the repository is private; design B's loop on a real iPhone (Chrome plays
-    it; on this PC Avast blocked Playwright's WebKit — Step 72's note of 2026-10-15).
+  **The open-source card redesigned 2026-10-29 (Step 95, owner request):** the family
+  (`local_docs/family_sil.jpg`) now stands beside the card, and it links both `funny-one` and the
+  new `funny-stories` repository, as two tiles. **Code done, not yet pushed or deployed.**
+  - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); design B's loop on
+    a real iPhone (Chrome plays it; on this PC Avast blocked Playwright's WebKit — Step 72's note
+    of 2026-10-15).
+  - *Resolved on the way, Step 95:* the GitHub link's 404 (the repository was private) — both
+    `funny-one` and `funny-stories` answer 200 now; the repository was made public at some point
+    since Step 72, outside this project's sessions.
   - *Seen on the way, older than B-11, not fixed:* Funny Multi's Tamil home title «வேடிக்கையான
     கதைகள்» is wider than a phone (≈ 440 px at 48 px; cut at 320–390 px) since 2026-08-16 — with
     B-3's review of the home titles, or a smaller size for a long title.

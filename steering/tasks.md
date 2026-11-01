@@ -163,6 +163,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   affiliate links in README/HUB only; the v2 animation export as the gift thank-you;
   grants/credits (Screen Australia games fund, Cloudflare/Oracle startup credits, Open
   Collective for language packs); ad network on «Чепуха 37» only — separate decision.
+  **The first seasonal pack is B-29, the Christmas 2026 edition (2026-11-01)** — a paid edition
+  with a free slice, not free content as written above; the other lines stand.
 - **B-11** The landing page «Семейная Чепуха» at `https://www.funny-family.oursharedcode.com/`
   (owner request 2026-10-14; the address replaces 2026-10-03's `www.funny.…`) — the common page
   for both games: what each one is, links to both and to the GitHub repository, and the trailer
@@ -179,7 +181,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   **The open-source card redesigned 2026-10-29 (Step 95, owner request):** the family
   (`local_docs/family_sil.jpg`) now stands beside the card, and it links both `funny-one` and the
   new `funny-stories` repository, as two tiles. **Each tile got a hopping external-link arrow
-  2026-10-29 (Step 98, owner request).** **Code done, not yet pushed or deployed.**
+  2026-10-29 (Step 98, owner request); pushed the same day** — `3bc8cbe..dffa428`, CI run
+  `40874552465` — and live, checked 2026-11-01 (Step 99).
   - *Owed:* the page's strings in 13 languages are machine drafts (with B-3); design B's loop on
     a real iPhone (Chrome plays it; on this PC Avast blocked Playwright's WebKit — Step 72's note
     of 2026-10-15).
@@ -466,6 +469,63 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   description and a website link to the landing page — also Step 97.
   - *Owed, the owner's:* one live check — download a picture from `https://funny37…` and scan
     the code with a phone, any language. Close the task once confirmed.
+- **B-29** The Christmas 2026 edition — Funny Multi's first paid pack (owner decisions
+  2026-11-01, chosen from seven payment strategies compared in Step 99's log entry; B-10's
+  "seasonal packs" line taken up). **Ahead of B-27** (owner decision 2026-11-01: Christmas is
+  dated, B-27 is not). Funny Multi only; nothing for the children's product.
+  - *Product:* one price, **A$2.60**, unlimited rooms, **never expires** — nothing that runs out
+    or stops, so nothing to dispute. English name "Christmas 2026 edition"; Russian
+    **«Новый год 2027»**, covering three days — католическое Рождество 25 декабря 2026, Новый
+    год, православное Рождество 7 января 2027. The pack is a room property the host sets.
+  - *Languages (20):* en, de, fr, it, es-es, es-419, pt-br, uk, ko, yue, id, sw, yo (Christmas
+    is the main winter festival); ja, zh, hi, ta, te, bn (secular, or a large minority — worth
+    the machine draft); ru, written by the owner. **Out:** ar, he (Hanukkah, 4–12 Dec 2026),
+    fa (Yalda, 20/21 Dec) — a winter edition of their own later, if ever.
+  - *Funnel:* a landing variant (`?pack=chr26`, as `?v=` picks a design today) with two big
+    "Christmas pack — try it free" buttons, hopping letters, one at the top and one at the foot;
+    shown 29 November (Advent Sunday) to 7 January. **The free trial is a slice, not a count:**
+    every room gets a quarter of the Christmas words and pictures, forever; the pack unlocks the
+    rest. No fingerprint, nothing to game, the trial is the demo. The pay prompt appears on the
+    host's screen between games, after the first free cartoon, never mid-story. Three new
+    funnel steps on `/stats/`, per language (DD-15).
+  - *Code:* signed, `XMAS26-XXXX-XXXX`, verified by the server with a secret and no database;
+    the host puts it in a bookmarkable create-room link, so the app stores nothing (B-25's
+    promise holds). A leaked code costs nothing to serve; a small blocklist revokes one. The
+    code field is **web-only** — the Android shell shows the free slice and never a price, so
+    Play's payments policy and the Data Safety form are untouched (as `storeShell.ts` hides
+    Support, B-1c).
+  - *Rails and posture:* **Australia — PayID**, the pending code is the payment reference and
+    the owner activates it on receipt (a manual match per sale); **anywhere — Lightning**, an
+    invoice service with a webhook, automatic; **abroad — a GitHub Sponsors one-time tier**,
+    the code in the tier's welcome message plus a webhook: GitHub is the merchant of record,
+    so EU/UK VAT and India's OIDAR GST (due from the first sale for a foreign seller) are
+    GitHub's. Abroad the pack is a **thank-you for a sponsorship, not a sale**. Ko-fi stays a
+    gift link and issues no code (the one rail with chargebacks). Price shown in the host's
+    currency as an approximation; the payment labelled `FUNNY XMAS26 <code>`.
+  - *Refunds:* policy shown before paying, consumer-law-safe wording ("no refunds for change of
+    mind; a pack that doesn't work is fixed or refunded"); the code appears on the page the
+    moment payment lands, email the backup copy; a "lost code" lookup by payment reference.
+  - *Receipt log (owner decision 2026-11-01):* **paid rooms only**, an append-only file on the
+    `funny_stats_data` volume (survives a deploy, like the visit counts): the code's issue (time,
+    rail, the rail's reference, amount, where delivered), the policy version shown, every room
+    created with it (time, room code, language, players, IP country, browser family — no full
+    IP, no fingerprint), every game (rounds, picks, cartoons delivered, downloads, shares). Kept
+    18 months. Free players stay as today: visit counts only. One privacy-policy paragraph in
+    23 languages (machine drafts, B-3).
+  - *Content — the long pole:* one concept set, one picture batch (5 options per visual slot
+    = 625 pictures; the paid Workers AI plan comes back for a day, then off again — Play's
+    AI-content policy, B-1e); a few Southern-Hemisphere options (beach, barbecue) for Australia
+    and Brazil. 20 word lists as **local glosses, not translations** — the local gift-bringer
+    (Reyes for Spain, Befana for Italy, Святий Миколай for Ukraine and never Дід Мороз, Дед
+    Мороз, мандарины and оливье for Russian): en and ru by the owner, 18 machine drafts with
+    that brief, on B-3's pile.
+  - *Rejected on the way:* device fingerprinting (breaks the privacy promise, adds no dispute
+    evidence, locks out shared Wi-Fi); counted rounds (the refund magnet); Play Billing
+    (chargebacks passed to developers since 2026-08-03, Google's 15% cut); a direct sale abroad
+    (tax registration from the first sale).
+  - *Owed before building:* the Sponsors tier and webhook; the Lightning service; the Workers
+    AI day for the batch; the owner's en/ru word lists. The PayID match stays the owner's op,
+    one per sale.
 
 ## Dependency notes
 

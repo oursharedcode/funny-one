@@ -5947,22 +5947,167 @@ languages are machine drafts; design B's loop unseen on a real iPhone).
 
 ---
 
+## Step 99 (task B-29) — The Christmas 2026 edition filed; two audit advisories accepted (2026-11-01)
+
+Owner request, after the morning's plan: find the documentation's seasonal — Christmas —
+monetisation option and lay it out; then "Christmas 2026: suggest seven payment strategies", on
+the owner's own example (a `v=chr26` landing variant with two big jumping-letter buttons, five
+free rounds, the device registered — IP, phone model, browsers, screen size — then paid rounds
+only, 49¢ for 5 or A$2.60 for 26, a token by email, every payment and played round stored to
+refuse refunds), with the best sales-funnel practice and the least refund and chargeback risk;
+then the language scope widened to every Christmas-celebrating locale, India included; then the
+decisions below; then "all recommended" — file the task now, ahead of B-27, and settle the audit
+gate.
+
+**Where the documentation stood:** D-6 — a fully commercial product, no card merchant of record
+beyond the Ko-fi and Buy Me a Coffee links, gifts over PayID, Sponsors and Lightning, ads on
+«Чепуха 37» only and later; B-10's backlog line "seasonal packs", as free content; D-7 — the
+library pre-generated, generation off; Play's chargeback shift of 2026-08-03; B-25 — Funny Multi
+keeps nothing on the device; B-1c — the store shell hides Support. No seasonal design existed
+beyond the line.
+
+**The rules first** — they cut refunds and chargebacks whatever the strategy, and the owner's
+example broke three: the paywall after the value moment (the first Christmas cartoon free and
+finished, the prompt on the host's screen between games, never mid-story); no card in the trial;
+sell what cannot run out — counters and clocks are what refund requests are made of; the
+chargeback-free rails first (PayID and Lightning have no dispute mechanism; card rails last, and
+there refund on request — a refund costs A$2.60, a lost dispute A$2.60 plus about A$20–25);
+instant, visible delivery (the code on the page the moment payment lands; the server sends no
+email today); evidence, not fingerprints (phone model, browser list and screen size weigh
+nothing in a dispute, break B-25's promise, the Play Data Safety form and GDPR for 178
+countries, and shared home Wi-Fi makes IP checks lock out the wrong families — while a free round
+costs nothing to serve); the refund policy before paying, in consumer-law-safe wording (a flat
+"no refunds" is unlawful in Australia); and a payment that names itself, `FUNNY XMAS26 <code>`.
+
+**The seven strategies**, each with its chargeback risk / refund claims / owner effort per sale
+/ host friction / build:
+
+1. The owner's example tightened — round packs over PayID and Lightning, the code issued before
+   payment as the PayID reference, rounds counted per room, not per device: none / counter
+   disputes / a manual match per PayID sale / medium / a counter and state. Its anchor was
+   broken (9.8¢ against 10¢ a story).
+2. **A "Christmas 2026 edition" — one price, A$2.60, unlimited rooms, never expires; the free
+   trial a slice (a quarter of the words and pictures, forever), not a count; a signed code
+   verified with a secret and no database, carried in a bookmarkable create-room link:** none /
+   "didn't work" only / manual for PayID, automatic for the rest / low / a stateless code.
+   **Chosen.**
+3. Gift-first — the pack as the thank-you for any gift of A$2.60 or more, inside D-6(c): none /
+   none / manual / low / the smallest build; weaker copy, since one cannot say "buy". **Its
+   posture is kept for abroad.**
+4. Pay per room over Lightning only — about 900 sats unlock this room, no code, no email: none /
+   none / none / high (crypto) / an invoice service with a webhook. **Kept as a rail.**
+5. Codes sold by a platform that delivers them — a Ko-fi Shop product, or a GitHub Sponsors tier
+   with the code in its welcome message, both with webhooks: Ko-fi has chargebacks, Sponsors
+   needs a GitHub account; minimums rule out 49¢. **The Sponsors half is kept, for abroad.**
+6. Play Billing in the Android app — the best Android conversion, but since 2026-08-03 Google
+   passes chargebacks to the developer (the price less its 15% cut, plus US$15–25), a Bubblewrap
+   rebuild and a Play review. **Rejected for now.**
+7. A sponsor buys the codes — a venue buys 50 for A$50 by ABN invoice, the landing variant
+   carries its name: a business contract, no consumer refunds, the selling in person. **Kept in
+   reserve.**
+
+**Decisions (the owner's, 2026-11-01):** strategy 2, with 4 as a rail and 7 in reserve; the
+edition never expires; day-one rails PayID in Australia (the owner's manual match per sale),
+Lightning anywhere, and abroad a GitHub Sponsors one-time tier — the pack a thank-you for a
+sponsorship, not a sale, GitHub the merchant of record, so EU/UK VAT and India's OIDAR GST (due
+from the first sale for a foreign seller) are GitHub's; Ko-fi stays a gift link and issues no
+code; 20 languages — the 13 certain (en, de, fr, it, es-es, es-419, pt-br, uk, ko, yue, id, sw,
+yo), six worth the machine draft (ja, zh, hi, ta, te, bn), Russian by the owner, no Arabic (he
+and fa out with it — Hanukkah, 4–12 December, and Yalda are a winter edition of their own, if
+ever); the Russian name «Новый год 2027», covering католическое Рождество 25 декабря 2026, Новый
+год and православное Рождество 7 января 2027; the word lists local glosses, not translations
+(Reyes, Befana, Святий Миколай and never Дід Мороз); "record all client actions to defend the
+developer's stand" became a receipt log of **paid rooms only, no fingerprints** — the code's
+issue, the policy version shown, every room and game played with it, IP country and browser
+family only, kept 18 months, one privacy paragraph in 23 languages — since logging every free
+player would break B-25's promise and the Data Safety form and buys no evidence; and B-29 filed
+now, ahead of B-27 (Christmas is dated, B-27 is not).
+
+**Written:** `steering/tasks.md` — the B-29 block (product, languages, funnel, code, rails and
+posture, refunds, receipt log, content, rejected on the way, owed before building) and a pointer
+in B-10; `steering/requirements.md` — D-6(e) amended with the edition, its rails and its
+posture, so (a) and (c) still hold and no tax registration abroad is triggered. Nothing is
+built: the content is the long pole (20 word lists; one 625-picture batch, five options per
+visual slot, which needs the paid Workers AI plan back for a day), and the funnel is dated —
+Advent Sunday, 29 November, to 7 January.
+
+**The audit gate, the morning's finding:** `npm audit` listed 24 entries (2 low, 22 moderate),
+3 in production, all from three advisories. On the owner's word `npm audit fix` without
+`--force` ran first: it bumped `@fastify/send` 4.1.1→4.2.0, `@fastify/static` 10.1.3→10.1.8 and
+`content-disposition` 2.0.1→3.0.0 and fixed nothing — still 24 — so the bumps were reverted and
+the lockfile is unchanged, no step. (Found on the way: `npm install` here — npm 10.9.3 on Node
+22.19.0 — strips the `libc` lines a newer npm wrote into the lockfile for six optional platform
+packages; harmless churn, reverted too, and worth recognising in a diff.) What remained was
+shown to the owner, each with its reason, and **accepted by ID on the owner's word
+(2026-11-01):**
+
+- **GHSA-g3hv-75wg-m249** — `minimatch` < 11.0.1, moderate: denial of service by globparts
+  amplification of a crafted pattern. In production the only pattern is `**/**`, hard-coded in
+  `@fastify/static`, run once at start-up over the built client folder (`index.ts:244`); a
+  player never supplies a pattern.
+- **GHSA-3g3m-2fjr-6pw4** — `glob` ≥ 9.0.0 ≤ 14.0.1, moderate: a cancelled walk kept reading
+  directories after its `AbortSignal` fired. No caller here passes a signal.
+
+Both sit under `@fastify/static@10.1.3 → glob@13 → minimatch@10`. The latest `@fastify/static`,
+10.1.8, and its main branch still pin `glob ^13.0.0` (whose `minimatch` is `^10.2.2`); `glob`
+14.0.3 and `minimatch` 11.0.3 exist, and only an npm `overrides` entry would force them in — a
+`package.json` change, a step of its own with a production-mode local start, since the tests
+never mount the static plugin — declined for now, the option if upstream stays silent. npm's own
+offer is a downgrade to `@fastify/static` 6.12.0 (Fastify 4's) — rejected. Upstream's PR #571
+(use Node's own `fs.glob`) has been open since 2026-08-06. The same two advisories reach the
+dev-only chains — `eslint` 8.57.1, `@typescript-eslint` 7.18.0, `vite-plugin-pwa` 1.3.0 →
+`workbox-build` → `glob`, and `ejs` → `jake` → `filelist` — with no in-range fix either (npm
+offers semver-major downgrades or nothing); accepted under the same two IDs. Step 95's
+GHSA-gcqx-w48m-w2h4 (`deepmerge`) stands.
+
+**Bookkeeping corrected:** Step 98 is pushed (`3bc8cbe..dffa428`, CI run `40874552465`) and
+live — checked 2026-11-01 (`ext-mark` twice in the live page, `.ext-mark` and `repo-hop` in its
+CSS) — where its RESUME note and B-11's block still said "not yet pushed or deployed"; and the
+"still open" list's `funny-one` description line, done in Step 97.
+
+Gates: typecheck 0, lint 0, `format:check` clean; `npm test` outside the sandbox from
+`C:/Mark/Dev/funnyone`: 1631 of 1632 on the first run (418, 397, 312 of 313, 178, 273 and 53
+by workspace) — the one failure `disconnect.socket.test.ts`'s grace-window timing, with the
+agent's transcript scan running alongside; re-run in isolation **13 of 13 passed**, so **1632
+passed** in all; `npm audit --omit=dev` 3 and the full `npm audit` 24, every entry under the
+three accepted IDs above (`npm audit fix` without `--force` taken first: nothing fixed,
+reverted); CI after the push.
+
+**Owed:** push on the owner's word (no deploy — nothing shipped). B-29's own owed list is in its
+block: the Sponsors tier and webhook, the Lightning service, the Workers AI day, the owner's
+en/ru word lists; the PayID match stays the owner's op, one per sale.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
 below.
 
-**RESUME HERE (2026-10-29, after Step 98, not yet pushed).** **Step 98 (B-11): the open-source
-card's two repository tiles now carry a hopping external-link arrow, matching the owner's
-mockup.** `npm audit` still carries Step 95's one accepted exception, GHSA-gcqx-w48m-w2h4
-(`deepmerge`, dev-only via `vite-plugin-pwa`) — no non-breaking fix exists yet. **Owed, the
-agent's:** push and deploy Step 98 (`deploy/ship-funny-family.sh`) once the owner confirms.
-**Owed, the owner's, unchanged from Step 97:** scan the printed code under a downloaded Funny
-Multi picture with a phone — it should open the landing page; once confirmed, B-28 is fully
-closed. **Next, the owner's, unchanged from Step 94:** once Google decides on Funny One — D5
-(recommended: leave Catalog Access on), *Submit* for Funny Multi, then the Play installs and
-checks. The agent has no other open task; B-27 is the next one if the owner wants it. Then the
-same note as before:
+~~RESUME HERE (2026-10-29, after Step 98, not yet pushed)~~ — carried into Step 99's note
+below.
+
+**RESUME HERE (2026-11-01, after Step 99, not yet pushed).** **Step 99 (B-29): the Christmas
+2026 edition — Funny Multi's first paid pack — is filed in `steering/tasks.md` from the owner's
+decisions of 2026-11-01, ahead of B-27; nothing is built yet.** Step 98 is pushed
+(`3bc8cbe..dffa428`, CI run `40874552465`) and live. `npm audit` carries three accepted
+exceptions, none with an in-range fix: Step 95's GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only) and
+Step 99's GHSA-g3hv-75wg-m249 (`minimatch`) and GHSA-3g3m-2fjr-6pw4 (`glob`), the last two in
+production under `@fastify/static` — re-check each session; drop them when `@fastify/static`
+moves off `glob` (its PR #571) or an in-range fix appears. **Owed, the agent's:** push Step 99
+once the owner confirms (no deploy — nothing shipped). **Next, the agent's: B-29**, in the order
+its block gives — the content first, the long pole (the owner's en/ru word lists, 18 machine
+drafts, one 625-picture batch with the paid Workers AI plan back for a day), then the signed code
+and the server's check, the create-room link, the landing variant and its three funnel steps,
+the rails (a Sponsors one-time tier with a webhook, a Lightning invoice service, PayID matched
+by hand), the receipt log and the privacy paragraph — live by Advent Sunday, 29 November.
+**Owed, the owner's, before B-29 builds:** the en/ru word lists, the Sponsors tier, the choice
+of Lightning service, a day of the paid Workers AI plan. **Owed, the owner's, unchanged from
+Step 97:** scan the printed code under a downloaded Funny Multi picture with a phone — it should
+open the landing page; once confirmed, B-28 is fully closed. **Next, the owner's, unchanged from
+Step 94:** once Google decides on Funny One — D5 (recommended: leave Catalog Access on), *Submit*
+for Funny Multi, then the Play installs and checks. B-27 waits behind B-29. Then the same note
+as before:
 
 **Step 94 (B-26): a new
 version no longer reloads a game in progress — both clients hold the service worker's reload
@@ -6185,12 +6330,18 @@ the new name in Payments Center → Review updates, before its deadline. Enrollm
 are not in this repo (Step 54).
 
 `npm audit` gate since Step 94: both `npm audit --omit=dev` and the full `npm audit` must
-report 0 — no exception is left. Step 53's `braces` exception went in Step 89; Step 67's
-GHSA-rj75-hqrm-r3gf went when GitHub revised the advisory on 2026-10-26 to count
-`postcss-selector-parser` 6.1.5, the version Tailwind 3 already has here, as fixed. Anything
-listed fails the gate — stop and ask. An in-range fix that npm offers (`npm audit fix` without
-`--force`) is taken as its own lockfile step once the owner says so, as Steps 67 and 89 did; a
-dev-only advisory with no fix is accepted by its ID only on the owner's word (Step 53).
+report nothing beyond the accepted exceptions — three as of Step 99: GHSA-gcqx-w48m-w2h4
+(`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95), and GHSA-g3hv-75wg-m249 (`minimatch`)
+with GHSA-3g3m-2fjr-6pw4 (`glob`), in production under `@fastify/static` and in the dev chains,
+accepted 2026-11-01 (Step 99, reachability in its entry) — re-checked each session, dropped
+when `@fastify/static` moves off `glob` (its PR #571) or an in-range fix appears. Step 53's
+`braces` exception went in Step 89; Step 67's GHSA-rj75-hqrm-r3gf went when GitHub revised the
+advisory on 2026-10-26 to count `postcss-selector-parser` 6.1.5, the version Tailwind 3 already
+has here, as fixed. Anything else listed fails the gate — stop and ask. An in-range fix that npm
+offers (`npm audit fix` without `--force`) is taken as its own lockfile step once the owner says
+so, as Steps 67 and 89 did (Step 99's run bumped three packages and fixed nothing, so it was
+reverted — no step); an advisory with no fix is accepted by its ID only on the owner's word,
+each shown with its reason first (Step 53; Step 99 extended this to production).
 
 The paid Workers AI plan is cancelled; production generation is off (`[ai]` commented out in
 `wrangler.toml`), which is what B-13's `liveGeneration: false` reports. The picture library's
@@ -6297,8 +6448,10 @@ pressed flag is not scrolled into view~~ fixed in Step 91; ~~the landing page ha
 in Step 91; a multi-language room's invite (`&multi=1`) also names the room's language
 (`LobbyScreen.tsx:52`), which wins over the joiner's phone, so a Korean phone opens the join
 screen in the room's language and its player picks Korean by hand — whether such an invite should
-leave the joiner's phone language instead (Step 88); `npm audit`'s new exception,
-GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) — drop it once a
-non-breaking `vite-plugin-pwa` exists; `funny-one`'s GitHub repository has no description, unlike
-`funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's wording.
+leave the joiner's phone language instead (Step 88); `npm audit`'s three accepted exceptions —
+GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) and Step 99's
+GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4 (`minimatch` and `glob` under `@fastify/static`,
+production too) — drop each once a non-breaking fix exists; ~~`funny-one`'s GitHub repository
+has no description, unlike `funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's
+wording~~ done in Step 97.
 

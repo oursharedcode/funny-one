@@ -6079,6 +6079,23 @@ en/ru word lists; the PayID match stays the owner's op, one per sale.
 
 ---
 
+## Step 100 (task B-29) — Step 99 pushed; CI green (2026-11-01)
+
+**Shipped:**
+
+- Pushed `dffa428..9d8d74c` (Step 99's commit) on the owner's word; CI passed (run
+  `41279053938`: typecheck, lint, test). Nothing to deploy — Step 99 changed `steering/` and
+  this log only.
+
+No code changed this step — a push and this record — so the six gates don't re-apply; Step 99's
+run stands. The end-of-session check closed no task: B-29 stays open and unticked, filed and not
+built; B-28 still waits on the owner's QR scan.
+
+**Owed:** push this commit on the owner's word. Everything else is B-29's own list and the
+owner's items in the note below.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6087,15 +6104,20 @@ below.
 ~~RESUME HERE (2026-10-29, after Step 98, not yet pushed)~~ — carried into Step 99's note
 below.
 
-**RESUME HERE (2026-11-01, after Step 99, not yet pushed).** **Step 99 (B-29): the Christmas
+~~RESUME HERE (2026-11-01, after Step 99, not yet pushed)~~ — carried into Step 100's note
+below.
+
+**RESUME HERE (2026-11-01, after Step 100, not yet pushed).** **Step 99 (B-29): the Christmas
 2026 edition — Funny Multi's first paid pack — is filed in `steering/tasks.md` from the owner's
-decisions of 2026-11-01, ahead of B-27; nothing is built yet.** Step 98 is pushed
-(`3bc8cbe..dffa428`, CI run `40874552465`) and live. `npm audit` carries three accepted
-exceptions, none with an in-range fix: Step 95's GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only) and
-Step 99's GHSA-g3hv-75wg-m249 (`minimatch`) and GHSA-3g3m-2fjr-6pw4 (`glob`), the last two in
-production under `@fastify/static` — re-check each session; drop them when `@fastify/static`
-moves off `glob` (its PR #571) or an in-range fix appears. **Owed, the agent's:** push Step 99
-once the owner confirms (no deploy — nothing shipped). **Next, the agent's: B-29**, in the order
+decisions of 2026-11-01, ahead of B-27; nothing is built yet. Step 100 records Step 99's push
+(`dffa428..9d8d74c`, CI run `41279053938` green); only Step 100's own commit is unpushed.**
+Step 98 is pushed (`3bc8cbe..dffa428`, CI run `40874552465`) and live. `npm audit` carries three
+accepted exceptions, none with an in-range fix: Step 95's GHSA-gcqx-w48m-w2h4 (`deepmerge`,
+dev-only) and Step 99's GHSA-g3hv-75wg-m249 (`minimatch`) and GHSA-3g3m-2fjr-6pw4 (`glob`), the
+last two in production under `@fastify/static` — re-check each session; drop them when
+`@fastify/static` moves off `glob` (its PR #571) or an in-range fix appears. **Owed, the
+agent's:** push Step 100 once the owner confirms (no deploy — nothing shipped). **Next, the
+agent's: B-29**, in the order
 its block gives — the content first, the long pole (the owner's en/ru word lists, 18 machine
 drafts, one 625-picture batch with the paid Workers AI plan back for a day), then the signed code
 and the server's check, the create-room link, the landing variant and its three funnel steps,

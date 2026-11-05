@@ -6149,6 +6149,140 @@ unconfirmed; `FUNNY XMAS26 K7QM-3FPA` is 22).
 
 ---
 
+## Step 102 — Audit: `@fastify/static` 10.1.3 → 10.1.10 in range clears production, lockfile only (2026-11-05)
+
+`/endsession`'s `npm audit` found Step 99's two production exceptions fixable in range:
+`@fastify/static` 10.1.10 takes `glob` 14, where Step 99's 10.1.8 still pinned `glob` 13. An
+exception stands only while no in-range fix exists, so the gate failed. The owner chose "bump
+first": `npm audit fix` without `--force` as a lockfile step of its own, committed ahead of
+Step 103, with the gates and one production-mode local start, since the tests never mount the static
+plugin.
+
+**Shipped:** `package-lock.json` only; no `package.json` changed. `@fastify/static`
+10.1.3 → 10.1.10, and under it `glob` 13.0.6 → 14.0.3, `minimatch` 10.2.6 → 11.0.4, `path-scurry`
+3.0.0 and `@isaacs/nonrecursive-glob-match` 1.0.3 (new); `@fastify/send` 4.1.1 → 4.2.1;
+`content-disposition` 2.0.1 → 3.0.0. The top-level `path-scurry` 2.0.2 is dev-only now. npm's `libc`
+churn (six hunks) reverted, as in Step 99.
+
+**Verified:** `npm audit --omit=dev` reports 0: GHSA-3g3m-2fjr-6pw4 (`glob`) and GHSA-g3hv-75wg-m249
+(`minimatch`) are out of production. The full `npm audit` lists 11 entries (2 low, 9 moderate; 12
+before the bump), all under the three accepted IDs and all in dev chains: GHSA-gcqx-w48m-w2h4
+(`deepmerge`, via `@rollup/plugin-node-resolve` and `workbox-build` under `vite-plugin-pwa`);
+GHSA-3g3m-2fjr-6pw4 (`workbox-build`'s own `glob`); GHSA-g3hv-75wg-m249 (`minimatch`:
+`workbox-build`'s copy, and the top-level one under `@typescript-eslint/typescript-estree`). npm
+offers each fix only with `--force`, as a downgrade (`vite-plugin-pwa` 1.3.0 → 1.1.0,
+`@typescript-eslint/parser` 7.18.0 → 6.15.0), so all three stay accepted.
+
+**Node 20, found on the way:** `content-disposition` 3.0.0 is an ES module only and declares Node 22
+or later, while CI (`node-version: 20`), the `Dockerfile` (`node:20-alpine`) and the root `engines`
+(`>=20`) are on Node 20, out of support since 2026-04-30. `@fastify/static` loads it with
+`require()`, which Node 20 allows from 20.19 (`require(esm)`, on by default), and npm only warns on
+an `engines` mismatch (there is no `.npmrc`, so no `engine-strict`), so the image's `npm ci` should
+pass, though no image was built in this step. Checked with this PC's Node 20.20.1 (nvm's copy, run
+by its path; the default stays 22.19.0): the module loads with no warning, and the start below ran
+on it. `deploy/ship.sh` builds from the `node:20-alpine` cached on this PC without pulling, so
+before the next deploy, `docker run --rm node:20-alpine node -v` must show 20.19 or later.
+
+**The production-mode start:** `npm run build`, then `apps/funny-multi-server/dist/index.js` under
+Node 20.20.1 on port 3000 with `NODE_ENV=production`; a preload stubbed `process.loadEnvFile`, so
+the repo `.env` never loaded, and the Worker was a dummy address. `/`, `/?room=ABCDEF` and an
+unknown deep path each returned `dist/index.html` byte for byte; a JS and a CSS asset (byte for
+byte), `sw.js` and `manifest.webmanifest` came back 200 with their types; the Socket.IO polling
+handshake answered; nothing at warning level or above in the log; port 3000 free again afterwards.
+
+Gates: one run for Steps 102 and 103 together, on the tree that holds both — this commit's tree
+differs from it only by Step 103's files, none of which reaches `@fastify/static`, and stashing them
+under `core.autocrlf` would have rewritten LF files: typecheck 0, lint 0, `format:check` clean;
+`npm test` outside the sandbox from `C:/Mark/Dev/funnyone`: **1674 passed** (418, 397, 329, 178, 299
+and 53 by workspace); `npm audit --omit=dev` 0 and the full `npm audit` 11, as above; CI after the
+push, which runs on the last commit only.
+
+**Owed:** the fix reaches production with the next deploy, after the `node -v` check above — not
+urgent, since Step 99 showed the path unreachable from player input. The move of CI, the image and
+`engines` to Node 22 is a step of its own: filed as **B-30** on the owner's word (2026-11-06), not
+scheduled.
+
+---
+
+## Step 103 (task B-29) — The Christmas pack's data model: 35 ids frozen, en and ru drafted (2026-11-05)
+
+Owner request: the morning's plan for B-29's first build step, then "1 (a); 2, 3, 4: all
+recommended; go" — the four decisions below — and, once the drafts existed, three Russian texts
+replaced with the owner's own (below).
+
+**Decided** (owner, on this step's plan; filed under B-29 as *Decisions 2026-11-05, second set*):
+**D1** — the agent drafts the en and ru word lists and the owner edits them, replacing "en and ru by
+the owner"; **D2** — the ids and English fragments first, frozen before any text: an id is the wire
+format (DD-1) and a fragment part of every picture's cache key (DD-4), while the texts stay free to
+edit; **D3** — Step 104's test pictures through `wrangler dev --remote` on the owner's Cloudflare
+account: real Flux Schnell output, nothing deployed, production's `[ai]` binding stays off (Play's
+AI-content policy, B-1e); **D4** — the PayID reference is the bare code, `XMAS26-K7QM-3FPA`: 16
+characters, inside the reported 18-character limit, so Step 101's owed test transfer is not needed.
+
+**Shipped:**
+
+- `packages/shared/src/packs/` (new; DD-16, design §4.4): `schema.ts` — `PackOption` (an
+  `AnswerOption` plus slot 6's `aftermathEn`), `PackConfig`, `StoryContent` (`base`, `slice`,
+  `full`), 5 options per slot, `AFTERMATH_SLOTS` (2 and 6); `index.ts` — the `PACKS` registry and
+  `optionsFor(slot, content)`, what the game wiring will check a pick against where it checks
+  `POOLS[slot]` today. chr26 is offered in B-29's 20 languages (all but ar, he and fa); its slice is
+  the three prose slots, so a free room's ordinary story keeps a picture the library already holds.
+- `chr26/options.ts`: the 35 ids, frozen — 20 picture options, every character in a costume (one
+  colour, one prop, one shape); 5 "when" and 5 "why", never drawn; 5 endings, each with an aftermath
+  fragment (the place afterwards, nobody in it). No Christmas tree in any place: an ending knocks
+  one over.
+- `chr26/text/en.ts` and `ru.ts`: local glosses for the owner's edit (D1) — Santa and his nice list
+  in English; Дед Мороз, tangerines and the morning after in Russian.
+- `packages/shared/src/prompt.ts`: `buildPrompt` takes each picture slot's fragment from the base
+  pools or the pack's and refuses a story that mixes the two; `buildAftermathPrompt` draws the place
+  and the ending on a skeleton of its own, with the style suffix minus its four character anchors.
+  The server's `prompt.ts` re-exports both.
+- Tests: `packs.test.ts` (26) — the registry, the slot namespaces, ids apart from every base id, a
+  fragment on every drawn option and on nothing else, leads and companions apart by head noun, each
+  draft complete, unique and within 70 characters, and the Russian template's rules («с» or «со»
+  before a companion, no comma in slots 0–4); `prompt.test.ts` +16 — 625 unique pack scenes, none a
+  base one, inside the cap; a slice's picture equals the base one; mixed sources refused; 25 unique
+  aftermaths, the batch 650.
+- `steering/`: design §4.4 *Packs*, a pointer from §7.1 and the DD-16 row; FM-PACK-1..5 and their
+  traceability row; under B-29, the decisions above, D4's settled note, D5 and a progress note;
+  B-29a filed.
+
+**The owner's edit, the same day:** «с подарком на ножках» → «со спящей Снегурочкой»,
+«на солнечном пляже» → «на киностудии, где снимают новогоднее кино», «жарили шашлыки на дымящемся
+мангале» → «смотрели новогодний фильм по покрытому паутиной телевизору». All three are drawn, and
+one picture serves every language, so each became a new concept everywhere — a new id, fragment and
+English text: a sleeping Snow Maiden (in sky blue, with a long braid); a film studio shooting a
+Christmas movie; watching a Christmas movie on a TV covered in cobwebs. The studio's Russian reads
+«на киностудии во время съёмок новогоднего кино»: the template joins slots 0–4 with spaces, so a
+«…, где …» clause could not be closed. The beach and the barbecue were B-29's Southern-Hemisphere
+options, for Australia and Brazil. **Decided** the same evening (owner; D5 under B-29): they go to
+an edition of their own, filed as **B-29a**, not scheduled; and the Russian edition is the New Year
+one, «Новый год 2027», as B-29's *Product* has it. The owner then asked how hard three Russian
+editions would be — Catholic Christmas with Санта-Клаус, Orthodox Christmas, New Year — answered in
+the session; nothing filed until the owner decides.
+
+**Sizes:** worst-case scene prompt 481 of 500 — 19 of headroom, the base pools' figure, pinned in
+`prompt.test.ts`; worst-case aftermath 263.
+
+**On the way:** Step 101 is pushed (`4fac764..76ad155`, 2026-11-05 21:05) and CI passed (run
+`42007780466`). The morning's plan misread B-29 as ruling out Дед Мороз; it rules out Дід Мороз for
+Ukraine (Святий Миколай there) and names Дед Мороз for Russian, as the ru draft has it. **Open**
+(design §4.4, for the step that brings packs into rooms): what a player sees whose language the pack
+lacks, in a room that mixes languages (DD-13).
+
+Gates (one run for Steps 102 and 103, see Step 102): typecheck 0, lint 0, `format:check` clean;
+`npm test` outside the sandbox from `C:/Mark/Dev/funnyone`: **1674 passed** (418, 397, 329, 178, 299
+and 53 by workspace — the server's 16 and shared's 26 new tests on Step 99's 1632);
+`npm audit --omit=dev` 0 and the full `npm audit` 11, every entry under the three accepted IDs; CI
+after the push.
+
+B-29 stays open and unticked: its data model is built, nothing reaches a room yet.
+
+**Owed:** the owner's edit of the drafts; Step 104, the ≈ 1-cent test (D3); push Steps 102–103 on
+the owner's word (no deploy for this step).
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6163,7 +6297,31 @@ below.
 ~~RESUME HERE (2026-11-01, after Step 100, not yet pushed)~~ — carried into Step 101's note
 below.
 
-**RESUME HERE (2026-11-05, after Step 101, not yet pushed).** **B-29's funnel, its free/paid
+~~RESUME HERE (2026-11-05, after Step 101, not yet pushed)~~ — carried into Step 103's note
+below.
+
+**RESUME HERE (2026-11-05, after Step 103, not yet pushed).** **B-29's data model is built
+(Step 103): `packages/shared/src/packs/` and `buildAftermathPrompt`, chr26's 35 ids frozen with
+their picture and aftermath fragments, en and ru texts drafted; nothing reaches a room yet. Step 102
+bumped `@fastify/static` in range, so production's audit is 0 again.** **Owed, the agent's:** push
+Steps 102–103 once the owner confirms — two commits, the lockfile first, one push, no deploy now;
+the next deploy takes Step 102 to production, after `docker run --rm node:20-alpine node -v` shows
+20.19 or later (Step 102's Node 20 finding), unless B-30 has moved the image to Node 22 by then.
+**Next, the agent's, Step 104:** the ≈ 1-cent test (D3) — 5 aftermaths through
+`wrangler dev --remote`, after reading `C:/Mark/Dev/machine/ports.md`, place *i* with ending *i*:
+the snowy square with the wrapping paper, the living room with the tangled lights, the festive table
+with the toppled tree, the frozen pond with the empty sack, the film studio with the melted snowman.
+Each must read as a punchline on its own, or its fragment changes before the batch. **Owed, the
+owner's:** edit the en and ru drafts — the 25 drawn options (who, with whom, where, what they did,
+the ending) before the batch, since a new concept there redraws its pictures in every language, as
+today's three did, while "when" and "why" stay free; the drawn concepts settled by about 2026-11-14
+keep the 650 pictures inside the free allowance, otherwise the paid day; which Lightning service;
+the Sponsors one-time tier; the Android-link test (Step 101's Owed; D4 settles the PayID transfer);
+whether a Russian edition splits into three (asked 2026-11-05, answered in the session). Filed and
+not scheduled: B-29a, the Southern-Hemisphere edition; B-30, the move to Node 22 (Step 102's
+finding, filed on the owner's word 2026-11-06). Then the same note as before:
+
+**B-29's funnel, its free/paid
 split and the code's mechanics are settled in `steering/tasks.md` (Step 101, its *Decisions
 2026-11-05*); nothing is built.** **Owed, the agent's:** push Step 101 once the owner confirms
 (no deploy). **Next, the agent's, once the owner's en/ru word lists exist:** the pack's data
@@ -6420,16 +6578,16 @@ the new name in Payments Center → Review updates, before its deadline. Enrollm
 are not in this repo (Step 54).
 
 `npm audit` gate since Step 94: both `npm audit --omit=dev` and the full `npm audit` must
-report nothing beyond the accepted exceptions — three as of Step 99: GHSA-gcqx-w48m-w2h4
-(`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95), and GHSA-g3hv-75wg-m249 (`minimatch`)
-with GHSA-3g3m-2fjr-6pw4 (`glob`), in production under `@fastify/static` and in the dev chains,
-accepted 2026-11-01 (Step 99, reachability in its entry) — re-checked each session, dropped
-when `@fastify/static` moves off `glob` (its PR #571) or an in-range fix appears. Step 53's
+report nothing beyond the accepted exceptions — three as of Step 99, **all dev-only since
+Step 102** (`@fastify/static` 10.1.10, on `glob` 14, cleared production): GHSA-gcqx-w48m-w2h4
+(`deepmerge`, via `vite-plugin-pwa`, Step 95), and GHSA-g3hv-75wg-m249 (`minimatch`) with
+GHSA-3g3m-2fjr-6pw4 (`glob`) in the dev chains, accepted 2026-11-01 (Step 99, reachability in
+its entry) — re-checked each session, each dropped once an in-range fix appears. Step 53's
 `braces` exception went in Step 89; Step 67's GHSA-rj75-hqrm-r3gf went when GitHub revised the
 advisory on 2026-10-26 to count `postcss-selector-parser` 6.1.5, the version Tailwind 3 already
 has here, as fixed. Anything else listed fails the gate — stop and ask. An in-range fix that npm
 offers (`npm audit fix` without `--force`) is taken as its own lockfile step once the owner says
-so, as Steps 67 and 89 did (Step 99's run bumped three packages and fixed nothing, so it was
+so, as Steps 67, 89 and 102 did (Step 99's run bumped three packages and fixed nothing, so it was
 reverted — no step); an advisory with no fix is accepted by its ID only on the owner's word,
 each shown with its reason first (Step 53; Step 99 extended this to production).
 
@@ -6540,8 +6698,8 @@ in Step 91; a multi-language room's invite (`&multi=1`) also names the room's la
 screen in the room's language and its player picks Korean by hand — whether such an invite should
 leave the joiner's phone language instead (Step 88); `npm audit`'s three accepted exceptions —
 GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) and Step 99's
-GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4 (`minimatch` and `glob` under `@fastify/static`,
-production too) — drop each once a non-breaking fix exists; ~~`funny-one`'s GitHub repository
+GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4 (`minimatch` and `glob`, dev-only since Step 102) —
+drop each once a non-breaking fix exists; ~~`funny-one`'s GitHub repository
 has no description, unlike `funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's
 wording~~ done in Step 97.
 

@@ -6,5 +6,14 @@
 // server asks the Worker for. This module stays as the server's import point:
 // `game.ts`, `prompt.test.ts`, `scripts/samplePrompts.mjs` and
 // `cloudflare/pregenerate.mjs` (through `dist/prompt.js`) all read it here.
+// The aftermath builder joined it in Step 103 (B-29, DD-16).
 
-export { MAX_PROMPT_LENGTH, SKELETON, STYLE_SUFFIX, buildPrompt } from '@funny/shared';
+export {
+  AFTERMATH_SKELETON,
+  AFTERMATH_STYLE_SUFFIX,
+  MAX_PROMPT_LENGTH,
+  SKELETON,
+  STYLE_SUFFIX,
+  buildAftermathPrompt,
+  buildPrompt,
+} from '@funny/shared';

@@ -583,7 +583,54 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       costs more.
     - **To check before building:** how long a PayID reference a banking app accepts (a limit
       of 18 characters is reported, unconfirmed; `FUNNY XMAS26 K7QM-3FPA` is 22) — one real
-      transfer from one or two Australian banks.
+      transfer from one or two Australian banks. *(Settled 2026-11-05 by D4 below: no transfer
+      needed.)*
+  - *Decisions 2026-11-05, second set (owner, on Step 103's plan):*
+    - **D1 — the agent drafts the en and ru word lists, the owner edits them.** Replaces "en and
+      ru by the owner" under *Content* above.
+    - **D2 — ids and English fragments first, texts after.** The ids and fragments are frozen
+      before any text, being the wire format and part of every picture's cache key (DD-1,
+      DD-4); the texts stay free to edit.
+    - **D3 — the test pictures through `wrangler dev --remote`** on the owner's Cloudflare
+      account: real Flux Schnell output, nothing deployed, production's `[ai]` binding stays
+      off, so Play's AI-content policy and B-1e are untouched.
+    - **D4 — the PayID reference is the bare code**, `XMAS26-K7QM-3FPA`: 16 characters, inside
+      the reported 18-character limit with room, so no test transfer is needed.
+    - **D5 — the Southern-Hemisphere options become an edition of their own, B-29a** (the same
+      evening, after the owner's ru edit had replaced the beach and the barbecue). Replaces "a
+      few Southern-Hemisphere options (beach, barbecue) for Australia and Brazil" under
+      *Content* above. The Russian edition is the New Year one, «Новый год 2027», as *Product*
+      has it.
+  - **Data model and concept set done 2026-11-05 (Step 103):** `packages/shared/src/packs/`
+    (DD-16, FM-PACK-1..5, design §4.4) — `PackConfig`, `StoryContent`, `optionsFor`;
+    `buildAftermathPrompt` beside `buildPrompt`; chr26's 35 ids frozen with 20 costumed picture
+    fragments and 5 aftermath fragments (worst-case scene prompt 481 of 500, 19 of headroom;
+    worst-case aftermath 263); en and ru texts drafted for the owner's edit. **Three concepts come
+    from the owner's ru edit the same day, so they changed in every language** (one picture per
+    option): the present on legs → a sleeping Snow Maiden («со спящей Снегурочкой»), the sunny
+    beach → a film studio shooting a holiday movie («на киностудии во время съёмок новогоднего
+    кино», the owner's «где …» clause made comma-free for the template), the barbecue → watching a
+    holiday film on a TV covered in cobwebs. The beach and the barbecue were *Content*'s
+    Southern-Hemisphere options above; they go to an edition of their own (D5, B-29a). **Next,
+    Step 104:** the ≈ 1-cent test — 5 aftermaths, place *i* with ending *i*, so each place and
+    each ending is drawn once; each must read as a punchline on its own. Still owed after it: the
+    other 18 languages' drafts, packs in rooms, the code, the rails, the batch.
+- **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
+  2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
+  until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not
+  options inside it: its own pack id, concept set and picture batch (650 at 5 options per slot,
+  DD-16). Not scheduled. Open when it is taken up: its languages (en for Australia, pt-br for
+  Brazil), its dates, and whether chr26's code unlocks it too.
+- **B-30** Move CI, the server image and `engines` to Node 22 (agent finding 2026-11-05, Step 102;
+  filed on the owner's word 2026-11-06). Node 20 has been out of support since 2026-04-30, and
+  `content-disposition` 3.0.0, which Step 102's `@fastify/static` 10.1.10 brings in, is an ES
+  module only and declares Node 22 or later; on Node 20 it loads only through `require(esm)`, on
+  by default from 20.19. Four pins: `.github/workflows/ci.yml` (`node-version: 20`), both stages
+  of the `Dockerfile` (`node:20-alpine`) and the root `package.json`'s `engines` (`>=20`). Done
+  when the gates pass on Node 22 (this PC's default, 22.19.0), CI runs on 22, a production-mode
+  start passes as in Step 102, and the deploy builds on a freshly pulled `node:22-alpine` —
+  `deploy/ship.sh` builds without `--pull`. Not scheduled; if it lands before the next deploy,
+  Step 102's `node -v` check is moot.
 
 ## Dependency notes
 

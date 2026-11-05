@@ -46,6 +46,12 @@ export type {
 export { ALL_OPTION_IDS, POOLS } from './pools/options.js';
 export { POOL_TEXTS } from './pools/text/index.js';
 
+// Step 103 (B-29) — packs: a second set of the seven pools a story can be
+// played from, the first the Christmas 2026 edition (DD-16).
+export { AFTERMATH_SLOTS, PACK_IDS, PACK_OPTIONS_PER_SLOT } from './packs/schema.js';
+export type { PackConfig, PackId, PackOption, PackPools, StoryContent } from './packs/schema.js';
+export { CHR26_LANGUAGES, PACKS, PACK_TEXTS, optionsFor } from './packs/index.js';
+
 // T-FO-2.1 — prose rendering (FO-ARC-2), promoted from
 // `apps/funny-multi-server/src/i18n/` and `.../grammar.ts` so both products
 // can render and polish story prose.
@@ -59,8 +65,17 @@ export type { TextMeasurer } from './wrapText.js';
 
 // T-4.1 / D-10 — the image-prompt builder, promoted from
 // `apps/funny-multi-server/src/prompt.ts` so Funny One can address the same
-// picture library by the same cache keys.
-export { MAX_PROMPT_LENGTH, SKELETON, STYLE_SUFFIX, buildPrompt } from './prompt.js';
+// picture library by the same cache keys. The aftermath builder is Step 103's
+// (B-29, DD-16).
+export {
+  AFTERMATH_SKELETON,
+  AFTERMATH_STYLE_SUFFIX,
+  MAX_PROMPT_LENGTH,
+  SKELETON,
+  STYLE_SUFFIX,
+  buildAftermathPrompt,
+  buildPrompt,
+} from './prompt.js';
 
 // T-1.6 — socket contract (design §5). Types only: the protocol carries no
 // runtime values, so this whole module erases at build time.

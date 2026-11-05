@@ -205,6 +205,29 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-POOL-6 (SHOULD)** Pool content is family-friendly and absurd-funny in the spirit of the
   source game; no option may name real people or brands.
 
+Packs — a second set of the seven pools a room can play with (B-29, DD-16, design §4.4):
+
+- **FM-PACK-1 (MUST)** A pack has **5 options per slot**. Its ids are `<prefix>.<pack>-<slug>`
+  (`who.chr26-reindeer`): valid under the base id rules, disjoint from every base id, and
+  permanent once the pack's pictures are drawn.
+- **FM-PACK-2 (MUST)** A pack's picture options carry `promptEn` under the base rules (printable
+  ASCII, ≤ 120 characters, leads and companions disjoint), and every character wears a
+  **costume** — a signature colour, prop or shape. A pack scene is built with the base skeleton,
+  style suffix and 500-character cap, and its four picture slots come from **one source**: the
+  base pools or one pack, never a mix.
+- **FM-PACK-3 (MUST)** Every pack ending carries an English `aftermathEn` and is drawn as an
+  **aftermath**: the place (slot 2) and the ending (slot 6), no characters — places × endings
+  pictures per pack, 25. No place may already show what an ending changes (chr26: no Christmas
+  tree in any place).
+- **FM-PACK-4 (MUST)** A story's content is `base`, `slice` or `full`: a free room's ordinary
+  story takes the pack's when, why and ending only, its picture slots staying on the base pools
+  (the ending shown as a text card); a free game's one golden story and every story of a paid
+  room take the pack in every slot. The slice never touches a picture slot.
+- **FM-PACK-5 (MUST)** A pack is offered only in the languages it names (chr26: 20, every
+  authored language but ar, he and fa). Its display texts are **local glosses, not
+  translations** — the local gift-bringer and dishes — written for each slot under FM-POOL-3/4;
+  secular, with no brands and no real people (FM-POOL-6).
+
 ## 7. Tiers and monetization
 
 - **FM-TIER-1 (MUST)** **Free tier**: playable by anyone; AI generation limited by the existing
@@ -334,6 +357,7 @@ No Funny One, no HUB site, no store apps in the v1 build (D-1, D-3). *(The forme
 | FM-BOT-* | spec §7, §17; ONE-4 |
 | FM-IMG-* | MUL-2; spec §10, §11, §15, §22 |
 | FM-POOL-* | ONE-10..12 adapted to MUL; ARC-2, ARC-5 |
+| FM-PACK-* | B-29; owner decisions 2026-11-01 and 2026-11-05 |
 | FM-TIER-* | MUL-3; MON-5; OD-8; D-6, D-7 (MON-1, MON-7, OD-3, OD-4 retired 2026-09-16); spec §11, §17 |
 | FM-NFR-* | spec §8, §13, §14; MUL-2; DESIGN_SYSTEM |
 | FM-CPL-* | CMP-1, CMP-5, CMP-6; MODERATION.md; spec §27 |

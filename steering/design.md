@@ -212,6 +212,57 @@ SRC's final prompt template used slots 0–4. Here slot 3 drops out of the pictu
 R2 cache converges quickly; including a 20–30-option "when" would multiply the space ×25 and
 mostly defeat caching. "When" remains in the prose where it does its comedic work.
 
+### 4.4 Packs (DD-16, FM-PACK-*) — `packages/shared/src/packs/`
+
+A **pack** is a second set of the seven pools that a room can play with, **5 options per slot**;
+the first is the Christmas 2026 edition, `chr26` (B-29, Step 103). It reuses everything above —
+the slots, the wire format (an id, DD-1), the display-text rules (FM-POOL-3/4/6) — and §7.1's
+scene `SKELETON`, `STYLE_SUFFIX` and 500-character cap.
+
+```ts
+export type PackId = 'chr26';
+export interface PackOption extends AnswerOption { aftermathEn?: string }  // slot 6 only
+export interface PackConfig { id; languages; sliceSlots; pools }           // chr26: slices 3, 5, 6
+export type StoryContent = { kind: 'base' } | { kind: 'slice' | 'full'; pack: PackId };
+export function optionsFor(slot: SlotIndex, content: StoryContent): readonly AnswerOption[];
+```
+
+- **Ids carry the pack inside the slug:** `<prefix>.<pack>-<slug>`, e.g. `who.chr26-reindeer`, so
+  `OPTION_ID_PATTERN` and the wire are unchanged and no pack id can equal a base id. The ids and
+  their English fragments were frozen before any display text (owner decision 2026-11-05): an id
+  is the wire format and a fragment part of a cache key; the texts stay free to edit.
+- **Content is decided per story, not per room** (`StoryContent`, `optionsFor`): `base` in a room
+  without a pack; `slice` for a free room's ordinary stories — the pack's when, why and ending,
+  the base pools' four picture slots, so the scene is one the library already holds and the
+  ending is a text card; `full` for a free game's one golden story and every story of a paid
+  room. A test holds every pack's `sliceSlots` apart from `VISUAL_SLOTS`.
+- **One source per scene.** `buildPrompt` throws when a story's four picture slots mix the base
+  pools and a pack: that picture is in no library.
+- **The aftermath** is a pack ending's own picture, built by `buildAftermathPrompt` from the place
+  (slot 2) and the ending's `aftermathEn` (slot 6) with `AFTERMATH_SKELETON` (`'{6}, in {2}, an
+  empty scene with nobody around'`) and `AFTERMATH_STYLE_SUFFIX` (`STYLE_SUFFIX` less its four
+  character anchors). No characters, on purpose: Flux draws each picture from its prompt alone,
+  so a second picture of the same two characters would never match the scene, while an empty
+  place cannot fail to. It also keeps the batch at 5 × 5 = 25 per pack, whoever the story was
+  about, instead of 5⁵ = 3,125. Both strings are in their tuning window until Step 104's test
+  pictures and the pack's batch; then they are locked like `STYLE_SUFFIX`.
+- **Authoring rules of the pack's own**, on top of the base pools': a **costume** on every
+  character — one colour, one prop, one shape — so the two subjects never merge and a pick looks
+  like itself in every picture it is in; **no Christmas tree in any place**, because the tree
+  belongs to an ending (an aftermath would draw it standing and fallen at once); an
+  `aftermathEn` on every ending.
+- **Sizes, measured at Step 103:** 625 scenes + 25 aftermaths = 650 pictures; the worst-case
+  scene prompt is 481 of 500 (19 of headroom, pinned in the server's `prompt.test.ts` like the
+  base pools' 19), the worst-case aftermath 263. "When" and "why" could grow at no picture cost;
+  the other five slots cannot grow without another batch.
+- **Languages and texts.** A pack names the languages it is offered in — chr26's 20 are every
+  authored language but ar, he and fa (B-29). Its texts are **local glosses, not translations**:
+  the local gift-bringer and dishes, under FM-POOL-3/4. en and ru are drafted by the agent for
+  the owner's edit (owner decision 2026-11-05); the other 18 are machine drafts on B-3's pile.
+  `PACK_TEXTS` is keyed by the drafted languages only, so registering the rest is one widened
+  type. *Open, for the step that brings packs into rooms:* what a player sees whose own language
+  the pack lacks, in a multi-language room (DD-13).
+
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 
 Everything not listed is carried from SRC unchanged (`Room`, `Player`, phases, lobby/stats/
@@ -344,6 +395,11 @@ untrusted text remains, FM-ANS), the RU/EN slot-1 connective synthesis and `ruAc
 (fragments are authored to compose with this one skeleton), and `looksLikeSameSubject` with its
 "two of them" chimera anchor — slots 0 and 1 draw from disjoint kinds, leads versus companions
 (T-1.4), so a duplicate pair is unreachable by construction.
+
+**Packs (Step 103, DD-16):** a pack's scenes are built by the same `buildPrompt` with the same
+skeleton, suffix and cap from the pack's own fragments, one source per scene (chr26 leaves 19 of
+headroom), and its endings get a second, character-free picture from `buildAftermathPrompt` —
+see §4.4.
 
 ### 7.2 Cloudflare Worker — `cloudflare/worker.js` (FM-IMG-3)
 
@@ -663,3 +719,4 @@ device, is under `tasks.md` B-14.
 | DD-13 | Multi-language room (B-15): each client renders questions, options and stories in its player's language from option ids; the server keeps one language per room (§5, §8.1, §8.2, §9) | DD-1's ids already make a story language-free, so the server needs no per-player language and no new event, and a chain written in three languages is still one story; client and server ship as one build (DD-2), so they render a story identically |
 | DD-14 | Funny Family landing page (`apps/funny-family-site`, Step 72): pre-rendered static pages, one per language at `/<code>/` (English at `/`, a browser in another of the 15 languages is sent on to its page), vanilla TypeScript built by Vite, served by the same Caddy at `HUB_HOST`; two designs — A, a trailer card that plays on click; B, a muted background loop — split 50/50 per tab, `?v=a`/`?v=b` forces one | One screen needs no framework or server: ~5 kB of script, every language indexable, nothing running on the 1 GB VM; the split lets the funnel (DD-15) choose the design by its clicks to Funny Multi, judged by a two-proportion z-test on `/stats/` once each design has 100 visits |
 | DD-15 | Visit and funnel counts kept first-party by Funny Multi's server (`analytics.ts`): events with allowlisted labels only (variant, language, source, target, referrer class, phone or not), summed per UTC day into one JSON file in a volume, kept 400 days; the landing page posts through its own host, the game from its client (`funnel.ts`); `/stats/` (public, `noindex`) reads `GET /api/stats/summary`. No IP address, cookie or identifier is stored; nothing is sent from the Android app or under Do Not Track / Global Privacy Control. Step 79 (B-20): a visit (a landing-page or game view, nothing else) also adds one to its country's daily total, a tally kept apart from the labels; the server finds the country from the address in DB-IP's free country file (CC BY 4.0), which it downloads itself once a month into the volume and searches in memory (`geo.ts`), and keeps no address; `/stats/` draws the totals on a world map of its own (Natural Earth shapes, public domain) | Answers "does the landing page lead to plays and gifts" without a third-party tracker, a database or a consent banner; FM-CPL-2 says exactly this. The country tally answers "where do visitors come from" without sending an address to a lookup service or loading a map from a third party; apart from the labels, a country cannot single out the one visitor who came from it |
+| DD-16 | Packs (Step 103, B-29, §4.4): a pack is a second set of the seven pools, 5 options per slot, its ids carrying the pack inside the slug (`who.chr26-reindeer`); a story's content is `base`, `slice` (the pack on when, why and the ending only) or `full` (the pack in every slot); a scene's four picture slots come from one source, the base pools or one pack; a pack ending also gets an **aftermath** picture — the place and the ending, no characters — from its own skeleton and a style suffix without the character anchors | An id inside the slug keeps the wire format and `OPTION_ID_PATTERN` unchanged and cannot collide with a base id; a slice that never touches a picture slot gives every free room the pack's words at no picture cost, its scene already in the library; an aftermath without characters cannot fail to match the scene, as a second picture of the same characters would, and costs 25 pictures per pack instead of 3,125 |

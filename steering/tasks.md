@@ -484,10 +484,11 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Funnel:* a landing variant (`?pack=chr26`, as `?v=` picks a design today) with two big
     "Christmas pack — try it free" buttons, hopping letters, one at the top and one at the foot;
     shown 29 November (Advent Sunday) to 7 January. **The free trial is a slice, not a count:**
-    every room gets a quarter of the Christmas words and pictures, forever; the pack unlocks the
-    rest. No fingerprint, nothing to game, the trial is the demo. The pay prompt appears on the
-    host's screen between games, after the first free cartoon, never mid-story. Three new
-    funnel steps on `/stats/`, per language (DD-15).
+    every room gets a share of the Christmas pack, forever; the pack unlocks the rest. No
+    fingerprint, nothing to game, the trial is the demo. The pay prompt appears between games,
+    after the first free cartoon, never mid-story. *(Superseded 2026-11-05: the slice was "a
+    quarter of the Christmas words and pictures", the prompt the host's alone and the funnel
+    three steps — see* Decisions 2026-11-05 *below.)*
   - *Code:* signed, `XMAS26-XXXX-XXXX`, verified by the server with a secret and no database;
     the host puts it in a bookmarkable create-room link, so the app stores nothing (B-25's
     promise holds). A leaked code costs nothing to serve; a small blocklist revokes one. The
@@ -526,6 +527,63 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - *Owed before building:* the Sponsors tier and webhook; the Lightning service; the Workers
     AI day for the batch; the owner's en/ru word lists. The PayID match stays the owner's op,
     one per sale.
+  - *Decisions 2026-11-05 (owner, from the options compared in session 2026-11-01 to 11-05):*
+    - **Free and paid.** A free room keeps today's words and pictures for who, with whom, where
+      and what they did, and gets the Christmas words for when, why and the ending (the ending
+      shown as a text card). **One golden story per free game**, picked at random and revealed
+      last, is fully Christmas — its words, its scene and its ending picture. A paid room is
+      Christmas in every slot of every story; it has no golden story. Replaces "a quarter".
+    - **Pictures: 650.** Scenes from the four picture slots, 5⁴ = 625; endings drawn as an
+      **aftermath** — the place and the objects, no characters, so nothing can fail to match the
+      scene — where × ending = 5² = 25. "When" and "why" are never drawn (DD-3's reason). The
+      scene characters get distinctive costumes (one colour, one prop, one shape). WebP, not
+      GIF and not the library's ≈ 730 KB JPEG. 650 pictures fit ≈ 13 days of the free allowance
+      (≈ 52 a day) if the word lists are frozen by about 14 November; otherwise the paid day.
+      First test: 5 aftermath endings, ≈ 1 cent, each must read as a punchline on its own.
+    - **Video.** Made on the phone, as today's 5 s video: the scene, then the ending (the
+      ending picture in a paid room or the golden story, a text card otherwise). A short sound
+      file (sleigh bells) plays to the speaker **and** into the recording.
+    - **Funnel, four of ten options:** (#1) the golden story above; (#4) **unlock the room
+      you're in** — a code unlocks the current room for its next game, nobody leaves or
+      rejoins, and any player's payment does it, the code then being that player's own;
+      (#5) **PayID unlocks at once, provisionally** — "I've paid" makes the code work, and it
+      switches itself off after 48 h unless the owner has marked that payment received (same
+      op per sale, moved after the unlock); (#10) **seven funnel steps on `/stats/`**, per
+      language (DD-15), not three: landing view → free room → first free cartoon → pay card
+      shown → pay pressed → payment landed or claimed → paid room. Next in line, not taken:
+      (#3) a before/after pay card. Rejected: locked Christmas options in the picker (#2) —
+      seen mid-story.
+    - **Screens.** Lobby, every player: "🔔 This game has one Christmas story". End of a free
+      game, every player (web only): "You just saw one Christmas story. Unlock all of them:
+      A$2.60, every game, forever". Downloads (picture and video) in a free room: the golden
+      story's carry "Unlock all Christmas 2026 stories: A$2.60, every game, forever" and a short
+      payment address (e.g. `…/xmas`), which replaces the landing link and the QR's target;
+      ordinary stories keep today's footer. In a paid room every download carries "Your
+      Christmas 2026 stories: every game, enjoy your party :))". Russian uses «Новый год 2027».
+    - **Never on any download:** the code or the link that holds it (a shared video would
+      leak it) — a test checks this. **The Android app** shows no price, no button and no
+      payment address, its downloads saying only "Christmas 2026 edition" (Play's payments
+      policy, as B-1c hides Support).
+    - **The website remembers the code on that phone** (owner decision 2026-11-05, replacing
+      "the app stores nothing" for the web): next week the same phone opens a Christmas room
+      with nothing to type; the bookmarkable link stays as the way to another phone. Web
+      only, never the Android app. One sentence more in the privacy policy, 23 languages.
+    - **The blocklist** is the owner's, by hand, case by case: (1) a refund; (2) a payment
+      taken back (a recalled PayID payment, a sponsorship GitHub refunds); (3) a code leaked in
+      public — the receipt log shows its rooms in many countries at once — and the buyer gets
+      a new code free; (4) the buyer asks (a link sent to the wrong group), with a new code.
+      An unpaid PayID claim is not listed: it switches itself off after 48 h. A leaked
+      signing secret is not a blocklist case: a new secret and new codes for every buyer.
+    - **The payment is the receipt:** every rail leaves the code where the buyer keeps it
+      anyway — PayID in the bank's history (the reference is the code), **Lightning in the
+      wallet's history (the invoice description carries the code)**, Sponsors in GitHub's
+      welcome email, the optional email backup. Last resort: the buyer writes in, the owner
+      finds the code in the receipt log. **Support rule (owner decision 2026-11-05): when in
+      doubt, issue a new code** — a code costs nothing to serve, an argument over A$2.60
+      costs more.
+    - **To check before building:** how long a PayID reference a banking app accepts (a limit
+      of 18 characters is reported, unconfirmed; `FUNNY XMAS26 K7QM-3FPA` is 22) — one real
+      transfer from one or two Australian banks.
 
 ## Dependency notes
 

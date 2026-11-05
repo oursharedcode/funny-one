@@ -6096,6 +6096,59 @@ owner's items in the note below.
 
 ---
 
+## Step 101 (task B-29) — The funnel, the free/paid split and the code's mechanics settled (2026-11-05)
+
+**Shipped:**
+
+- `steering/tasks.md`: a *Decisions 2026-11-05* block under B-29, from the options compared
+  with the owner across this session (2026-11-01 to 11-05); B-29's "a quarter" line is marked
+  superseded. Text only, nothing built.
+  - **Free and paid.** A free room keeps today's words and pictures for who, with whom, where
+    and what they did, and gets Christmas words for when, why and the ending (a text card).
+    **One golden story per free game**, picked at random and revealed last, is Christmas end to
+    end. A paid room is Christmas throughout. A strict quarter was dropped: 2 of 5 options per
+    picture slot leaves 16 pictures, and a 7-player free room would repeat one ≈ 85% of the
+    time.
+  - **Pictures: 650.** 625 scenes (5⁴) plus 25 **aftermath** endings (where × ending, no
+    characters — the model draws each picture from its prompt alone, so a second picture of
+    the same pirate never matches). Chosen from five ways compared: costumes, best of three,
+    aftermath, two panels in one picture (5⁵ = 3,125), one picture moved. Costumes go on the
+    scenes anyway. WebP, not GIF; "when" and "why" never drawn (DD-3). ≈ 13 days of the free
+    allowance (≈ 52 a day at Step 68's ≈ 190 neurons a picture).
+  - **Video:** made on the phone as today (`recordWobble.ts`), scene then ending, with a short
+    sound file (sleigh bells) to the speaker and into the recording — today's video has no
+    sound track.
+  - **Funnel:** four of ten improvements — #1 the golden story, #4 unlock the room you're in
+    (any player's payment, the code then theirs), #5 PayID unlocks at once and switches itself
+    off after 48 h unless marked received, #10 seven funnel steps on `/stats/` instead of
+    three. #3 (a before/after pay card) is next in line; #2 (locked options in the picker) is
+    rejected as mid-story.
+  - **Screens and downloads:** the lobby line and the end-of-game button for every player (the
+    button web only); the golden story's downloads carry the unlock line and a short payment
+    address replacing the landing link; paid downloads carry "Your Christmas 2026 stories";
+    **no download ever carries the code**; the Android app shows no price, button or address.
+  - **The code:** no IP or device check; the website remembers it on the phone (web only —
+    a privacy-policy sentence more); a manual blocklist for four named cases; every rail leaves
+    the code where the buyer keeps it (the PayID reference, the Lightning invoice description,
+    GitHub's welcome email); support rule — when in doubt, issue a new code.
+
+**Bookkeeping corrected:** Step 100 is pushed (`9d8d74c..4fac764`, 2026-11-01 20:57) and CI
+passed (run `41295311219`) — its RESUME note, written before the push, said otherwise.
+`npm audit` re-checked 2026-11-03: production 3 entries and the full audit 24, all under the
+three accepted IDs, still no in-range fix.
+
+No code changed — `steering/` and this log only — so the six gates don't apply; Step 99's run
+stands. B-29 stays open and unticked: decided further, not built.
+
+**Owed:** push this commit on the owner's word (no deploy). Found on the way, to check on the
+owner's phone before the code's link is built: whether a game link tapped in WhatsApp opens in
+Funny Multi's installed app (which shows only the free slice) rather than in Chrome — if so, the
+Christmas link takes an address the app does not claim. And one real PayID transfer from one or
+two Australian banks to learn the longest reference they accept (18 characters reported,
+unconfirmed; `FUNNY XMAS26 K7QM-3FPA` is 22).
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6107,16 +6160,31 @@ below.
 ~~RESUME HERE (2026-11-01, after Step 99, not yet pushed)~~ — carried into Step 100's note
 below.
 
-**RESUME HERE (2026-11-01, after Step 100, not yet pushed).** **Step 99 (B-29): the Christmas
+~~RESUME HERE (2026-11-01, after Step 100, not yet pushed)~~ — carried into Step 101's note
+below.
+
+**RESUME HERE (2026-11-05, after Step 101, not yet pushed).** **B-29's funnel, its free/paid
+split and the code's mechanics are settled in `steering/tasks.md` (Step 101, its *Decisions
+2026-11-05*); nothing is built.** **Owed, the agent's:** push Step 101 once the owner confirms
+(no deploy). **Next, the agent's, once the owner's en/ru word lists exist:** the pack's data
+model, the 20 Christmas picture-slot options with their costumes, the 5 aftermath endings, and
+a ≈ 1-cent test drawing of those 5 — ids are permanent once shipped (DD-1), so this gates the
+650-picture batch. **Owed, the owner's:** the en/ru word lists — urgent: the 650 pictures fit
+the free Workers AI allowance only if the lists are frozen by about 2026-11-14, otherwise the
+paid day; whether the agent drafts them for the owner to edit (asked, unanswered); which
+Lightning service (recommended: a hosted one with a webhook); the Sponsors one-time tier; the
+Android-link test and one real PayID transfer (Step 101's Owed). Then the same note as before:
+
+**Step 99 (B-29): the Christmas
 2026 edition — Funny Multi's first paid pack — is filed in `steering/tasks.md` from the owner's
 decisions of 2026-11-01, ahead of B-27; nothing is built yet. Step 100 records Step 99's push
-(`dffa428..9d8d74c`, CI run `41279053938` green); only Step 100's own commit is unpushed.**
+(`dffa428..9d8d74c`, CI run `41279053938` green); Step 100 is pushed too (`9d8d74c..4fac764`,
+CI run `41295311219`).**
 Step 98 is pushed (`3bc8cbe..dffa428`, CI run `40874552465`) and live. `npm audit` carries three
 accepted exceptions, none with an in-range fix: Step 95's GHSA-gcqx-w48m-w2h4 (`deepmerge`,
 dev-only) and Step 99's GHSA-g3hv-75wg-m249 (`minimatch`) and GHSA-3g3m-2fjr-6pw4 (`glob`), the
 last two in production under `@fastify/static` — re-check each session; drop them when
-`@fastify/static` moves off `glob` (its PR #571) or an in-range fix appears. **Owed, the
-agent's:** push Step 100 once the owner confirms (no deploy — nothing shipped). **Next, the
+`@fastify/static` moves off `glob` (its PR #571) or an in-range fix appears. **Next, the
 agent's: B-29**, in the order
 its block gives — the content first, the long pole (the owner's en/ru word lists, 18 machine
 drafts, one 625-picture batch with the paid Workers AI plan back for a day), then the signed code

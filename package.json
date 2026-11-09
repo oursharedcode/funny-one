@@ -10,7 +10,7 @@
     "url": "https://github.com/oursharedcode/funny-one.git"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "workspaces": [
     "apps/*",

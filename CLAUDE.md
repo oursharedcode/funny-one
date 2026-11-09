@@ -1,12 +1,12 @@
 # Funny Family — «Чепуха 37» (Funny Multi)
 
 3–7 player party game: web client + Socket.IO server; each finished story becomes an AI cartoon
-(Cloudflare Worker → Flux Schnell → R2). npm-workspaces monorepo, Node 20, TypeScript.
+(Cloudflare Worker → Flux Schnell → R2). npm-workspaces monorepo, Node 22, TypeScript.
 
 ## Layout
 
 - `apps/funny-multi-client` — React 18 + Vite + Tailwind + Framer Motion PWA
-- `apps/funny-multi-server` — Node 20 + Fastify + Socket.IO, in-memory rooms
+- `apps/funny-multi-server` — Node 22 + Fastify + Socket.IO, in-memory rooms
 - `packages/shared` — rotation formula, answer pools, i18n (15 languages), schemas. Other
   workspaces need it built; the pre-scripts handle that automatically.
 - `cloudflare` — Worker: `/generate`, `/i/<hash>`, `/stats` (R2 + KV)

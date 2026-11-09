@@ -19,7 +19,7 @@ into this repo and adapted here. SRC spec section references (`spec §N`) point 
 ```
 ┌──────────────────────────┐        WebSocket         ┌───────────────────────────┐
 │  Player phones (PWA)     │ ◄──────────────────────► │  Render web service       │
-│  React 18 + Vite         │   room/round/reveal      │  Node 20 + Fastify        │
+│  React 18 + Vite         │   room/round/reveal      │  Node 22 + Fastify        │
 │  Tailwind + Framer       │   events (URLs only,     │  Socket.IO                │
 │  socket.io-client        │   never image bytes)     │  In-memory rooms Map      │
 └────────────┬─────────────┘                          └────────────┬──────────────┘

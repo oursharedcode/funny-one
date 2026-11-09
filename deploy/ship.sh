@@ -14,7 +14,7 @@
 # script. What it does, in order:
 #   1. reads BASE_PATH from the remote .env, so the client is built with the
 #      value the server will run under (they must agree — DEPLOYMENT.md);
-#   2. builds the image with that build-arg, tagged with the git commit;
+#   2. builds the image on a freshly pulled base with that build-arg, tagged with the git commit;
 #   3. streams it over SSH (docker save | gzip | ssh docker load), ~80 MB;
 #   4. copies docker-compose.yml and deploy/caddy/Caddyfile alongside .env,
 #      and streams deploy/origin-root/funny37 (the privacy policy and
@@ -55,7 +55,7 @@ case "${BASE_PATH:-/}" in /) ;; *) echo "BASE_PATH must be / (or unset) behind t
 echo "    BASE_PATH=${BASE_PATH:-/}  FM_HOST=$FM_HOST  SITE_HOST=$SITE_HOST"
 
 echo "==> build $IMAGE:$COMMIT (BASE_PATH=${BASE_PATH:-/})"
-docker build --build-arg "BASE_PATH=${BASE_PATH:-/}" -t "$IMAGE:$COMMIT" -t "$IMAGE:latest" . >/dev/null
+docker build --pull --build-arg "BASE_PATH=${BASE_PATH:-/}" -t "$IMAGE:$COMMIT" -t "$IMAGE:latest" . >/dev/null
 
 echo "==> stream image to $HOST"
 docker save "$IMAGE:$COMMIT" "$IMAGE:latest" | gzip | ssh "$HOST" 'gunzip | docker load' | tail -1

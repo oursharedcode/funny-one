@@ -95,7 +95,7 @@ no profanity filter on nicknames.
   and the socket event contract. Future family products consume the same rotation code and pools.
 - **FM-ARC-3 (MUST)** Tech stack inherited from the source project and locked (spec §2):
   TypeScript, React 18 + Vite + Tailwind + Framer Motion + socket.io-client (client);
-  Node 20 + Fastify + Socket.IO (server); Cloudflare Worker + Workers AI Flux Schnell (images).
+  Node 22 + Fastify + Socket.IO (server); Cloudflare Worker + Workers AI Flux Schnell (images).
   Graphics: SVG + CSS + Framer Motion only — no Lottie, no Rive, no video, no WebGL, no sound.
 - **FM-ARC-4 (MUST)** Motion and look are governed by the source `DESIGN_SYSTEM.md`
   (goofy spring presets, mascot library, idle/reaction animations, timer behavior, reveal
@@ -275,7 +275,7 @@ Packs — a second set of the seven pools a room can play with (B-29, DD-16, des
   API and the built client statics *(amended by D-5, 2026-09-14: production is the Docker image
   on an Oracle Always-Free VM behind Caddy, served under a URL sub-path; Render remains the
   self-deploy alternative — and 2026-09-16: Render dropped entirely, see D-5)*; single
-  Cloudflare Worker + R2 bucket + KV namespace. Docker (two-stage node:20-alpine) is the only
+  Cloudflare Worker + R2 bucket + KV namespace. Docker (two-stage node:22-alpine) is the only
   deploy; free-tier self-hosting stays possible (Oracle Always-Free or any small VPS).
 - **FM-NFR-4 (MUST)** Animations use transform/opacity only, 60 fps on mid-range Android Chrome
   (design-system constraint); reduced-motion preference honored.

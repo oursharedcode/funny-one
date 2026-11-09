@@ -21,7 +21,7 @@
 #   docker build --build-arg BASE_PATH=/funny37-game -t funny-multi .
 
 # ---- build stage -----------------------------------------------------------
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ ENV BASE_PATH=$BASE_PATH
 RUN npm run build
 
 # ---- runtime stage ---------------------------------------------------------
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production

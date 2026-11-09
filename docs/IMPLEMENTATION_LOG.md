@@ -6302,6 +6302,43 @@ Everything else is B-29's own list and the owner's items in the note below.
 
 ---
 
+## Step 105 (task B-30) — Node 22: both `Dockerfile` stages, CI and `engines`; the image rebuilt on a pulled `node:22-alpine`, the deploy still owed (2026-11-09)
+
+B-30 was "not scheduled"; the Brotli decoder flaw brought it forward (CVE-2026-111497, an
+out-of-bounds write in Google's Brotli decoder, on CISA's KEV list since 2026-10-27). Node fixed it
+on 2026-10-21 in 22.23.4, 24.22.1 and 26.12.1 — by cherry-pick, so `process.versions.brotli` stays
+`1.1.0` on a patched Node and `node -v` is the proof — and **Node 20 gets no fix**, so production's
+`node:20-alpine` image cannot be patched, only moved. The laptop's default Node is 22.23.4 since
+this morning (nvm). The Brotli work spans the owner's projects; this entry records funnyone's part.
+
+**Shipped:** the four pins B-30 names — the `Dockerfile`'s build and runtime stages
+`node:22-alpine`, `.github/workflows/ci.yml` `node-version: 22`, the root `package.json`'s
+`engines` `>=22` and the lockfile's root entry to match — plus `--pull` on `deploy/ship.sh`'s
+`docker build`, so every deploy builds on a freshly pulled base (B-30's last clause; Step 102's
+cached-`node:20-alpine` check is moot). The current-state documents follow: `CLAUDE.md` (two lines),
+`steering/design.md`'s diagram and `steering/requirements.md` (two lines). No code changed.
+
+**Verified:** `docker build --pull -t funny-multi:node22-test .` on `node:22-alpine` — 303 MB
+against the Node 20 image's 252 MB, the base alone. Step 102's production-mode start, repeated
+against that container on `127.0.0.1:5188` (a new row in `C:\Mark\Dev\machine\ports.md`, up only
+for the check): `/`, `/?room=ABCDEF` and `/some/deep/path` returned the same 878-byte
+`index.html` (one sha256); its CSS and JS assets, `sw.js` and `manifest.webmanifest` 200 with
+their types; the Socket.IO polling handshake answered; `/health` ok; `node -v` inside the
+container v22.23.4; nothing at warning level or above in the log; 5188 free afterwards. The gates
+on the laptop's 22.23.4: typecheck, lint, format:check green; `npm test` 1674 tests green across
+the six workspace runs; `npm audit --omit=dev` 0; the full audit 11 (2 low, 9 moderate), all under
+the three accepted IDs. CI on Node 22: with the push (the owner's word).
+
+**Owed:** the deploy — `deploy/ship.sh ubuntu@152.69.166.212` from this laptop, which now pulls
+`node:22-alpine`, builds and streams the image, then `docker compose --profile caddy up`; B-27
+still holds (a deploy ends every room in progress), so a quiet hour, the server's log first; then
+`node -v` inside the container on the host must show v22.23.4, and Step 102's fix reaches
+production with it. B-30 closes with that deploy and CI green on 22. Afterwards, on the laptop,
+`nvm uninstall 20.20.1`. B-29's ≈ 1-cent test (D3), queued as Step 105 in the note below, moves
+to Step 106.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6322,7 +6359,20 @@ below.
 ~~RESUME HERE (2026-11-05, after Step 103, not yet pushed)~~ — carried into Step 104's note
 below.
 
-**RESUME HERE (2026-11-06, after Step 104, pushed and CI green).** **B-29's data model is built
+~~RESUME HERE (2026-11-06, after Step 104, pushed and CI green)~~ — carried into Step 105's note
+below.
+
+**RESUME HERE (2026-11-09, after Step 105, not yet pushed).** **funnyone is on Node 22 in the repo
+(Step 105, task B-30): both `Dockerfile` stages, CI, `engines`, `deploy/ship.sh` with `--pull`; the
+image built on `node:22-alpine` passed Step 102's production-mode checks, and the five local gates
+are green on the laptop's 22.23.4. Not yet pushed, not yet deployed.** The reason is the Brotli
+decoder flaw (CVE-2026-111497): Node 20 gets no fix. **Next, the agent's:** push on the owner's
+word, CI on 22; then the deploy, `deploy/ship.sh ubuntu@152.69.166.212`, at a quiet hour (B-27),
+the server's log first, and `node -v` v22.23.4 inside the container on the host closes B-30 — the
+owner decides who runs it (the VM's SSH is theirs). Then B-29's ≈ 1-cent test (D3) as Step 106, as
+queued below. **Owed, the owner's:** unchanged from Step 104's note. Then the same note as before:
+
+**B-29's data model is built
 (Step 103): `packages/shared/src/packs/` and `buildAftermathPrompt`, chr26's 35 ids frozen with
 their picture and aftermath fragments, en and ru texts drafted; nothing reaches a room yet.
 Steps 102–103 are pushed and CI is green (Step 104); production's audit is 0 again.** **Owed, the

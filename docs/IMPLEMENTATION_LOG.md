@@ -6283,6 +6283,25 @@ the owner's word (no deploy for this step).
 
 ---
 
+## Step 104 — Steps 102–103 pushed; CI green (2026-11-06)
+
+**Shipped:**
+
+- Pushed `76ad155..eaf15c1` (Steps 102 and 103's commits) on the owner's word; CI passed (run
+  `42040703288`: typecheck, lint, test). Nothing to deploy — Step 102's fix reaches production only
+  with the next deploy, after the `node -v` check in its entry (not urgent); Step 103 built nothing
+  a room uses yet.
+
+No code changed this step — a push and this record — so the six gates don't re-apply; Step 103's run
+stands (one run for Steps 102 and 103 together: 1674 tests, `npm audit --omit=dev` 0, the full audit
+11, all three accepted IDs). The end-of-session check closed no task: B-29 stays open and unticked,
+its data model built but nothing reaches a room; B-29a and B-30 stay filed and not scheduled.
+
+**Owed:** the deploy, after the `node -v` check (not urgent); B-30 if the owner wants Node 22 first.
+Everything else is B-29's own list and the owner's items in the note below.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6300,7 +6319,31 @@ below.
 ~~RESUME HERE (2026-11-05, after Step 101, not yet pushed)~~ — carried into Step 103's note
 below.
 
-**RESUME HERE (2026-11-05, after Step 103, not yet pushed).** **B-29's data model is built
+~~RESUME HERE (2026-11-05, after Step 103, not yet pushed)~~ — carried into Step 104's note
+below.
+
+**RESUME HERE (2026-11-06, after Step 104, pushed and CI green).** **B-29's data model is built
+(Step 103): `packages/shared/src/packs/` and `buildAftermathPrompt`, chr26's 35 ids frozen with
+their picture and aftermath fragments, en and ru texts drafted; nothing reaches a room yet.
+Steps 102–103 are pushed and CI is green (Step 104); production's audit is 0 again.** **Owed, the
+agent's:** the next deploy takes Step 102 to production, after
+`docker run --rm node:20-alpine node -v` shows 20.19 or later (Step 102's Node 20 finding), unless
+B-30 has moved the image to Node 22 by then. **Next, the agent's, Step 105:** the ≈ 1-cent test
+(D3) — 5 aftermaths through `wrangler dev --remote`, after reading `C:/Mark/Dev/machine/ports.md`,
+place *i* with ending *i*: the snowy square with the wrapping paper, the living room with the
+tangled lights, the festive table with the toppled tree, the frozen pond with the empty sack, the
+film studio with the melted snowman. Each must read as a punchline on its own, or its fragment
+changes before the batch. **Owed, the owner's:** edit the en and ru drafts — the 25 drawn options
+(who, with whom, where, what they did, the ending) before the batch, since a new concept there
+redraws its pictures in every language, as today's three did, while "when" and "why" stay free; the
+drawn concepts settled by about 2026-11-14 keep the 650 pictures inside the free allowance,
+otherwise the paid day; which Lightning service; the Sponsors one-time tier; the Android-link test
+(Step 101's Owed; D4 settles the PayID transfer); whether a Russian edition splits into three (asked
+2026-11-05, answered in the session). Filed and not scheduled: B-29a, the Southern-Hemisphere
+edition; B-30, the move to Node 22 (Step 102's finding, filed on the owner's word 2026-11-06). Then
+the same note as before:
+
+**B-29's data model is built
 (Step 103): `packages/shared/src/packs/` and `buildAftermathPrompt`, chr26's 35 ids frozen with
 their picture and aftermath fragments, en and ru texts drafted; nothing reaches a room yet. Step 102
 bumped `@fastify/static` in range, so production's audit is 0 again.** **Owed, the agent's:** push

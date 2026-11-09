@@ -621,16 +621,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   options inside it: its own pack id, concept set and picture batch (650 at 5 options per slot,
   DD-16). Not scheduled. Open when it is taken up: its languages (en for Australia, pt-br for
   Brazil), its dates, and whether chr26's code unlocks it too.
-- **B-30** Move CI, the server image and `engines` to Node 22 (agent finding 2026-11-05, Step 102;
-  filed on the owner's word 2026-11-06). Node 20 has been out of support since 2026-04-30, and
-  `content-disposition` 3.0.0, which Step 102's `@fastify/static` 10.1.10 brings in, is an ES
-  module only and declares Node 22 or later; on Node 20 it loads only through `require(esm)`, on
-  by default from 20.19. Four pins: `.github/workflows/ci.yml` (`node-version: 20`), both stages
-  of the `Dockerfile` (`node:20-alpine`) and the root `package.json`'s `engines` (`>=20`). Done
-  when the gates pass on Node 22 (this PC's default, 22.19.0), CI runs on 22, a production-mode
-  start passes as in Step 102, and the deploy builds on a freshly pulled `node:22-alpine` —
-  `deploy/ship.sh` builds without `--pull`. Not scheduled; if it lands before the next deploy,
-  Step 102's `node -v` check is moot.
+- **B-30** — **closed 2026-11-09 (Step 106)**, block in `steering/tasks-done.md`. CI, the server
+  image and `engines` are on Node 22; production runs 22.23.4 since the 2026-11-09 deploy.
 
 ## Dependency notes
 

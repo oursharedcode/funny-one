@@ -1514,3 +1514,21 @@ unless they carry advisories:
       (`a36fa9c`, CI run `40422235804`); deployed the same morning, Funny One at 10:53 and Funny
       Multi at 11:02 AEDT after an hour with no game connections, both checked live. Seen on the
       way and filed as B-27: a Funny Multi deploy still ends every room in progress.
+- [x] **B-30** Move CI, the server image and `engines` to Node 22 (agent finding 2026-11-05, Step
+      102; filed on the owner's word 2026-11-06). Node 20 has been out of support since 2026-04-30,
+      and `content-disposition` 3.0.0, which Step 102's `@fastify/static` 10.1.10 brings in, is an
+      ES module only and declares Node 22 or later; on Node 20 it loads only through `require(esm)`,
+      on by default from 20.19. Four pins: `.github/workflows/ci.yml` (`node-version: 20`), both
+      stages of the `Dockerfile` (`node:20-alpine`) and the root `package.json`'s `engines`
+      (`>=20`). Done when the gates pass on Node 22 (this PC's default, 22.19.0), CI runs on 22,
+      a production-mode start passes as in Step 102, and the deploy builds on a freshly pulled
+      `node:22-alpine` — `deploy/ship.sh` builds without `--pull`. Not scheduled; if it lands before
+      the next deploy, Step 102's `node -v` check is moot.
+      _Closed 2026-11-09 (Step 106)._ Brought forward by the Brotli decoder flaw (CVE-2026-111497),
+      which Node 20 never gets a fix for. Step 105: both `Dockerfile` stages `node:22-alpine`, CI
+      `node-version: 22`, `engines` `>=22` with the lockfile's root entry, `--pull` on `ship.sh`'s
+      build, the documents; the gates green on the laptop's 22.23.4 and the image's production-mode
+      start as in Step 102 on 127.0.0.1:5188. Pushed (`95ee912`, CI run `42598938569` green on 22);
+      deployed 2026-11-09 at 21:26 AEDT by the owner's `deploy/ship.sh`, after the port-22 rule was
+      re-pointed to the moved home IP (`deploy/oci/network.py`); the four checks through Caddy green
+      and `node -v` inside the production container v22.23.4.

@@ -6339,6 +6339,43 @@ to Step 106.
 
 ---
 
+## Step 106 (task B-30) — Step 105 pushed and deployed: production on Node 22.23.4; B-30 closed (2026-11-09)
+
+**Shipped:**
+
+- Pushed `fec441f..95ee912` (Step 105's commit) on the owner's word at 21:10 AEDT; CI passed on
+  Node 22 (run `42598938569`: typecheck, lint, test).
+- Deployed at 21:26 AEDT by the owner's `deploy/ship.sh ubuntu@152.69.166.212`: the image built on
+  a freshly pulled `node:22-alpine` (Step 105's `--pull`), tagged `funny-multi:95ee912`, streamed
+  and started (`funny-funny-multi-1` recreated), Caddy reloaded, the four checks through Caddy
+  green — `/health` `{"ok":true}`, `/.well-known/assetlinks.json` 200 `application/json`,
+  `/privacy` the policy, the old address 301 to `https://www.funny37.oursharedcode.com/?room=CHECK`.
+  The first run, at 21:15, died at its first `ssh`: `connect to host 152.69.166.212 port 22:
+  Connection timed out`. 80 and 443 answered and the site was healthy, so it was the cause Steps 36
+  and 55 record: the security list allows 22 only from the owner's home IP, and that address had
+  moved (to 14.201.22.33); the agent re-pointed the rule with
+  `python deploy/oci/network.py 14.201.22.33` (idempotent; ids in `~/.oci/funny-infra.json`), and 22
+  answered at once.
+- `node -v` inside the production container (the owner's `docker compose exec -T funny-multi
+  node -v` on the host): **v22.23.4** — B-30's last criterion. Step 102's `@fastify/static` 10.1.10
+  went to production with it (read from the same image's `node_modules` on the laptop).
+
+No code changed this step — a push, a deploy and this record — so the six gates don't re-apply;
+Step 105's run stands (1674 tests, `npm audit --omit=dev` 0, the full audit 11 under the three
+accepted IDs). The end-of-session check closes B-30: its done-line holds clause by clause — the
+gates on Node 22 (Step 105, on 22.23.4 rather than the 22.19.0 the task named), CI on 22 (the run
+above), a production-mode start as in Step 102 (Step 105, on 5188), the deploy on a freshly pulled
+`node:22-alpine` (today). B-29 stays open and unticked; B-29a and B-27 stay filed.
+
+**Owed:** on the laptop, `nvm uninstall 20.20.1` (nothing here needs Node 20 now) and
+`nvm uninstall 22.19.0` once the 5173 Vite that holds its binary restarts, plus the throwaway image
+`funny-multi:node22-test`; B-27 unchanged — this deploy ran without the server's log read first, so
+any room in progress ended with it. B-29's ≈ 1-cent test (D3), queued as Step 106 in the note
+below, moves to Step 107. Everything else is B-29's own list and the owner's items in the note
+below.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6362,7 +6399,19 @@ below.
 ~~RESUME HERE (2026-11-06, after Step 104, pushed and CI green)~~ — carried into Step 105's note
 below.
 
-**RESUME HERE (2026-11-09, after Step 105, not yet pushed).** **funnyone is on Node 22 in the repo
+~~RESUME HERE (2026-11-09, after Step 105, not yet pushed)~~ — carried into Step 106's note below.
+
+**RESUME HERE (2026-11-09, after Step 106, pushed, CI green and deployed).** **funnyone runs on
+Node 22 everywhere (Step 106; B-30 closed): Step 105 is pushed (`95ee912`, CI run `42598938569`
+green on 22), production carries `funny-multi:95ee912` since 21:26 AEDT, built on a freshly pulled
+`node:22-alpine`, and `node -v` inside the container on the host is v22.23.4; Step 102's
+`@fastify/static` 10.1.10 went with it.** The Brotli flaw (CVE-2026-111497) is out of funnyone's
+production. **Next, the agent's:** on the laptop, `nvm uninstall 20.20.1`, and 22.19.0 after the
+5173 Vite restarts; then B-29's ≈ 1-cent test (D3) as Step 107, as queued below. **Owed, the
+owner's:** unchanged from Step 104's note. B-27 unchanged — this deploy ran without the server's
+log read first. Then the same note as before:
+
+**funnyone is on Node 22 in the repo
 (Step 105, task B-30): both `Dockerfile` stages, CI, `engines`, `deploy/ship.sh` with `--pull`; the
 image built on `node:22-alpine` passed Step 102's production-mode checks, and the five local gates
 are green on the laptop's 22.23.4. Not yet pushed, not yet deployed.** The reason is the Brotli

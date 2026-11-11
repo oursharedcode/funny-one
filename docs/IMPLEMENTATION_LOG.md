@@ -6376,6 +6376,71 @@ below.
 
 ---
 
+## Step 107 — Playwright 1.65.0 (`6cb6c38`) recorded; the laptop's brotli programme checked against the repo, the gates re-run on the new browsers (2026-11-11)
+
+**Shipped:**
+
+- The record of `6cb6c38`, committed and pushed on 2026-11-10 at 20:39 AEDT by the laptop-wide
+  brotli programme (its report: `C:\Mark\Dev\BrBr\Brotli-CVE-2026-111497.md`, written
+  2026-11-11) outside this log's ritual and without a step number — this entry numbers it 107, so
+  B-29's ≈ 1-cent test (D3) moves from Step 107 to Step 108. The commit moves the root dev
+  dependency `playwright` `^1.63.0` → `^1.65.0` (lockfile: `playwright` and `playwright-core`
+  1.63.0 → 1.65.0) and drops the six `libc` arrays from the `@rolldown/binding-linux-*` entries of
+  `package-lock.json` — npm 10.9.9's form, the churn Step 42's rule had the agent revert; committed
+  now, the lockfile sits in the local npm's form, and the churn to revert from here on is a diff that
+  re-adds them. CI run `42796006498` green (typecheck, lint, test on Node 22). Why the bump: the
+  programme deleted the browser builds 1.63.0 expects (`chromium-1243`, `webkit-2359`) and installed
+  `chromium-1254` (Chromium 158) and `webkit-2388`, so the pinned line had to be one whose browsers
+  are present. Not a CVE fix in itself (the report's correction 7): Playwright's Chromium 151 and
+  153 were already fixed, and WebKit's `brotlidec.dll` is 1.2.0, pre-fix, at 1.65.0 too.
+- Checked today against the report's §3–5, read-only on this PC: `node -v` v22.23.4 and nvm holds
+  only it — Step 106's Owed `nvm uninstall 20.20.1` and `22.19.0` were done by the programme, as was
+  the throwaway image `funny-multi:node22-test` (`docker images`: `funny-multi:95ee912` and `latest`
+  only); `playwright-core` 1.65.0 resolves Chromium to `chromium-1254\chrome-win64\chrome.exe` and
+  WebKit to `webkit-2388\Playwright.exe`, both present (the report's `scan\pw-exe-check.cjs`);
+  Chromium 158.0.8127.18 launched headless and opened a page; `webkit-2388` holds `Playwright.exe`
+  and `WebKitWebProcess.exe`, the pair Avast took from 2359 — not launched: no Avast exception for
+  the new folder is recorded, and a new quarantine would take WebKit from every project on this PC;
+  a grep of the repo (`node_modules`, SRC, `dist` and the Android build outputs excluded) finds no
+  Node 20 pin, no browser-folder path, no `ms-playwright` or `mingw64` path — CI `node-version: 22`,
+  `engines` `>=22`, both `Dockerfile` stages `node:22-alpine` (Step 105). Nothing in the repo needed
+  a change; this record is the step.
+- The gates, re-run on 22.23.4 with the new browsers: typecheck 0, lint 0, `format:check` clean;
+  `npm test` outside the sandbox **1674 passed** (418, 397, 329, 178, 299 and 53 by workspace, the
+  same six counts as Step 103) — in two runs, since the first full run from `C:/Mark/Dev/funnyone`
+  met a laptop at 100 % CPU (other projects' sessions building and deploying, a VS Code update) and
+  Vitest dropped 16 of the client's 27 files with `[vitest-pool-runner]: Timeout waiting for worker
+  to respond` plus one 5 s test timeout, reporting 204 for the client; the client workspace alone
+  then gave 27 files, 397 passed, and the other five workspaces' counts stand from the full run.
+  Two findings for the next session: a Vitest total that shrinks is a dropped file, not a removed
+  test — compare the six counts; and `npm test` from the harness's lower-case `c:\Mark\Dev\funnyone`
+  fails every file at once ("Vitest failed to find the runner", `reading 'config'`, 0 tests) —
+  run it from `C:/…`. `npm audit --omit=dev` 0; the full audit 11 (2 low, 9 moderate), all under
+  the three accepted IDs (GHSA-gcqx-w48m-w2h4, GHSA-g3hv-75wg-m249, GHSA-3g3m-2fjr-6pw4), as in
+  Step 105. CI: this step changes only the log, so `6cb6c38`'s run `42796006498` stands.
+- What the programme leaves pre-fix around the repo (the report's §5.4 and §5.9), none in the
+  repo's own code or in production's Node image: Playwright WebKit's `brotlidec.dll` 1.2.0 (the
+  five `.screens` WebKit scripts open the project's own pages; re-check at each Playwright release);
+  Bubblewrap's `adb.exe` (brotli only on compressed transfers to a connected device; the owner's
+  signed builds); FFmpeg 8.0 (`encode-media.sh`, own media; winget offers 9.0.2); Pillow 12.3.0's
+  FreeType in `.picture-review/venv`, undatable (system fonts by name, never WOFF2); and the
+  production VM's `caddy:2` image — `deploy/ship.sh` runs `compose up -d --no-build` without a pull,
+  so the VM keeps the image it first pulled, whose `brotli-libs` 1.2.0 (read on the laptop's copy of
+  the same tag) is pre-fix. Caddy is a Go binary and never calls libbrotli; the package belongs to
+  the image's `curl`, which nothing runs (no healthcheck in `docker-compose.yml`), so no path reaches
+  it. Docker Hub rebuilt `caddy:2` on 2026-11-06: pulled here today, it is Alpine 3.24.4 with
+  `brotli-libs` 1.2.1-r0 (fixed) and Caddy v2.11.9.
+
+**Owed:** the owner's, one op at a quiet hour, the server's log first as B-27 asks: on the VM,
+`cd funny && docker compose pull caddy && docker compose --profile caddy up -d` moves production's
+Caddy to the 2026-11-06 image; Caddy restarts for a few seconds (the game server is not touched;
+the sockets through Caddy drop and reconnect — whether a room in progress survives that is
+untested). Optional, the laptop's: Android platform-tools for `adb`, FFmpeg 9.0.2 via winget; and
+whether Avast holds an exception for `webkit-2388` — until that is known, WebKit checks stay off
+here. B-29's ≈ 1-cent test (D3) moves to Step 108. Everything else as in Step 106's note below.
+
+---
+
 ~~RESUME HERE (2026-10-29, after Step 96, not yet pushed)~~ — carried into Step 97's note below.
 
 ~~RESUME HERE (2026-10-29, after Step 97, pushed and deployed)~~ — carried into Step 98's note
@@ -6401,7 +6466,26 @@ below.
 
 ~~RESUME HERE (2026-11-09, after Step 105, not yet pushed)~~ — carried into Step 106's note below.
 
-**RESUME HERE (2026-11-09, after Step 106, pushed, CI green and deployed).** **funnyone runs on
+~~RESUME HERE (2026-11-09, after Step 106, pushed, CI green and deployed)~~ — carried into Step 107's
+note below.
+
+**RESUME HERE (2026-11-11, after Step 107, not yet pushed).** **Step 107 records `6cb6c38` —
+Playwright 1.65.0, pushed 2026-11-10 by the laptop's brotli programme without a step — and checks
+the programme's machine changes against the repo: nothing in the code or the configuration needed a
+change; the gates are green on 22.23.4 with the new browsers (Chromium 158 launches; WebKit 2388
+present, not run); Step 106's laptop Owed (Node 20 and 22.19.0 uninstalled, the throwaway image
+gone) was done by the programme.** **Next, the agent's:** commit Step 107's record and push on the
+owner's word; then B-29's ≈ 1-cent test (D3) as Step 108, as queued below. **Owed, the owner's:**
+one op at a quiet hour — on the VM, `cd funny && docker compose pull caddy && docker compose
+--profile caddy up -d`, which moves production's Caddy image to the 2026-11-06 build (Alpine
+3.24.4, `brotli-libs` 1.2.1, Caddy 2.11.9; the current one carries a pre-fix `brotli-libs` that
+nothing reaches); the laptop's `adb` (Android platform-tools) and FFmpeg (winget 9.0.2) when
+convenient; whether Avast holds an exception for `webkit-2388` — until it is known, WebKit checks
+stay off here. The report to read when any of this comes up:
+`C:\Mark\Dev\BrBr\Brotli-CVE-2026-111497.md`. Everything else unchanged from Step 106's note.
+Then the same note as before:
+
+**funnyone runs on
 Node 22 everywhere (Step 106; B-30 closed): Step 105 is pushed (`95ee912`, CI run `42598938569`
 green on 22), production carries `funny-multi:95ee912` since 21:26 AEDT, built on a freshly pulled
 `node:22-alpine`, and `node -v` inside the container on the host is v22.23.4; Step 102's

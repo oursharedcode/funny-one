@@ -6438,6 +6438,12 @@ the sockets through Caddy drop and reconnect — whether a room in progress surv
 untested). Optional, the laptop's: Android platform-tools for `adb`, FFmpeg 9.0.2 via winget; and
 whether Avast holds an exception for `webkit-2388` — until that is known, WebKit checks stay off
 here. B-29's ≈ 1-cent test (D3) moves to Step 108. Everything else as in Step 106's note below.
+*Done 2026-11-12 (the Caddy op):* the owner ran it over ssh from the laptop (PowerShell 5.1 has no
+`&&`, so the chain went inside the `ssh ... "..."` quotes) — `caddy:2` pulled, `funny-caddy-1`
+recreated and started, `funny-funny-multi-1` left running. Checked from here afterwards: `/health`
+`{"ok":true}`, `assetlinks.json` and `/privacy` 200 with `Server: Caddy`, the bare name still 301s
+to `www` with the query kept. The record commit `22c832b` was pushed 2026-11-11 20:48 UTC; its CI
+run `43098225720` sat queued for GitHub runners at the time of this line.
 
 ---
 
@@ -6469,17 +6475,16 @@ below.
 ~~RESUME HERE (2026-11-09, after Step 106, pushed, CI green and deployed)~~ — carried into Step 107's
 note below.
 
-**RESUME HERE (2026-11-11, after Step 107, not yet pushed).** **Step 107 records `6cb6c38` —
+**RESUME HERE (2026-11-11, after Step 107; pushed as `22c832b`, the Caddy op done 2026-11-12).** **Step 107 records `6cb6c38` —
 Playwright 1.65.0, pushed 2026-11-10 by the laptop's brotli programme without a step — and checks
 the programme's machine changes against the repo: nothing in the code or the configuration needed a
 change; the gates are green on 22.23.4 with the new browsers (Chromium 158 launches; WebKit 2388
 present, not run); Step 106's laptop Owed (Node 20 and 22.19.0 uninstalled, the throwaway image
 gone) was done by the programme.** **Next, the agent's:** commit Step 107's record and push on the
-owner's word; then B-29's ≈ 1-cent test (D3) as Step 108, as queued below. **Owed, the owner's:**
-one op at a quiet hour — on the VM, `cd funny && docker compose pull caddy && docker compose
---profile caddy up -d`, which moves production's Caddy image to the 2026-11-06 build (Alpine
-3.24.4, `brotli-libs` 1.2.1, Caddy 2.11.9; the current one carries a pre-fix `brotli-libs` that
-nothing reaches); the laptop's `adb` (Android platform-tools) and FFmpeg (winget 9.0.2) when
+owner's word (done, `22c832b`); then B-29's ≈ 1-cent test (D3) as Step 108, as queued below.
+**Owed, the owner's:** ~~the VM's Caddy op~~ — done 2026-11-12, production's Caddy is on the
+2026-11-06 build (Alpine 3.24.4, `brotli-libs` 1.2.1, Caddy 2.11.9), health checks green (Step 107's
+Owed has the detail); the laptop's `adb` (Android platform-tools) and FFmpeg (winget 9.0.2) when
 convenient; whether Avast holds an exception for `webkit-2388` — until it is known, WebKit checks
 stay off here. The report to read when any of this comes up:
 `C:\Mark\Dev\BrBr\Brotli-CVE-2026-111497.md`. Everything else unchanged from Step 106's note.

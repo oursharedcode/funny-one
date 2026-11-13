@@ -6475,13 +6475,68 @@ below.
 ~~RESUME HERE (2026-11-09, after Step 106, pushed, CI green and deployed)~~ — carried into Step 107's
 note below.
 
-**RESUME HERE (2026-11-11, after Step 107; pushed as `22c832b`, the Caddy op done 2026-11-12).** **Step 107 records `6cb6c38` —
-Playwright 1.65.0, pushed 2026-11-10 by the laptop's brotli programme without a step — and checks
-the programme's machine changes against the repo: nothing in the code or the configuration needed a
-change; the gates are green on 22.23.4 with the new browsers (Chromium 158 launches; WebKit 2388
-present, not run); Step 106's laptop Owed (Node 20 and 22.19.0 uninstalled, the throwaway image
-gone) was done by the programme.** **Next, the agent's:** commit Step 107's record and push on the
-owner's word (done, `22c832b`); then B-29's ≈ 1-cent test (D3) as Step 108, as queued below.
+~~RESUME HERE (2026-11-11, after Step 107; pushed as `22c832b`, the Caddy op done 2026-11-12)~~ —
+carried into Step 108's note below.
+
+## Step 108 (task B-1e) — Play: Equifax refuses the rename, Funny One verified live, Funny Multi submitted, D5 and Trader status decided (2026-11-13)
+
+No code changed this session (`git status` clean) — all six gates and `npm test` are not
+applicable; nothing was typechecked, linted, formatted, tested or audited because nothing in the
+repo moved.
+
+**Shipped — the owner's ops, read and advised by the agent:**
+
+- **Equifax answered (10 Nov; read by the agent 2026-11-12): no rename.** A sole trader's
+  D-U-N-S legal entity name is always the registry's individual name; MARK WEB TOOLS stays the record's *trading* name, never its legal name. The 17 Nov rename and
+  its Payments Center confirmation are void — nothing is owed there again; only a registered
+  company with its own D-U-N-S would change the legal name.
+- **Funny One confirmed live on Google Play** (seen 2026-11-12; Publishing overview later read
+  "Last published on 3 November 2026"), "About the developer" printing the D-U-N-S legal name as
+  an organisation listing does. The owner's install-from-Play check passed 2026-11-13: the
+  hand-installed copy removed, the Play copy opens full screen with no URL bar. Funny One counts
+  no analytics (its policy is "no analytics"), so no `/stats/` check applies to it — that check
+  is Funny Multi's alone, after its own approval.
+- **D5 (Catalog Access) decided (owner, 2026-11-13): stays on**, the default — under the US
+  court-ordered programme, only listing data (name, icon, description, screenshots, videos) goes
+  to enrolled third-party US stores, installs still complete through Google Play on the same
+  terms, and the choice is changeable at any time, so it never had to hold up *Submit*.
+- **Funny Multi submitted for review 2026-11-13:** the 33 pending changes (Production release,
+  177+1 countries, 11 store listings with AI-labelled assets, from Steps 92–93); Publishing
+  overview now reads "Changes in review"; managed publishing is off, so it goes live the moment
+  Google approves it.
+- **Trader status declared, account level (owner, 2026-11-13): Trader.** Google Play now asks
+  every developer, not only EU sellers, to declare trader status by 1 February 2027 or have the
+  profile and apps removed from Play globally (Console notice, first seen 2026-11-06). Declaring
+  Trader makes the D-U-N-S number public under "About the provider" (the "identified itself as a
+  trader" sentence shows to EEA/UK users only); both tick-boxes (consent to publish; commitment
+  to comply with local laws) are true for an ABN-registered business and were accepted.
+  Funny One's own app-level confirmation ("Yes, my trader status applies to this app", Terms of
+  Service left empty — asked only "if available", neither game has one) is saved and submitted,
+  "Changes in review". Funny Multi's app-level confirmation is deliberately held back by the
+  agent's advice until its current review ends — the deadline is 1 Feb 2027, so there is no
+  urgency and no reason to touch an app mid-review.
+
+**Owed, the owner's:** Google's decision on Funny Multi's 33 changes (mail to the developer
+account); once approved — install Funny Multi from Play, check full screen with no URL bar,
+check an "Android app" visit lands on `/stats/`, then Funny Multi's own app-level trader
+confirmation, before 1 Feb 2027. B-29's four decisions from this session's morning plan are
+still open (see the RESUME note below) — the 25 drawn options' freeze is due 2026-11-14.
+
+**RESUME HERE (2026-11-13, after Step 108; its one commit is this record — the log and
+`steering/tasks.md` only, no code changed).** **Step 108
+closes the Equifax question for good and moves Funny One and Funny Multi through Play's trader
+and catalog-access requirements; B-1e stays open only on Funny Multi's pending review.** **Next,
+the agent's:** once the owner answers B-29's four decisions below, B-29's ≈ 1-cent aftermath test
+(D3) as Step 109. **Owed, the owner's:** Google's decision on Funny Multi (mail to the developer
+account); once approved, the three Funny Multi checks above; the four B-29 decisions from this
+session's plan — (1) freeze the 25 drawn Christmas options by 2026-11-14 or keep editing past it;
+(2) the 5 D3 test pictures into the production R2 bucket `funny-multi-images` or a throwaway
+bucket (needs an R2 wrangler scope the saved login lacks); (3) a throwaway
+`cloudflare/wrangler.d3.toml` to switch `[ai]` on for the dev run, or editing the committed
+`wrangler.toml` and reverting it; (4) `npx wrangler@4.160.1` as a one-off, or a devDependency in
+`cloudflare/package.json` — and whether the owner runs `wrangler login` themself, since the saved
+OAuth session is from 25 August and may need a fresh browser login. Everything else unchanged
+from Step 107's note below.
 **Owed, the owner's:** ~~the VM's Caddy op~~ — done 2026-11-12, production's Caddy is on the
 2026-11-06 build (Alpine 3.24.4, `brotli-libs` 1.2.1, Caddy 2.11.9), health checks green (Step 107's
 Owed has the detail); the laptop's `adb` (Android platform-tools) and FFmpeg (winget 9.0.2) when

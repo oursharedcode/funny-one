@@ -110,9 +110,28 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   the Equifax request.** **Account done 2026-10-18 (Step 80):** the organisation account MARK WEB
   TOOLS, created and paid 2026-10-17, has its identity, website and phone verified and can
   publish.
-  - *Owed:* the Equifax D-U-N-S rename to MARK WEB TOOLS, submitted 2026-10-18, due about
-    2026-11-17; when it lands, the owner confirms the new name in Payments Center → Review updates,
-    before its deadline. Then the listing (assets, content rating 12+, Data Safety, release).
+  - **Equifax refused the rename (10 Nov; read 2026-11-12, Step 108):** a sole
+    trader's D-U-N-S legal entity name is always the registry's individual name; MARK WEB TOOLS
+    stays the record's trading name, not its legal name. No "no longer verified" banner is
+    coming; nothing to confirm in Payments Center. Never list the rename as owed again.
+  - **Funny One is live on Play** (seen 2026-11-12; last published 3 Nov 2026) and its
+    install-from-Play check passed 2026-11-13 (hand-installed copy removed, full screen, no URL
+    bar). It counts no analytics, so no `/stats/` check applies to it — that check is Funny
+    Multi's alone, after its own approval.
+  - **D5 (Catalog Access) decided 2026-11-13 (owner): stays on**, the default — changeable at any
+    time, so it never had to hold up *Submit*.
+  - **Funny Multi submitted for review 2026-11-13** (33 changes; Publishing overview reads
+    "Changes in review"; managed publishing off, so it goes live on approval).
+  - **Trader status:** the Play Console notice (all developers declare by 1 February 2027 or be
+    removed from Play globally) is answered at account level — **declared Trader 2026-11-13**
+    (owner); the D-U-N-S number is now public under "About the provider", the Trader sentence
+    shown to EEA/UK users only. Funny One's own app-level confirmation ("Yes, applies to this
+    app", no Terms of Service URL — neither game has one) is saved and submitted, "Changes in
+    review". Funny Multi's app-level confirmation is deliberately held until its current review
+    ends (deadline 1 Feb 2027, no urgency).
+  - *Owed:* Google's decision on Funny Multi's 33 changes; once approved, install from Play,
+    check full screen with no URL bar, check an "Android app" visit lands on `/stats/`; then
+    Funny Multi's own app-level trader confirmation, before 1 Feb 2027.
   - *Listing assets done 2026-10-19 (Step 87), for both apps:* under `store/`, the texts in 22
     languages (en and ru written, 20 machine drafts with B-3), graphics and screenshots
     (regenerated, not committed), and the answers for Store settings and App content

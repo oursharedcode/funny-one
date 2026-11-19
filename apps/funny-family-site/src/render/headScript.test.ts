@@ -18,6 +18,9 @@ interface Env {
   /** Storage that throws on every access, as a blocked or sandboxed one does. */
   blocked?: boolean;
   random?: number;
+  /** Undefined: a browser too old to say. */
+  userAgent?: string;
+  maxTouchPoints?: number;
 }
 
 /** Runs the inline script against stand-ins for the browser globals it uses. */
@@ -69,11 +72,38 @@ function run(root: boolean, env: Env = {}) {
     },
     storage(session),
     storage(local),
-    { languages: env.languages ?? ['en-GB', 'en'], language: env.language ?? 'en-GB' },
+    {
+      languages: env.languages ?? ['en-GB', 'en'],
+      language: env.language ?? 'en-GB',
+      userAgent: env.userAgent,
+      maxTouchPoints: env.maxTouchPoints,
+    },
     (callback: () => void) => timers.push(callback),
   );
-  return { variant: attributes.get('data-variant'), replaced, session, style, timers };
+  return {
+    variant: attributes.get('data-variant'),
+    ios: attributes.get('data-ios'),
+    replaced,
+    session,
+    style,
+    timers,
+  };
 }
+
+// User agents as browsers of 2025–2026 send them.
+const IPHONE_SAFARI =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1';
+const IPHONE_CHROME =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/138.0.7204.156 Mobile/15E148 Safari/604.1';
+const IPAD_CHROME =
+  'Mozilla/5.0 (iPad; CPU OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/138.0.7204.156 Mobile/15E148 Safari/604.1';
+// An iPad's Safari and a Mac's say the same.
+const MAC_SAFARI =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15';
+const ANDROID_CHROME =
+  'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36';
+const WINDOWS_CHROME =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36';
 
 describe('the head script: the design', () => {
   it('takes ?v= first, and keeps it for the tab', () => {
@@ -94,6 +124,38 @@ describe('the head script: the design', () => {
 
   it('still picks a design when storage throws', () => {
     expect(run(false, { blocked: true, random: 0.9 }).variant).toBe('b');
+  });
+});
+
+describe('the head script: iPhones and iPads (Step 110)', () => {
+  it('marks an iPhone and an iPad, in any of their browsers', () => {
+    for (const userAgent of [IPHONE_SAFARI, IPHONE_CHROME, IPAD_CHROME])
+      expect(run(false, { userAgent, maxTouchPoints: 5 }).ios, userAgent).toBe('');
+    // An iPad's Safari calls itself a Mac; its touch screen gives it away.
+    expect(run(false, { userAgent: MAC_SAFARI, maxTouchPoints: 5 }).ios).toBe('');
+  });
+
+  it('leaves a Mac, Android, Windows and a browser that does not say alone', () => {
+    expect(run(false, { userAgent: MAC_SAFARI, maxTouchPoints: 0 }).ios).toBeUndefined();
+    expect(run(false, { userAgent: ANDROID_CHROME, maxTouchPoints: 5 }).ios).toBeUndefined();
+    expect(run(false, { userAgent: WINDOWS_CHROME, maxTouchPoints: 10 }).ios).toBeUndefined();
+    expect(run(false, {}).ios).toBeUndefined();
+  });
+
+  it('marks it on / too, before the language check can end the script', () => {
+    // Back on / from another page of the site: the check stops there.
+    const shown = run(true, {
+      userAgent: IPHONE_SAFARI,
+      maxTouchPoints: 5,
+      referrer: `https://${HOST}/ru/`,
+      languages: ['ru'],
+    });
+    expect(shown.replaced).toEqual([]);
+    expect(shown.ios).toBe('');
+    expect(run(true, { userAgent: IPHONE_SAFARI, languages: ['ja'] })).toMatchObject({
+      ios: '',
+      replaced: ['/ja/'],
+    });
   });
 });
 

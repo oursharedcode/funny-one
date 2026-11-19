@@ -14,9 +14,16 @@
 //
 // **A costume on every character.** Each lead and companion has a signature
 // colour, prop or shape — the reindeer's green sweater and belled antlers, the
-// gnome's teal hat — so the two subjects of a scene never merge into one, and a
-// pick looks like itself in every picture it is in (B-29: "one colour, one
+// gnome's orange hat — so the two subjects of a scene never merge into one, and
+// a pick looks like itself in every picture it is in (B-29: "one colour, one
 // prop, one shape").
+//
+// **Nothing any buyer's culture forbids** (owner decision 2026-11-19, after a
+// check of every audience; two fragments changed after the freeze, before any
+// picture was drawn). The feast table names what is on it: cakes,
+// fruit and sweets, never a roast, because a Christmas table drawn unprompted
+// gets a ham (pork) or a joint (beef). The gnome's hat is orange, not teal: in
+// Chinese a man in a green hat is a cuckold, and teal can draw green.
 //
 // **No Christmas tree in any place.** The tree belongs to an ending ("the
 // Christmas tree fell over"); a place that already had one would draw that
@@ -30,8 +37,9 @@
 // presents is named in each language's text (Santa, Дед Мороз, Святий Миколай),
 // never in a fragment, so one picture serves every language.
 //
-// The worst-case scene prompt is 481 characters of the 500 cap, 19 of headroom,
-// pinned in the server's prompt.test.ts.
+// The worst-case scene prompt is 495 characters of the 500 cap, 5 of headroom
+// (19 until the feast table named its food), pinned in the server's
+// prompt.test.ts.
 
 import type { PackPools } from '../schema.js';
 
@@ -68,7 +76,7 @@ export const CHR26_POOLS: PackPools = {
       id: 'with.chr26-winter-bird',
       promptEn: 'a plump red-breasted bird with red berries in its beak',
     },
-    { id: 'with.chr26-gnome', promptEn: 'a tiny bearded gnome under a giant teal pointy hat' },
+    { id: 'with.chr26-gnome', promptEn: 'a tiny bearded gnome under a giant orange pointy hat' },
     {
       id: 'with.chr26-cocoa-mug',
       promptEn: 'a giant mug of hot cocoa piled high with marshmallows',
@@ -84,7 +92,7 @@ export const CHR26_POOLS: PackPools = {
     { id: 'where.chr26-living-room', promptEn: 'a cozy living room with a crackling fireplace' },
     {
       id: 'where.chr26-festive-table',
-      promptEn: 'a dining room with a long table laid for a feast',
+      promptEn: 'a dining room with a long table laid with cakes, fruit and sweets',
     },
     { id: 'where.chr26-frozen-pond', promptEn: 'a snowy forest clearing around a frozen pond' },
     {

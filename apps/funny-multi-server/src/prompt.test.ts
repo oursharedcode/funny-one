@@ -305,10 +305,11 @@ describe('pack scenes (DD-16, B-29)', () => {
         longest.reduce((sum, n) => sum + n, 0) +
         STYLE_SUFFIX.length;
       expect(worstCase, pack).toBeLessThanOrEqual(MAX_PROMPT_LENGTH);
-      // Measured at Step 103, when chr26's fragments froze. Like the base
-      // pools' 19, a change here means a fragment changed and its pictures
-      // were orphaned.
-      if (pack === 'chr26') expect(MAX_PROMPT_LENGTH - worstCase).toBe(19);
+      // Measured at Step 103, when chr26's fragments froze (19), and again on
+      // 2026-11-19, when the feast table named its food before any picture
+      // was drawn (5). Like the base pools' 19, a change here means a
+      // fragment changed and its pictures were orphaned.
+      if (pack === 'chr26') expect(MAX_PROMPT_LENGTH - worstCase).toBe(5);
     }
   });
 

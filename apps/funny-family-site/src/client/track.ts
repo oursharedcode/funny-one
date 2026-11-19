@@ -7,8 +7,9 @@
 //   hub_view   once per tab: the design shown (v), the page's language (l),
 //              where the visit came from as a class (r), phone or not (d)
 //   hub_click  once per tab per target (t): either game, the source code,
-//              the trailer, the author's site, and (Step 76) the Support
-//              Author ♥ and each gift rail on the sheet it opens
+//              the trailer, the author's site, (Step 76) the Support
+//              Author ♥ and each gift rail on the sheet it opens, and
+//              (Step 110) either game's Google Play badge
 //
 // No URL, no identifier, no cookie; the referrer is classified here and only
 // its class is sent. Nothing at all is sent when the browser asks not to be
@@ -22,6 +23,8 @@ export type ReferrerClass = 'direct' | 'search' | 'social' | 'oursharedcode' | '
 const TARGETS = [
   'fm',
   'fo',
+  'fm-gp',
+  'fo-gp',
   'gh',
   'video',
   'root',

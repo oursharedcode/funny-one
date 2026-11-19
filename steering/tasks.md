@@ -122,16 +122,23 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     time, so it never had to hold up *Submit*.
   - **Funny Multi submitted for review 2026-11-13** (33 changes; Publishing overview reads
     "Changes in review"; managed publishing off, so it goes live on approval).
+  - **Funny Multi published: the owner reported it 2026-11-19 (Step 111).** Its listing, "Funny
+    Multi: Party Story Game" (`com.oursharedcode.funny37`), answered HTTP 200 the same day —
+    Google's decision on the 33 changes submitted at Step 108 is in, and it is live. The
+    install-from-Play check **passed 2026-11-19** (hand-installed copy removed, the Play copy
+    fills the screen with no address bar). The app-visit check is **seen 2026-11-19:**
+    `/api/stats/summary?days=2` showed `fm_view||en|app|||: 2` in that day's bucket, after the
+    owner reopened the Play-installed app. Funny Multi's review has ended, so the app-level
+    Trader hold below is lifted.
   - **Trader status:** the Play Console notice (all developers declare by 1 February 2027 or be
     removed from Play globally) is answered at account level — **declared Trader 2026-11-13**
     (owner); the D-U-N-S number is now public under "About the provider", the Trader sentence
     shown to EEA/UK users only. Funny One's own app-level confirmation ("Yes, applies to this
     app", no Terms of Service URL — neither game has one) is saved and submitted, "Changes in
-    review". Funny Multi's app-level confirmation is deliberately held until its current review
-    ends (deadline 1 Feb 2027, no urgency).
-  - *Owed:* Google's decision on Funny Multi's 33 changes; once approved, install from Play,
-    check full screen with no URL bar, check an "Android app" visit lands on `/stats/`; then
-    Funny Multi's own app-level trader confirmation, before 1 Feb 2027.
+    review". Funny Multi's own app-level confirmation is the only piece **still owed**, now that
+    its review has ended.
+  - *Owed:* Funny Multi's own app-level trader confirmation (App content → trader status, "Yes,
+    applies to this app", then send the one change for review), before 1 Feb 2027.
   - *Listing assets done 2026-10-19 (Step 87), for both apps:* under `store/`, the texts in 22
     languages (en and ru written, 20 machine drafts with B-3), graphics and screenshots
     (regenerated, not committed), and the answers for Store settings and App content
@@ -634,6 +641,31 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     Step 104:** the ≈ 1-cent test — 5 aftermaths, place *i* with ending *i*, so each place and
     each ending is drawn once; each must read as a punchline on its own. Still owed after it: the
     other 18 languages' drafts, packs in rooms, the code, the rails, the batch.
+  - **D3 test run 2026-11-17 (Step 109): blocked on auth, not on the content.** All 5 aftermath
+    prompts built correctly (240–262 characters). All 5 draws failed the same way: wrangler's
+    remote AI binding needs an interactive OAuth session or a `CLOUDFLARE_API_TOKEN`; the
+    throwaway script deliberately strips that variable (it names a different project) and the
+    saved login (25 August) could not authenticate a non-interactive child process. The attempt
+    settled three of the open mechanical decisions in the doing: the images went to a local-disk
+    R2 simulation (`--persist-to`, a bucket name that does not exist in the real account), not
+    the production bucket or a new real one; the `[ai]` switch lived in a throwaway
+    `wrangler.d3.toml` kept outside the repo, the committed `wrangler.toml` untouched; wrangler
+    ran as the pinned one-off `wrangler@4.160.1`, not a devDependency. **Still owed:** a fresh,
+    interactive `wrangler login` from the owner (the saved session cannot authenticate a
+    script), then the same throwaway script re-run.
+  - **Cultural-safety check, 2026-11-19 (Step 109, owner decision), ahead of the 25 drawn
+    options' freeze.** A CLIP zero-shot scan of the base library's ≈ 10,000 pictures (Step 68)
+    across 11 culturally-sensitive categories — cow, meat, pig, dog, owl, monkey, elephant,
+    snake, rat, turtle, religious imagery — scored against the library's own cast and food as
+    the negative set, top matches per category on a contact sheet for a by-eye check.
+    **Verdict: every top match is a CLIP false positive** — the base library is unchanged. A
+    direct text read of chr26's own fragments (no picture exists yet, so no scan applies) found
+    two real issues, fixed the same day, safely past Step 103's freeze since nothing has been
+    drawn from it yet: the festive table's "laid for a feast" risked an AI-drawn ham or roast,
+    which Jewish, Muslim and Hindu dietary rules forbid, renamed to name the food itself ("laid
+    with cakes, fruit and sweets"); the gnome's teal hat recoloured orange (green reads as a
+    cuckold's sign in Chinese, and teal can draw as green). Worst case moved from 481/500 (19 of
+    headroom) to 495/500 (5); `prompt.test.ts`'s pinned constant updated to match.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not
@@ -642,6 +674,26 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   Brazil), its dates, and whether chr26's code unlocks it too.
 - **B-30** — **closed 2026-11-09 (Step 106)**, block in `steering/tasks-done.md`. CI, the server
   image and `engines` are on Node 22; production runs 22.23.4 since the 2026-11-09 deploy.
+- **B-31** Google Play badges on the landing page (owner decision 2026-11-19, alongside the Play
+  publish): the official "Get it on Google Play" badge under each game's Play row, a second
+  route to the same Android app besides the existing Play button and QR code. **Code done and
+  verified 2026-11-19 (Step 110):** `apps/funny-family-site/src/render/playBadge.ts` (new) draws
+  the badge from Google's own artwork, trimmed and re-served locally
+  (`public/media/google-play/<language>.png`, 23 languages) at the Play button's height (52px,
+  Google's quarter-height clear space); hidden on an iPhone or iPad, which the head script now
+  marks `<html data-ios>` (`render/headScript.ts`, UA sniffing plus iPadOS's Mac-disguise via
+  `maxTouchPoints`) since neither has the app; a `foot-legal` trademark line, pinned
+  `lang="en" dir="ltr"` even on an RTL page. Counted as a new `fm-gp`/`fo-gp` hub-click target
+  (`client/track.ts`, `analytics.ts`, `stats/view.ts`). Verified with a 13-language Playwright
+  pass plus two click-throughs to the real Play listings, both firing the right `hub_click`
+  beacon; the only failures were the pre-existing `/api/config` 502 of a backend-less preview,
+  unrelated to badges.
+  - *Owed:* the owner's own eyes on the live badge, in a language or two of their choice, once
+    this is deployed.
+  - *Kept on purpose:* no badge on iOS, which has no app to send a tap to; six languages (ar, bn,
+    fa, he, ta, te) keep Google's pre-2022 Play logo, since that is what Google's own badge page
+    hands out for them and the owner chose not to override it with the English artwork; Yoruba
+    shows the English badge, Google having none of its own.
 
 ## Dependency notes
 

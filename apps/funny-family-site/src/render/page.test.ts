@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { LANGUAGES } from '@funny/shared';
 import { describe, expect, it } from 'vitest';
 import { esc, withLink } from './html.ts';
@@ -7,8 +10,11 @@ import { renderNotFound, renderStatsPage } from './extra.ts';
 import { HTML_LANG, OG_LOCALE, shortLanguageName } from './locale.ts';
 import { assetTags, renderPage } from './page.ts';
 import type { EntryAssets } from './page.ts';
+import { PLAY_TRADEMARK, playBadgeImage } from './playBadge.ts';
 import { hopParts } from './support.ts';
 import {
+  FM_PLAY_URL,
+  FO_PLAY_URL,
   FO_URL,
   fmUrl,
   GITHUB_REPOS,
@@ -98,6 +104,8 @@ describe('renderPage', () => {
       );
     expect(tracked('fm')).toEqual([fmUrl(code, 'a'), fmUrl(code, 'a')]);
     expect(tracked('fo')).toEqual([FO_URL, FO_URL]);
+    expect(tracked('fm-gp')).toEqual([FM_PLAY_URL]);
+    expect(tracked('fo-gp')).toEqual([FO_PLAY_URL]);
     expect(tracked('gh')).toEqual(GITHUB_REPOS.map(githubUrl));
     expect(tracked('video')).toEqual(['/media/clip.mp4']);
     expect(tracked('root')).toEqual([ROOT_URL]);
@@ -148,6 +156,58 @@ describe('renderPage', () => {
     expect(toggle?.hidden).toBe(true);
     expect(toggle?.dataset.pause).toBe(STRINGS.en.videoPause);
     expect(toggle?.dataset.resume).toBe(STRINGS.en.videoResume);
+  });
+});
+
+describe("the games' Google Play badges (Step 110)", () => {
+  it.each(CODES)(
+    "%s: under each card's Play row, Google's badge in the page's language",
+    (code) => {
+      const doc = parse(renderPage(code, ASSETS));
+      const { src, width, height } = playBadgeImage(code);
+      const badges = [...doc.querySelectorAll<HTMLAnchorElement>('a.store-badge')];
+      expect(badges.map((badge) => badge.closest('.game')?.className)).toEqual([
+        'game game-fm',
+        'game game-fo',
+      ]);
+      expect(badges.map((badge) => badge.previousElementSibling?.className)).toEqual([
+        'game-play',
+        'game-play',
+      ]);
+      expect(badges.map((badge) => badge.textContent)).toEqual([
+        `: ${GAME_NAMES[code].fm}`,
+        `: ${GAME_NAMES[code].fo}`,
+      ]);
+      for (const badge of badges) {
+        const img = badge.querySelector('img');
+        expect(
+          ['src', 'alt', 'width', 'height', 'loading'].map((name) => img?.getAttribute(name)),
+        ).toEqual([src, 'Google Play', String(width), String(height), 'lazy']);
+      }
+    },
+  );
+
+  it("each language's file is a PNG of the size the page gives it", () => {
+    // Not `new URL(…, import.meta.url)`, which Vite turns into a served address.
+    const folder = join(dirname(fileURLToPath(import.meta.url)), '../../public/media/google-play');
+    const file = (code: string): Buffer => readFileSync(join(folder, `${code}.png`));
+    for (const code of CODES) {
+      const { src, width, height } = playBadgeImage(code);
+      expect(src).toBe(`/media/google-play/${code}.png`);
+      const png = file(code);
+      expect(png.subarray(1, 4).toString('latin1'), code).toBe('PNG');
+      // The header chunk's width and height, after the 8-byte signature.
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)], code).toEqual([width, height]);
+    }
+    // Yoruba has no badge of its own: the English one.
+    expect(file('yo').equals(file('en'))).toBe(true);
+  });
+
+  it.each(['en', 'he'] as const)("%s: the footer names Google's trademarks, in English", (code) => {
+    const line = parse(renderPage(code, ASSETS)).querySelector('footer .foot-legal span');
+    expect(line?.textContent).toBe(PLAY_TRADEMARK);
+    expect(line?.getAttribute('lang')).toBe('en');
+    expect(line?.getAttribute('dir')).toBe('ltr');
   });
 });
 

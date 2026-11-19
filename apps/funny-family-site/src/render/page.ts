@@ -12,7 +12,8 @@
 // background loop, closing the picker, counting visits and clicks, and
 // (Step 76) the header's Support Author ♥ with its gift sheet, which only a
 // script can fill (render/support.ts). Step 78's QR codes beside the games'
-// buttons are drawn here, at build time, and cost the page no script.
+// buttons are drawn here, at build time, and cost the page no script; nor do
+// Step 110's Google Play badges in the games' cards (render/playBadge.ts).
 
 import type { Language } from '@funny/shared';
 import {
@@ -26,6 +27,7 @@ import {
 } from './art.ts';
 import { esc, withLink } from './html.ts';
 import { headScript } from './headScript.ts';
+import { PLAY_TRADEMARK, playBadge } from './playBadge.ts';
 import { supportButton, supportSheet } from './support.ts';
 import {
   HTML_LANG,
@@ -36,6 +38,8 @@ import {
   shortLanguageName,
 } from './locale.ts';
 import {
+  FM_PLAY_URL,
+  FO_PLAY_URL,
   FO_URL,
   fmUrl,
   GITHUB_ORG,
@@ -194,11 +198,13 @@ function hero(code: Language): string {
 function games(code: Language): string {
   const s = STRINGS[code];
   const names = GAME_NAMES[code];
+  // Under the Play row (Step 110): the game's Android app on Google Play.
   const card = (
     key: 'fm' | 'fo',
     art: string,
     href: string,
     qr: string,
+    store: string,
     tag: string,
     text: string,
   ): string =>
@@ -208,12 +214,13 @@ function games(code: Language): string {
 <p class="tag">${esc(tag)}</p>
 <p>${esc(text)}</p>
 <div class="game-play"><a class="btn ${key === 'fm' ? 'btn-primary' : 'btn-secondary'}" href="${esc(href)}" data-track="${key}">${esc(s.play)}<span class="sr-only">: ${esc(names[key])}</span></a>${qr}</div>
+${playBadge(code, key, store, names[key])}
 </article>`;
   return `<section class="games" id="games" aria-labelledby="games-title">
 <h2 id="games-title">${esc(s.gamesTitle)}</h2>
 <div class="game-grid">
-${card('fm', FM_ART, fmUrl(code, 'a'), fmQr(code), s.fmTag, s.fmText)}
-${card('fo', FO_ART, FO_URL, playQr(FO_URL), s.foTag, s.foText)}
+${card('fm', FM_ART, fmUrl(code, 'a'), fmQr(code), FM_PLAY_URL, s.fmTag, s.fmText)}
+${card('fo', FO_ART, FO_URL, playQr(FO_URL), FO_PLAY_URL, s.foTag, s.foText)}
 </div>
 </section>`;
 }
@@ -281,6 +288,7 @@ function footer(code: Language): string {
 <p>${esc(s.privacyNote)} <a href="${privacyUrl(code)}">${esc(s.privacyLink)}</a></p>
 <p>${withLink(s.footerMore, root)}</p>
 ${languageList(code, s.langLabel)}
+<p class="foot-legal"><span lang="en" dir="ltr">${PLAY_TRADEMARK}</span></p>
 </div>
 </footer>`;
 }

@@ -46,13 +46,15 @@ describe('deviceClass and isClickTarget', () => {
     expect(deviceClass(768)).toBe('d');
   });
 
-  it('knows the twelve click targets', () => {
+  it('knows the fourteen click targets', () => {
     for (const target of ['fm', 'fo', 'gh', 'video', 'root'])
       expect(isClickTarget(target)).toBe(true);
     // Step 76: the ♥ and the gift sheet it opens.
     for (const target of ['support', 'payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'])
       expect(isClickTarget(target)).toBe(true);
-    for (const value of ['', 'FM', 'bogus', 'payId', null, 1])
+    // Step 110: the games' Google Play badges.
+    for (const target of ['fm-gp', 'fo-gp']) expect(isClickTarget(target)).toBe(true);
+    for (const value of ['', 'FM', 'bogus', 'payId', 'gp', 'fm-GP', null, 1])
       expect(isClickTarget(value)).toBe(false);
   });
 });

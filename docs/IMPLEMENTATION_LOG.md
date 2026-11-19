@@ -6478,6 +6478,9 @@ note below.
 ~~RESUME HERE (2026-11-11, after Step 107; pushed as `22c832b`, the Caddy op done 2026-11-12)~~ —
 carried into Step 108's note below.
 
+~~RESUME HERE (2026-11-13, after Step 108; its one commit is this record — the log and
+`steering/tasks.md` only, no code changed)~~ — carried into Step 111's note below.
+
 ## Step 108 (task B-1e) — Play: Equifax refuses the rename, Funny One verified live, Funny Multi submitted, D5 and Trader status decided (2026-11-13)
 
 No code changed this session (`git status` clean) — all six gates and `npm test` are not
@@ -6522,8 +6525,123 @@ check an "Android app" visit lands on `/stats/`, then Funny Multi's own app-leve
 confirmation, before 1 Feb 2027. B-29's four decisions from this session's morning plan are
 still open (see the RESUME note below) — the 25 drawn options' freeze is due 2026-11-14.
 
-**RESUME HERE (2026-11-13, after Step 108; its one commit is this record — the log and
-`steering/tasks.md` only, no code changed).** **Step 108
+## Step 109 (task B-29) — Christmas pack: the D3 test blocked on auth; a cultural-safety check and chr26's two fixes (2026-11-19)
+
+**Shipped:**
+
+- **D3's test run, 2026-11-17: blocked on auth, not on the content.** All 5 aftermath prompts
+  built correctly (240–262 characters; prompt 1, 249). All 5 draws failed the same way:
+  wrangler's remote AI binding needs an interactive OAuth session or a `CLOUDFLARE_API_TOKEN`;
+  the throwaway script deliberately strips that variable (it belongs to a different project)
+  and the saved login (25 August) could not authenticate a non-interactive
+  child process (`wrangler.log`: "In a non-interactive environment, it's necessary to set a
+  CLOUDFLARE_API_TOKEN environment variable…", then `ERR_IPC_CHANNEL_CLOSED`). The attempt
+  settled three of Step 108's four open mechanical decisions in the doing: the images went to a
+  local-disk R2 simulation (`--persist-to`, a bucket name `d3-local-only` that does not exist in
+  the real account), not the production bucket or a new real one; the `[ai]` switch lived in a
+  throwaway `wrangler.d3.toml` kept outside the repo, the committed `cloudflare/wrangler.toml`
+  untouched; wrangler ran as the pinned one-off `wrangler@4.160.1` (`d3-run.mjs`), not a
+  devDependency.
+- **A cultural-safety check across the base library, 2026-11-19 (owner decision), ahead of the
+  25 drawn options' freeze.** A CLIP zero-shot scan (`scratchpad/sacred/scan.py`) of the base
+  library's ≈ 10,000 who×with×where×did pictures (Step 68) across 11 categories — cow, meat,
+  pig, dog, owl, monkey, elephant, snake, rat, turtle, religious imagery — scored against the
+  library's own cast and food as the negative set, top matches per category on a contact sheet
+  for a by-eye check. **Verdict: every top match is a CLIP false positive** (top "cow" 0.7553,
+  top "meat" 0.7753, neither an actual cow or meat) — the base library needs no change.
+- **chr26's own two text fixes, 2026-11-19,** from a direct text read (no picture exists yet for
+  these fragments, so no scan applies), safely past Step 103's freeze since nothing has been
+  drawn from it: the festive table's `promptEn` "a dining room with a long table laid for a
+  feast" risked an AI-drawn ham or roast, which Jewish, Muslim and Hindu dietary rules forbid,
+  renamed to name the food itself ("...laid with cakes, fruit and sweets"); the gnome's
+  `promptEn` "giant teal pointy hat" recoloured "giant orange pointy hat" (green reads as a
+  cuckold's sign in Chinese, and teal can draw as green). `packages/shared/src/packs/chr26/options.ts`
+  gains a header line: "**Nothing any buyer's culture forbids** (owner decision 2026-11-19,
+  after a check of every audience; two fragments changed after the freeze, before any picture
+  was drawn)." Worst case moved from 481/500 (19 of headroom) to 495/500 (5);
+  `prompt.test.ts`'s pinned `.toBe(19)` → `.toBe(5)`, its comment citing both figures.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 1704/1704 across 6 workspaces
+(447 funny-family-site, 397 funny-multi-client, 330 funny-multi-server, 178 funny-one-client,
+299 shared, 53 cloudflare); `npm audit --omit=dev` 0, full `npm audit` 9 moderate under exactly
+two already-accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch, Steps 99/102)
+— the third previously-accepted id (GHSA-gcqx-w48m-w2h4, deepmerge) is gone, with no lockfile
+change; CI last green on `25b7a89` (run `43418813045`), this commit's own run pending the push.
+
+**Owed:** a fresh, interactive `wrangler login` from the owner (the saved session cannot
+authenticate a non-interactive script), then D3's throwaway script re-run — still ≈ 1 cent,
+nothing deployed; the other 18 languages' drafts, packs in rooms, the code, the rails, the
+batch (unchanged since Step 103).
+
+## Step 110 (task B-31) — Google Play badges on the landing page (2026-11-19)
+
+**Shipped:** the official "Get it on Google Play" badge under each game's Play row on the
+landing page, a second route to the same Android app beside the existing Play button and QR
+code (owner decision 2026-11-19, alongside the Play publish below).
+`apps/funny-family-site/src/render/playBadge.ts` (new) draws the badge from Google's own
+artwork, fetched once and re-served locally (`public/media/google-play/<language>.png`, 23
+languages — ar, bn, de, en, es-419, es-es, fa, fr, he, hi, id, it, ja, ko, pt-br, ru, sw, ta, te,
+uk, yo, yue, zh), trimmed of its transparent margin, at the Play button's height (52px,
+Google's quarter-height clear space, `styles/landing.css`'s new `.store-badge` rule). Hidden on
+an iPhone or iPad, neither of which has the app: `render/headScript.ts` gains a job marking
+`<html data-ios>` (UA sniffing, plus iPadOS's Mac-disguise via `navigator.maxTouchPoints > 1`),
+placed ahead of the language-redirect job since that job can end the script early.
+`render/page.ts`'s footer gains a trademark line, pinned `lang="en" dir="ltr"` even on an RTL
+page. Counted as a new `fm-gp`/`fo-gp` hub-click target (`client/track.ts`, `analytics.ts`,
+`analytics.test.ts`, `stats/view.ts`). Six languages (ar, bn, fa, he, ta, te) keep Google's
+pre-2022 Play logo on the owner's choice, since that is what Google's own badge page hands out
+for them; Yoruba shows the English badge, Google having none of its own.
+
+Verified with a 13-case Playwright pass plus two click-throughs
+(`scratchpad/badge-shots/report.txt`): en/he/ta/yo/ru/ja/de/ar phones and desktops, an iPhone
+and an iPad (both correctly showing no badge, 0×0, `display:none`), a Mac — every shown badge
+drew the right image, size, clear space and localized name, Hebrew and Arabic keeping the badge
+image itself LTR while the trademark line stayed `lang=en dir=ltr`; both click-throughs landed
+on the real Play listings and fired the right beacon (`{"e":"hub_click","v":"a","l":"en","t":"fm-gp"}`
+etc.). The 11 of 13 failures were the identical, pre-existing `/api/config` 502 of a
+standalone-preview backend not running on port 3000 — unrelated to badges.
+
+**Gates:** as Step 109's, from the same working tree and the same `npm test`/typecheck/
+lint/format passes.
+
+**Owed:** the owner's own eyes on the live badge, in a language or two of their choice, once
+this is deployed.
+
+## Step 111 (task B-1e) — Play: Funny Multi published, installed and counted (2026-11-19)
+
+No code of its own this session — Google's publish decision and the owner's own checks are the
+news; the six gates are Step 109's, from the same session.
+
+**Shipped — the owner's ops, read and advised by the agent:**
+
+- **Funny Multi published:** the owner reported it 2026-11-19. Its listing answered HTTP 200
+  the same day — Google's decision on the 33 changes submitted at Step 108 is in, and it is
+  live.
+- **Install-from-Play check passed 2026-11-19:** the hand-installed copy removed, the Play copy
+  fills the screen with no address bar.
+- **App-visit check seen 2026-11-19:** `/api/stats/summary?days=2` at 08:49 UTC showed
+  `fm_view||en|app|||: 2` in the 2026-11-19 UTC bucket (plus one earlier count in the 2026-11-18
+  UTC bucket, from the first test open), after the owner reopened the Play-installed app.
+  Funny Multi's own review has ended, so the app-level Trader hold from Step 108's note is
+  lifted.
+
+**Owed:** Funny Multi's own app-level trader confirmation (App content → trader status, "Yes,
+applies to this app", then send the one change for review), before 1 Feb 2027.
+
+**RESUME HERE (2026-11-19, after Steps 109–111; not yet pushed).** **Steps 109–111 close B-29's
+D3 auth block and two real chr26 cultural fixes, Funny Multi's own Play publish with its install
+and visit checks (B-1e stays open only on its trader confirmation), and ship a new Google Play
+badges feature (B-31).** **Next, the agent's:** once the owner has run a fresh, interactive
+`wrangler login`, re-run the same throwaway D3 script — still ≈ 1 cent, nothing deployed,
+production's `[ai]` binding still off. **Owed, the owner's:** that `wrangler login` (the saved
+session is from 25 August and cannot authenticate a non-interactive run); Funny Multi's own
+app-level trader confirmation, before 1 Feb 2027; the owner's own eyes on the live Google Play
+badges once this is deployed, in a language or two of their choice; the 25 drawn Christmas
+options' freeze — safe to set whenever the owner is ready, since chr26's two cultural fixes just
+moved safely past Step 103's freeze the same way. Everything else unchanged from Step 108's note
+below. Then the same note as before:
+
+**Step 108
 closes the Equifax question for good and moves Funny One and Funny Multi through Play's trader
 and catalog-access requirements; B-1e stays open only on Funny Multi's pending review.** **Next,
 the agent's:** once the owner answers B-29's four decisions below, B-29's ≈ 1-cent aftermath test
@@ -6865,10 +6983,11 @@ are not in this repo (Step 54).
 
 `npm audit` gate since Step 94: both `npm audit --omit=dev` and the full `npm audit` must
 report nothing beyond the accepted exceptions — three as of Step 99, **all dev-only since
-Step 102** (`@fastify/static` 10.1.10, on `glob` 14, cleared production): GHSA-gcqx-w48m-w2h4
-(`deepmerge`, via `vite-plugin-pwa`, Step 95), and GHSA-g3hv-75wg-m249 (`minimatch`) with
-GHSA-3g3m-2fjr-6pw4 (`glob`) in the dev chains, accepted 2026-11-01 (Step 99, reachability in
-its entry) — re-checked each session, each dropped once an in-range fix appears. Step 53's
+Step 102** (`@fastify/static` 10.1.10, on `glob` 14, cleared production): ~~GHSA-gcqx-w48m-w2h4
+(`deepmerge`, via `vite-plugin-pwa`, Step 95)~~ — gone by Step 109, no lockfile change, and
+GHSA-g3hv-75wg-m249 (`minimatch`) with GHSA-3g3m-2fjr-6pw4 (`glob`) in the dev chains, accepted
+2026-11-01 (Step 99, reachability in its entry) — re-checked each session, each dropped once an
+in-range fix appears. Step 53's
 `braces` exception went in Step 89; Step 67's GHSA-rj75-hqrm-r3gf went when GitHub revised the
 advisory on 2026-10-26 to count `postcss-selector-parser` 6.1.5, the version Tailwind 3 already
 has here, as fixed. Anything else listed fails the gate — stop and ask. An in-range fix that npm

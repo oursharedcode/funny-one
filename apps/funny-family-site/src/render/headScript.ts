@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Step 72: the one inline script, at the top of every landing page's <head>.
-// It runs before anything is drawn, which is the point of both its jobs:
+// It runs before anything is drawn, which is the point of all its jobs:
 //
 //  1. The A/B design. `?v=a|b` forces one; otherwise the tab keeps the one it
 //     was first shown, otherwise it is a coin toss. Written to
@@ -14,6 +14,10 @@
 //     site (who chose `/` from the picker or the footer) stays. The original
 //     referrer is handed on in sessionStorage so the visit is still counted
 //     by where it came from, not as a visit from `/`.
+//  3. (Step 110) An iPhone, iPod or iPad, marked <html data-ios>: the
+//     stylesheet hides the games' Google Play badges there, where no app
+//     installs. An iPad's Safari calls itself a Mac, but a Mac has no touch
+//     screen. Before job 2, which may end the script early.
 //
 // Plain ES5 and every storage access guarded: it must not throw on any
 // browser, in a private window, or with storage blocked.
@@ -29,6 +33,10 @@ if (v !== 'a' && v !== 'b') { try { v = sessionStorage.getItem('${VARIANT_KEY}')
 if (v !== 'a' && v !== 'b') v = Math.random() < 0.5 ? 'a' : 'b';
 try { sessionStorage.setItem('${VARIANT_KEY}', v); } catch (e) {}
 d.setAttribute('data-variant', v);`;
+
+const IOS = `
+var ua = navigator.userAgent || '';
+if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) d.setAttribute('data-ios', '');`;
 
 // The browser-language match is the one both games make (matchLanguageTag in
 // packages/shared/src/uiLanguage.ts): an exact code, then Spanish and
@@ -65,6 +73,6 @@ if (target && target !== 'en') {
 
 /** The script's source, without the <script> tags. `root` adds the language redirect. */
 export function headScript(options: { root: boolean }): string {
-  return `(function () {${VARIANT}${options.root ? REDIRECT : ''}
+  return `(function () {${VARIANT}${IOS}${options.root ? REDIRECT : ''}
 })();`;
 }

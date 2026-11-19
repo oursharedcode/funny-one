@@ -66,10 +66,13 @@ const REFERRERS: Record<string, string> = {
 };
 const DEVICES: Record<string, string> = { m: 'Phone-sized screen', d: 'Larger screen' };
 // Step 76: the header's Support Author ♥ opens a gift sheet on the landing
-// page itself; its rails count as the page's clicks too.
+// page itself; its rails count as the page's clicks too. Step 110: each
+// game's card also has a Google Play badge.
 const HUB_TARGETS: Record<string, string> = {
   fm: 'Funny Multi',
   fo: 'Funny One',
+  'fm-gp': 'Funny Multi on Google Play',
+  'fo-gp': 'Funny One on Google Play',
   gh: 'The source code (GitHub)',
   video: 'The trailer',
   root: 'oursharedcode.com',

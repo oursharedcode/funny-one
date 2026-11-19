@@ -142,7 +142,7 @@ describe('renderStats', () => {
     expect(header).toEqual(['', 'From the landing page', 'From elsewhere', 'Android app', 'All']);
   });
 
-  it('lists what was clicked on the landing page, its own ♥ and gift sheet too', () => {
+  it('lists what was clicked on the landing page, its own ♥, gift sheet and badges too', () => {
     const root = render({
       ...SUMMARY,
       days: {
@@ -150,12 +150,15 @@ describe('renderStats', () => {
           ...SUMMARY.days['2026-10-01'],
           'hub_click|a|en||support||': 2,
           'hub_click|b|ru||kofi||': 1,
+          'hub_click|a|hi||fo-gp||': 1,
         },
       },
     });
     expect(tableOf(root, 'What was clicked on the landing page')).toEqual([
       ['Funny Multi', '3', '30%'],
       ['Funny One', '1', '10%'],
+      ['Funny Multi on Google Play', '0', '0%'],
+      ['Funny One on Google Play', '1', '10%'],
       ['The source code (GitHub)', '0', '0%'],
       ['The trailer', '0', '0%'],
       ['oursharedcode.com', '0', '0%'],

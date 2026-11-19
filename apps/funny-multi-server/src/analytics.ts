@@ -54,9 +54,19 @@ const DEVICES = ['m', 'd'] as const;
 // the hub's own.
 const GIFT_TARGETS = ['payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'] as const;
 // What was clicked on the hub: either game, the source code, the video, the
-// author's site, and (Step 76) its Support Author ♥ and the gift rails on the
-// sheet that opens.
-const HUB_TARGETS = ['fm', 'fo', 'gh', 'video', 'root', 'support', ...GIFT_TARGETS] as const;
+// author's site, (Step 76) its Support Author ♥ and the gift rails on the
+// sheet that opens, and (Step 110) either game's Google Play badge.
+const HUB_TARGETS = [
+  'fm',
+  'fo',
+  'fm-gp',
+  'fo-gp',
+  'gh',
+  'video',
+  'root',
+  'support',
+  ...GIFT_TARGETS,
+] as const;
 
 // Each event's own labels. Every one listed is required, except that a Funny
 // Multi event carries `v` only when it came through the hub — a visit that did

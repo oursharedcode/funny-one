@@ -31,6 +31,18 @@ describe('statKey', () => {
     expect(statKey({ e: 'hub_click', v: 'a', l: 'he', t: 'fm' })).toBe('hub_click|a|he||fm||');
   });
 
+  it("keys a click on either game's Google Play badge as a hub click (Step 110)", () => {
+    expect(statKey({ e: 'hub_click', v: 'b', l: 'ta', t: 'fm-gp' })).toBe(
+      'hub_click|b|ta||fm-gp||',
+    );
+    expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: 'fo-gp' })).toBe(
+      'hub_click|a|en||fo-gp||',
+    );
+    expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: 'gp' })).toBeNull();
+    // A badge is no gift rail.
+    expect(statKey({ e: 'fm_gift', s: 'direct', l: 'en', t: 'fm-gp' })).toBeNull();
+  });
+
   it("keys the hub's ♥ and the rails on its own gift sheet as hub clicks", () => {
     // Step 76: the landing page's Support Author ♥ opens a sheet of its own.
     expect(statKey({ e: 'hub_click', v: 'b', l: 'fa', t: 'support' })).toBe(

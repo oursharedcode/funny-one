@@ -14,6 +14,13 @@ export const FM_ORIGIN = 'https://www.funny37.oursharedcode.com';
 // one its player picked last time.
 export const FO_URL = 'https://www.funny1.oursharedcode.com/';
 
+// Step 110: each game's Android app on Google Play, linked from its card's
+// badge (render/playBadge.ts). No `hl`: Play shows its listing in the
+// visitor's own language.
+export const FM_PLAY_URL =
+  'https://play.google.com/store/apps/details?id=com.oursharedcode.funny37';
+export const FO_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.oursharedcode.funny1';
+
 export const GITHUB_ORG = 'oursharedcode';
 
 // The open-source card's repositories: this one, which Funny Multi's footer

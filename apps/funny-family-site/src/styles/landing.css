@@ -554,6 +554,28 @@ html[data-variant='b'] .cta-tag {
   }
 }
 
+/* Step 110: under the Play row, the game's Android app on Google Play
+   (render/playBadge.ts), at the button's height. Google asks for a quarter of
+   the badge's height clear all round, 13px: the card's padding gives it
+   beside and below, this margin above. None on an iPhone or an iPad
+   (render/headScript.ts). */
+.store-badge {
+  display: block;
+  margin-block-start: 16px;
+  border-radius: 8px;
+}
+
+/* Never squeezed out of shape: the narrowest card has room for its 175px. */
+.store-badge img {
+  width: auto;
+  max-width: none;
+  height: 52px;
+}
+
+html[data-ios] .store-badge {
+  display: none;
+}
+
 /* Step 78: each game's address as a QR code beside its button, so a visitor
    can open the game on another phone. Funny Multi has one code per design
    (render/page.ts); the rule at the top hides the other design's.
@@ -986,6 +1008,12 @@ html[data-variant='b'] .cta-tag {
 
 .foot-langs a[aria-current='page'] {
   font-weight: 700;
+}
+
+/* Step 110: Google Play's trademark line, in English on every page. */
+.foot-legal {
+  margin: 24px 0 0;
+  font-size: 0.8125rem;
 }
 
 /* Step 76: the gift sheet the ♥ opens, a modal <dialog> with the rows of

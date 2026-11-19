@@ -687,9 +687,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   (`client/track.ts`, `analytics.ts`, `stats/view.ts`). Verified with a 13-language Playwright
   pass plus two click-throughs to the real Play listings, both firing the right `hub_click`
   beacon; the only failures were the pre-existing `/api/config` 502 of a backend-less preview,
-  unrelated to badges.
-  - *Owed:* the owner's own eyes on the live badge, in a language or two of their choice, once
-    this is deployed.
+  unrelated to badges. **Live since 2026-11-20 (Step 112):** `deploy/ship-funny-family.sh`, its
+  eight checks green, and the badges confirmed on the live page — markup on `/` and `/he/`, six
+  badge files byte-identical to the repo's, the game's container untouched.
+  - *Owed:* the owner's own eyes on the live badge, in a language or two of their choice.
   - *Kept on purpose:* no badge on iOS, which has no app to send a tap to; six languages (ar, bn,
     fa, he, ta, te) keep Google's pre-2022 Play logo, since that is what Google's own badge page
     hands out for them and the owner chose not to override it with the English artwork; Yoruba

@@ -6481,6 +6481,9 @@ carried into Step 108's note below.
 ~~RESUME HERE (2026-11-13, after Step 108; its one commit is this record — the log and
 `steering/tasks.md` only, no code changed)~~ — carried into Step 111's note below.
 
+~~RESUME HERE (2026-11-19, after Steps 109–111; not yet pushed)~~ — pushed as `62beb95` the same
+evening (CI run `44511867454` green); carried into Step 112's note below.
+
 ## Step 108 (task B-1e) — Play: Equifax refuses the rename, Funny One verified live, Funny Multi submitted, D5 and Trader status decided (2026-11-13)
 
 No code changed this session (`git status` clean) — all six gates and `npm test` are not
@@ -6628,7 +6631,57 @@ news; the six gates are Step 109's, from the same session.
 **Owed:** Funny Multi's own app-level trader confirmation (App content → trader status, "Yes,
 applies to this app", then send the one change for review), before 1 Feb 2027.
 
-**RESUME HERE (2026-11-19, after Steps 109–111; not yet pushed).** **Steps 109–111 close B-29's
+## Step 112 (task B-31) — the landing page deployed: Google Play badges live (2026-11-20)
+
+No code of its own: `62beb95` (Steps 109–111, CI run `44511867454` green) shipped as it stands, on
+the owner's word ("deploy the landing page so B-31's Play badges go live").
+
+**Shipped:**
+
+- **The deploy, 01:10 AEDT:** `deploy/ship-funny-family.sh ubuntu@152.69.166.212`, exit 0. SSH
+  first timed out — the home IP had moved — so `deploy/oci/network.py <ip>` re-pointed the
+  port-22 rule, as the notes below say. The script's own eight checks all passed through Caddy:
+  `/` and `/ru/` 200, `/stats/` 200, a missing path 404, the trailer `video/mp4`, the visit-count
+  summary 200 (crossing to the game's server), the bare name 301 to `www`, Funny Multi `/health`
+  200. The only warning is Caddy's known "not formatted" one, line 23.
+- **The badges, checked live afterwards:** before the deploy the live page had no badge markup and
+  `/media/google-play/en.png` answered 404. After it, `/` and `/he/` each carry two
+  `store-badge` images (`en.png`, `he.png`), the English trademark line is in the footer and
+  Hebrew's sits in `<span lang="en" dir="ltr">`, the head script's `data-ios` job is present, and
+  six badge files (en, he, ru, ta, yo, ja) answer 200 `image/png`, byte-identical to the repo's.
+- **The game untouched:** the script brings the compose services up and reloads Caddy only;
+  `funny-funny-multi-1` reported `Running`, not recreated, and still starts at 2026-11-09 10:25
+  UTC (Step 106's deploy). No room ended, so B-27's quiet hour did not apply.
+
+**Found on the way — `npm audit`, re-checked as the notes ask:** production-only, 0. Dev, 9
+moderate from two advisories, not three: **`deepmerge`'s GHSA-gcqx-w48m-w2h4 (Step 95) no longer
+appears in the tree at all**, so it leaves the accepted list. The two left are dev-only and still
+have no real fix: GHSA-3g3m-2fjr-6pw4 (`glob`, now only under `workbox-build` via
+`vite-plugin-pwa`) — npm's offered "fix" is `vite-plugin-pwa@1.1.0`, a downgrade from the declared
+`^1.3.0`, so not a fix — and GHSA-g3hv-75wg-m249 (`minimatch`), fixed only by typescript-eslint 8,
+already its own task.
+
+**Gates:** typecheck, lint, format:check, `npm test`, `npm audit` (as above) green on this tree;
+CI green on `62beb95`, the commit that shipped.
+
+**Owed:** the owner's own eyes on the live badge, in a language or two of their choice.
+
+**RESUME HERE (2026-11-20, after Step 112; its one commit is this record — the log and
+`steering/tasks.md` only, no code changed).** **B-31's Google Play badges are live on the landing
+page (Step 112).** **Next, the agent's:** B-29's D3 re-run (≈ 1 cent, nothing
+deployed, production's `[ai]` binding still off) once its auth is settled. **Owed, the owner's —
+three decisions from this session's plan, unanswered:** (1) B-29's 29 November target — hold the
+full scope, ship the free half (slice, golden story, landing variant) on 29 November and add the
+paid code and rails inside the window (recommended), slip it all to 7 January, or drop it to
+2027; nine days remain and the ~14 November free-allowance date has passed, so the batch now
+costs the paid Workers AI day either way; (2) D3's auth — an interactive `wrangler login`, or a
+scoped `CLOUDFLARE_API_TOKEN` (Workers AI + R2) the agent can use unattended (recommended, since
+the 650-picture batch needs unattended runs too); (3) the 25 drawn options' freeze — now
+(recommended) or after the batch is paid for. **Owed, the owner's, besides:** their own eyes on the
+live badge; Funny Multi's own app-level trader confirmation, before 1 Feb 2027. Everything else
+unchanged from Steps 109–111's note below. Then the same note as before:
+
+**Steps 109–111 close B-29's
 D3 auth block and two real chr26 cultural fixes, Funny Multi's own Play publish with its install
 and visit checks (B-1e stays open only on its trader confirmation), and ship a new Google Play
 badges feature (B-31).** **Next, the agent's:** once the owner has run a fresh, interactive
@@ -7101,10 +7154,10 @@ pressed flag is not scrolled into view~~ fixed in Step 91; ~~the landing page ha
 in Step 91; a multi-language room's invite (`&multi=1`) also names the room's language
 (`LobbyScreen.tsx:52`), which wins over the joiner's phone, so a Korean phone opens the join
 screen in the room's language and its player picks Korean by hand — whether such an invite should
-leave the joiner's phone language instead (Step 88); `npm audit`'s three accepted exceptions —
-GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95) and Step 99's
-GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4 (`minimatch` and `glob`, dev-only since Step 102) —
-drop each once a non-breaking fix exists; ~~`funny-one`'s GitHub repository
+leave the joiner's phone language instead (Step 88); `npm audit`'s two accepted exceptions —
+~~GHSA-gcqx-w48m-w2h4 (`deepmerge`, dev-only via `vite-plugin-pwa`, Step 95)~~ gone from the
+tree, seen in Step 112 — Step 99's GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4 (`minimatch` and
+`glob`, dev-only since Step 102) — drop each once a non-breaking fix exists; ~~`funny-one`'s GitHub repository
 has no description, unlike `funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's
 wording~~ done in Step 97.
 

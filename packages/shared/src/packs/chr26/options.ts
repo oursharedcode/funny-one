@@ -6,6 +6,14 @@
 // picture's cache key (DD-4), so neither may change once the 650 pictures are
 // drawn. The display texts in text/ stay free to edit.
 //
+// Changed once more, and frozen for good, at Step 114 (owner decisions 3B and
+// "A", 2026-11-20), after D3's 28 test pictures and before the 650: two
+// endings that drew wrong twice (lights hung on purpose rather than tangled; a
+// sack that looked full beside an unreadable note, now a sealed envelope) and
+// the snowman and Snow Maiden, whose first wording drew a pair close to a
+// famous film's snowman and ice princess (a bucket for the one, a fur coat and
+// fur hat for the other).
+//
 // Every rule of the base pools holds here (pools/options.ts): ids
 // `<prefix>.<slug>`, the slug opening with the pack id; fragments printable
 // ASCII and ≤ 120 characters; slot 2 reading after "in"; slot 4 as "are" + a
@@ -52,7 +60,7 @@ export const CHR26_POOLS: PackPools = {
     },
     {
       id: 'who.chr26-snowman',
-      promptEn: 'a round snowman with a carrot nose and a red striped scarf',
+      promptEn: 'a snowman with a bucket on its head and a red striped scarf',
     },
     {
       id: 'who.chr26-gingerbread-man',
@@ -70,7 +78,7 @@ export const CHR26_POOLS: PackPools = {
     { id: 'with.chr26-grumpy-cat', promptEn: 'a grumpy orange cat in a yellow bobble hat' },
     {
       id: 'with.chr26-sleeping-snow-maiden',
-      promptEn: 'a sleeping snow maiden in sky blue with a long braid',
+      promptEn: 'a sleeping snow maiden in a blue fur coat and fur hat',
     },
     {
       id: 'with.chr26-winter-bird',
@@ -148,7 +156,8 @@ export const CHR26_POOLS: PackPools = {
     },
     {
       id: 'end.chr26-tangled-lights',
-      aftermathEn: 'everything tangled up in one endless string of glowing fairy lights',
+      aftermathEn:
+        'a giant tangled heap of fairy lights dumped on the ground, wires sprawling everywhere',
     },
     {
       id: 'end.chr26-toppled-tree',
@@ -156,7 +165,8 @@ export const CHR26_POOLS: PackPools = {
     },
     {
       id: 'end.chr26-empty-sack',
-      aftermathEn: 'an empty gift sack slumped on the ground beside a folded handwritten note',
+      aftermathEn:
+        'an empty, crumpled gift sack lying flat on the ground with a small sealed envelope on it',
     },
     {
       id: 'end.chr26-melted-snowman',

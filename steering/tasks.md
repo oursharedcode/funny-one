@@ -666,6 +666,36 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     with cakes, fruit and sweets"); the gnome's teal hat recoloured orange (green reads as a
     cuckold's sign in Chinese, and teal can draw as green). Worst case moved from 481/500 (19 of
     headroom) to 495/500 (5); `prompt.test.ts`'s pinned constant updated to match.
+  - *Decisions 2026-11-20 (owner, on Step 112's three open questions and Step 113's one):*
+    - **1A — the free half ships 29 November** (the Christmas words, the golden story, the
+      `?pack=chr26` landing variant, no price shown anywhere); the paid code and the rails switch
+      on by about 10 December. Replaces the all-at-once 29 November target.
+    - **2B — a scoped Cloudflare API token in a file on this PC** (location in the agent's
+      memory), so D3 and the batch run unattended: Workers AI Edit + Read, Workers Scripts Edit,
+      Account Settings Read, expiring 18 February 2027. The batch adds Workers R2 Storage Edit if
+      it writes the real bucket. Replaces Step 109's "interactive `wrangler login`".
+    - **3B — D3 widened by five scenes** that draw each of the 20 scene fragments once, and the
+      25 drawn options frozen right after the owner approves the pictures.
+    - **4A — Haiku 5.5 stays** in `docs/MODEL_PLAYBOOK.md` (Step 113's open cell).
+  - **D3 done 2026-11-20 (Step 114); the 25 drawn options frozen for good.** 28 pictures through
+    a local `wrangler dev` of the real Worker, real Flux Schnell, R2 simulated on disk, nothing
+    deployed. Of the first ten (five aftermaths, five scenes), seven passed: the two subjects
+    never merged, the gnome's hat drew orange, the feast table showed no meat. Three fixes,
+    re-drawn until they held: **tangled lights** (hung on purpose, not tangled, twice) → "a giant
+    tangled heap of fairy lights dumped on the ground, wires sprawling everywhere", 3 of 3 strong;
+    **empty sack** (drawn full, beside an unreadable note, twice) → "an empty, crumpled gift sack
+    lying flat on the ground with a small sealed envelope on it", the envelope standing for the
+    polite note without lettering; **the snowman and the Snow Maiden** together drew close to a
+    famous film's snowman and ice princess → "a snowman with a bucket on its head…" and "a
+    sleeping snow maiden in a blue fur coat and fur hat" (owner pick A of fur hat, crown or
+    kokoshnik: the crown still echoed the film, the kokoshnik reads as Russian to Ukrainian
+    buyers and cost a character of headroom). Worst case unchanged, 495/500. Display texts
+    unchanged (they still fit). **Known artefacts, for the batch's own review:** a fake signature
+    or watermark in about 1 picture in 4, and small passers-by behind 2 of 4 snowy-square
+    endings — flag and redraw, which needs a way past the prompt-hash cache, settled in the
+    batch script. **Next:** the 650-picture batch (the paid Workers AI day), the other 18
+    languages' drafts, packs in rooms, the landing variant, deployed before 29 November at a
+    quiet hour; the code and the rails by about 10 December.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

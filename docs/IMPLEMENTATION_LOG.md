@@ -7182,9 +7182,84 @@ ran clean on the tree.
 **Owed:** the owner's pick on Haiku — the playbook's chores row moved from `claude-haiku-4-5`
 ($1/$5) to `claude-haiku-5-5`; revert that one cell to keep 4.5.
 
-**RESUME HERE (2026-11-20, after Step 113; its one commit is this record — the log, the two
-commands and the playbook only, no code changed).** Nothing new is owed by this step beyond its
+~~RESUME HERE (2026-11-20, after Step 113; its one commit is this record — the log, the two
+commands and the playbook only, no code changed)~~ — carried into Step 114's note below; its
+text is kept as written. Nothing new is owed by this step beyond its
 Haiku line above. **Everything else is unchanged from Step 112's note above** — the agent's
 next step (B-29's D3 re-run once its auth is settled), the owner's three B-29 decisions (the
 29 November target, D3's auth, the 25 options' freeze), the live-badge look, and Funny Multi's
 trader confirmation before 1 Feb 2027.
+
+## Step 114 (task B-29) — D3 done: 28 test pictures, four fragments re-worded, the 25 drawn options frozen (2026-11-20)
+
+**Owner decisions, 2026-11-20 (`/morning`):** **1A** — B-29's free half (the Christmas words,
+the golden story, the `?pack=chr26` landing variant, no price shown) ships 29 November; the paid
+code and the rails switch on by about 10 December. **2B** — a scoped Cloudflare API token in a
+file on this PC (location in the agent's memory), made by the owner: user token `funnyone-ai`,
+Workers AI Edit + Read, Workers Scripts Edit, Account Settings Read, all IPs, expiring
+18 February 2027; it sees exactly one account. **3B** — D3 widened by five scenes that draw each
+of the 20 scene fragments once; the 25 drawn options frozen right after the owner approves.
+**4A** — Haiku 5.5 stays in the playbook, closing Step 113's owed line. After the pictures, the
+owner's pick **A**: the Snow Maiden in a fur hat (below).
+
+**Shipped:**
+
+- **D3 run, three re-test rounds, 28 pictures, nothing deployed.** The Step 109 throwaway script
+  (`d3-run.mjs`, kept outside the repo) runs the real `cloudflare/worker.js` under a pinned
+  `wrangler@4.160.1 dev` on 5189 (inspector 5182, both in `machine/ports.md`) with a throwaway
+  `wrangler.d3.toml`: `[ai]` remote, so real Flux Schnell; R2 simulated on disk (`--persist-to`,
+  bucket `d3-local-only`); a random Worker secret per run. The committed `wrangler.toml` and
+  production's `[ai]`-off posture are untouched (Play's AI-content policy, B-1e). Auth is the 2B
+  token; the shell's ambient `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` belong to another
+  project and are stripped, the account id read from the token's one account. Every picture
+  1024 × 1024 JPEG in 2.3–4.7 s, its key the prompt's SHA-256 as DD-4 has it. ≈ 2 cents at list
+  price.
+- **The first ten: seven passed.** Five aftermaths (place *i* with ending *i*) and five scenes
+  (each who, with, where and did fragment once; scene 1 the 495-character worst case). The two
+  subjects never merged; the gnome's hat drew orange; the feast table showed cakes and fruit,
+  no meat. Failed: the **tangled lights** (hung on purpose, not tangled) and the **empty sack**
+  (drawn full, beside an unreadable scribbled note) — each drawn again from a fresh cache with
+  the same words and failing the same way, so the wording, not luck; and the **snowman with the
+  Snow Maiden**, who together drew close to a famous film's snowman and ice princess, a risk for
+  a paid pack.
+- **Four fragments re-worded in `packages/shared/src/packs/chr26/options.ts`,** each tried in
+  two or three places first (by swapping the text into prompts built from the real ids):
+  `end.chr26-tangled-lights` → "a giant tangled heap of fairy lights dumped on the ground, wires
+  sprawling everywhere" (3 of 3 strong; an earlier try, "a giant knotted ball … as big as a
+  sofa", drew a literal sofa); `end.chr26-empty-sack` → "an empty, crumpled gift sack lying flat
+  on the ground with a small sealed envelope on it" (the envelope stands for the polite note
+  with no lettering to garble); `who.chr26-snowman` → "a snowman with a bucket on its head and a
+  red striped scarf"; `with.chr26-sleeping-snow-maiden` → "a sleeping snow maiden in a blue fur
+  coat and fur hat" — the owner's pick A over a crown (still echoed the film) and a kokoshnik
+  (the clearest Snow Maiden, but reads as Russian to Ukrainian buyers, and 55 characters would
+  have cost one of headroom). Worst case unchanged, 495/500, so `prompt.test.ts` keeps
+  `.toBe(5)`. The ids, and the en and ru display texts, are unchanged — the texts still fit.
+  The file's header records the change and the final freeze; the built prompts were checked to
+  be byte-identical to the ones drawn in the test.
+- **The 25 drawn options are frozen for good** (3B): the batch draws exactly these fragments.
+
+**Known artefacts, for the batch's own review:** a fake signature or watermark in about 1
+picture in 4 (Flux Schnell's, already accepted in the base library); small passers-by behind 2
+of 4 snowy-square endings. Flag and redraw — which needs a way past the prompt-hash cache,
+to settle in the batch script.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 1704/1704 across 6 workspaces
+(447 funny-family-site, 397 funny-multi-client, 330 funny-multi-server, 178 funny-one-client,
+299 shared, 53 cloudflare) — the first run, from a lower-case `c:` working directory, failed
+every suite at once ("Vitest failed to find the runner", Step 88's known cause), and the same
+run from `C:` passed; `npm audit --omit=dev` 0, full `npm audit` 9 moderate under exactly the two
+accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed:** the owner's own eyes on the live Play badge (Step 112); Funny Multi's app-level trader
+confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-21, after Step 114; not yet pushed).** **B-29's D3 is done and the 25
+drawn options are frozen.** **Next, the agent's — B-29's free half for 29 November (1A):** the
+650-picture batch on the paid Workers AI day (5⁴ = 625 scenes + 25 aftermaths, WebP; the 2B
+token gains Workers R2 Storage Edit if the batch writes the real bucket; a redraw path past the
+prompt-hash cache for the fake-signature pictures), the other 18 languages' machine drafts,
+packs in rooms (the golden story, the Christmas when/why/ending words in a free room), the
+`?pack=chr26` landing variant — deployed before 29 November at a quiet hour. Then the paid code
+and the rails (PayID, Lightning, Sponsors) by about 10 December. **Owed, the owner's:** the
+live-badge look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the
+Sponsors tier and webhook and the Lightning service (B-29's *Owed before building*).

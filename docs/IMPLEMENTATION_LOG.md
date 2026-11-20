@@ -7253,9 +7253,10 @@ accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pendi
 **Owed:** the owner's own eyes on the live Play badge (Step 112); Funny Multi's app-level trader
 confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-21, after Step 114; not yet pushed).** **B-29's D3 is done and the 25
-drawn options are frozen.** **Next, the agent's — B-29's free half for 29 November (1A):** the
-650-picture batch on the paid Workers AI day (5⁴ = 625 scenes + 25 aftermaths, WebP; the 2B
+~~RESUME HERE (2026-11-21, after Step 114; not yet pushed)~~ — pushed as `ff551ea`, CI green
+(run 44741969430); carried into Step 115's note below; its text is kept as written. **B-29's D3
+is done and the 25 drawn options are frozen.** **Next, the agent's — B-29's free half for
+29 November (1A):** the 650-picture batch on the paid Workers AI day (5⁴ = 625 scenes + 25 aftermaths, WebP; the 2B
 token gains Workers R2 Storage Edit if the batch writes the real bucket; a redraw path past the
 prompt-hash cache for the fake-signature pictures), the other 18 languages' machine drafts,
 packs in rooms (the golden story, the Christmas when/why/ending words in a free room), the
@@ -7263,3 +7264,66 @@ packs in rooms (the golden story, the Christmas when/why/ending words in a free 
 and the rails (PayID, Lightning, Sponsors) by about 10 December. **Owed, the owner's:** the
 live-badge look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the
 Sponsors tier and webhook and the Lightning service (B-29's *Owed before building*).
+
+## Step 115 (task B-29) — two golden stories and the edition's end dates (2026-11-21)
+
+No code changed: three steering files and this log. Typecheck, lint, `npm test` and `npm audit`
+are not applicable — nothing they check moved; `format:check` ran clean on the tree.
+
+**Owner decisions, 2026-11-21,** on the agent's options after the funnel was explained: a second
+golden story (A one everywhere; B one for 3–5 players and two for 6–7, the agent's pick; C two
+everywhere) and an end date (the free part on 1 July 2027; the paid pack A never expiring, the
+agent's pick, or B dated, 1 August safer than 1 July). **1C** — two golden stories in every
+free game, at every room size, so a room of 3 sees 2 of its 3 stories fully Christmas and a
+room of 7 two in seven. **Free yes** — the free Christmas part (the slice and the golden
+stories) ends 1 July 2027, on the agent's condition that `/xmas` and the QR on shared
+golden-story downloads keep leading to a working page. **Paid B, 1 August** — a code works
+until 1 August 2027, covering Australia's Christmas-in-July parties.
+
+**Shipped:**
+
+- **`steering/tasks.md`:** B-29's *Decisions 2026-11-21* — the two golden stories with their
+  lobby, end-of-game and download texts ("two Christmas stories", "until 1 August 2027", ru
+  «до 1 августа 2027»); the free part's end; one server-checked date on the pack and none
+  inside the code, so the code format and D4's 16-character reference stand; the date shown
+  before paying (pay card, pay page, Sponsors tier, refund policy); a remembered code saying
+  the edition has ended. Superseded markers on the four places the decisions change:
+  *Product*'s "never expires", *Funnel*'s "forever", 2026-11-05's "one golden story" and its
+  *Screens*.
+- **`steering/requirements.md`:** FM-PACK-4 says two golden stories; new **FM-PACK-6** holds the
+  dates; D-6(e) amended; the FM-PACK source row cites 2026-11-21.
+- **`steering/design.md` §4.4:** two golden stories and a *Dated* bullet. Two stale figures
+  corrected in passing, measured on the built prompts: the worst-case scene prompt is 495 of
+  500 since Step 109 (§4.4 still said 481, and both §4.4 and §7.1 said 19 of headroom, now 5),
+  the worst-case aftermath 281 since Step 114's re-wordings (was 263).
+
+**The agent's two proposals, confirmed by the owner the same day:** each date is the last day,
+honoured through the whole of it anywhere on Earth — the free part until 1 July 2027, the paid
+pack until 1 August 2027 (cut-offs noon UTC the next day); sales stop with the free part on
+1 July 2027, so every buyer gets at least a month, and the agent retires chr26's Sponsors tier
+that day — that tier only, Sponsors staying a support rail (D-6). GitHub's GraphQL API has the
+call, `retireSponsorsTier` (checked by introspection); how it runs on the day is settled with
+the rails.
+
+**Gates:** `format:check` clean on the final tree; typecheck, lint, `npm test` and `npm audit`
+not applicable — no code or dependency moved, and no test reads the steering files; CI pending
+the push.
+
+**Owed:** the build of these decisions, in the packs-in-rooms and rails steps — two golden
+stories, the two server-checked dates, `/xmas`'s ended page, a remembered code's ended state,
+the date on every pay screen. Dated, all in B-29's block: 1 July 2027 the free part switches
+off, sales stop and chr26's Sponsors tier is retired; 1 August 2027 a code ends. The owner's
+lines are unchanged from Step 114: the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027.
+
+**RESUME HERE (2026-11-21, after Step 115; not yet pushed).** Step 114 is pushed and green
+(`ff551ea`). **Next, Step 116 (the agent's) — B-29's free half for 29 November (1A), as Step
+114's note has it:** the 650-picture batch on the paid Workers AI day (the 2B token gains
+Workers R2 Storage Edit if it writes the real bucket; a redraw path past the prompt-hash cache),
+the other 18 languages' machine drafts, packs in rooms — now **two golden stories** and
+FM-PACK-6's two dates, with `schema.ts`'s comments — and the `?pack=chr26` landing variant,
+deployed before 29 November at a quiet hour. Then the paid code and the rails by about
+10 December, the date on every pay screen, and how the agent retires chr26's Sponsors tier on
+1 July 2027. **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook
+and the Lightning service.

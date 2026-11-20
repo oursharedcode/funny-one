@@ -234,8 +234,13 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 - **Content is decided per story, not per room** (`StoryContent`, `optionsFor`): `base` in a room
   without a pack; `slice` for a free room's ordinary stories — the pack's when, why and ending,
   the base pools' four picture slots, so the scene is one the library already holds and the
-  ending is a text card; `full` for a free game's one golden story and every story of a paid
-  room. A test holds every pack's `sliceSlots` apart from `VISUAL_SLOTS`.
+  ending is a text card; `full` for a free game's two golden stories (one until the owner's
+  decision of 2026-11-21) and every story of a paid room. A test holds every pack's `sliceSlots`
+  apart from `VISUAL_SLOTS`.
+- **Dated** (FM-PACK-6, owner decision 2026-11-21): a pack carries the last day of its free part
+  and the last day a paid code works — chr26: 2027-07-01 and 2027-08-01. Each is honoured through
+  the whole of that day anywhere on Earth, so the server's cut-off is noon UTC the next day. The
+  server alone checks them, and a code carries no date, so `XMAS26-XXXX-XXXX` is unchanged.
 - **One source per scene.** `buildPrompt` throws when a story's four picture slots mix the base
   pools and a pack: that picture is in no library.
 - **The aftermath** is a pack ending's own picture, built by `buildAftermathPrompt` from the place
@@ -251,9 +256,10 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   like itself in every picture it is in; **no Christmas tree in any place**, because the tree
   belongs to an ending (an aftermath would draw it standing and fallen at once); an
   `aftermathEn` on every ending.
-- **Sizes, measured at Step 103:** 625 scenes + 25 aftermaths = 650 pictures; the worst-case
-  scene prompt is 481 of 500 (19 of headroom, pinned in the server's `prompt.test.ts` like the
-  base pools' 19), the worst-case aftermath 263. "When" and "why" could grow at no picture cost;
+- **Sizes, first measured at Step 103:** 625 scenes + 25 aftermaths = 650 pictures; the
+  worst-case scene prompt is 495 of 500 (5 of headroom, pinned in the server's `prompt.test.ts` beside the
+  base pools' 19; 481 until Step 109's cultural fix), the worst-case aftermath 281 (263 until
+  Step 114's re-wordings). "When" and "why" could grow at no picture cost;
   the other five slots cannot grow without another batch.
 - **Languages and texts.** A pack names the languages it is offered in — chr26's 20 are every
   authored language but ar, he and fa (B-29). Its texts are **local glosses, not translations**:
@@ -397,7 +403,7 @@ untrusted text remains, FM-ANS), the RU/EN slot-1 connective synthesis and `ruAc
 (T-1.4), so a duplicate pair is unreachable by construction.
 
 **Packs (Step 103, DD-16):** a pack's scenes are built by the same `buildPrompt` with the same
-skeleton, suffix and cap from the pack's own fragments, one source per scene (chr26 leaves 19 of
+skeleton, suffix and cap from the pack's own fragments, one source per scene (chr26 leaves 5 of
 headroom), and its endings get a second, character-free picture from `buildAftermathPrompt` —
 see §4.4.
 

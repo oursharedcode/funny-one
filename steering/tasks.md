@@ -500,7 +500,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   "seasonal packs" line taken up). **Ahead of B-27** (owner decision 2026-11-01: Christmas is
   dated, B-27 is not). Funny Multi only; nothing for the children's product.
   - *Product:* one price, **A$2.60**, unlimited rooms, **never expires** — nothing that runs out
-    or stops, so nothing to dispute. English name "Christmas 2026 edition"; Russian
+    or stops, so nothing to dispute. *(Superseded 2026-11-21: a code works until 1 August 2027 —
+    see* Decisions 2026-11-21 *below.)* English name "Christmas 2026 edition"; Russian
     **«Новый год 2027»**, covering three days — католическое Рождество 25 декабря 2026, Новый
     год, православное Рождество 7 января 2027. The pack is a room property the host sets.
   - *Languages (20):* en, de, fr, it, es-es, es-419, pt-br, uk, ko, yue, id, sw, yo (Christmas
@@ -514,7 +515,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     fingerprint, nothing to game, the trial is the demo. The pay prompt appears between games,
     after the first free cartoon, never mid-story. *(Superseded 2026-11-05: the slice was "a
     quarter of the Christmas words and pictures", the prompt the host's alone and the funnel
-    three steps — see* Decisions 2026-11-05 *below.)*
+    three steps — see* Decisions 2026-11-05 *below. And 2026-11-21: "forever" — the free share
+    ends 1 July 2027, see* Decisions 2026-11-21 *below.)*
   - *Code:* signed, `XMAS26-XXXX-XXXX`, verified by the server with a secret and no database;
     the host puts it in a bookmarkable create-room link, so the app stores nothing (B-25's
     promise holds). A leaked code costs nothing to serve; a small blocklist revokes one. The
@@ -559,6 +561,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       shown as a text card). **One golden story per free game**, picked at random and revealed
       last, is fully Christmas — its words, its scene and its ending picture. A paid room is
       Christmas in every slot of every story; it has no golden story. Replaces "a quarter".
+      *(Superseded 2026-11-21: two golden stories — see* Decisions 2026-11-21 *below.)*
     - **Pictures: 650.** Scenes from the four picture slots, 5⁴ = 625; endings drawn as an
       **aftermath** — the place and the objects, no characters, so nothing can fail to match the
       scene — where × ending = 5² = 25. "When" and "why" are never drawn (DD-3's reason). The
@@ -586,6 +589,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       payment address (e.g. `…/xmas`), which replaces the landing link and the QR's target;
       ordinary stories keep today's footer. In a paid room every download carries "Your
       Christmas 2026 stories: every game, enjoy your party :))". Russian uses «Новый год 2027».
+      *(Superseded 2026-11-21: "one" becomes "two" and "forever" becomes "until 1 August 2027" —
+      see* Decisions 2026-11-21 *below.)*
     - **Never on any download:** the code or the link that holds it (a shared video would
       leak it) — a test checks this. **The Android app** shows no price, no button and no
       payment address, its downloads saying only "Christmas 2026 edition" (Play's payments
@@ -696,6 +701,34 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     batch script. **Next:** the 650-picture batch (the paid Workers AI day), the other 18
     languages' drafts, packs in rooms, the landing variant, deployed before 29 November at a
     quiet hour; the code and the rails by about 10 December.
+  - *Decisions 2026-11-21 (owner, on the agent's options for a second golden story and an end
+    date; built in the step that brings packs into rooms):*
+    - **1C — two golden stories in every free game**, at every room size, both picked at random
+      and revealed last. Chosen over the agent's pick (one for 3–5 players, two for 6–7) knowing
+      that a room of 3 then sees 2 of its 3 stories fully Christmas, a room of 4 half, a room of
+      7 two in seven. No extra picture cost: both come from the 650. Lobby: "🔔 This game has two
+      Christmas stories"; end of a free game: "You just saw two Christmas stories. Unlock all of
+      them: A$2.60, every game, until 1 August 2027"; both golden stories' downloads carry the
+      unlock line. FM-PACK-4 and design §4.4 say two; `schema.ts`'s comments follow in the build.
+    - **The free Christmas part ends 1 July 2027** — the slice and the golden stories: from then
+      a free room, and the Android app, plays the base pools only. On the agent's condition:
+      `/xmas` and the QR on every shared golden-story download keep leading to a working page,
+      which then says the edition has ended.
+    - **B — a paid code works until 1 August 2027**, not "forever": a month past the free part,
+      for Australia's Christmas-in-July parties. One date on the pack, checked by the server; no
+      date inside the code, so `XMAS26-XXXX-XXXX` and D4's 16-character reference stand. The date
+      is shown before paying — the pay card, the pay page, the Sponsors tier, the refund policy —
+      where "forever" becomes "until 1 August 2027" (ru «до 1 августа 2027»). A code the website
+      remembers then says the edition has ended rather than quietly opening a free room.
+    - **The agent's two proposals, confirmed by the owner the same day:** each date is the last
+      day, honoured through the whole of it anywhere on Earth — the free part of "Christmas
+      2026" until 1 July 2027, the paid pack until 1 August 2027 (the server's cut-offs: 2 July
+      and 2 August 2027, 12:00 UTC); **sales stop with the free part, 1 July 2027**, so every
+      buyer gets at least a month — the pay card only ever appears in a free Christmas game; then
+      `/xmas` says the edition is no longer on sale, and **the agent retires chr26's Sponsors
+      tier** that day — that tier only, Sponsors staying a support rail (D-6). GitHub's API has
+      the call (`retireSponsorsTier`); how it runs on the day is settled with the rails.
+      FM-PACK-6 holds the dates.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

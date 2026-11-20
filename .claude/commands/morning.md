@@ -1,6 +1,6 @@
 ---
 description: Start-of-session ritual — read state, propose the next step, plan only
-model: claude-opus-5
+model: claude-opus-5-5
 ---
 
 Start of session. Read the RESUME HERE note at the foot of docs/IMPLEMENTATION_LOG.md

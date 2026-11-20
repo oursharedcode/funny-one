@@ -1,6 +1,6 @@
 ---
 description: End-of-session ritual — gates, log entry, RESUME note, then commit+push on confirm
-model: claude-sonnet-5
+model: claude-sonnet-5-5
 ---
 
 End of session. Close out the step per house conventions:

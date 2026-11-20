@@ -6666,8 +6666,8 @@ CI green on `62beb95`, the commit that shipped.
 
 **Owed:** the owner's own eyes on the live badge, in a language or two of their choice.
 
-**RESUME HERE (2026-11-20, after Step 112; its one commit is this record — the log and
-`steering/tasks.md` only, no code changed).** **B-31's Google Play badges are live on the landing
+~~RESUME HERE (2026-11-20, after Step 112; pushed as `f8c2caa`)~~ — carried into Step 113's note
+at the foot of this log; its text is kept below as written. **B-31's Google Play badges are live on the landing
 page (Step 112).** **Next, the agent's:** B-29's D3 re-run (≈ 1 cent, nothing
 deployed, production's `[ai]` binding still off) once its auth is settled. **Owed, the owner's —
 three decisions from this session's plan, unanswered:** (1) B-29's 29 November target — hold the
@@ -7161,3 +7161,30 @@ tree, seen in Step 112 — Step 99's GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4
 has no description, unlike `funny-stories` (Step 96) — a one-line `gh repo edit`, the owner's
 wording~~ done in Step 97.
 
+
+## Step 113 (follow-up) — model pins and the playbook moved to the 5.5 generation (2026-11-20)
+
+No code changed: three Markdown files in the working tree, no task opened or closed. Typecheck,
+lint, `npm test` and `npm audit` are not applicable — nothing they check moved; `format:check`
+ran clean on the tree.
+
+**Shipped:**
+
+- **`/morning`** now pins `claude-opus-5-5` (was `claude-opus-5`) and **`/endsession`**
+  `claude-sonnet-5-5` (was `claude-sonnet-5`) — the Sonnet tier stays on purpose; the newest
+  Sonnet costs the same.
+- **`docs/MODEL_PLAYBOOK.md`** moved to the same generation, prices as of 2026-11: Opus 5.5
+  $4/$20; Fable 5.2 $8/$40 as the escalation; Sonnet 5.5 $2/$10; Haiku 5.5 $0.10/$0.50 up to 100K
+  tokens ($0.50/$2.50 beyond) for mechanical chores. One line added under the effort table: Opus
+  5.5's API default effort is medium (Opus 5's was high), so check the session's effort before
+  relying on the table.
+
+**Owed:** the owner's pick on Haiku — the playbook's chores row moved from `claude-haiku-4-5`
+($1/$5) to `claude-haiku-5-5`; revert that one cell to keep 4.5.
+
+**RESUME HERE (2026-11-20, after Step 113; its one commit is this record — the log, the two
+commands and the playbook only, no code changed).** Nothing new is owed by this step beyond its
+Haiku line above. **Everything else is unchanged from Step 112's note above** — the agent's
+next step (B-29's D3 re-run once its auth is settled), the owner's three B-29 decisions (the
+29 November target, D3's auth, the 25 options' freeze), the live-badge look, and Funny Multi's
+trader confirmation before 1 Feb 2027.

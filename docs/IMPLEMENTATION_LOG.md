@@ -7418,8 +7418,16 @@ funny-one-client (every test that ran passed); the same command alone passed in 
 **Owed:** nothing of this step's. The owner's lines are unchanged: the live-badge look; Funny
 Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-21, after Step 116; not yet pushed).** Step 115 is pushed and green
-(`40684eb`). **B-29's 650 pictures are in the bucket; the token is back to no R2; Workers Paid
+**Follow-up, the same day:** the pushed `packbatch.mjs` (`2d4a149`, CI green, run 44866760548)
+named the token file's path, against Step 86's rule for the public repo; the agent caught it
+after the push. The script now takes the path from `PACKBATCH_TOKEN_FILE` (location in the
+agent's memory) and stops with a plain message when it is unset; the path stays in
+`2d4a149`'s history, as earlier paths stay in the history before Step 86. Gates on the fix:
+typecheck 0, lint 0, format:check clean, `npm test` 1739/1739 across the 6 workspaces,
+`npm audit --omit=dev` 0; CI pending the push.
+
+**RESUME HERE (2026-11-21, after Step 116; its follow-up not yet pushed).** Step 116 is pushed
+and green (`2d4a149`). **B-29's 650 pictures are in the bucket; the token is back to no R2; Workers Paid
 runs out on 3 December.** **Next, Step 117 (the agent's) — packs in rooms**, for 29 November:
 3A's Christmas room by default in the 20 languages with the host's switch; 4A's room-language
 rule with English for ar, he and fa; the Christmas when/why/ending words; **two golden stories**

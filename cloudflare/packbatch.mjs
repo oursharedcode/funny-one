@@ -27,10 +27,11 @@
 // and a picture can be drawn again over its own key: that is the redraw path
 // past the prompt-hash cache that Step 114 asked for.
 //
-// Auth (owner decision 2B, 2026-11-20): funnyone's scoped token in
-// ~/.cloudflare/funny-ai-token — Workers AI, Workers Scripts, Account
-// Settings, and Workers R2 Storage Edit for this batch (owner decision 1A,
-// 2026-11-21; removed again after it). The shell's ambient
+// Auth (owner decision 2B, 2026-11-20): funnyone's scoped token, in a file on
+// this PC whose path PACKBATCH_TOKEN_FILE gives (location in the agent's
+// memory) — Workers AI, Workers Scripts, Account Settings, and Workers R2
+// Storage Edit for a batch (owner decision 1A, 2026-11-21; added for the batch
+// and removed again after it). The shell's ambient
 // CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID belong to another project and
 // are replaced for the wrangler child only. The token is never printed.
 //
@@ -54,7 +55,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { homedir, tmpdir } from 'node:os';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
@@ -77,7 +78,6 @@ export const PORT = 5189;
 export const INSPECTOR_PORT = 5182;
 // Pinned and run through npx, as for D3: not a devDependency of the repo.
 const WRANGLER = 'wrangler@4.160.1';
-const TOKEN_FILE = join(homedir(), '.cloudflare', 'funny-ai-token');
 const HELPER = join(REPO, 'scripts', 'picture-review', 'packimages.py');
 const VENV_PYTHON = join(REPO, '.picture-review', 'venv', 'Scripts', 'python.exe');
 const BASE_BACKOFF_MS = 1_000;
@@ -546,8 +546,12 @@ export async function keepDraws(items, options) {
 // ---------------------------------------------------------------------------
 
 function readToken() {
-  if (!existsSync(TOKEN_FILE)) throw new FatalError(`no token file at ${TOKEN_FILE}`);
-  const token = readFileSync(TOKEN_FILE, 'utf8').trim();
+  // The path is not in the repository: it is public (B-24), and the owner keeps
+  // credential locations out of it.
+  const file = process.env.PACKBATCH_TOKEN_FILE;
+  if (!file) throw new FatalError('set PACKBATCH_TOKEN_FILE to the token file');
+  if (!existsSync(file)) throw new FatalError(`no token file at ${file}`);
+  const token = readFileSync(file, 'utf8').trim();
   if (!/^[A-Za-z0-9_-]{30,}$/.test(token)) {
     throw new FatalError('the token file does not hold one token on one line');
   }

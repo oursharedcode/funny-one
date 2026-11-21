@@ -824,6 +824,16 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     lines: en and ru the agent's, 18 machine drafts on B-3's pile. The ship script checks
     `/x26` too. **Next:** Step 120 — D3 A's two-character nickname minimum (client, server, the
     FM requirement, tests), then the deploy of Steps 117–120 at a quiet hour before 29 November.
+  - *Decision 2026-11-21, sixth set (owner, on Step 120's plan):*
+    - **D1 A — the deploy of Steps 117–120 runs in Step 120's own session**, after its push and
+      green CI, the server's log checked first for a game in progress (B-27); not a separate
+      quiet-hour session (B), not held to 27 November (C).
+  - **The two-character nickname minimum done 2026-11-21 (Step 120)** — FM-CORE-4 amended.
+    `NICKNAME_MIN` (2) and `NICKNAME_MAX` (20) now live in `@funny/shared`; the server's
+    `validateNickname` and the client's Create/Join buttons and field cap read the one pair. A
+    character is a UTF-16 unit, as the field's `maxLength` counts — one emoji alone passes.
+    Tests: Jo, ゆい, 王芳, 민수 and a padded Li taken, "a" and 王 refused, in-process and on the
+    wire. **Next:** the deploy of Steps 117–120 (D1 A).
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

@@ -358,7 +358,8 @@ describe('room:create', () => {
     const h = await listen();
     const host = await connect(h);
     const err = once<{ code: string }>(host, 'error');
-    host.emit('room:create', { nickname: 'ab', language: 'en' }, () => {
+    // One character: the minimum is 2 since Step 120 (B-29, D3 A).
+    host.emit('room:create', { nickname: 'a', language: 'en' }, () => {
       throw new Error('ack must not fire on a rejected create');
     });
     expect((await err).code).toBe('INVALID_NICKNAME');
@@ -468,6 +469,27 @@ describe('room:join', () => {
       nickname: 'x',
     });
     expect(ack.error.code).toBe('INVALID_NICKNAME');
+  });
+
+  it('takes two-character nicknames on the wire (Step 120, B-29 D3 A)', async () => {
+    // Gate 2's lesson: the in-process bound is not enough, so the 2 is
+    // checked through a real socket for both create and join.
+    const h = await listen();
+    const host = await connect(h);
+    const { roomCode } = await emitWithAck<{ roomCode: string }>(host, 'room:create', {
+      nickname: 'Jo',
+      language: 'ja',
+    });
+
+    const names = ['ゆい', '王芳', '민수'];
+    for (const nickname of names) {
+      const joiner = await connect(h);
+      const ack = await emitWithAck<{ players?: { nickname: string }[] }>(joiner, 'room:join', {
+        roomCode,
+        nickname,
+      });
+      expect(ack.players?.at(-1)?.nickname).toBe(nickname);
+    }
   });
 });
 

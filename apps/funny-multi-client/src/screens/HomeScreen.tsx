@@ -49,7 +49,7 @@ import LanguageList from '../components/LanguageList';
 import SupportHeart from '../components/SupportHeart';
 import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
-import { LANGUAGES, isLanguage } from '@funny/shared';
+import { LANGUAGES, NICKNAME_MAX, NICKNAME_MIN, isLanguage } from '@funny/shared';
 import type { LobbyState } from '../App';
 import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
 
@@ -231,7 +231,10 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
     setMode('create');
   }
 
-  const nicknameValid = nickname.trim().length >= 3 && nickname.trim().length <= 20;
+  // The client half of the server's `validateNickname`; one pair of bounds
+  // in @funny/shared (2–20 since Step 120, B-29 D3 A).
+  const trimmedLength = nickname.trim().length;
+  const nicknameValid = trimmedLength >= NICKNAME_MIN && trimmedLength <= NICKNAME_MAX;
 
   return (
     <div
@@ -273,7 +276,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
             className="w-full rounded border border-amber-300 p-3 text-lg"
             placeholder={t('home.nicknamePlaceholder')}
             value={nickname}
-            maxLength={20}
+            maxLength={NICKNAME_MAX}
             onChange={(e) => setNickname(e.target.value)}
           />
 
@@ -392,7 +395,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
             className="w-full rounded border border-amber-300 p-3 text-lg"
             placeholder={t('home.nicknamePlaceholder')}
             value={nickname}
-            maxLength={20}
+            maxLength={NICKNAME_MAX}
             onChange={(e) => setNickname(e.target.value)}
           />
 

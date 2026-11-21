@@ -10,20 +10,29 @@
 //      builds (ARC-3 / DD-9 — the field is gone from the protocol, so a server
 //      that still set it would not typecheck).
 //
+// Since then (Step 120, B-29, D3 A): the nickname minimum is 2, not SRC's 3,
+// and both bounds come from @funny/shared.
+//
 // NOT here: the §17 rate limiter. SRC's spec mandates it and SRC's own
 // DEPLOYMENT.md documents it, but SRC never implemented it — see rateLimit.ts,
 // which is written from the spec rather than copied.
 
 import { customAlphabet } from 'nanoid';
-import { AUTHORED_LANGUAGES, packForRoom, type AuthoredLanguage } from '@funny/shared';
+import {
+  AUTHORED_LANGUAGES,
+  NICKNAME_MAX,
+  NICKNAME_MIN,
+  packForRoom,
+  type AuthoredLanguage,
+} from '@funny/shared';
 import type { ErrorCode, Language, Player, Room, RoomPack } from './types.js';
 
 // Constants from spec §17.
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_LENGTH = 6;
 export const MAX_PLAYERS = 7;
-const NICKNAME_MIN = 3;
-const NICKNAME_MAX = 20;
+// The nickname bounds live in @funny/shared since Step 120, which dropped the
+// minimum from 3 to 2 (B-29, D3 A); the client's buttons read the same pair.
 const MAX_ROOMS_DEFAULT = 500;
 
 const generateCode = customAlphabet(CODE_ALPHABET, CODE_LENGTH);

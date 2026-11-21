@@ -7,7 +7,7 @@
 // lobby-vs-in-game removal split that rotation integrity depends on.
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { LANGUAGES } from '@funny/shared';
+import { LANGUAGES, NICKNAME_MAX, NICKNAME_MIN } from '@funny/shared';
 import {
   MAX_PLAYERS,
   RoomError,
@@ -88,16 +88,40 @@ describe('capacity (FM-CORE-4)', () => {
   });
 });
 
-describe('nickname rules (3–20, spec §17)', () => {
-  it('accepts the boundaries and trims', () => {
-    expect(validateNickname('abc')).toEqual({ ok: true, nickname: 'abc' });
-    expect(validateNickname('a'.repeat(20))).toEqual({ ok: true, nickname: 'a'.repeat(20) });
-    expect(validateNickname('  Ada  ')).toEqual({ ok: true, nickname: 'Ada' });
+describe('nickname rules (2–20, spec §17 as amended by B-29 D3 A)', () => {
+  it('reads its bounds from @funny/shared', () => {
+    // Step 120: the client's buttons read the same pair, so the two halves
+    // cannot drift apart again.
+    expect(NICKNAME_MIN).toBe(2);
+    expect(NICKNAME_MAX).toBe(20);
   });
 
+  it('accepts the boundaries and trims', () => {
+    expect(validateNickname('ab')).toEqual({ ok: true, nickname: 'ab' });
+    expect(validateNickname('a'.repeat(20))).toEqual({ ok: true, nickname: 'a'.repeat(20) });
+    expect(validateNickname('  Ada  ')).toEqual({ ok: true, nickname: 'Ada' });
+    expect(validateNickname('  Li  ')).toEqual({ ok: true, nickname: 'Li' });
+  });
+
+  it.each(['Jo', 'ゆい', '王芳', '민수'])(
+    'takes the two-character name %s (Step 120: the 3 refused them)',
+    (name) => {
+      expect(validateNickname(name)).toEqual({ ok: true, nickname: name });
+    },
+  );
+
   it('rejects just outside the boundaries', () => {
-    expect(validateNickname('ab').ok).toBe(false);
+    expect(validateNickname('a').ok).toBe(false);
+    expect(validateNickname('  a  ').ok).toBe(false);
+    expect(validateNickname('王').ok).toBe(false);
     expect(validateNickname('a'.repeat(21)).ok).toBe(false);
+  });
+
+  it('names the minimum in its message', () => {
+    expect(validateNickname('a')).toEqual({
+      ok: false,
+      message: 'Nickname must be at least 2 characters.',
+    });
   });
 
   it('rejects whitespace-only and non-strings', () => {

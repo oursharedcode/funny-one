@@ -282,20 +282,37 @@ describe("the device's language (Step 88)", () => {
   });
 });
 
-describe('nickname bounds (server rejects outside 3–20)', () => {
+describe('nickname bounds (server rejects outside 2–20)', () => {
   // Gate 2 found this the expensive way: a 2-character fixture nickname passed
-  // every in-process test and failed on the wire. The button is the client-side
-  // half of `validateNickname`.
+  // every in-process test and failed on the wire, when the server's minimum
+  // was 3. The button is the client-side half of `validateNickname`, and since
+  // Step 120 (B-29, D3 A) both read NICKNAME_MIN = 2 from @funny/shared.
   it.each([
     ['', false],
-    ['ab', false],
-    ['  ab  ', false],
-    ['abc', true],
+    ['a', false],
+    ['  a  ', false],
+    ['ab', true],
+    ['  ab  ', true],
+    ['ゆい', true],
+    ['王芳', true],
+    ['민수', true],
+    ['王', false],
     ['a'.repeat(20), true],
   ])('nickname %j enables create: %s', (value, enabled) => {
     renderHome();
     typeNickname(value);
     const button = screen.getByText('Create room') as HTMLButtonElement;
+    expect(button.disabled).toBe(!enabled);
+  });
+
+  it.each([
+    ['a', false],
+    ['Li', true],
+  ])('nickname %j enables join: %s', (value, enabled) => {
+    setUrl('?room=abcd');
+    renderHome();
+    typeNickname(value);
+    const button = screen.getByText('Join room') as HTMLButtonElement;
     expect(button.disabled).toBe(!enabled);
   });
 

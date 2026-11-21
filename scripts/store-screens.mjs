@@ -72,8 +72,8 @@ const NAMES = {
   // Ending in -ā, which takes Tamil's "{{name}}க்கு" as written.
   ta: { people: ['மீரா', 'ராதா', 'கீதா'], bot: 'ரோபோ' },
   te: { people: ['అను', 'రవి', 'మీరా'], bot: 'రోబో' },
-  // Funny Multi's nicknames take 3–20 characters (HomeScreen.tsx), so the
-  // Chinese and Korean names carry a surname.
+  // Funny Multi's nicknames took 3–20 characters when these were chosen, so
+  // the Chinese and Korean names carry a surname; 2–20 since Step 120.
   zh: { people: ['李小美', '王小明', '张乐乐'], bot: '小机' },
   yue: { people: ['陳小欣', '黃家明', '李樂樂'], bot: '機械人' },
   bn: { people: ['অনু', 'রবি', 'মীরা'], bot: 'রোবো' },

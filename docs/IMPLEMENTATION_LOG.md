@@ -7655,6 +7655,9 @@ accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pendi
 at the deploy. If one tab clicks both kinds of Funny Multi button, the A/B click total counts
 both. B-29 stays open: Step 120 and the paid half remain.
 
+~~RESUME HERE (2026-11-21, after Step 119; not yet pushed)~~ — pushed as `54e229c`, CI green
+(run 44897773797); carried into Step 120's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-21, after Step 119; not yet pushed).** Step 118 is pushed and green
 (`6808df9`, CI run 44883774100). **The landing page carries the Christmas buttons; the address
 is `/x26`.** **Next, Step 120 (the agent's) — D3 A's two-character nickname minimum** (the
@@ -7666,3 +7669,55 @@ the date on every pay screen, and how the agent retires chr26's Sponsors tier on
 **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation before 1 Feb
 2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook and the
 Lightning service.
+
+## Step 120 (task B-29) — the two-character nickname minimum (2026-11-21)
+
+**Owner decision, 2026-11-21 (`/morning`), on Step 120's plan:** **D1 A** — the deploy of Steps
+117–120 runs in this session, after the push and green CI, the server's log checked first for a
+game in progress (B-27). In B-29's block as the sixth set.
+
+**Shipped (D3 A of the fifth set):**
+
+- **`packages/shared/src/nickname.ts` (new):** `NICKNAME_MIN = 2`, `NICKNAME_MAX = 20`, exported
+  from `@funny/shared`. A character is a UTF-16 unit (`String.length`), the unit the field's
+  `maxLength` counts, so one emoji on its own passes.
+- **Server** (`rooms.ts`): `validateNickname` reads the shared pair; its message now says "at
+  least 2 characters". The file's SRC-copy header notes the change.
+- **Client** (`HomeScreen.tsx`): the Create and Join buttons and both fields' `maxLength` read
+  the same pair — the drift Gate 2 once found the expensive way cannot recur.
+- **Tests:** server — the bounds, Jo, ゆい, 王芳, 민수 and a padded Li taken, "a", " a " and 王
+  refused, the message; on the wire, "a" refused on create (was "ab") and a ja room created by
+  Jo and joined by ゆい, 王芳 and 민수. Client — the Create table (a, ab, ゆい, 王芳, 민수, 王)
+  and Join for "a" and "Li".
+- **Docs:** FM-CORE-4 and the free-text note in requirements.md say 2–20, with the amendment;
+  ACCEPTANCE.md B2; the comment in `scripts/store-screens.mjs` (its names stay as they are);
+  tasks.md — the sixth set of decisions and the Step 120 line.
+
+**Verified in the browser** (`.screens/step120-check.mjs`, gitignored: production build, the
+real server on 3000, Chromium at 360 px, ja interface): Create stays greyed for "", "a", " a "
+and 王 and opens for Jo; Join stays greyed for "a"; ゆい, 王芳 and 민수 join Jo's room, every
+lobby lists all four, the host's Start is enabled, and the server logs no `INVALID_NICKNAME`.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 2073 across 6 workspaces (533
+funny-family-site, 461 funny-multi-client, 366 funny-multi-server, 178 funny-one-client, 447
+shared, 88 cloudflare). The laptop was loaded (CPU 77–95 % from other sessions), and each of
+the two full runs lost one workspace to a timeout outside this step's code — the first, six
+client files whose test workers failed to start; the second, one landing-page test over its
+5 s limit. Each workspace then passed whole on its own. `npm audit` 9 moderate under exactly
+the two accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the
+push.
+
+**Owed:** the deploy of Steps 117–120 (D1 A), next in this session. B-29 stays open: the paid
+half remains.
+
+**RESUME HERE (2026-11-21, after Step 120; not yet pushed).** Step 119 is pushed and green
+(`54e229c`, CI run 44897773797). **Nicknames take 2–20 characters.** **Next — the deploy of
+Steps 117–120 (D1 A),** this session once Step 120 is pushed and green: the server's log
+checked first for a game in progress, then `deploy/ship.sh` and `deploy/ship-funny-family.sh`,
+the running image against the commit, the scripts' live checks (`/x26` → 308); the owner's
+phone check after (the landing page's red buttons, the Christmas switch in a new room's
+lobby). Christmas rooms are on from then; `PACK_ROOMS=off` in the VM's .env is the lever.
+Then the paid code and the rails by about 10 December, the date on every pay screen, and how
+the agent retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier
+(its text naming 1 August 2027) and webhook and the Lightning service.

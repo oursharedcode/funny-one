@@ -80,7 +80,8 @@ pools there is no untrusted text anywhere in the content path):
 | Free-text answer UI (textarea, 70-char counter) | Combobox (FM-ANS-1) |
 | Lottie share-video engine (`recordWobbleLottie.ts`, `wobbleEngine` protocol field) | CSS wobble engine only — ARC-3 locks the stack to SVG + CSS + Framer Motion, no Lottie. *(Amended 2026-10-05, B-12, owner request: the monkey that engine drew — walks in, "ha-ha", falls — is back in the share video, drawn by the one recorder in plain canvas with four PNG sprites. Still one engine, no protocol field, no Lottie library.)* |
 
-**Free text that remains:** the player **nickname** (3–20 chars, trimmed, per spec §17). It is
+**Free text that remains:** the player **nickname** (2–20 chars, trimmed; spec §17's 3–20,
+amended 2026-11-21 — FM-CORE-4). It is
 shown only to the room, never enters prose or image prompts, and keeps the source rule of
 no profanity filter on nicknames.
 
@@ -121,7 +122,12 @@ Everything in this section is inherited from the source spec v4 unless marked **
   window tolerates brief drops; beyond it, **disconnect = bot, no reconnect**. Host is notified
   (`player:lost`). Lobby-phase leavers are simply removed; host migration per spec.
 - **FM-CORE-4 (MUST)** Rate limits and capacity per spec §17: `room:create` 5/IP/min,
-  `room:join` 30/IP/min, max rooms per process 500 (`MAX_ROOMS` override), nickname 3–20 chars.
+  `room:join` 30/IP/min, max rooms per process 500 (`MAX_ROOMS` override), nickname 2–20 chars.
+  *Amended 2026-11-21 (owner decision, B-29 D3 A; Step 120): the nickname minimum is 2, not
+  spec §17's 3, for everyone — two-character Japanese, Chinese and Korean names (ゆい, 王芳,
+  민수) and short Latin ones (Jo, Li) were refused. Server and client read one pair of bounds,
+  `NICKNAME_MIN`/`NICKNAME_MAX` in `@funny/shared`; a character is a UTF-16 unit, as the
+  field's `maxLength` counts.*
   *Note (T-2.2): the source project specifies these limits and ships the `RATE_LIMITED` error
   code and its 15 translations, but never implemented the limiter — this is net-new code here,
   not inherited. Per-IP bucketing depends on `x-forwarded-for`; see OD-F9.*

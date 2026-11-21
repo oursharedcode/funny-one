@@ -20,6 +20,9 @@ export { storyIndex } from './rotation.js';
 
 export { normalizeBasePath } from './basePath.js';
 
+// Step 120 (B-29, D3 A) — the nickname bounds, one place for server and client.
+export { NICKNAME_MAX, NICKNAME_MIN } from './nickname.js';
+
 // T-1.3 — answer-pool schema (FM-POOL-1/3/4)
 export {
   AUTHORED_LANGUAGES,

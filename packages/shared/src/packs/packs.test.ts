@@ -87,6 +87,10 @@ describe('the pack registry (DD-16)', () => {
     expect(CHR26_LANGUAGES).toHaveLength(20);
   });
 
+  it("has the Christmas 2026 edition's texts in every one of its languages (Step 118)", () => {
+    expect(Object.keys(CHR26_TEXTS).sort()).toEqual([...CHR26_LANGUAGES].sort());
+  });
+
   it('has texts only in languages the pack is offered in', () => {
     for (const id of PACK_IDS) {
       for (const language of Object.keys(PACK_TEXTS[id])) {
@@ -250,6 +254,77 @@ describe("the Christmas 2026 edition's texts (FM-POOL-3/4, B-29)", () => {
     }
   });
 
+  it.each(drafted)('%s texts are NFC and end in no punctuation of their own', (language) => {
+    // The template closes every sentence itself, so a text's own full stop
+    // would double it; NFC keeps a Yoruba ọ̀ from counting 3 code points.
+    for (const [id, text] of Object.entries(CHR26_TEXTS[language])) {
+      expect(text, `${language}/${id} is not NFC`).toBe(text.normalize('NFC'));
+      expect(text, `${language}/${id}`).not.toMatch(/[.!?…。！？।]$/u);
+    }
+  });
+
+  it('writes no Yoruba dot below as a combining U+0323', () => {
+    for (const [id, text] of Object.entries(CHR26_TEXTS.yo)) {
+      expect(text, `yo/${id}`).not.toContain('̣');
+    }
+  });
+
+  // The base templates' mechanical rules, as each pools/text/<language>.ts
+  // header sets them out: the word a slot must open or close with so that the
+  // template's own glue words read (Step 118). The grammar beyond is B-3's
+  // native review.
+  const SHAPES: readonly (readonly [Chr26DraftedLanguage, SlotIndex, string, RegExp])[] = [
+    ['de', 1, 'leaves «mit» to the template', /^(?!mit )/],
+    ['fr', 1, 'leaves «avec» to the template', /^(?!avec )/],
+    ['it', 1, 'leaves «con» to the template', /^(?!con )/],
+    ['es-es', 1, 'leaves «con» to the template', /^(?!con )/],
+    ['es-419', 1, 'leaves «con» to the template', /^(?!con )/],
+    ['pt-br', 1, 'leaves «com» to the template', /^(?!com )/],
+    ['id', 1, 'leaves «bersama» to the template', /^(?!bersama )/],
+    ['id', 5, 'opens with its own connective', /^(untuk|karena|demi|supaya|agar) /],
+    ['sw', 1, 'leaves «na» to the template', /^(?!(pamoja )?na )/],
+    ['sw', 4, 'is a wali- verb', /^wali/],
+    ['sw', 5, 'opens with its own connective', /^(ili|kwa sababu|kwa ajili ya) /],
+    ['yo', 5, 'opens with its own connective', /^(láti|nítorí|kí) /],
+    ['uk', 1, 'opens with «з», «із» or «зі»', /^(з|із|зі) /],
+    ['uk', 6, 'is a clause of three words or more', /^\S+\s+\S+\s+\S+/],
+    ['ko', 2, 'leaves «에서» to the template', /(?<!에서)$/],
+    ['ko', 4, 'is a connective «-고» form', /고$/],
+    ['ja', 2, 'leaves «で» to the template', /(?<!で)$/],
+    ['ja', 4, 'is a て-form', /[てで]$/],
+    ['zh', 1, 'opens with «和» or «跟»', /^[和跟]/],
+    ['zh', 2, 'leaves «在» to the template', /^(?!在)/],
+    ['zh', 4, 'carries «了»', /了/],
+    ['zh', 5, 'opens with «为了» or «因为»', /^(为了|因为)/],
+    ['yue', 1, 'opens with «同»', /^同/],
+    ['yue', 2, 'leaves «喺» to the template', /^(?!喺)/],
+    ['yue', 4, 'is completed with «咗» or «晒»', /[咗晒]/],
+    ['yue', 5, 'opens with «為咗» or «因為»', /^(為咗|因為)/],
+    ['hi', 0, 'closes with «ने»', / ने$/],
+    ['hi', 1, 'closes with «के साथ»', / के साथ$/],
+    ['hi', 5, 'closes with «के लिए» or «के नाते»', / के (लिए|नाते)$/],
+    ['ta', 1, 'closes with «-உடன்»', /டன்$/],
+    ['ta', 4, 'closes with «-ார்கள்»', /ார்கள்$/],
+    ['te', 1, 'closes with «-తో కలిసి»', /తో కలిసి$/],
+    ['te', 4, 'closes with «-ఆరు»', /ారు$/],
+    ['bn', 1, 'closes with «সাথে»', / সাথে$/],
+    ['bn', 4, 'is a simple past in «-ল»', /ল$/],
+  ];
+
+  it.each(SHAPES)('%s slot %i %s', (language, slot, _rule, pattern) => {
+    for (const option of pools[slot]) {
+      expect(CHR26_TEXTS[language][option.id], `${language}/${option.id}`).toMatch(pattern);
+    }
+  });
+
+  it('leaves no comma in Ukrainian slots 0–4, where the template joins with spaces alone', () => {
+    for (const slot of [0, 1, 2, 3, 4] as const) {
+      for (const option of pools[slot]) {
+        expect(CHR26_TEXTS.uk[option.id], `uk/${option.id}`).not.toContain(',');
+      }
+    }
+  });
+
   it.each(drafted)('%s tells full and slice stories with nothing left over', (language) => {
     // Option i of every slot, for each i: a full story (the pack in every slot)
     // and a slice story (today's characters, place and action, the pack's when,
@@ -406,7 +481,7 @@ describe('optionTexts (owner decision 4A)', () => {
   });
 
   it('resolves every pack id to English in a language without its texts', () => {
-    for (const language of ['ar', 'he', 'fa', 'de'] as const) {
+    for (const language of ['ar', 'he', 'fa'] as const) {
       for (const id of packIds) expect(optionTexts(language)[id]).toBe(CHR26_TEXTS.en[id]);
     }
   });

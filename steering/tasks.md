@@ -163,7 +163,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   traders as organizations, shows the personal legal name as seller, needs no D-U-N-S, and moves
   the account to an Organization later on request. Findings in Step 58.
 - **B-3** Native-speaker review of the 21 machine-drafted pool languages (OD-F5): T-6.3's 13,
-  B-16's five and B-21's three.
+  B-16's five and B-21's three; and B-29's chr26 texts in 18 languages (Step 118, 35 each).
 - **B-4** Per-option gloss in joiner's UI language on the combobox (design §8.1 deferral).
 - **B-5** Theme packs as pool extensions (pirates/space/dinosaurs — MON-3 mechanism, shared
   with future Funny One).
@@ -785,6 +785,19 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     `xm_gold` counted, a `/stats/` section per language, the privacy page in 23 languages.
     The 6 new interface lines: en and ru the agent's, the other 21 machine drafts on B-3's pile.
     **Next:** Step 118, the other 18 languages' pack texts.
+  - *Decisions 2026-11-21, fourth set (owner, on Step 118's plan):*
+    - **D1 A — the German ending card is the template's last sentence**, "Am Ende endete es mit
+      …", since a German ending is a dative phrase; every other language's card is the ending
+      as written.
+    - **D2 A — the Ukrainian snow maiden is «Сніжинка»** ('зі сплячою Сніжинкою').
+  - **The other 18 languages done 2026-11-21 (Step 118)** — design §4.4 "Languages and texts".
+    chr26's texts in de, fr, it, es-es, es-419, pt-br, uk, ko, ja, zh, yue, id, sw, yo, hi, ta,
+    te and bn: 630 machine drafts, local glosses written to each base template (Reyes, Befana,
+    Святий Миколай, サンタさん, 圣诞老人, Baba Krismasi, Bàbá Kérésìmesì, …), each file
+    `needs-<code>-review` and on B-3's pile. A room in any of the 20 languages is now offered
+    the pack; ar, he and fa rooms are not, and their players in a mixed room read English.
+    Tests: every language present, NFC, no punctuation of its own, each language's slot shapes.
+    **Next:** Step 119, the `?pack=chr26` landing variant and `/xmas`.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

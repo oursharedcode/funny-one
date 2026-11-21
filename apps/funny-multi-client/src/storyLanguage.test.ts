@@ -6,9 +6,15 @@
 // language the server's own texts are shown as they came.
 
 import { describe, expect, it } from 'vitest';
-import { AUTHORED_LANGUAGES, LANGUAGES, POOLS, POOL_TEXTS, SLOT_COUNT } from '@funny/shared';
+import { AUTHORED_LANGUAGES, LANGUAGES, PACKS, POOLS, POOL_TEXTS, SLOT_COUNT } from '@funny/shared';
 import type { SlotIndex } from '@funny/shared';
-import { CONTENT_LANGUAGES, isAuthoredLanguage, renderStory, storyIn } from './storyLanguage';
+import {
+  CONTENT_LANGUAGES,
+  endingText,
+  isAuthoredLanguage,
+  renderStory,
+  storyIn,
+} from './storyLanguage';
 
 const IDS = Array.from({ length: SLOT_COUNT }, (_, i) => POOLS[i as SlotIndex][0]!.id);
 
@@ -66,5 +72,33 @@ describe('storyIn', () => {
 
   it('renders the story locally in any other language', () => {
     expect(storyIn(WIRE, 'ru', 'ja')).toEqual(renderStory('ja', IDS));
+  });
+});
+
+describe('endingText', () => {
+  // A full Christmas story: the pack's first option in every slot.
+  const FULL = Array.from(
+    { length: SLOT_COUNT },
+    (_, i) => PACKS.chr26.pools[i as SlotIndex][0]!.id,
+  );
+
+  it('opens the ending slot with a capital, as the card starts the sentence', () => {
+    expect(endingText(renderStory('en', FULL), 'en')).toBe(
+      'Everything vanished under a mountain of wrapping paper',
+    );
+    expect(endingText(renderStory('uk', FULL), 'uk')).toBe(
+      'Усе зникло під горою обгорткового паперу',
+    );
+  });
+
+  it("reads German's whole last sentence, its ending a dative after «mit» (D1 A)", () => {
+    expect(endingText(renderStory('de', FULL), 'de')).toBe(
+      'Am Ende endete es mit einem Berg Geschenkpapier, unter dem alles verschwand',
+    );
+  });
+
+  it('is empty for a story with no ending', () => {
+    expect(endingText(renderStory('de', FULL.slice(0, -1)), 'de')).toBe('');
+    expect(endingText(renderStory('en', FULL.slice(0, -1)), 'en')).toBe('');
   });
 });

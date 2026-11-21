@@ -277,11 +277,16 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 - **Languages and texts.** A pack names the languages it is offered in — chr26's 20 are every
   authored language but ar, he and fa (B-29). Its texts are **local glosses, not translations**:
   the local gift-bringer and dishes, under FM-POOL-3/4. en and ru are drafted by the agent for
-  the owner's edit (owner decision 2026-11-05); the other 18 are machine drafts on B-3's pile.
-  `PACK_TEXTS` is keyed by the drafted languages only, so registering the rest is one widened
-  type. **The room's language decides whether the pack is on** (owner decision 4A, 2026-11-21);
-  in a multi-language room (DD-13) a player whose own language the pack lacks reads its words in
-  English.
+  the owner's edit (owner decision 2026-11-05); the other 18 are machine drafts (Step 118), each
+  `needs-<code>-review`, on B-3's pile. `CHR26_TEXTS` is keyed by every authored language but
+  ar, he and fa, so TypeScript refuses a missing one, and a test holds it to `languages`. Each
+  is written to its language's base template, which fills with no repair step (`packs.test.ts`
+  checks each language's slot shapes). **The room's language decides whether the pack is on**
+  (owner decision 4A, 2026-11-21); in a multi-language room (DD-13) a player whose own language
+  the pack lacks (ar, he, fa) reads its words in English. **The German ending card** is the
+  template's whole last sentence, "Am Ende endete es mit {6}", since a German ending is a dative
+  phrase, not a sentence (`endingText`, owner decision D1 A, 2026-11-21); every other language
+  shows the ending as written, first letter capitalised.
 - **In rooms** (Step 117, owner decisions 1C, 3A, 4A, 5A). `packOffer` (rooms.ts) offers a new
   room its language's pack while the free part lasts, switched on; the host's lobby switch
   (`room:setPack`, §5) turns it off and on until the game starts, and it carries over to "one

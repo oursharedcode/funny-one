@@ -19,6 +19,7 @@ import {
   isGolden,
   optionsFor,
   storyIndex,
+  type AuthoredLanguage,
   type OptionId,
   type SlotIndex,
   type StoryContent,
@@ -81,7 +82,7 @@ function makeIo() {
   };
 }
 
-function makeRoom(playerCount: number, language: 'en' | 'ru' | 'ar' | 'de' = 'en'): Room {
+function makeRoom(playerCount: number, language: AuthoredLanguage = 'en'): Room {
   const room = createRoom('p0', language, 's0');
   for (let i = 1; i < playerCount; i++) joinRoom(room.code, `p${i}`, `s${i}`);
   return room;
@@ -119,14 +120,16 @@ afterEach(() => {
 });
 
 describe('the offer (owner decisions 3A, 4A)', () => {
-  it('offers a new en or ru room the Christmas pack, switched on', () => {
-    expect(makeRoom(3, 'en').pack).toEqual({ id: 'chr26', on: true });
-    expect(makeRoom(3, 'ru').pack).toEqual({ id: 'chr26', on: true });
+  it('offers a new room in any of its 20 languages the Christmas pack, switched on', () => {
+    for (const language of ['en', 'ru', 'de', 'ja', 'yo'] as const) {
+      expect(makeRoom(3, language).pack, language).toEqual({ id: 'chr26', on: true });
+    }
   });
 
-  it('offers an ar room nothing, nor a language whose pack texts are not drafted', () => {
-    expect(makeRoom(3, 'ar').pack).toBeNull();
-    expect(makeRoom(3, 'de').pack).toBeNull();
+  it('offers an ar, he or fa room nothing', () => {
+    for (const language of ['ar', 'he', 'fa'] as const) {
+      expect(makeRoom(3, language).pack, language).toBeNull();
+    }
   });
 
   it('offers nothing with PACK_ROOMS=off, the launch kill switch', () => {

@@ -12,6 +12,7 @@
 import {
   AUTHORED_LANGUAGES,
   LANGUAGES,
+  PROSE_TEMPLATES,
   SLOT_COUNT,
   optionTexts,
   polishProse,
@@ -75,12 +76,26 @@ export function storyIn(
   return renderStory(language, story.optionIds);
 }
 
+// Languages whose ending slot cannot open a sentence of its own: German's is a
+// dative after the template's "mit" («einem Berg Geschenkpapier …»), so its
+// card reads the template's whole last sentence (owner decision D1 A, Step 118).
+const SENTENCE_CARD_LANGUAGES: readonly AuthoredLanguage[] = ['de'];
+
 /**
  * Step 117: a Christmas story's ending on its own, for the card that stands in
  * for an ending picture — the last slot's text, opening with a capital. The
- * prose reads it after "In the end, "; alone, it starts the sentence.
+ * prose reads it after "In the end, "; alone, it starts the sentence. In a
+ * SENTENCE_CARD_LANGUAGES language, the template's last sentence around it
+ * instead, without its full stop, like every other card.
  */
 export function endingText(story: StoryText, language: AuthoredLanguage): string {
-  const [first = '', ...rest] = story.answers[SLOT_COUNT - 1] ?? '';
+  const ending = story.answers[SLOT_COUNT - 1] ?? '';
+  if (ending === '') return '';
+  if (SENTENCE_CARD_LANGUAGES.includes(language)) {
+    const template = PROSE_TEMPLATES[language];
+    const lastSentence = template.slice(template.lastIndexOf('. ') + 2).replace(/\.$/, '');
+    return lastSentence.replace(`{${SLOT_COUNT - 1}}`, ending);
+  }
+  const [first = '', ...rest] = ending;
   return first.toLocaleUpperCase(language) + rest.join('');
 }

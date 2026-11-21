@@ -7518,6 +7518,9 @@ push.
 **Owed:** nothing of this step's; the 21 machine-drafted interface lines join B-3's pile. The
 owner's lines are unchanged.
 
+~~RESUME HERE (2026-11-21, after Step 117; not yet pushed)~~ — pushed as `d23eaa9`, CI green
+(run 44876809792); carried into Step 118's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-21, after Step 117; not yet pushed).** Step 116 and its follow-up are
 pushed and green (`9cfca32`). **Packs are in rooms, en and ru only until their texts exist.**
 **Next, Step 118 (the agent's) — the other 18 languages' chr26 texts**, machine drafts of the
@@ -7528,3 +7531,72 @@ Then the paid code and the rails by about 10 December, the date on every pay scr
 the agent retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier (its
 text naming 1 August 2027) and webhook and the Lightning service.
+
+## Step 118 (task B-29) — the chr26 texts in the other 18 languages (2026-11-21)
+
+**Owner decisions, 2026-11-21 (`/morning`), on Step 118's plan:** **D1 A** — the German ending
+card shows the template's whole last sentence, «Am Ende endete es mit …», since a German ending
+is a dative phrase and not a sentence. **D2 A** — the Ukrainian snow maiden is «Сніжинка»
+('зі сплячою Сніжинкою'). Both in B-29's block.
+
+**Shipped:**
+
+- **18 text files** in `packages/shared/src/packs/chr26/text/`: de, fr, it, es-es, es-419,
+  pt-br, uk, ko, ja, zh, yue, id, sw, yo, hi, ta, te, bn — 35 display texts each, 630 in all,
+  machine-drafted with B-29's brief (local glosses, not translations: Reyes, Befana, Святий
+  Миколай, サンタさん, 圣诞老人, Baba Krismasi, Bàbá Kérésìmesì …), each opening with a
+  `needs-<code>-review` header and notes on its base template's slot rules. Ids and English
+  prompt fragments untouched (the 650 pictures are drawn).
+- **`chr26/text/index.ts`:** `CHR26_TEXTS` typed by every authored language but ar, he and fa,
+  so a missing language fails to compile. `packForRoom` now offers the pack in all 20 of the
+  edition's languages; its comment says the text check now guards the next pack.
+- **German card** (D1 A): `endingText` in `storyLanguage.ts` returns the template's last
+  sentence for `de` (`SENTENCE_CARD_LANGUAGES`); every other language still shows the ending as
+  written, first letter capitalised. One function feeds the reveal, the gallery, the still, the
+  video and recordWobble.
+- **Tests:** shared 317 → 447 — every language present and equal to `CHR26_LANGUAGES`; NFC; no
+  punctuation of its own at the end; no combining U+0323 in Yoruba; a per-language table of slot
+  shapes (the word the template already supplies is not repeated, the connectives and verb
+  endings the base templates need: id/sw/yo slot 5, ko, ja, zh, yue, hi, ta, te, bn …); uk slots
+  0–4 carry no comma. Server `game.pack.test.ts`: a room in en, ru, de, ja or yo is offered the
+  pack, ar, he and fa rooms are not. Client 451 → 454: `endingText` for en, uk, de and the
+  empty ending.
+- **Docs:** design §4.4 "Languages and texts" (20 languages, the German card); tasks.md —
+  B-29's fourth set of decisions, the Step 118 line, and the 18 × 35 texts added to B-3's list.
+
+**Verified in the browser** (`.screens/step118-check.mjs`, gitignored: production build on 3000,
+the real `cloudflare/worker.js` stand-in on 5185 over the live library, Chromium at 360 × 740;
+`problems: []`, no overflow, every picture a library hit): a full three-player game in each of
+de, es-es, uk, ja, ta and yo — the offer in the lobby, every round's options equal to
+`optionsFor` in that language, two golden stories and one slice per round, golden stories last
+in the gallery, ending pictures decoded, the slice's card in the language's own words; stills
+and, for de, the 5 s video (the card at the end: «Am Ende endete es mit einem Weihnachtsbaum,
+der ganz langsam umkippte»); Tamil wraps cleanly at 360 px, Yoruba's accents render in the
+downloaded still. ar, he and fa lobbies: no line, no switch, `pack: null`. An en multi-language
+room with a de and a uk player: each reads the pack in its own language, the en player in
+English.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 1973/1973 across 6 workspaces
+(448 funny-family-site, 454 funny-multi-client, 358 funny-multi-server, 178 funny-one-client,
+447 shared, 88 cloudflare); full `npm audit` 9 moderate under exactly the two accepted ids
+(GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed:** the 18 × 35 texts go to B-3's native review (the agent's drafts are not checked by a
+speaker). Seen, not caused by this step: **(1)** a nickname must be 3 characters or more
+(`HomeScreen.tsx`), so a two-character Japanese or Chinese name such as ゆい cannot create a
+room — for the owner to decide; **(2)** German and Ukrainian stories lack the comma before
+«um … zu», «weil», «щоб», «бо» (the base pools do the same; for B-3's review); **(3)** the
+downloaded Japanese still draws the kanji heavier than the kana (a font fallback). B-29 stays
+open: Steps 119–120 and the paid half remain.
+
+**RESUME HERE (2026-11-21, after Step 118; not yet pushed).** Step 117 is pushed and green
+(`d23eaa9`, CI run 44876809792). **Packs are offered in all 20 of chr26's languages.**
+**Next, Step 119 (the agent's) — the `?pack=chr26` landing variant and `/xmas`**, its landing
+views counted (D2 A); then 120, the deploy at a quiet hour before 29 November (rooms on from
+then, D3 A; `PACK_ROOMS=off` in the VM's .env is the lever). If 117–119 are not passing by
+Friday 27 November, the owner chooses between 6 December and a smaller launch. Then the paid
+code and the rails by about 10 December, the date on every pay screen, and how the agent
+retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-badge look;
+Funny Multi's trader confirmation before 1 Feb 2027; the nickname-length question above; for
+the rails, the Sponsors tier (its text naming 1 August 2027) and webhook and the Lightning
+service.

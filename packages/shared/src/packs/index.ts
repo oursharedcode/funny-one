@@ -128,7 +128,9 @@ export function isPackFree(id: PackId, now: number): boolean {
  *
  * A language the pack names but whose texts are not drafted yet is not offered
  * it: its room would read the pack's words in English, which the owner chose
- * for ar, he and fa players only, never for a German room.
+ * for players of a language outside the pack only (ar, he and fa for chr26).
+ * Since Step 118 chr26 has all 20 of its languages, so the check guards the
+ * next pack.
  */
 export function packForRoom(language: AuthoredLanguage, now: number): PackId | null {
   for (const id of PACK_IDS) {

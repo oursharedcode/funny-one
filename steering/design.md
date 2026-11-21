@@ -301,9 +301,22 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   a picture for a golden story, a card otherwise (`StoryEnding`); "🔔 A Christmas story" over a
   golden one. A golden story's still stacks the ending under the scene, best-effort; its 5 s
   video switches to the ending at 2.5 s, a card when there is no picture, with no sound (sleigh
-  bells come with the paid half). Their footer names the edition and leads to `/xmas` on the
+  bells come with the paid half). Their footer names the edition and leads to `/x26` on the
   website, to the landing page inside the Android app (`footerTarget`). **No price anywhere in
   the free half (5A), and no download ever carries a room or unlock code** — both tested.
+- **On the landing page** (Step 119, owner decisions D1 C and D2, 2026-11-21): every page in
+  the edition's 20 languages carries two red buttons to Funny Multi, "🔔 Christmas stories —
+  play free" (`xmasStrings.ts`), one under the header and one above the footer; the bell rings
+  and the letters hop one after another (graphemes; the Indic scripts word by word). No
+  `?pack=` variant: every visitor sees them. Their link is Funny Multi's own, so the visit
+  counts as one from the landing page, and the clicks (`xm-top`, `xm-foot`) count among its
+  clicks to Funny Multi. The page is built once, so its head script hides the buttons from the
+  free part's cut-off by the visitor's clock (`<html data-xmas>`). **`/x26/`** — the address a
+  golden story's QR leads to; Caddy adds the slash — sends the visitor straight on to their
+  language's page, as `/` would choose it, with `?from=xmas`; the page counts that visit's
+  referrer as `xmas`, takes the mark off the address, and from the cut-off says the edition has
+  ended in place of the button. ar, he and fa land on their own pages, which have no buttons.
+  The paid half swaps the line for its own ("Christmas pack — try it free").
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 

@@ -3,12 +3,12 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANGUAGES } from '@funny/shared';
+import { CHR26_LANGUAGES, LANGUAGES } from '@funny/shared';
 import { describe, expect, it } from 'vitest';
 import { esc, withLink } from './html.ts';
-import { renderNotFound, renderStatsPage } from './extra.ts';
+import { renderNotFound, renderStatsPage, renderXmasForward } from './extra.ts';
 import { HTML_LANG, OG_LOCALE, shortLanguageName } from './locale.ts';
-import { assetTags, renderPage } from './page.ts';
+import { assetTags, renderPage, xmasLabel } from './page.ts';
 import type { EntryAssets } from './page.ts';
 import { PLAY_TRADEMARK, playBadgeImage } from './playBadge.ts';
 import { hopParts } from './support.ts';
@@ -27,6 +27,7 @@ import {
 import { qrPath } from '../qr.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
 import { SUPPORT_STRINGS } from '../supportStrings.ts';
+import { XMAS_STRINGS } from '../xmasStrings.ts';
 
 const CODES = LANGUAGES.map((option) => option.code);
 
@@ -381,5 +382,86 @@ describe('the Support Author ♥ and its gift sheet (Step 76)', () => {
     expect(hopParts('支持作者')).toEqual(['支', '持', '作', '者']);
     // A letter and its combining accent hop together.
     expect(hopParts('Café')).toEqual(['C', 'a', 'f', 'é']);
+  });
+});
+
+describe('the Christmas 2026 edition’s buttons (Step 119)', () => {
+  const xmasCodes: readonly string[] = CHR26_LANGUAGES;
+
+  it.each(CODES)('%s: two buttons to Funny Multi, in the edition’s languages only', (code) => {
+    const doc = parse(renderPage(code, ASSETS));
+    const head = doc.head.querySelector('script:not([src])')?.textContent ?? '';
+    const buttons = [...doc.querySelectorAll<HTMLAnchorElement>('a.btn-xmas')];
+    if (!xmasCodes.includes(code)) {
+      expect(buttons).toHaveLength(0);
+      expect(doc.querySelector('.xmas')).toBeNull();
+      expect(head).not.toContain('data-xmas');
+      return;
+    }
+    const t = XMAS_STRINGS[code as keyof typeof XMAS_STRINGS];
+    expect(buttons.map((a) => a.dataset.track)).toEqual(['xm-top', 'xm-foot']);
+    for (const a of buttons) {
+      expect(a.getAttribute('href')).toBe(fmUrl(code, 'a'));
+      expect(a.getAttribute('aria-label')).toBe(t.play);
+      // The hopping letters put together read the line as it is written.
+      expect(a.querySelector('.xmas-label')?.textContent).toBe(t.play.split(/\s+/).join(' '));
+      expect(a.querySelector('.xmas-bell')?.getAttribute('aria-hidden')).toBe('true');
+    }
+    // One under the header, before the hero; one last, above the footer.
+    const main = doc.querySelector('main');
+    expect(main?.firstElementChild?.classList.contains('xmas-top')).toBe(true);
+    expect(main?.lastElementChild?.classList.contains('xmas-foot')).toBe(true);
+    const ended = [...doc.querySelectorAll('.xmas-ended')];
+    expect(ended.map((p) => p.textContent)).toEqual([t.ended]);
+    expect(ended[0]?.closest('.xmas-top')).not.toBeNull();
+    expect(head).toContain("d.setAttribute('data-xmas'");
+  });
+
+  it('hops letter by letter, a letter and its accents as one, each word kept whole', () => {
+    const doc = parse(`<p>${xmasLabel('fr', 'Noël  joué')}</p>`);
+    const words = [...doc.querySelectorAll('.xmas-word')];
+    expect(words.map((word) => [...word.children].map((hop) => hop.textContent))).toEqual([
+      ['N', 'o', 'ë', 'l'],
+      ['j', 'o', 'u', 'é'],
+    ]);
+    const delays = [...doc.querySelectorAll<HTMLElement>('.xmas-hop')].map(
+      (hop) => hop.style.animationDelay,
+    );
+    expect(delays).toEqual([
+      '300ms',
+      '345ms',
+      '390ms',
+      '435ms',
+      '480ms',
+      '525ms',
+      '570ms',
+      '615ms',
+    ]);
+    expect(doc.querySelector('p')?.textContent).toBe('Noël joué');
+  });
+
+  it('hops word by word in the Indic scripts, whose letters join', () => {
+    for (const code of ['hi', 'bn', 'ta', 'te'] as const) {
+      const doc = parse(`<p>${xmasLabel(code, XMAS_STRINGS[code].play)}</p>`);
+      const words = XMAS_STRINGS[code].play.split(/\s+/);
+      expect([...doc.querySelectorAll('.xmas-hop')].map((hop) => hop.textContent)).toEqual(words);
+    }
+  });
+
+  it('escapes what it is given', () => {
+    expect(xmasLabel('en', '<b>&')).not.toContain('<b>');
+  });
+
+  it('/x26/ sends visitors on, hidden from search engines, with a list for no script', () => {
+    const doc = parse(renderXmasForward(ASSETS));
+    const scripts = [...doc.head.querySelectorAll('script:not([src])')];
+    expect(scripts).toHaveLength(1);
+    expect(scripts[0]?.textContent).toContain('location.replace');
+    expect(scripts[0]?.textContent).toContain('from=xmas');
+    expect(doc.querySelector('meta[name="robots"]')?.getAttribute('content')).toContain('noindex');
+    expect(
+      [...doc.querySelectorAll<HTMLAnchorElement>('main a[data-lang]')].map((a) => a.dataset.lang),
+    ).toEqual(CODES);
+    expect(doc.body.textContent).not.toContain('support-open');
   });
 });

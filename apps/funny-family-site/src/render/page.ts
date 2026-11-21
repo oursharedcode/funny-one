@@ -14,6 +14,11 @@
 // script can fill (render/support.ts). Step 78's QR codes beside the games'
 // buttons are drawn here, at build time, and cost the page no script; nor do
 // Step 110's Google Play badges in the games' cards (render/playBadge.ts).
+//
+// Step 119 (B-29): a page in one of the Christmas 2026 edition's 20 languages
+// also has its two big buttons to Funny Multi, one first in <main> and one
+// last, their letters hopping. The head script hides them from the free
+// part's cut-off (render/headScript.ts).
 
 import type { Language } from '@funny/shared';
 import {
@@ -53,6 +58,8 @@ import {
 } from '../links.ts';
 import { qrPath } from '../qr.ts';
 import { GAME_NAMES, STRINGS } from '../strings.ts';
+import { hasXmas, XMAS_STRINGS } from '../xmasStrings.ts';
+import type { XmasLanguage } from '../xmasStrings.ts';
 
 /**
  * The side of a game's QR code on a computer, in CSS pixels: 2.5 to 3.2 per
@@ -95,7 +102,7 @@ function head(code: Language, assets: EntryAssets): string {
   return `<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>${headScript({ root: code === 'en' })}</script>
+<script>${headScript({ root: code === 'en', xmas: hasXmas(code) })}</script>
 <title>${esc(s.metaTitle)}</title>
 <meta name="description" content="${esc(s.metaDescription)}">
 <link rel="canonical" href="${url}">
@@ -193,6 +200,56 @@ function hero(code: Language): string {
 </div>
 <button class="bg-toggle vb-only" type="button" hidden aria-label="${esc(s.videoPause)}" data-pause="${esc(s.videoPause)}" data-resume="${esc(s.videoResume)}">${PAUSE_PLAY_ICONS}</button>
 </section>`;
+}
+
+/**
+ * The languages whose letters join up, so that one hopping on its own would
+ * tear its word apart: Devanagari's, Bengali's, Tamil's and Telugu's vowel
+ * signs and conjuncts are drawn across letters. Their words hop whole.
+ */
+const WHOLE_WORDS: readonly XmasLanguage[] = ['hi', 'bn', 'ta', 'te'];
+
+/**
+ * The Christmas button's label, hopping a letter at a time — a grapheme, so
+ * no accent or vowel sign leaves its letter — each a little after the one
+ * before, a wave along the line (styles/landing.css). Each word is kept on
+ * one line: the letters are boxes of their own, which a line could break
+ * between.
+ */
+export function xmasLabel(code: XmasLanguage, label: string): string {
+  const segmenter = new Intl.Segmenter(HTML_LANG[code], { granularity: 'grapheme' });
+  const whole = WHOLE_WORDS.includes(code);
+  let index = 0;
+  const words = label
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => {
+      const parts = whole ? [word] : Array.from(segmenter.segment(word), (part) => part.segment);
+      const hops = parts.map(
+        (part) =>
+          `<span class="xmas-hop" style="animation-delay:${300 + index++ * (whole ? 160 : 45)}ms">${esc(part)}</span>`,
+      );
+      return `<span class="xmas-word">${hops.join('')}</span>`;
+    });
+  return words.join(' ');
+}
+
+/**
+ * One of the Christmas edition's buttons (Step 119, owner decision D1 C): to
+ * Funny Multi, where every new room in these languages offers the Christmas
+ * stories (3A). The link is Funny Multi's own (main.ts gives it the design
+ * too), so the game counts the visit as one from here. Its name is exactly
+ * the visible label (WCAG 2.5.3); the bell is decoration. The top band also
+ * holds what replaces the button for a visitor sent by /x26 once the free
+ * part is over.
+ */
+function xmasBand(code: Language, place: 'top' | 'foot'): string {
+  if (!hasXmas(code)) return '';
+  const t = XMAS_STRINGS[code];
+  const ended = place === 'top' ? `\n<p class="xmas-ended">${esc(t.ended)}</p>` : '';
+  return `<div class="xmas xmas-${place}">
+<a class="btn btn-xmas" href="${esc(fmUrl(code, 'a'))}" data-track="xm-${place}" aria-label="${esc(t.play)}"><span class="xmas-bell" aria-hidden="true">🔔</span><span class="xmas-label" aria-hidden="true">${xmasLabel(code, t.play)}</span></a>${ended}
+</div>`;
 }
 
 function games(code: Language): string {
@@ -303,10 +360,9 @@ ${head(code, assets)}
 <a class="skip" href="#main">${esc(s.skip)}</a>
 ${siteHeader(code, true)}
 <main id="main">
-${hero(code)}
-${games(code)}
-${how(code)}
-${source(code)}
+${[xmasBand(code, 'top'), hero(code), games(code), how(code), source(code), xmasBand(code, 'foot')]
+  .filter(Boolean)
+  .join('\n')}
 </main>
 ${footer(code)}
 ${supportSheet(code)}

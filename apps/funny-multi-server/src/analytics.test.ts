@@ -104,6 +104,22 @@ describe('statKey', () => {
     expect(statKey({ e: 'xm_gold', s: 'app', l: 'en' })).toBeNull();
   });
 
+  it("keys a hub visit sent by /x26/ and the hub's two Christmas buttons (Step 119)", () => {
+    expect(statKey({ e: 'hub_view', v: 'a', l: 'de', r: 'xmas', d: 'm' })).toBe(
+      'hub_view|a|de|||xmas|m',
+    );
+    expect(statKey({ e: 'hub_click', v: 'b', l: 'ja', t: 'xm-top' })).toBe(
+      'hub_click|b|ja||xm-top||',
+    );
+    expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: 'xm-foot' })).toBe(
+      'hub_click|a|en||xm-foot||',
+    );
+    expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: 'xm' })).toBeNull();
+    // A referrer class is no click target, nor a button a source.
+    expect(statKey({ e: 'hub_click', v: 'a', l: 'en', t: 'xmas' })).toBeNull();
+    expect(statKey({ e: 'fm_view', s: 'xmas', l: 'en' })).toBeNull();
+  });
+
   it.each([
     ['an unknown event', { e: 'page_view', v: 'a', l: 'en', r: 'direct', d: 'm' }],
     ['an unknown field', { e: 'hub_view', v: 'a', l: 'en', r: 'direct', d: 'm', x: '1' }],

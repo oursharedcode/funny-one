@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // @vitest-environment node
 
-import { LANGUAGES } from '@funny/shared';
+import { CHR26_LANGUAGES, LANGUAGES } from '@funny/shared';
 import type { Language } from '@funny/shared';
 import { describe, expect, it } from 'vitest';
 import { GAME_NAMES, STRINGS } from './strings.ts';
 import { SUPPORT_STRINGS } from './supportStrings.ts';
+import { hasXmas, XMAS_STRINGS } from './xmasStrings.ts';
 
 const CODES = LANGUAGES.map((option) => option.code);
 
@@ -100,5 +101,30 @@ describe('the Support Author sheet', () => {
 
   it.each(CODES)('%s names the bank account exactly once', (code) => {
     expect(SUPPORT_STRINGS[code].payIdBankNote.split('{{name}}')).toHaveLength(2);
+  });
+});
+
+describe('the Christmas 2026 edition’s lines (Step 119)', () => {
+  const XMAS_CODES = CODES.filter(hasXmas);
+
+  it('cover exactly the languages the edition is offered in', () => {
+    expect(Object.keys(XMAS_STRINGS).sort()).toEqual([...CHR26_LANGUAGES].sort());
+    expect([...XMAS_CODES].sort()).toEqual([...CHR26_LANGUAGES].sort());
+  });
+
+  it.each(XMAS_CODES)('%s has both lines, trimmed and composed', (code) => {
+    for (const [key, value] of Object.entries(XMAS_STRINGS[code])) {
+      expect(value.trim(), `${code}.${key}`).not.toBe('');
+      expect(value, `${code}.${key}`).toBe(value.trim());
+      expect(value, `${code}.${key}`).toBe(value.normalize('NFC'));
+    }
+  });
+
+  it.each(XMAS_CODES)('%s names the edition as a golden story’s download does', (code) => {
+    const edition = entry(catalog('funny-multi-client', code), 'footer.edition');
+    expect(typeof edition).toBe('string');
+    expect(XMAS_STRINGS[code].ended.toLocaleLowerCase()).toContain(
+      String(edition).toLocaleLowerCase(),
+    );
   });
 });

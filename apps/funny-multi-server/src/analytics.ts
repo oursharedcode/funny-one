@@ -12,7 +12,7 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (86 combinations per language a
+// into the file and the key space is closed (94 combinations per language a
 // day at most).
 //
 // Step 79 (B-20): a visit — hub_view or fm_view, not a click or a gift — also
@@ -55,7 +55,17 @@ const SOURCES = ['hub', 'direct'] as const;
 // the app offers no gifts, so a support or gift event from it is refused.
 const VISIT_SOURCES = [...SOURCES, 'app'] as const;
 // A hub visit's referrer, classified in the browser (no URL is ever sent).
-const REFERRERS = ['direct', 'search', 'social', 'oursharedcode', 'games', 'other'] as const;
+// Step 119 (B-29): `xmas`, a visit sent by the hub's /x26/ — the QR code on
+// a golden story's download.
+const REFERRERS = [
+  'direct',
+  'search',
+  'social',
+  'oursharedcode',
+  'games',
+  'other',
+  'xmas',
+] as const;
 // Phone-sized screen or not.
 const DEVICES = ['m', 'd'] as const;
 // Which gift rail was used on a support sheet — Funny Multi's, or (Step 76)
@@ -63,7 +73,8 @@ const DEVICES = ['m', 'd'] as const;
 const GIFT_TARGETS = ['payid', 'sponsors', 'lightning', 'kofi', 'bmc', 'donate'] as const;
 // What was clicked on the hub: either game, the source code, the video, the
 // author's site, (Step 76) its Support Author ♥ and the gift rails on the
-// sheet that opens, and (Step 110) either game's Google Play badge.
+// sheet that opens, (Step 110) either game's Google Play badge, and (Step
+// 119) the Christmas edition's two buttons to Funny Multi.
 const HUB_TARGETS = [
   'fm',
   'fo',
@@ -74,6 +85,8 @@ const HUB_TARGETS = [
   'root',
   'support',
   ...GIFT_TARGETS,
+  'xm-top',
+  'xm-foot',
 ] as const;
 // Step 117 (B-29, D2 A): the Christmas 2026 edition's funnel. A game played in
 // a room offered the Christmas stories, with the host's switch as it stood

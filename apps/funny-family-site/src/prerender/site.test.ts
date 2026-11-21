@@ -67,12 +67,13 @@ describe('renderSite', () => {
   };
   const files = renderSite(assets);
 
-  it('writes one page per language, /stats/, the 404 page and the sitemap', () => {
+  it('writes one page per language, /stats/, the 404 page, /x26/ and the sitemap', () => {
     expect([...files.keys()].sort()).toEqual(
       [
         ...CODES.map((code) => (code === 'en' ? 'index.html' : `${code}/index.html`)),
         'stats/index.html',
         '404.html',
+        'x26/index.html',
         'sitemap.xml',
       ].sort(),
     );
@@ -85,6 +86,11 @@ describe('renderSite', () => {
     const notFound = files.get('404.html') ?? '';
     expect(notFound).toContain('href="/assets/main-1.css"');
     expect(notFound).not.toContain('<script');
+    // /x26/ has its inline forward and the styles, and no bundle.
+    const xmas = files.get('x26/index.html') ?? '';
+    expect(xmas).toContain('href="/assets/main-1.css"');
+    expect(xmas).not.toContain('<script src');
+    expect(xmas).toContain('location.replace');
   });
 
   it('lists every language page in the sitemap, each with all its alternates', () => {
@@ -92,6 +98,7 @@ describe('renderSite', () => {
     expect(sitemap.match(/<loc>/g)).toHaveLength(CODES.length);
     expect(sitemap.match(/hreflang="x-default"/g)).toHaveLength(CODES.length);
     expect(sitemap).toContain('<loc>https://www.funny-family.oursharedcode.com/ru/</loc>');
+    expect(sitemap).not.toContain('xmas');
   });
 });
 
@@ -123,6 +130,16 @@ describe('pageForPath (the dev server)', () => {
     expect(pageForPath('/404.html')).toMatchObject({
       html: expect.stringContaining('Page not found'),
     });
+  });
+
+  it('answers /x26/, with a redirect to the trailing slash (Step 119)', () => {
+    for (const path of ['/x26/', '/x26/index.html']) {
+      expect(pageForPath(path), path).toMatchObject({
+        html: expect.stringContaining('from=xmas'),
+      });
+    }
+    expect(page('/x26')).toBe('→ /x26/');
+    expect(pageForPath('/x26/x')).toBeNull();
   });
 
   it('leaves everything else to Vite', () => {

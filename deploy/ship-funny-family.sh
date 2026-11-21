@@ -13,14 +13,15 @@
 # eight host names, and a game server that keeps visit counts (Step 72 or
 # later, shipped by deploy/ship.sh). What the script does, in order:
 #   1. builds apps/funny-family-site: one page per language, /stats/,
-#      404.html and sitemap.xml;
+#      404.html, /x26/ (Step 119) and sitemap.xml;
 #   2. streams dist/ over SSH into static/funny-family.new, then swaps it in
 #      for static/funny-family — a reader sees the old pages or the new ones,
 #      never a half-copied mix;
 #   3. copies docker-compose.yml and deploy/caddy/Caddyfile, brings the caddy
 #      service up and reloads the Caddyfile, as deploy/ship-funny-one.sh does;
 #   4. checks through Caddy the English and Russian pages, /stats/, a missing
-#      path (404 with the page that says so), the trailer, the visit-count
+#      path (404 with the page that says so), /x26 and the Christmas
+#      buttons (Step 119), the trailer, the visit-count
 #      summary (which crosses to the game's server), the bare-name redirect,
 #      and that Funny Multi's /health still answers.
 set -euo pipefail
@@ -49,7 +50,7 @@ echo "==> build funny-family-site"
 npm run build -w packages/shared >/dev/null
 npm run build -w apps/funny-family-site >/dev/null
 DIST="apps/funny-family-site/dist"
-for f in index.html ru/index.html stats/index.html 404.html sitemap.xml media/clip.mp4; do
+for f in index.html ru/index.html stats/index.html 404.html x26/index.html sitemap.xml media/clip.mp4; do
   [ -f "$DIST/$f" ] || { echo "build produced no $f" >&2; exit 1; }
 done
 
@@ -108,6 +109,11 @@ has "$ORIGIN/ru/" 'data-code="ru"' || ok=0
 check "$ORIGIN/stats/" 200 || ok=0
 check "$ORIGIN/no-such-page" 404 || ok=0
 has "$ORIGIN/no-such-page" 'noindex' || ok=0
+# Step 119: a golden story's QR code leads to /x26, which Caddy sends on to
+# /x26/ and that to the visitor's language; the pages carry the buttons.
+check "$ORIGIN/x26" "308 $ORIGIN/x26/" || ok=0
+has "$ORIGIN/x26/" 'from=xmas' || ok=0
+has "$ORIGIN/ru/" 'data-track="xm-top"' || ok=0
 got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/media/clip.mp4" || true)"
 echo "    $ORIGIN/media/clip.mp4 -> $got"
 case "$got" in "200 video/mp4"*) ;; *) ok=0 ;; esac

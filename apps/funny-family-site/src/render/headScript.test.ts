@@ -2,7 +2,7 @@
 // @vitest-environment node
 
 import { describe, expect, it, vi } from 'vitest';
-import { headScript } from './headScript.ts';
+import { FROM_XMAS, headScript, XMAS_CUTOFF, xmasForwardScript } from './headScript.ts';
 import { LANG_KEY, REFERRER_KEY, VARIANT_KEY } from '../keys.ts';
 
 const HOST = 'www.funny-family.oursharedcode.com';
@@ -21,10 +21,19 @@ interface Env {
   /** Undefined: a browser too old to say. */
   userAgent?: string;
   maxTouchPoints?: number;
+  /** A page with the Christmas edition's buttons (Step 119); true unless said. */
+  xmas?: boolean;
+  /** The visitor's clock; by default a day of the edition's free part. */
+  now?: number;
 }
 
-/** Runs the inline script against stand-ins for the browser globals it uses. */
-function run(root: boolean, env: Env = {}) {
+const IN_DECEMBER = Date.parse('2026-12-01T09:00:00Z');
+
+/**
+ * Runs the inline script — or `source`, another of the site's — against
+ * stand-ins for the browser globals it uses.
+ */
+function run(root: boolean, env: Env = {}, source = headScript({ root, xmas: env.xmas ?? true })) {
   const session = new Map(Object.entries(env.session ?? {}));
   const local = new Map(Object.entries(env.local ?? {}));
   const storage = (map: Map<string, string>) =>
@@ -46,6 +55,7 @@ function run(root: boolean, env: Env = {}) {
   const replaced: string[] = [];
   const timers: (() => void)[] = [];
   vi.spyOn(Math, 'random').mockReturnValue(env.random ?? 0.25);
+  vi.spyOn(Date, 'now').mockReturnValue(env.now ?? IN_DECEMBER);
 
   const script = new Function(
     'document',
@@ -54,7 +64,7 @@ function run(root: boolean, env: Env = {}) {
     'localStorage',
     'navigator',
     'setTimeout',
-    headScript({ root }),
+    source,
   );
   script(
     {
@@ -83,6 +93,7 @@ function run(root: boolean, env: Env = {}) {
   return {
     variant: attributes.get('data-variant'),
     ios: attributes.get('data-ios'),
+    xmas: attributes.get('data-xmas'),
     replaced,
     session,
     style,
@@ -246,5 +257,83 @@ describe('the head script: the language, on / only', () => {
 
   it('never redirects from a language’s own page', () => {
     expect(run(false, { languages: ['ru'] }).replaced).toEqual([]);
+  });
+});
+
+describe('the head script: the end of the Christmas edition’s free part (Step 119)', () => {
+  it('is noon UTC the day after its last day, 1 July 2027', () => {
+    expect(new Date(XMAS_CUTOFF).toISOString()).toBe('2027-07-02T12:00:00.000Z');
+  });
+
+  it('leaves the buttons until the cut-off, then hides them', () => {
+    expect(run(false, { now: XMAS_CUTOFF - 1 }).xmas).toBeUndefined();
+    expect(run(false).xmas).toBeUndefined();
+    expect(run(false, { now: XMAS_CUTOFF }).xmas).toBe('over');
+    expect(run(false, { now: XMAS_CUTOFF + 400 * 86_400_000 }).xmas).toBe('over');
+  });
+
+  it('tells a visitor sent by /x26 that the edition has ended', () => {
+    const now = XMAS_CUTOFF;
+    expect(run(false, { now, search: `?${FROM_XMAS}` }).xmas).toBe('ended');
+    expect(run(false, { now, search: `?v=b&${FROM_XMAS}` }).xmas).toBe('ended');
+    expect(run(false, { now, search: `?${FROM_XMAS}&v=a` }).xmas).toBe('ended');
+    expect(run(false, { now, search: `?${FROM_XMAS}y` }).xmas).toBe('over');
+    expect(run(false, { now, search: `?not${FROM_XMAS}` }).xmas).toBe('over');
+  });
+
+  it('marks no page without the buttons', () => {
+    expect(run(false, { now: XMAS_CUTOFF, xmas: false }).xmas).toBeUndefined();
+    expect(headScript({ root: false, xmas: false })).not.toContain('data-xmas');
+  });
+
+  it('marks / too, before the language check can end the script', () => {
+    const shown = run(true, {
+      now: XMAS_CUTOFF,
+      referrer: `https://${HOST}/ru/`,
+      languages: ['ru'],
+    });
+    expect(shown).toMatchObject({ replaced: [], xmas: 'over' });
+  });
+});
+
+describe('/x26/: on to the visitor’s own page (Step 119)', () => {
+  const forward = (env: Env = {}) => run(false, env, xmasForwardScript()).replaced;
+
+  it('sends a browser that prefers a language of the games to its page, marked', () => {
+    expect(forward({ languages: ['de-DE', 'en'] })).toEqual([`/de/?${FROM_XMAS}`]);
+    expect(forward({ languages: ['zh-HK'] })).toEqual([`/yue/?${FROM_XMAS}`]);
+    expect(forward({ languages: [], language: 'ko-KR' })).toEqual([`/ko/?${FROM_XMAS}`]);
+  });
+
+  it('sends English and every language the games lack to /', () => {
+    expect(forward({ languages: ['en-AU'] })).toEqual([`/?${FROM_XMAS}`]);
+    expect(forward({ languages: ['xx-YY'] })).toEqual([`/?${FROM_XMAS}`]);
+    expect(forward({ languages: [], language: '' })).toEqual([`/?${FROM_XMAS}`]);
+  });
+
+  it('sends ar, he and fa to their own pages, which have no Christmas buttons', () => {
+    expect(forward({ languages: ['he-IL'] })).toEqual([`/he/?${FROM_XMAS}`]);
+  });
+
+  it('puts the language picked here before over the browser’s', () => {
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'ru' } })).toEqual([
+      `/ru/?${FROM_XMAS}`,
+    ]);
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'en' } })).toEqual([`/?${FROM_XMAS}`]);
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'xx' } })).toEqual([
+      `/de/?${FROM_XMAS}`,
+    ]);
+  });
+
+  it('goes on from a page of this site too, keeps the hash, and copes with blocked storage', () => {
+    expect(forward({ languages: ['fr'], referrer: `https://${HOST}/de/` })).toEqual([
+      `/fr/?${FROM_XMAS}`,
+    ]);
+    expect(forward({ languages: ['ja'], hash: '#games' })).toEqual([`/ja/?${FROM_XMAS}#games`]);
+    expect(forward({ languages: ['ja'], blocked: true })).toEqual([`/ja/?${FROM_XMAS}`]);
+  });
+
+  it('drops the rest of its own query: the page is reached by its code alone', () => {
+    expect(forward({ languages: ['it'], search: '?v=b' })).toEqual([`/it/?${FROM_XMAS}`]);
   });
 });

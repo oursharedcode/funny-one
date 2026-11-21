@@ -156,6 +156,8 @@ describe('renderStats', () => {
     });
     expect(tableOf(root, 'What was clicked on the landing page')).toEqual([
       ['Funny Multi', '3', '30%'],
+      ['Funny Multi: the Christmas button at the top', '0', '0%'],
+      ['Funny Multi: the Christmas button at the foot', '0', '0%'],
       ['Funny One', '1', '10%'],
       ['Funny Multi on Google Play', '0', '0%'],
       ['Funny One on Google Play', '1', '10%'],
@@ -198,12 +200,52 @@ describe('renderStats', () => {
       },
     });
     expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
-      ['All', '7', '1', '5'],
-      ['Deutsch (Deutschland)', '5', '0', '4'],
-      ['English (United Kingdom)', '2', '1', '1'],
+      ['All', '0', '0', '7', '1', '5'],
+      ['Deutsch (Deutschland)', '0', '0', '5', '0', '4'],
+      ['English (United Kingdom)', '0', '0', '2', '1', '1'],
     ]);
     // No game in a Christmas room yet: the row of totals alone, all nought.
-    expect(tableOf(render(), 'The Christmas 2026 edition')).toEqual([['All', '0', '0', '0']]);
+    expect(tableOf(render(), 'The Christmas 2026 edition')).toEqual([
+      ['All', '0', '0', '0', '0', '0'],
+    ]);
+  });
+
+  it('counts the landing page’s Christmas buttons and /x26 visits, as clicks to Funny Multi too (Step 119)', () => {
+    const root = render({
+      ...SUMMARY,
+      days: {
+        '2026-10-01': {
+          ...SUMMARY.days['2026-10-01'],
+          'hub_view|b|de|||xmas|m': 3,
+          'hub_view|a|en|||xmas|d': 1,
+          'hub_click|b|de||xm-top||': 2,
+          'hub_click|a|en||xm-foot||': 1,
+          'xm_game||de|hub|on||': 1,
+        },
+      },
+    });
+    expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
+      ['All', '4', '3', '1', '0', '0'],
+      ['Deutsch (Deutschland)', '3', '2', '1', '0', '0'],
+      ['English (United Kingdom)', '1', '1', '0', '0', '0'],
+    ]);
+    // Three Funny Multi clicks of its own, and three on the Christmas buttons.
+    expect(root.querySelector('.tile:nth-child(2) .tile-value')?.textContent).toBe('6');
+    expect(root.querySelectorAll('.funnel-numbers')[1]?.firstChild?.textContent).toBe('6');
+    expect(tableOf(root, 'Design A against design B').map((row) => row.slice(0, 3))).toEqual([
+      ['A: trailer card', '7', '4'],
+      ['B: background video', '7', '2'],
+    ]);
+    expect(tableOf(root, 'By language').map((row) => row.slice(0, 3))).toEqual([
+      ['English (United Kingdom)', '7', '4'],
+      ['Русский (Россия)', '4', '0'],
+      ['Deutsch (Deutschland)', '3', '2'],
+    ]);
+    expect(tableOf(root, 'Where the landing page’s visits came from')).toContainEqual([
+      'The /x26 address: a Christmas story’s QR code',
+      '4',
+      '28.6%',
+    ]);
   });
 
   it('draws the days as lines, and gives their numbers in a table, newest first', () => {

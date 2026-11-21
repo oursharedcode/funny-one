@@ -508,7 +508,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     is the main winter festival); ja, zh, hi, ta, te, bn (secular, or a large minority — worth
     the machine draft); ru, written by the owner. **Out:** ar, he (Hanukkah, 4–12 Dec 2026),
     fa (Yalda, 20/21 Dec) — a winter edition of their own later, if ever.
-  - *Funnel:* a landing variant (`?pack=chr26`, as `?v=` picks a design today) with two big
+  - *Funnel:* a landing variant (`?pack=x26`, as `?v=` picks a design today) with two big
     "Christmas pack — try it free" buttons, hopping letters, one at the top and one at the foot;
     shown 29 November (Advent Sunday) to 7 January. **The free trial is a slice, not a count:**
     every room gets a share of the Christmas pack, forever; the pack unlocks the rest. No
@@ -516,7 +516,9 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     after the first free cartoon, never mid-story. *(Superseded 2026-11-05: the slice was "a
     quarter of the Christmas words and pictures", the prompt the host's alone and the funnel
     three steps — see* Decisions 2026-11-05 *below. And 2026-11-21: "forever" — the free share
-    ends 1 July 2027, see* Decisions 2026-11-21 *below.)*
+    ends 1 July 2027, see* Decisions 2026-11-21 *below. And 2026-11-21, fifth set: no
+    variant — every visitor sees the buttons, from the deploy to 1 July 2027, and in the free
+    half they say "Christmas stories — play free".)*
   - *Code:* signed, `XMAS26-XXXX-XXXX`, verified by the server with a secret and no database;
     the host puts it in a bookmarkable create-room link, so the app stores nothing (B-25's
     promise holds). A leaked code costs nothing to serve; a small blocklist revokes one. The
@@ -586,7 +588,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       game, every player (web only): "You just saw one Christmas story. Unlock all of them:
       A$2.60, every game, forever". Downloads (picture and video) in a free room: the golden
       story's carry "Unlock all Christmas 2026 stories: A$2.60, every game, forever" and a short
-      payment address (e.g. `…/xmas`), which replaces the landing link and the QR's target;
+      payment address (e.g. `…/x26`), which replaces the landing link and the QR's target;
       ordinary stories keep today's footer. In a paid room every download carries "Your
       Christmas 2026 stories: every game, enjoy your party :))". Russian uses «Новый год 2027».
       *(Superseded 2026-11-21: "one" becomes "two" and "forever" becomes "until 1 August 2027" —
@@ -673,7 +675,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     headroom) to 495/500 (5); `prompt.test.ts`'s pinned constant updated to match.
   - *Decisions 2026-11-20 (owner, on Step 112's three open questions and Step 113's one):*
     - **1A — the free half ships 29 November** (the Christmas words, the golden story, the
-      `?pack=chr26` landing variant, no price shown anywhere); the paid code and the rails switch
+      `?pack=x26` landing variant, no price shown anywhere); the paid code and the rails switch
       on by about 10 December. Replaces the all-at-once 29 November target.
     - **2B — a scoped Cloudflare API token in a file on this PC** (location in the agent's
       memory), so D3 and the batch run unattended: Workers AI Edit + Read, Workers Scripts Edit,
@@ -712,7 +714,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       unlock line. FM-PACK-4 and design §4.4 say two; `schema.ts`'s comments follow in the build.
     - **The free Christmas part ends 1 July 2027** — the slice and the golden stories: from then
       a free room, and the Android app, plays the base pools only. On the agent's condition:
-      `/xmas` and the QR on every shared golden-story download keep leading to a working page,
+      `/x26` and the QR on every shared golden-story download keep leading to a working page,
       which then says the edition has ended.
     - **B — a paid code works until 1 August 2027**, not "forever": a month past the free part,
       for Australia's Christmas-in-July parties. One date on the pack, checked by the server; no
@@ -725,13 +727,13 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       2026" until 1 July 2027, the paid pack until 1 August 2027 (the server's cut-offs: 2 July
       and 2 August 2027, 12:00 UTC); **sales stop with the free part, 1 July 2027**, so every
       buyer gets at least a month — the pay card only ever appears in a free Christmas game; then
-      `/xmas` says the edition is no longer on sale, and **the agent retires chr26's Sponsors
+      `/x26` says the edition is no longer on sale, and **the agent retires chr26's Sponsors
       tier** that day — that tier only, Sponsors staying a support rail (D-6). GitHub's API has
       the call (`retireSponsorsTier`); how it runs on the day is settled with the rails.
       FM-PACK-6 holds the dates.
   - *Decisions 2026-11-21, second set (owner, on the agent's plan for the free half's five
     steps — 116 the batch, 117 packs in rooms, 118 the other 18 languages, 119 the landing
-    variant and `/xmas`, 120 the deploy):*
+    variant and `/x26`, 120 the deploy):*
     - **1A — the batch writes the real bucket with the same token**: Workers R2 Storage Edit
       added to it for the batch, removed again after it.
     - **2A — the agent reviews all 650 pictures** — a grid per character pair and the bottom
@@ -744,7 +746,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       has no Christmas texts (ar, he, fa) reads the pack's words in English. Settles design
       §4.4's open point on a mixed-language room.
     - **5A — the free half shows no price** (none until about 10 December): a golden story's
-      download carries "Christmas 2026 edition" and a QR to `/xmas`, which leads to the
+      download carries "Christmas 2026 edition" and a QR to `/x26`, which leads to the
       Christmas landing until the paid half; no end-of-game unlock line until then.
     - **A — the pictures still failing after three redraws (52 of 650)** get up to three more
       draws each; a picture still signed after those has its bottom tenth cut away (half as
@@ -780,7 +782,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     switch; two golden stories per game, at random, last in the gallery, their aftermath drawn
     after the scene (a card if it cannot be had); the slice in every other story. Reveal and
     gallery show the ending under the scene; a golden story's still and 5 s video carry it, with
-    "Christmas 2026 edition" (ru «Новый год 2027») and a QR to `/xmas` on the website — the
+    "Christmas 2026 edition" (ru «Новый год 2027») and a QR to `/x26` on the website — the
     landing page in the Android app. No price, no code in any download (tested). `xm_game` and
     `xm_gold` counted, a `/stats/` section per language, the privacy page in 23 languages.
     The 6 new interface lines: en and ru the agent's, the other 21 machine drafts on B-3's pile.
@@ -797,7 +799,31 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     `needs-<code>-review` and on B-3's pile. A room in any of the 20 languages is now offered
     the pack; ar, he and fa rooms are not, and their players in a mixed room read English.
     Tests: every language present, NFC, no punctuation of its own, each language's slot shapes.
-    **Next:** Step 119, the `?pack=chr26` landing variant and `/xmas`.
+    **Next:** Step 119, the `?pack=x26` landing variant and `/x26`.
+  - *Decisions 2026-11-21, fifth set (owner, on Step 119's plan):*
+    - **D1 C — every visitor to a page in the 20 languages sees the two Christmas buttons**,
+      from the deploy until the free part's last day, 1 July 2027. No `?pack=x26` variant.
+    - **D2 — the buttons say "Christmas stories — play free"** from the deploy, which happens as
+      soon as possible, before 29 November. The paid half swaps in its own line ("Christmas pack
+      — try it free").
+    - **D3 A — the nickname minimum drops to 2 characters for everyone** (decided 2026-11-21,
+      after Step 119): two-character ja, zh and ko names (ゆい, 王芳, 민수) and short Latin ones
+      (Jo, Li) are refused by the 3 today — the client's check, the server's `NICKNAME_MIN` and
+      the FM requirement's "3–20 chars". Not B (2 for Han, kana and Hangul only: script
+      detection in both, and Jo and Li still refused) and not C (keep 3). Built in Step 120.
+    - **The address is `/x26`** (owner, 2026-11-21, after Step 119): the golden story's QR and
+      printed URL, the forwarding page and the ship script's checks say `/x26`, not `/xmas`; the
+      dropped variant's name in these notes reads `?pack=x26`. Internal labels — the `from=xmas`
+      mark, the `xmas` referrer, CSS classes — are unchanged.
+  - **The landing page's Christmas part done 2026-11-21 (Step 119)** — design §4.4 "On the
+    landing page". Two red buttons on every page in the 20 languages, a ringing bell and hopping
+    letters, to Funny Multi as its own link; `/x26/` forwards to the visitor's language with
+    `?from=xmas`, counted as the `xmas` referrer; from the cut-off the head script hides the
+    buttons and tells a visitor from `/x26` that the edition has ended. `/stats/`: the
+    Christmas section's landing columns, the buttons among the clicks to Funny Multi. The 20
+    lines: en and ru the agent's, 18 machine drafts on B-3's pile. The ship script checks
+    `/x26` too. **Next:** Step 120 — D3 A's two-character nickname minimum (client, server, the
+    FM requirement, tests), then the deploy of Steps 117–120 at a quiet hour before 29 November.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

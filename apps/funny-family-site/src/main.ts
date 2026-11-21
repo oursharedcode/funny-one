@@ -15,9 +15,12 @@ import { initBackgroundLoop, initTrailer } from './client/video.ts';
 
 // The built page links Funny Multi as design A's; tell the game which design
 // this visitor actually saw (the head script chose it), so its own counts of
-// visits from here split by design too.
+// visits from here split by design too. The Christmas buttons (Step 119) are
+// links to Funny Multi as well.
 const variant = document.documentElement.dataset.variant === 'b' ? 'b' : 'a';
-for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-track="fm"]')) {
+for (const link of document.querySelectorAll<HTMLAnchorElement>(
+  'a[data-track="fm"], a[data-track^="xm-"]',
+)) {
   const url = new URL(link.href);
   url.searchParams.set('hv', variant);
   link.href = url.href;

@@ -19,10 +19,10 @@ export const LANDING_URL_TEXT = 'www.funny-family.oursharedcode.com';
 // "short payment address"), on the website only: inside the Android app it
 // keeps LANDING_URL, since the app may carry no payment address. Neither URL
 // ever holds a room code or an unlock code: an exported file travels.
-export const XMAS_URL = 'https://www.funny-family.oursharedcode.com/xmas';
+export const XMAS_URL = 'https://www.funny-family.oursharedcode.com/x26';
 
 /** XMAS_URL as printed under the QR code: no scheme. */
-export const XMAS_URL_TEXT = 'www.funny-family.oursharedcode.com/xmas';
+export const XMAS_URL_TEXT = 'www.funny-family.oursharedcode.com/x26';
 
 export interface FooterTarget {
   /** What the QR code encodes. */

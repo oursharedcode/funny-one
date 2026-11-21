@@ -7,7 +7,12 @@
 // source modules in place of the built ones, so dev and build cannot drift.
 
 import type { Language } from '@funny/shared';
-import { renderNotFound, renderSitemap, renderStatsPage } from '../render/extra.ts';
+import {
+  renderNotFound,
+  renderSitemap,
+  renderStatsPage,
+  renderXmasForward,
+} from '../render/extra.ts';
 import { LANGUAGE_CODES } from '../render/locale.ts';
 import { renderPage } from '../render/page.ts';
 import type { EntryAssets } from '../render/page.ts';
@@ -67,7 +72,7 @@ export function entryAssets(bundle: Record<string, BundleItem>, name: string): E
   return { scripts: [`/${entry.fileName}`], styles, preloads };
 }
 
-/** The 404 page has the landing page's look and none of its scripts. */
+/** The 404 page and /x26/ have the landing page's look and none of its scripts. */
 function stylesOnly(assets: EntryAssets): EntryAssets {
   return { scripts: [], styles: assets.styles, preloads: [] };
 }
@@ -82,6 +87,7 @@ export function renderSite(assets: SiteAssets): Map<string, string> {
   for (const code of LANGUAGE_CODES) files.set(pageFile(code), renderPage(code, assets.main));
   files.set('stats/index.html', renderStatsPage(assets.stats));
   files.set('404.html', renderNotFound(stylesOnly(assets.main)));
+  files.set('x26/index.html', renderXmasForward(stylesOnly(assets.main)));
   files.set('sitemap.xml', renderSitemap());
   return files;
 }
@@ -98,13 +104,18 @@ export function pageForPath(
   if (pathname === '/' || pathname === '/index.html')
     return { html: renderPage('en', assets.main) };
   if (pathname === '/stats/') return { html: renderStatsPage(assets.stats) };
+  if (pathname === '/x26/') return { html: renderXmasForward(stylesOnly(assets.main)) };
   if (pathname === '/404.html') return { html: renderNotFound(stylesOnly(assets.main)) };
   const match = /^\/([a-z0-9-]+)(?:(\/)(?:index\.html)?)?$/.exec(pathname);
   if (!match) return null;
   const [, segment = '', slash] = match;
-  const isPage = segment === 'stats' || (LANGUAGE_CODES as readonly string[]).includes(segment);
+  const isPage =
+    segment === 'stats' ||
+    segment === 'x26' ||
+    (LANGUAGE_CODES as readonly string[]).includes(segment);
   if (!isPage || segment === 'en') return null;
   if (!slash) return { redirect: `/${segment}/` };
   if (segment === 'stats') return { html: renderStatsPage(assets.stats) };
+  if (segment === 'x26') return { html: renderXmasForward(stylesOnly(assets.main)) };
   return { html: renderPage(segment as Language, assets.main) };
 }

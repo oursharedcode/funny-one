@@ -4,6 +4,9 @@
 // the funnel from the landing page to Funny Multi's gift sheet, the A/B test
 // of the page's two designs, the days, and where the visits came from — by
 // Step 79 their countries too, on a map of the page's own (worldMap.ts).
+// Step 119: the Christmas 2026 edition's two buttons on the landing page go
+// to Funny Multi too, so they count among its clicks, and /x26 among the
+// referrers.
 // Built with DOM calls and text nodes only: nothing in the answer is ever
 // parsed as HTML.
 
@@ -63,6 +66,7 @@ const REFERRERS: Record<string, string> = {
   oursharedcode: 'oursharedcode.com',
   games: 'The games',
   other: 'Other websites',
+  xmas: 'The /x26 address: a Christmas story’s QR code',
 };
 const DEVICES: Record<string, string> = { m: 'Phone-sized screen', d: 'Larger screen' };
 // Step 76: the header's Support Author ♥ opens a gift sheet on the landing
@@ -70,6 +74,8 @@ const DEVICES: Record<string, string> = { m: 'Phone-sized screen', d: 'Larger sc
 // game's card also has a Google Play badge.
 const HUB_TARGETS: Record<string, string> = {
   fm: 'Funny Multi',
+  'xm-top': 'Funny Multi: the Christmas button at the top',
+  'xm-foot': 'Funny Multi: the Christmas button at the foot',
   fo: 'Funny One',
   'fm-gp': 'Funny Multi on Google Play',
   'fo-gp': 'Funny One on Google Play',
@@ -93,6 +99,20 @@ const GIFT_RAILS: Record<string, string> = {
   donate: 'Donation page',
 };
 const DESIGNS: Record<'a' | 'b', string> = { a: 'A: trailer card', b: 'B: background video' };
+
+// The landing page's links to Funny Multi: its own, and from Step 119 the
+// Christmas edition's two buttons, which lead to the same game.
+const FM_LINKS = ['fm', 'xm-top', 'xm-foot'] as const;
+const XMAS_BUTTONS = ['xm-top', 'xm-foot'] as const;
+
+function clicksOn(rows: readonly Row[], targets: readonly string[], match: Match = {}): number {
+  return targets.reduce((sum, t) => sum + total(rows, { ...match, e: 'hub_click', t }), 0);
+}
+
+/** The landing page's clicks on to Funny Multi, by any of its links. */
+function fmClicks(rows: readonly Row[], match: Match = {}): number {
+  return clicksOn(rows, FM_LINKS, match);
+}
 
 /** The period line above the numbers. */
 export function periodText(summary: Summary): string {
@@ -455,16 +475,16 @@ function countrySection(summary: Summary): HTMLElement {
 }
 
 function languageTable(rows: readonly Row[], names: Record<string, string>): HTMLElement {
-  const columns: readonly Match[] = [
-    { e: 'hub_view' },
-    { e: 'hub_click', t: 'fm' },
-    { e: 'fm_view' },
-    { e: 'fm_support' },
-    { e: 'fm_gift' },
+  const columns: readonly ((l: string) => number)[] = [
+    (l) => total(rows, { e: 'hub_view', l }),
+    (l) => fmClicks(rows, { l }),
+    (l) => total(rows, { e: 'fm_view', l }),
+    (l) => total(rows, { e: 'fm_support', l }),
+    (l) => total(rows, { e: 'fm_gift', l }),
   ];
   const codes = [...new Set([...Object.keys(names), ...rows.map((row) => row.l)])].filter(Boolean);
   const body = codes
-    .map((code) => ({ code, sums: columns.map((match) => total(rows, { ...match, l: code })) }))
+    .map((code) => ({ code, sums: columns.map((column) => column(code)) }))
     .filter(({ sums }) => sums.some((value) => value > 0))
     .sort((a, b) => (b.sums[0] ?? 0) - (a.sums[0] ?? 0) || (b.sums[2] ?? 0) - (a.sums[2] ?? 0))
     .map(({ code, sums }) => {
@@ -492,19 +512,27 @@ function languageTable(rows: readonly Row[], names: Record<string, string>): HTM
 
 // Step 117 (B-29, D2 A): the Christmas 2026 edition's funnel, per language.
 // Website only, like every count but a visit: the Android app sends neither.
+// Step 119: the landing page's part of it first, visits sent by /x26 and
+// clicks on the edition's two buttons.
 function christmasSection(rows: readonly Row[], names: Record<string, string>): HTMLElement {
-  const columns: readonly Match[] = [
-    { e: 'xm_game', t: 'on' },
-    { e: 'xm_game', t: 'off' },
-    { e: 'xm_gold' },
+  const columns: readonly ((match: Match) => number)[] = [
+    (match) => total(rows, { ...match, e: 'hub_view', r: 'xmas' }),
+    (match) => clicksOn(rows, XMAS_BUTTONS, match),
+    (match) => total(rows, { ...match, e: 'xm_game', t: 'on' }),
+    (match) => total(rows, { ...match, e: 'xm_game', t: 'off' }),
+    (match) => total(rows, { ...match, e: 'xm_gold' }),
   ];
-  const sumsFor = (match: Match): number[] =>
-    columns.map((column) => total(rows, { ...column, ...match }));
+  const sumsFor = (match: Match): number[] => columns.map((column) => column(match));
   const codes = [...new Set([...Object.keys(names), ...rows.map((row) => row.l)])].filter(Boolean);
   const body = codes
     .map((code) => ({ code, sums: sumsFor({ l: code }) }))
     .filter(({ sums }) => sums.some((value) => value > 0))
-    .sort((a, b) => (b.sums[0] ?? 0) - (a.sums[0] ?? 0) || (b.sums[2] ?? 0) - (a.sums[2] ?? 0))
+    .sort(
+      (a, b) =>
+        (b.sums[2] ?? 0) - (a.sums[2] ?? 0) ||
+        (b.sums[1] ?? 0) - (a.sums[1] ?? 0) ||
+        (b.sums[4] ?? 0) - (a.sums[4] ?? 0),
+    )
     .map(({ code, sums }): Child[] => [
       Object.hasOwn(names, code) ? (names[code] ?? code) : code,
       ...sums.map(num),
@@ -514,6 +542,8 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
     table(
       [
         'Language',
+        'Landing visits from /x26',
+        'Christmas buttons clicked',
         'Games with the Christmas stories',
         'Games with them switched off',
         'Christmas cartoon seen',
@@ -522,6 +552,9 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
     ),
     note(
       'Website only. Each player’s tab counts a game once, when its first round starts, with the host’s switch as it stood then; and a golden story’s cartoon once, in the reveal or the gallery. The language is the one each player’s screen is in.',
+    ),
+    note(
+      'The first two columns are the landing page’s: a visit sent there by the /x26 address (the QR code on a golden story’s download), and a click on one of the edition’s two buttons, in the page’s language. The buttons lead to Funny Multi, so their clicks count among its clicks above and below too.',
     ),
   );
 }
@@ -536,7 +569,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
   fragment.append(
     tiles([
       ['Landing-page visits', views],
-      ['Went on to Funny Multi', total(rows, { e: 'hub_click', t: 'fm' })],
+      ['Went on to Funny Multi', fmClicks(rows)],
       ['Went on to Funny One', total(rows, { e: 'hub_click', t: 'fo' })],
       ['Funny Multi visits, all', total(rows, { e: 'fm_view' })],
       ['Gift sheet opened, all', total(rows, { e: 'fm_support' })],
@@ -550,7 +583,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
       funnelList(
         funnel([
           { label: 'Visited the landing page', count: views },
-          { label: 'Clicked to play Funny Multi', count: total(rows, { e: 'hub_click', t: 'fm' }) },
+          { label: 'Clicked to play Funny Multi', count: fmClicks(rows) },
           { label: 'Opened Funny Multi', count: total(rows, { e: 'fm_view', s: 'hub' }) },
           { label: 'Opened the gift sheet', count: total(rows, { e: 'fm_support', s: 'hub' }) },
           { label: 'Chose a gift option', count: total(rows, { e: 'fm_gift', s: 'hub' }) },
@@ -614,7 +647,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
   const arms = (['a', 'b'] as const).map((v) => ({
     v,
     visits: total(rows, { e: 'hub_view', v }),
-    clicks: total(rows, { e: 'hub_click', t: 'fm', v }),
+    clicks: fmClicks(rows, { v }),
     opened: total(rows, { e: 'fm_view', s: 'hub', v }),
     sheet: total(rows, { e: 'fm_support', s: 'hub', v }),
     gifts: total(rows, { e: 'fm_gift', s: 'hub', v }),

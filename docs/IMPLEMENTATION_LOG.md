@@ -7193,7 +7193,7 @@ trader confirmation before 1 Feb 2027.
 ## Step 114 (task B-29) — D3 done: 28 test pictures, four fragments re-worded, the 25 drawn options frozen (2026-11-20)
 
 **Owner decisions, 2026-11-20 (`/morning`):** **1A** — B-29's free half (the Christmas words,
-the golden story, the `?pack=chr26` landing variant, no price shown) ships 29 November; the paid
+the golden story, the `?pack=x26` landing variant, no price shown) ships 29 November; the paid
 code and the rails switch on by about 10 December. **2B** — a scoped Cloudflare API token in a
 file on this PC (location in the agent's memory), made by the owner: user token `funnyone-ai`,
 Workers AI Edit + Read, Workers Scripts Edit, Account Settings Read, all IPs, expiring
@@ -7260,7 +7260,7 @@ is done and the 25 drawn options are frozen.** **Next, the agent's — B-29's fr
 token gains Workers R2 Storage Edit if the batch writes the real bucket; a redraw path past the
 prompt-hash cache for the fake-signature pictures), the other 18 languages' machine drafts,
 packs in rooms (the golden story, the Christmas when/why/ending words in a free room), the
-`?pack=chr26` landing variant — deployed before 29 November at a quiet hour. Then the paid code
+`?pack=x26` landing variant — deployed before 29 November at a quiet hour. Then the paid code
 and the rails (PayID, Lightning, Sponsors) by about 10 December. **Owed, the owner's:** the
 live-badge look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the
 Sponsors tier and webhook and the Lightning service (B-29's *Owed before building*).
@@ -7276,7 +7276,7 @@ everywhere) and an end date (the free part on 1 July 2027; the paid pack A never
 agent's pick, or B dated, 1 August safer than 1 July). **1C** — two golden stories in every
 free game, at every room size, so a room of 3 sees 2 of its 3 stories fully Christmas and a
 room of 7 two in seven. **Free yes** — the free Christmas part (the slice and the golden
-stories) ends 1 July 2027, on the agent's condition that `/xmas` and the QR on shared
+stories) ends 1 July 2027, on the agent's condition that `/x26` and the QR on shared
 golden-story downloads keep leading to a working page. **Paid B, 1 August** — a code works
 until 1 August 2027, covering Australia's Christmas-in-July parties.
 
@@ -7310,7 +7310,7 @@ not applicable — no code or dependency moved, and no test reads the steering f
 the push.
 
 **Owed:** the build of these decisions, in the packs-in-rooms and rails steps — two golden
-stories, the two server-checked dates, `/xmas`'s ended page, a remembered code's ended state,
+stories, the two server-checked dates, `/x26`'s ended page, a remembered code's ended state,
 the date on every pay screen. Dated, all in B-29's block: 1 July 2027 the free part switches
 off, sales stop and chr26's Sponsors tier is retired; 1 August 2027 a code ends. The owner's
 lines are unchanged from Step 114: the live-badge look; Funny Multi's trader confirmation
@@ -7322,7 +7322,7 @@ before 1 Feb 2027.
 114's note has it:** the 650-picture batch on the paid Workers AI day (the 2B token gains
 Workers R2 Storage Edit if it writes the real bucket; a redraw path past the prompt-hash cache),
 the other 18 languages' machine drafts, packs in rooms — now **two golden stories** and
-FM-PACK-6's two dates, with `schema.ts`'s comments — and the `?pack=chr26` landing variant,
+FM-PACK-6's two dates, with `schema.ts`'s comments — and the `?pack=x26` landing variant,
 deployed before 29 November at a quiet hour. Then the paid code and the rails by about
 10 December, the date on every pay screen, and how the agent retires chr26's Sponsors tier on
 1 July 2027. **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation
@@ -7332,15 +7332,15 @@ and the Lightning service.
 ## Step 116 (task B-29) — the chr26 batch: all 650 pictures in the real bucket (2026-11-21)
 
 **Owner decisions, 2026-11-21 (`/morning`),** on the agent's plan to split B-29's free half into
-five steps (116 the batch, 117 packs in rooms, 118 the other 18 languages, 119 the `?pack=chr26`
-landing variant and `/xmas`, 120 the deploy): **1A** — the batch writes the real bucket with the
+five steps (116 the batch, 117 packs in rooms, 118 the other 18 languages, 119 the `?pack=x26`
+landing variant and `/x26`, 120 the deploy): **1A** — the batch writes the real bucket with the
 2B token, Workers R2 Storage Edit added for it and removed after; **2A** — the agent reviews all
 650 and redraws every fake signature or watermark, aftermath passer-by, merged pair and lost
 costume, the owner approving one summary sheet; **3A** — every new room in the edition's 20
 languages is a Christmas room, with a host switch; **4A** — the room's language decides, and a
 player whose language has no Christmas texts (ar, he, fa) reads the pack in English; **5A** — no
 price in the free half, a golden story's download carrying "Christmas 2026 edition" and a QR to
-`/xmas`. Later the same day: **A** — up to three more draws for the 52 still failing after three
+`/x26`. Later the same day: **A** — up to three more draws for the 52 still failing after three
 redraws, then a cut for any still signed; **A** again for the last four (A02, A04, S229, S604) —
 up to five more draws each, the first clean one kept, else the least flawed. All in B-29's block.
 
@@ -7466,7 +7466,7 @@ server-checked start date; `PACK_ROOMS=off` in the VM's .env is the lever. All i
   `storyLanguage.ts`. **Downloads:** a golden story's still stacks the ending under the scene
   (best-effort: without it, the plain still); the video stays 5 s and silent, the ending fading
   in at 2.5 s (a card for the slice); a golden story's footer reads "Christmas 2026 edition" with
-  a QR to `/xmas` on the website, the landing page inside the Android app (`?shell=android`, kept
+  a QR to `/x26` on the website, the landing page inside the Android app (`?shell=android`, kept
   in sessionStorage; `landingUrl.ts` `footerTarget`). No price anywhere, no room or unlock code
   in any file (tested).
 - **Funnel** (D2 A): `xm_game` (`t` on/off, the switch as it stood when the first round began)
@@ -7494,7 +7494,7 @@ an ordinary room until then; an ar, he or fa room never gets one.
   `optionsFor` (5 pack options, or 10 base in a slice's base slots). Golden reveals: badge and
   a decoded ending picture; the slice: a card ("🔔 The Christmas tree fell over, very slowly").
   Gallery: the slice, then the two golden stories. Downloads: a golden still on the web — scene
-  and ending, "Christmas 2026 edition", `www.funny-family.oursharedcode.com/xmas`; the same with
+  and ending, "Christmas 2026 edition", `www.funny-family.oursharedcode.com/x26`; the same with
   `?shell=android` — the landing address; a slice still; the video — the scene at 1 s, the
   ending at 4 s (ffmpeg frames), the edition's footer. File names carry no room code.
 - **B, switch off:** no line; every story base, no badge, no card.
@@ -7524,7 +7524,7 @@ owner's lines are unchanged.
 **RESUME HERE (2026-11-21, after Step 117; not yet pushed).** Step 116 and its follow-up are
 pushed and green (`9cfca32`). **Packs are in rooms, en and ru only until their texts exist.**
 **Next, Step 118 (the agent's) — the other 18 languages' chr26 texts**, machine drafts of the
-pack's words, so `packForRoom` offers the pack in all 20; then 119 the `?pack=chr26` landing variant and `/xmas` (its landing views counted, D2
+pack's words, so `packForRoom` offers the pack in all 20; then 119 the `?pack=x26` landing variant and `/x26` (its landing views counted, D2
 A), 120 the deploy at a quiet hour before 29 November (rooms on from then, D3 A). If 117–119 are
 not passing by Friday 27 November, the owner chooses between 6 December and a smaller launch.
 Then the paid code and the rails by about 10 December, the date on every pay screen, and how
@@ -7589,9 +7589,12 @@ room — for the owner to decide; **(2)** German and Ukrainian stories lack the 
 downloaded Japanese still draws the kanji heavier than the kana (a font fallback). B-29 stays
 open: Steps 119–120 and the paid half remain.
 
+~~RESUME HERE (2026-11-21, after Step 118; not yet pushed)~~ — pushed as `6808df9`, CI green
+(run 44883774100); carried into Step 119's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-21, after Step 118; not yet pushed).** Step 117 is pushed and green
 (`d23eaa9`, CI run 44876809792). **Packs are offered in all 20 of chr26's languages.**
-**Next, Step 119 (the agent's) — the `?pack=chr26` landing variant and `/xmas`**, its landing
+**Next, Step 119 (the agent's) — the `?pack=x26` landing variant and `/x26`**, its landing
 views counted (D2 A); then 120, the deploy at a quiet hour before 29 November (rooms on from
 then, D3 A; `PACK_ROOMS=off` in the VM's .env is the lever). If 117–119 are not passing by
 Friday 27 November, the owner chooses between 6 December and a smaller launch. Then the paid
@@ -7600,3 +7603,66 @@ retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-ba
 Funny Multi's trader confirmation before 1 Feb 2027; the nickname-length question above; for
 the rails, the Sponsors tier (its text naming 1 August 2027) and webhook and the Lightning
 service.
+
+## Step 119 (task B-29) — the Christmas buttons on the landing page and `/x26` (2026-11-21)
+
+**Owner decisions, 2026-11-21 (`/morning`), on Step 119's plan:** **D1 C** — every visitor to a
+page in the edition's 20 languages sees the two Christmas buttons, from the deploy until 1 July
+2027; no `?pack=x26` variant. **D2** — they say "Christmas stories — play free" from the deploy,
+as soon as possible and before 29 November (the paid half swaps in "Christmas pack — try it
+free"). **D3 A** (after the build) — the nickname minimum drops to 2 for everyone; built in Step
+120. **The address is `/x26`** (after the build), not `/xmas`. All in B-29's block.
+
+**Shipped:**
+
+- **`xmasStrings.ts` (new):** `{play, ended}` for the 20 languages (en and ru the agent's, 18
+  machine drafts on B-3's pile); `hasXmas` narrows a language to the edition's.
+- **Landing page** (`render/page.ts`, `styles/landing.css`): a red button above the hero and one
+  at the foot, a ringing bell and hopping letters (graphemes by `Intl.Segmenter`, each word kept
+  whole; hi, bn, ta and te hop by word), still under reduced motion; both link to Funny Multi
+  as `xm-top` / `xm-foot`, `hv` set to the page's design like the `fm` link (`main.ts`).
+- **Cut-off** (`render/headScript.ts`): from 2027-07-02 12:00 UTC by the visitor's clock the
+  head script sets `<html data-xmas="over">`, which hides the buttons — `"ended"` for a visitor
+  sent by `/x26`, who reads instead that the edition has ended.
+- **`/x26/`** (`render/extra.ts`, `prerender/site.ts`): an unlisted page whose inline script
+  sends the visitor to their language's page (saved, else browser, else en) with `?from=xmas`;
+  `client/track.ts` counts that visit's referrer as `xmas` and takes the mark off the address.
+  Funny Multi's golden-story QR and printed URL (`landingUrl.ts`) now say `/x26`.
+- **Analytics:** server `REFERRERS` + `xmas`, `HUB_TARGETS` + `xm-top`, `xm-foot` (94 keys per
+  language a day). `/stats/`: the Christmas table gains "Landing visits from /x26" and
+  "Christmas buttons clicked"; the buttons count among the clicks to Funny Multi in the tiles,
+  the funnel and the A/B arms.
+- **Ship script:** builds `x26/index.html`; live checks `/x26` → 308 `/x26/`, its mark, and the
+  buttons on `/ru/`.
+- **Docs:** design §4.4 "On the landing page"; tasks.md — B-29's fifth set of decisions, the
+  `/x26` rename and the Step 119 line. Every `/xmas` and `?pack=chr26` in the repo (outside SRC
+  and the archive) now reads `/x26` and `?pack=x26`.
+
+**Verified in the browser** (`.screens/step119-check.mjs`, gitignored: production build on
+5187, Chromium): the buttons on en, ru, de, ja, ta, yo and hi at 360 px, none on ar or he; no
+overflow at 320 px in 12 languages (Tamil wraps to 4 lines); `hv` matches the design; both
+designs at 1280 px; reduced motion stills them; `/xmas/` (before the rename) sends de-DE to
+`/de/`, en-US to `/`, he-IL to `/he/` with the `xmas` referrer and the mark gone; after the
+cut-off the buttons hide and the forwarded German visitor reads the ended note; one second
+before, they show. The rename itself is covered by the tests.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 2059/2059 across 6 workspaces
+(533 funny-family-site, 454 funny-multi-client, 359 funny-multi-server, 178 funny-one-client,
+447 shared, 88 cloudflare), re-run after the rename; `npm audit` 9 moderate under exactly the two
+accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed:** the 18 machine-drafted lines join B-3's pile; Caddy's 308 for `/x26` is checked live
+at the deploy. If one tab clicks both kinds of Funny Multi button, the A/B click total counts
+both. B-29 stays open: Step 120 and the paid half remain.
+
+**RESUME HERE (2026-11-21, after Step 119; not yet pushed).** Step 118 is pushed and green
+(`6808df9`, CI run 44883774100). **The landing page carries the Christmas buttons; the address
+is `/x26`.** **Next, Step 120 (the agent's) — D3 A's two-character nickname minimum** (the
+client's check in `HomeScreen.tsx`, the server's `NICKNAME_MIN`, the FM requirement's "3–20
+chars", tests), **then the deploy of Steps 117–120** — server, client and landing site — at a
+quiet hour before 29 November (rooms on from then; `PACK_ROOMS=off` in the VM's .env is the
+lever; the ship script checks `/x26`). Then the paid code and the rails by about 10 December,
+the date on every pay screen, and how the agent retires chr26's Sponsors tier on 1 July 2027.
+**Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation before 1 Feb
+2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook and the
+Lightning service.

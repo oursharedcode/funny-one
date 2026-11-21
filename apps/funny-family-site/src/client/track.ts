@@ -8,8 +8,15 @@
 //              where the visit came from as a class (r), phone or not (d)
 //   hub_click  once per tab per target (t): either game, the source code,
 //              the trailer, the author's site, (Step 76) the Support
-//              Author ♥ and each gift rail on the sheet it opens, and
-//              (Step 110) either game's Google Play badge
+//              Author ♥ and each gift rail on the sheet it opens,
+//              (Step 110) either game's Google Play badge, and (Step 119)
+//              the Christmas edition's buttons, the top one and the foot one
+//
+// Step 119 (B-29): a visit sent by /x26/ — the QR code on a golden story's
+// download — comes marked `?from=xmas` and counts as one from there, whatever
+// the referrer says: /x26/ is this site's own page, whose referrer would
+// make it no new visit at all. The mark is taken off the address bar, so a
+// copied link does not carry it on.
 //
 // No URL, no identifier, no cookie; the referrer is classified here and only
 // its class is sent. Nothing at all is sent when the browser asks not to be
@@ -18,7 +25,8 @@
 
 import { REFERRER_KEY, SENT_KEY } from '../keys.ts';
 
-export type ReferrerClass = 'direct' | 'search' | 'social' | 'oursharedcode' | 'games' | 'other';
+export type ReferrerClass =
+  'direct' | 'search' | 'social' | 'oursharedcode' | 'games' | 'other' | 'xmas';
 
 const TARGETS = [
   'fm',
@@ -35,6 +43,8 @@ const TARGETS = [
   'kofi',
   'bmc',
   'donate',
+  'xm-top',
+  'xm-foot',
 ] as const;
 export type ClickTarget = (typeof TARGETS)[number];
 
@@ -142,6 +152,28 @@ export function isClickTarget(value: unknown): value is ClickTarget {
   return typeof value === 'string' && (TARGETS as readonly string[]).includes(value);
 }
 
+/**
+ * True for a visit sent by /x26/; takes the mark off the address bar either
+ * way (history.replaceState, so no new history entry and no reload).
+ */
+export function takeXmasMark(win: Window): boolean {
+  let url: URL;
+  try {
+    url = new URL(win.location.href);
+  } catch {
+    return false;
+  }
+  if (url.searchParams.get('from') !== 'xmas') return false;
+  url.searchParams.delete('from');
+  try {
+    win.history.replaceState(win.history.state, '', url.pathname + url.search + url.hash);
+  } catch {
+    // An address bar that cannot be changed keeps the mark; the visit is
+    // still counted once, as the tab remembers.
+  }
+  return true;
+}
+
 /** The same test Funny Multi's funnel.ts makes. */
 export function trackingRefused(win: Window): boolean {
   const nav = win.navigator as Navigator & { globalPrivacyControl?: boolean };
@@ -156,6 +188,9 @@ export function trackingRefused(win: Window): boolean {
 export function initTracking(win: Window): boolean {
   const doc = win.document;
   const nav = win.navigator;
+  // Before anything can stop the counting: the mark leaves the address bar
+  // even when nothing is counted.
+  const fromXmas = takeXmasMark(win);
   if (trackingRefused(win) || typeof nav.sendBeacon !== 'function') return false;
   const root = doc.documentElement;
   const v = root.dataset.variant;
@@ -203,7 +238,7 @@ export function initTracking(win: Window): boolean {
   } catch {
     // No storage, no hand-off: the page's own referrer stands.
   }
-  const r = classifyReferrer(referrer, win.location.host);
+  const r: ReferrerClass | null = fromXmas ? 'xmas' : classifyReferrer(referrer, win.location.host);
   if (r && !sent('view')) {
     send({ e: 'hub_view', v, l, r, d: deviceClass(win.innerWidth) });
     remember('view');

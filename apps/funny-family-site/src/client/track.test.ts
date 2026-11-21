@@ -46,7 +46,7 @@ describe('deviceClass and isClickTarget', () => {
     expect(deviceClass(768)).toBe('d');
   });
 
-  it('knows the fourteen click targets', () => {
+  it('knows the sixteen click targets', () => {
     for (const target of ['fm', 'fo', 'gh', 'video', 'root'])
       expect(isClickTarget(target)).toBe(true);
     // Step 76: the ♥ and the gift sheet it opens.
@@ -54,7 +54,9 @@ describe('deviceClass and isClickTarget', () => {
       expect(isClickTarget(target)).toBe(true);
     // Step 110: the games' Google Play badges.
     for (const target of ['fm-gp', 'fo-gp']) expect(isClickTarget(target)).toBe(true);
-    for (const value of ['', 'FM', 'bogus', 'payId', 'gp', 'fm-GP', null, 1])
+    // Step 119: the Christmas edition's buttons.
+    for (const target of ['xm-top', 'xm-foot']) expect(isClickTarget(target)).toBe(true);
+    for (const value of ['', 'FM', 'bogus', 'payId', 'gp', 'fm-GP', 'xm', 'xm-', null, 1])
       expect(isClickTarget(value)).toBe(false);
   });
 });
@@ -94,6 +96,8 @@ interface PageOptions {
   width?: number;
   navigator?: Record<string, unknown>;
   doNotTrack?: string;
+  /** The page's address; none by default, as a stand-in without one. */
+  href?: string;
 }
 
 /** One page load: a fresh document, the beacon recorded. */
@@ -108,11 +112,13 @@ function page(options: PageOptions = {}) {
     <p class="plain">text</p>`;
   Object.defineProperty(doc, 'referrer', { value: options.referrer ?? '' });
   const sendBeacon = vi.fn((_url: string, _data: string) => true);
+  const replaceState = vi.fn((_state: unknown, _unused: string, _url: string) => undefined);
   const win = {
     document: doc,
     navigator: { sendBeacon, ...options.navigator },
     sessionStorage: options.storage ?? memoryStorage(),
-    location: { host: HOST },
+    location: { host: HOST, href: options.href },
+    history: { state: null, replaceState },
     innerWidth: options.width ?? 390,
     doNotTrack: options.doNotTrack,
   } as unknown as Window;
@@ -127,7 +133,8 @@ function page(options: PageOptions = {}) {
       .querySelector(selector)
       ?.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, ...init }));
   };
-  return { started, sent, click, doc };
+  const addresses = (): string[] => replaceState.mock.calls.map(([, , url]) => url);
+  return { started, sent, click, doc, addresses };
 }
 
 describe('initTracking', () => {
@@ -174,6 +181,51 @@ describe('initTracking', () => {
     const reloaded = page({ storage, variant: 'b' });
     reloaded.click('a[data-track="fm"]');
     expect(reloaded.sent()).toEqual([]);
+  });
+
+  it('counts a visit sent by /x26/ as one from there, and takes the mark off (Step 119)', () => {
+    const storage = memoryStorage();
+    storage.setItem(REFERRER_KEY, 'https://t.co/x');
+    // /x26/ is the site's own page: by its referrer alone, no new visit.
+    const shown = page({
+      storage,
+      code: 'de',
+      referrer: `https://${HOST}/x26/`,
+      href: `https://${HOST}/de/?from=xmas#games`,
+    });
+    expect(shown.sent()).toEqual([{ e: 'hub_view', v: 'a', l: 'de', r: 'xmas', d: 'm' }]);
+    expect(shown.addresses()).toEqual(['/de/#games']);
+    expect(storage.getItem(REFERRER_KEY)).toBeNull();
+    expect(page({ href: `https://${HOST}/?v=b&from=xmas` }).addresses()).toEqual(['/?v=b']);
+  });
+
+  it('leaves an address without the mark, and its visit, alone', () => {
+    const shown = page({ referrer: 'https://www.google.com/', href: `https://${HOST}/de/?v=a` });
+    expect(shown.sent()).toEqual([{ e: 'hub_view', v: 'a', l: 'ru', r: 'search', d: 'm' }]);
+    expect(shown.addresses()).toEqual([]);
+    expect(page({ href: `https://${HOST}/?from=hub` }).addresses()).toEqual([]);
+  });
+
+  it('takes the mark off when nothing is counted too', () => {
+    const shown = page({ navigator: { doNotTrack: '1' }, href: `https://${HOST}/ja/?from=xmas` });
+    expect(shown.started).toBe(false);
+    expect(shown.sent()).toEqual([]);
+    expect(shown.addresses()).toEqual(['/ja/']);
+  });
+
+  it('counts the Christmas buttons apart from Funny Multi’s own', () => {
+    const shown = page();
+    shown.doc.body.insertAdjacentHTML(
+      'beforeend',
+      '<a data-track="xm-top" href="#t"><span class="xmas-label">x</span></a><a data-track="xm-foot" href="#f">y</a>',
+    );
+    shown.click('a[data-track="xm-top"] .xmas-label');
+    shown.click('a[data-track="xm-foot"]');
+    shown.click('a[data-track="xm-top"]');
+    expect(shown.sent().slice(1)).toEqual([
+      { e: 'hub_click', v: 'a', l: 'ru', t: 'xm-top' },
+      { e: 'hub_click', v: 'a', l: 'ru', t: 'xm-foot' },
+    ]);
   });
 
   it('counts a middle click, not a right click', () => {

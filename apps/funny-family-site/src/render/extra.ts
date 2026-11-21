@@ -1,18 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Step 72: the site's other files — the statistics page's shell, the 404 page
-// and the sitemap.
+// and the sitemap; (Step 119) /x26/.
 
+import { xmasForwardScript } from './headScript.ts';
 import { esc } from './html.ts';
 import { HTML_LANG, LANGUAGE_CODES, languageName } from './locale.ts';
 import { assetTags, languageList, siteHeader } from './page.ts';
 import type { EntryAssets } from './page.ts';
 import { FM_ORIGIN, pagePath, SITE_ORIGIN } from '../links.ts';
 
-function plainHead(title: string, assets: EntryAssets): string {
+function plainHead(title: string, assets: EntryAssets, script = ''): string {
   return `<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">${
+    script
+      ? `
+<script>${script}</script>`
+      : ''
+  }
 <meta name="robots" content="noindex">
 <title>${esc(title)}</title>
 <meta name="theme-color" content="#fef3c7">
@@ -66,6 +72,30 @@ ${siteHeader('en', false)}
 <main id="main" class="not-found">
 <h1>Page not found</h1>
 <p>There is nothing at this address. Pick a language to go to the home page:</p>
+${languageList(null, 'Languages')}
+</main>
+</body>
+</html>
+`;
+}
+
+/**
+ * /x26/ (Step 119, B-29): the address on every golden story's download, as a
+ * QR code. Its script sends the visitor straight on to the landing page in
+ * their language, marked as sent from here (render/headScript.ts), which
+ * offers the Christmas stories — or, once the free part is over, says the
+ * edition has ended. What shows without scripts is the languages to pick
+ * from. Not in the sitemap: it is a door, not a page.
+ */
+export function renderXmasForward(assets: EntryAssets): string {
+  return `<!doctype html>
+<html lang="en" dir="ltr" data-code="en">
+${plainHead('Christmas stories — Funny Family', assets, xmasForwardScript())}
+<body>
+${siteHeader('en', false)}
+<main id="main" class="not-found">
+<h1>Christmas stories</h1>
+<p>Pick a language to go to the home page:</p>
 ${languageList(null, 'Languages')}
 </main>
 </body>

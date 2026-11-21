@@ -252,7 +252,7 @@ describe('buildStoryImageFile', () => {
       expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
       expect(texts()).toContain(LANDING_URL_TEXT);
       expect(texts()).toContain('Christmas 2026 edition');
-      expect(texts().some((t) => t.includes('/xmas'))).toBe(false);
+      expect(texts().some((t) => t.includes('/x26'))).toBe(false);
     });
 
     it('names the edition «Новый год 2027» in Russian', async () => {

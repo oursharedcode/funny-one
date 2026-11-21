@@ -38,6 +38,12 @@ REMOTE_DIR="${2:-funny}"
 OLD_PATH="/funny1-game"
 # Git Bash rewrites arguments that look like POSIX paths; see deploy/ship.sh.
 export MSYS_NO_PATHCONV=1
+# ...which also hands "/dev/null" to Git Bash's native Windows curl as a real
+# path it cannot open: a response with a body then aborts the transfer before
+# %{redirect_url} is filled (Step 121 found it on /x26's 308). Discard bodies
+# to the platform's null device instead.
+DEVNULL=/dev/null
+case "$(uname -s)" in MINGW* | MSYS* | CYGWIN*) DEVNULL=NUL ;; esac
 
 cd "$(dirname "$0")/.."
 
@@ -94,7 +100,7 @@ ORIGIN="https://$FO_HOST"
 OLD="https://$SITE_HOST$OLD_PATH"
 check() { # url expected ("status" or "status redirect-url")
   local got
-  got="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 10 "$1" || true)"
+  got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{redirect_url}' --max-time 10 "$1" || true)"
   got="${got% }"
   printf '    %s -> %s\n' "$1" "$got"
   [ "$got" = "$2" ]
@@ -116,7 +122,7 @@ check "https://$FO_APEX/" "301 $ORIGIN/" || ok=0
 # Both must come from the origin-root blocks, not the game's SPA fallback,
 # which would answer either path 200 with index.html. Google also refuses an
 # assetlinks.json behind a redirect or of another type.
-got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/.well-known/assetlinks.json" || true)"
+got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/.well-known/assetlinks.json" || true)"
 echo "    $ORIGIN/.well-known/assetlinks.json -> $got"
 case "$got" in "200 application/json"*) ;; *) ok=0 ;; esac
 # Into a variable, then matched in the shell: `curl | grep -q` fails under
@@ -135,7 +141,7 @@ esac
 # worker that retires it (a redirect there would be ignored).
 check "$OLD/" "301 $ORIGIN/" || ok=0
 check "$OLD" "301 $ORIGIN/" || ok=0
-got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "$OLD/sw.js" || true)"
+got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{content_type}' --max-time 10 "$OLD/sw.js" || true)"
 echo "    $OLD/sw.js -> $got"
 case "$got" in "200 text/javascript"* | "200 application/javascript"*) ;; *) ok=0 ;; esac
 curl -s --max-time 10 "$OLD/sw.js" | grep -q 'registration.unregister' \

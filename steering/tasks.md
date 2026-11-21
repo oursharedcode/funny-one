@@ -834,6 +834,12 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     character is a UTF-16 unit, as the field's `maxLength` counts — one emoji alone passes.
     Tests: Jo, ゆい, 王芳, 민수 and a padded Li taken, "a" and 王 refused, in-process and on the
     wire. **Next:** the deploy of Steps 117–120 (D1 A).
+  - **Steps 117–120 deployed 2026-11-21 (Step 121)** — image `funny-multi:f707819` and the
+    landing page; no game was in progress (the log's socket lines, B-27). Christmas rooms are
+    on; `PACK_ROOMS=off` in the VM's .env is the lever. The ship scripts now discard curl
+    bodies to `NUL` under Git Bash (`/dev/null` failed the `/x26` check). **Next:** the paid
+    half by about 10 December — the paid code and the rails, the date on every pay screen,
+    and how chr26's Sponsors tier retires on 1 July 2027.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

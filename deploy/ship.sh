@@ -33,6 +33,12 @@ REMOTE_DIR="${2:-funny}"
 # becomes "C:/Program Files/Git/funny37-game"); this stops it. No effect
 # elsewhere.
 export MSYS_NO_PATHCONV=1
+# ...which also hands "/dev/null" to Git Bash's native Windows curl as a real
+# path it cannot open: a response with a body then aborts the transfer before
+# %{redirect_url} is filled (Step 121 found it on /x26's 308). Discard bodies
+# to the platform's null device instead.
+DEVNULL=/dev/null
+case "$(uname -s)" in MINGW* | MSYS* | CYGWIN*) DEVNULL=NUL ;; esac
 
 cd "$(dirname "$0")/.."
 COMMIT="$(git rev-parse --short HEAD)"
@@ -105,7 +111,7 @@ done
 # answer either path 200 with index.html, so the status alone proves nothing.
 # Google also refuses an assetlinks.json behind a redirect or of another type.
 origin_ok=1
-got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "https://$FM_HOST/.well-known/assetlinks.json" || true)"
+got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{content_type}' --max-time 10 "https://$FM_HOST/.well-known/assetlinks.json" || true)"
 echo "    https://$FM_HOST/.well-known/assetlinks.json -> $got"
 case "$got" in "200 application/json"*) ;; *) origin_ok=0 ;; esac
 got="$(curl -s --max-time 10 "https://$FM_HOST/privacy" || true)"
@@ -126,7 +132,7 @@ OLD="https://$SITE_HOST/funny37-game/?room=CHECK"
 # right after a reload the old host can answer slowly for a moment.
 got=""
 for i in 1 2 3 4 5; do
-  got="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 10 "$OLD" || true)"
+  got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{redirect_url}' --max-time 10 "$OLD" || true)"
   [ "$got" = "301 https://$FM_HOST/?room=CHECK" ] && break
   sleep 2
 done

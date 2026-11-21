@@ -30,6 +30,12 @@ HOST="${1:?usage: deploy/ship-funny-family.sh user@host [remote-dir]}"
 REMOTE_DIR="${2:-funny}"
 # Git Bash rewrites arguments that look like POSIX paths; see deploy/ship.sh.
 export MSYS_NO_PATHCONV=1
+# ...which also hands "/dev/null" to Git Bash's native Windows curl as a real
+# path it cannot open: a response with a body then aborts the transfer before
+# %{redirect_url} is filled (Step 121 found it on /x26's 308). Discard bodies
+# to the platform's null device instead.
+DEVNULL=/dev/null
+case "$(uname -s)" in MINGW* | MSYS* | CYGWIN*) DEVNULL=NUL ;; esac
 
 cd "$(dirname "$0")/.."
 
@@ -77,7 +83,7 @@ echo "==> verify via Caddy"
 ORIGIN="https://$HUB_HOST"
 check() { # url expected ("status" or "status redirect-url")
   local got
-  got="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 10 "$1" || true)"
+  got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{redirect_url}' --max-time 10 "$1" || true)"
   got="${got% }"
   printf '    %s -> %s\n' "$1" "$got"
   [ "$got" = "$2" ]
@@ -114,7 +120,7 @@ has "$ORIGIN/no-such-page" 'noindex' || ok=0
 check "$ORIGIN/x26" "308 $ORIGIN/x26/" || ok=0
 has "$ORIGIN/x26/" 'from=xmas' || ok=0
 has "$ORIGIN/ru/" 'data-track="xm-top"' || ok=0
-got="$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/media/clip.mp4" || true)"
+got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/media/clip.mp4" || true)"
 echo "    $ORIGIN/media/clip.mp4 -> $got"
 case "$got" in "200 video/mp4"*) ;; *) ok=0 ;; esac
 # The summary comes from the game's server: this proves the forward to it.

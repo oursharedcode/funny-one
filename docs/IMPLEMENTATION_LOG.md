@@ -7710,6 +7710,9 @@ push.
 **Owed:** the deploy of Steps 117–120 (D1 A), next in this session. B-29 stays open: the paid
 half remains.
 
+~~RESUME HERE (2026-11-21, after Step 120; not yet pushed)~~ — pushed as `f707819`, CI green
+(run 44903068306); carried into Step 121's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-21, after Step 120; not yet pushed).** Step 119 is pushed and green
 (`54e229c`, CI run 44897773797). **Nicknames take 2–20 characters.** **Next — the deploy of
 Steps 117–120 (D1 A),** this session once Step 120 is pushed and green: the server's log
@@ -7719,5 +7722,49 @@ phone check after (the landing page's red buttons, the Christmas switch in a new
 lobby). Christmas rooms are on from then; `PACK_ROOMS=off` in the VM's .env is the lever.
 Then the paid code and the rails by about 10 December, the date on every pay screen, and how
 the agent retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier
+(its text naming 1 August 2027) and webhook and the Lightning service.
+
+## Step 121 (task B-29) — Steps 117–120 deployed; the ship scripts' null device (2026-11-21)
+
+**Owner request, 2026-11-21:** "push and deploy" — Step 120 pushed as `f707819`, CI green (run
+44903068306), then the deploy of Steps 117–120 under D1 A.
+
+**Before the deploy (B-27):** the server's log (`docker logs funny-funny-multi-1`) showed no
+"socket connected" line in the 24 hours before, so no game was cut off. SSH first timed out:
+the home IP had changed, and `deploy/oci/network.py` re-pointed the port-22 rule.
+
+**Deployed:**
+
+- **Server and Funny Multi client** (`deploy/ship.sh`): image `funny-multi:f707819`, built here,
+  streamed to the VM. The running container's image matches that tag, runs node v22.23.5, and
+  the script's checks pass — `/health` `{"ok":true}`, `assetlinks.json` 200, `/privacy` the
+  policy, the old address's 301. The live client bundle is the build's (`index-DZugWJBE.js`);
+  the server log shows no error line. `PACK_ROOMS` is not set in the VM's .env, so Christmas
+  rooms are on.
+- **Landing page** (`deploy/ship-funny-family.sh`): every check passes, `/x26` → 308 `/x26/`
+  included; the en page carries `xm-top` and `xm-foot`, the ar page neither (chr26 has no ar).
+
+**Fixed — the ship scripts' null device.** The landing script's first run failed its own check
+(`/x26 -> 308` with no address) though the site was right (`Location: /x26/`). The scripts set
+`MSYS_NO_PATHCONV=1`, which also hands `/dev/null` to Git Bash's native Windows curl as a path
+it cannot open; on a response with a body curl then stops before `%{redirect_url}` is filled.
+All three scripts (`ship.sh`, `ship-funny-family.sh`, `ship-funny-one.sh`) now discard bodies
+to `$DEVNULL` — `NUL` under Git Bash, `/dev/null` elsewhere. The re-run passed whole.
+
+**Gates:** the change is three shell scripts: `bash -n` on each, format:check clean; the landing
+script's re-run is the live test. typecheck, lint and `npm test` untouched since Step 120's
+green run; `npm audit` unchanged (the two accepted ids); CI pending the push.
+
+**Owed, the owner's:** the phone check — the red Christmas buttons on the landing page (en and
+ru), and the Christmas switch in a new Funny Multi room's lobby. B-29 stays open: the paid half
+remains.
+
+**RESUME HERE (2026-11-21, after Step 121; not yet pushed).** Step 120 is pushed and green
+(`f707819`, CI run 44903068306). **Steps 117–120 are live: Christmas rooms, the 18 languages'
+texts, the landing buttons and `/x26`, two-character nicknames.** `PACK_ROOMS=off` in the VM's
+.env is the lever if a room misbehaves. **Next — the paid half, by about 10 December:** the
+paid code and the rails, the date on every pay screen, and how the agent retires chr26's
+Sponsors tier on 1 July 2027. **Owed, the owner's:** the phone check above; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier
 (its text naming 1 August 2027) and webhook and the Lightning service.

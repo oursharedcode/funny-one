@@ -729,6 +729,42 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       tier** that day — that tier only, Sponsors staying a support rail (D-6). GitHub's API has
       the call (`retireSponsorsTier`); how it runs on the day is settled with the rails.
       FM-PACK-6 holds the dates.
+  - *Decisions 2026-11-21, second set (owner, on the agent's plan for the free half's five
+    steps — 116 the batch, 117 packs in rooms, 118 the other 18 languages, 119 the landing
+    variant and `/xmas`, 120 the deploy):*
+    - **1A — the batch writes the real bucket with the same token**: Workers R2 Storage Edit
+      added to it for the batch, removed again after it.
+    - **2A — the agent reviews all 650 pictures** — a grid per character pair and the bottom
+      strips at full size, where fake signatures sit — and redraws every visible fake signature
+      or watermark, every passer-by in an aftermath, every merged pair and every lost costume,
+      up to three tries a picture; the owner approves one summary sheet.
+    - **3A — every new room in the edition's 20 languages is a Christmas room**, with a host
+      switch in the lobby to play without it.
+    - **4A — the room's language decides whether the pack is on.** A player whose own language
+      has no Christmas texts (ar, he, fa) reads the pack's words in English. Settles design
+      §4.4's open point on a mixed-language room.
+    - **5A — the free half shows no price** (none until about 10 December): a golden story's
+      download carries "Christmas 2026 edition" and a QR to `/xmas`, which leads to the
+      Christmas landing until the paid half; no end-of-game unlock line until then.
+    - **A — the pictures still failing after three redraws (52 of 650)** get up to three more
+      draws each; a picture still signed after those has its bottom tenth cut away (half as
+      much from each side, scaled back to size: the feet go, the scene stays); anything else
+      left the owner keeps or not on the summary sheet. Flux Schnell signs about one picture
+      in two, and a fresh draw is no less likely to be signed, so a few always remain.
+    - **A, the four left after those draws** (A02, A04, S229, S604, none clean in seven): up to
+      five more draws each, the first clean one kept, else the least flawed draw.
+  - **Batch done 2026-11-21 (Step 116): all 650 pictures in the real bucket**, the summary sheet
+    approved by the owner. 1,345 draws (650, then redraw rounds of 307, 172, 88, 52, 35, 26 and
+    15), ≈ US$2.82 of Workers AI. 630 are stored as last drawn, 30 of them with a minor flaw let
+    through (a snowman in a top hat the commonest); 19 still signed after their redraws are cut,
+    5 of those from an earlier draw whose only fault was the signature; A02 (the tangled lights)
+    keeps its 9th draw of 12 as it was — one tiny passer-by at a shop window — as no draw came
+    out empty. Of the last four, A04 came out clean and S229 and S604 signed, then cut.
+    **Known artefacts, for the next pack's prompts:** a cocoa mug "watching TV" melts into the TV
+    in most draws; town-square aftermaths draw passers-by, steeples and crosses; a snow maiden
+    can come out old. The same day the owner took R2 Edit off the token again (checked: R2
+    answers 403, Workers AI still works) and cancelled Workers Paid, which runs out on
+    3 December 2026. **Next:** Step 117, packs in rooms.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

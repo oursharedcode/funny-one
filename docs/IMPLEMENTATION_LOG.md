@@ -7316,7 +7316,8 @@ off, sales stop and chr26's Sponsors tier is retired; 1 August 2027 a code ends.
 lines are unchanged from Step 114: the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027.
 
-**RESUME HERE (2026-11-21, after Step 115; not yet pushed).** Step 114 is pushed and green
+~~RESUME HERE (2026-11-21, after Step 115; not yet pushed)~~ — pushed as `40684eb`, CI green
+(run 44754549171); carried into Step 116's note below; its text is kept as written. Step 114 is pushed and green
 (`ff551ea`). **Next, Step 116 (the agent's) — B-29's free half for 29 November (1A), as Step
 114's note has it:** the 650-picture batch on the paid Workers AI day (the 2B token gains
 Workers R2 Storage Edit if it writes the real bucket; a redraw path past the prompt-hash cache),
@@ -7325,5 +7326,108 @@ FM-PACK-6's two dates, with `schema.ts`'s comments — and the `?pack=chr26` lan
 deployed before 29 November at a quiet hour. Then the paid code and the rails by about
 10 December, the date on every pay screen, and how the agent retires chr26's Sponsors tier on
 1 July 2027. **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook
+and the Lightning service.
+
+## Step 116 (task B-29) — the chr26 batch: all 650 pictures in the real bucket (2026-11-21)
+
+**Owner decisions, 2026-11-21 (`/morning`),** on the agent's plan to split B-29's free half into
+five steps (116 the batch, 117 packs in rooms, 118 the other 18 languages, 119 the `?pack=chr26`
+landing variant and `/xmas`, 120 the deploy): **1A** — the batch writes the real bucket with the
+2B token, Workers R2 Storage Edit added for it and removed after; **2A** — the agent reviews all
+650 and redraws every fake signature or watermark, aftermath passer-by, merged pair and lost
+costume, the owner approving one summary sheet; **3A** — every new room in the edition's 20
+languages is a Christmas room, with a host switch; **4A** — the room's language decides, and a
+player whose language has no Christmas texts (ar, he, fa) reads the pack in English; **5A** — no
+price in the free half, a golden story's download carrying "Christmas 2026 edition" and a QR to
+`/xmas`. Later the same day: **A** — up to three more draws for the 52 still failing after three
+redraws, then a cut for any still signed; **A** again for the last four (A02, A04, S229, S604) —
+up to five more draws each, the first clean one kept, else the least flawed. All in B-29's block.
+
+**Owner ops, in order:** R2 Edit added to the `funnyone-ai` token; **Workers Paid** bought
+(US$5 a month — the free Workers AI allowance covers about 50 pictures a day); after the batch,
+R2 Edit removed (checked from the PC without printing the token: R2 answers 403 "Authentication
+error", Workers AI 200, the token active) and Workers Paid cancelled, running out on
+3 December 2026.
+
+**Shipped:**
+
+- **`cloudflare/packbatch.mjs`** (`npm run packbatch -w cloudflare -- <command>`): `plan`,
+  `status [--restore]`, `draw`, `redraw N…`, `crop N[:K]…`, `keep N:K…`, `sheets`. It builds the
+  625 scene and 25 aftermath prompts with `@funny/shared`'s own builders and takes each key from
+  production's `worker.js` run in process, so a stored picture sits exactly where the game will
+  ask (`i/<sha256>.png`). It draws through a local `wrangler@4.160.1 dev` of
+  **`packbatch-worker.js`** — never deployed — on 5189 (inspector 5182, D3's pair in
+  `machine/ports.md`), with Workers AI and R2 both remote, from a config written to a temp
+  folder outside the repo; production's `[ai]`-off posture is untouched (B-1e). The shell's
+  ambient `CLOUDFLARE_*` variables are replaced for the wrangler child only. A manifest in the
+  gitignored `.picture-review/packs/chr26/` makes every run resumable; four pictures in flight,
+  retries on passing errors, a clean stop on a fatal one (an exhausted allowance among them). A
+  redraw overwrites its own key and moves the earlier draw to `rejected/<n>.draw<K>.webp`;
+  `crop` and `keep` can take an earlier draw (`S197:1`), and a cut or kept copy is never cut
+  again or overwritten.
+- **Windows hardening, after round 1 crashed** on `EPERM` saving the manifest (a file briefly
+  held, likely Avast or a file watcher): renames retry for about two seconds, and a new draw
+  replaces the local copy only after the bucket has it, so the local copy always matches the
+  bucket.
+- **`scripts/picture-review/packimages.py`**, Pillow from the gitignored picture-review venv:
+  `encode` (WebP quality 82, method 6 — 54–252 KB a picture, 112 KB on average, ≈ 6× smaller
+  than the model's JPEG), `crop` (the bottom tenth and half as much from each side, scaled back
+  to 1024 × 1024), `keep` (a byte copy, no second lossy encode) and review `sheets` (a grid per
+  character pair and the bottom strips at half size). Pillow, not `sharp`: the safety check
+  refused a new npm package, so the `npm audit` gate is untouched.
+- **Tests:** `cloudflare/packbatch.test.js`, 35 (the cloudflare workspace 53 → 88).
+- **`packages/shared/src/prompt.ts`** and **design §4.4:** `AFTERMATH_SKELETON` and
+  `AFTERMATH_STYLE_SUFFIX` are **locked** — every stored aftermath is filed under their hash;
+  §4.4 gains the batch's bullet (WebP under a `.png` key, a redraw final only before any public
+  GET as `/i/` is cached immutable, the cut and the keep, no picture can be dropped) and 4A,
+  closing its open point on mixed-language rooms. **`cloudflare/package.json`:** the
+  `packbatch` script and its pre-script.
+
+**The batch:** 650 pictures from **1,345 draws** — 650, then redraw rounds of 307, 172, 88, 52,
+35, 26 and 15 — ≈ **US$2.82** of Workers AI (Flux Schnell ≈ US$0.0021 a draw) on top of the
+month of Workers Paid. Reviewer subagents checked the per-pair grids and the bottom strips,
+the agent spot-checking their calls; a second pass, which the first
+reviewers were not asked for, looked for religious symbols, meat and alcohol (the pack is
+secular): wall crosses (S065, S440 and six more) and church spires (S002, S452, A01) were
+redrawn; S205's crescent on a shop sign was kept, as it reads as a moon. **Flux Schnell signed
+about one draw in two** (Step 114 saw one in four), and a fresh draw was no less likely to be
+signed — hence the cut. **Outcome:** 630 stored as last drawn, 30 of them with a minor flaw let
+through (a snowman in a top hat the commonest); **19 cut**, 14 from their latest draw and 5 from
+an earlier one whose only fault was the signature (S116 draw 1, S197 1, S299 4, S354 6, S624 5);
+**A02** (the tangled lights) keeps its 9th draw of 12 uncut — one tiny passer-by at a shop
+window — as no draw came out empty. Of the last four, A04's 12th draw was clean (the red shape
+by its door a postbox); S229 and S604 signed, then cut. The owner approved the summary sheet
+(the cut pictures) and the overview of all 650.
+
+**Verified:** `status` — 650/650 in the bucket, none missing; S001, S197 and A02 fetched from the
+public Worker (`/i/<key>.png`): 200 `image/webp`, each byte-identical to the local copy.
+
+**Known artefacts, for the next pack's prompts:** a cocoa mug "watching TV" melts into the TV in
+most draws; town-square aftermaths draw passers-by, steeples and crosses; a snow maiden can come
+out old.
+
+**Gates:** typecheck 0, lint 0 (the cloudflare files are eslint-ignored, as before),
+format:check clean; `npm test` 1739/1739 across 6 workspaces (447 funny-family-site, 397
+funny-multi-client, 330 funny-multi-server, 178 funny-one-client, 299 shared, 88 cloudflare) —
+the first run, with `npm audit` running alongside, hit 14 vitest worker-start timeouts in
+funny-one-client (every test that ran passed); the same command alone passed in full.
+`npm audit --omit=dev` 0; full `npm audit` 9 moderate under exactly the two accepted ids
+(GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed:** nothing of this step's. The owner's lines are unchanged: the live-badge look; Funny
+Multi's trader confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-21, after Step 116; not yet pushed).** Step 115 is pushed and green
+(`40684eb`). **B-29's 650 pictures are in the bucket; the token is back to no R2; Workers Paid
+runs out on 3 December.** **Next, Step 117 (the agent's) — packs in rooms**, for 29 November:
+3A's Christmas room by default in the 20 languages with the host's switch; 4A's room-language
+rule with English for ar, he and fa; the Christmas when/why/ending words; **two golden stories**
+drawing the stored pictures; FM-PACK-6's two dates, server-checked, with `schema.ts`'s comments;
+5A's download footer ("Christmas 2026 edition" and the QR to `/xmas`), no price. Then 118 the
+other 18 languages' machine drafts, 119 the `?pack=chr26` landing variant and `/xmas`, 120 the
+deploy at a quiet hour before 29 November; if 117–119 are not passing by Friday 27 November, the
+owner chooses between 6 December and a smaller launch. Then the paid code and the rails by about
+10 December. **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook
 and the Lightning service.

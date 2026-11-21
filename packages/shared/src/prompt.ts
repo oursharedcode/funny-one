@@ -203,9 +203,9 @@ function fragmentFor(story: Story, slot: SlotIndex): Fragment {
  * small: an aftermath depends on the place and the ending only, 5 × 5 = 25
  * pictures for chr26, whoever the story was about.
  *
- * **Tuning window**, as SKELETON had: Step 104 draws five of these to see that
- * each reads as a punchline on its own, and may reword this string. Once the
- * pack's batch is drawn it is locked like STYLE_SUFFIX.
+ * **Locked** like STYLE_SUFFIX since chr26's batch (Step 116, 2026-11-21):
+ * every stored aftermath is filed under a hash of this string. Its tuning
+ * window was Step 114's D3 test pictures.
  */
 export const AFTERMATH_SKELETON = '{6}, in {2}, an empty scene with nobody around';
 
@@ -213,7 +213,7 @@ export const AFTERMATH_SKELETON = '{6}, in {2}, an empty scene with nobody aroun
  * STYLE_SUFFIX less its four character anchors — googly eyes, exaggerated
  * expressions, separated subjects, unfused bodies — which on an empty place
  * would only invite the model to put someone in it. The same goofy-cartoon
- * look otherwise. In the tuning window with the skeleton above.
+ * look otherwise. Locked with the skeleton above.
  */
 export const AFTERMATH_STYLE_SUFFIX =
   ', in a goofy cartoon style, bright colors, hand-drawn doodle illustration, well-composed';

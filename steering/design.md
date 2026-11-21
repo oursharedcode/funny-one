@@ -249,8 +249,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   character anchors). No characters, on purpose: Flux draws each picture from its prompt alone,
   so a second picture of the same two characters would never match the scene, while an empty
   place cannot fail to. It also keeps the batch at 5 × 5 = 25 per pack, whoever the story was
-  about, instead of 5⁵ = 3,125. Both strings are in their tuning window until Step 104's test
-  pictures and the pack's batch; then they are locked like `STYLE_SUFFIX`.
+  about, instead of 5⁵ = 3,125. Both strings are **locked** like `STYLE_SUFFIX` since chr26's
+  batch (Step 116, 2026-11-21): every stored aftermath is filed under a hash of them.
 - **Authoring rules of the pack's own**, on top of the base pools': a **costume** on every
   character — one colour, one prop, one shape — so the two subjects never merge and a pick looks
   like itself in every picture it is in; **no Christmas tree in any place**, because the tree
@@ -261,13 +261,27 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   base pools' 19; 481 until Step 109's cultural fix), the worst-case aftermath 281 (263 until
   Step 114's re-wordings). "When" and "why" could grow at no picture cost;
   the other five slots cannot grow without another batch.
+- **The batch** (`cloudflare/packbatch.mjs`, Step 116) draws a pack straight into the real
+  picture bucket without deploying anything: a local `wrangler dev` of its own Worker
+  (`packbatch-worker.js`) with Workers AI and R2 both remote, from a config written outside the
+  repo, so production's generation switch stays off (B-1e). Keys come from production's own
+  `worker.js`, run in process — the same `i/<sha256>.png` the game asks for. Pictures are stored
+  as **WebP** (quality 82, Pillow on the PC; ≈ 6× smaller than the model's JPEG), so a pack key
+  can serve `image/webp` under its `.png` name; `/i/` already serves the stored type. A redraw
+  overwrites its own key — the way past the prompt-hash cache for a picture with a fake
+  signature — and is final only before any public GET, since `/i/` is cached as immutable.
+  A picture still signed after its redraws is **cut** (`crop`): the bottom tenth and half as much
+  from each side, scaled back to size, once only; one no draw of which came out clean keeps its
+  least flawed earlier draw as it was (`keep`). Every combination must have its picture, so none
+  can be dropped.
 - **Languages and texts.** A pack names the languages it is offered in — chr26's 20 are every
   authored language but ar, he and fa (B-29). Its texts are **local glosses, not translations**:
   the local gift-bringer and dishes, under FM-POOL-3/4. en and ru are drafted by the agent for
   the owner's edit (owner decision 2026-11-05); the other 18 are machine drafts on B-3's pile.
   `PACK_TEXTS` is keyed by the drafted languages only, so registering the rest is one widened
-  type. *Open, for the step that brings packs into rooms:* what a player sees whose own language
-  the pack lacks, in a multi-language room (DD-13).
+  type. **The room's language decides whether the pack is on** (owner decision 4A, 2026-11-21);
+  in a multi-language room (DD-13) a player whose own language the pack lacks reads its words in
+  English.
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 

@@ -8,6 +8,8 @@
   "scripts": {
     "prepregenerate": "cd .. && npm run build -w packages/shared && npm run build -w apps/funny-multi-server",
     "pregenerate": "node pregenerate.mjs",
+    "prepackbatch": "cd .. && npm run build -w packages/shared",
+    "packbatch": "node packbatch.mjs",
     "test": "vitest run"
   }
 }

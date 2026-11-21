@@ -35,7 +35,7 @@ vi.mock('./image.js', () => {
 });
 
 import { generateBotStoryPictures } from './game.js';
-import type { Player, Room, Story } from './types.js';
+import type { Player, Room, RoomStory } from './types.js';
 import * as imageModule from './image.js';
 
 type ImageMockExtras = {
@@ -43,24 +43,25 @@ type ImageMockExtras = {
 };
 const imageMock = imageModule as unknown as typeof imageModule & ImageMockExtras;
 
-function completeStory(picture: Story['picture'] = null): Story {
+function completeStory(picture: RoomStory['picture'] = null): RoomStory {
   const answers: (OptionId | null)[] = new Array(7).fill(null);
   for (const slot of VISUAL_SLOTS) {
     answers[slot] = POOLS[slot as SlotIndex][0]!.id;
   }
-  return { answers, picture };
+  return { answers, picture, content: { kind: 'base' }, ending: null };
 }
 
 function player(id: string, nickname: string, isBot: boolean): Player {
   return { id, nickname, isBot };
 }
 
-function makeRoom(players: Player[], stories: Story[]): Room {
+function makeRoom(players: Player[], stories: RoomStory[]): Room {
   return {
     code: 'ABCDEF',
     hostId: players[0]!.id,
     language: 'en',
     multiLanguage: false,
+    pack: null,
     players,
     phase: 'reveal',
     currentRound: 7,

@@ -184,6 +184,28 @@ describe('renderStats', () => {
     ]);
   });
 
+  it('counts the Christmas 2026 edition per language, the switch either way (Step 117)', () => {
+    const root = render({
+      ...SUMMARY,
+      days: {
+        '2026-10-02': {
+          'xm_game|a|en|hub|on||': 2,
+          'xm_game||en|direct|off||': 1,
+          'xm_game||de|direct|on||': 5,
+          'xm_gold||de|direct|||': 4,
+          'xm_gold|b|en|hub|||': 1,
+        },
+      },
+    });
+    expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
+      ['All', '7', '1', '5'],
+      ['Deutsch (Deutschland)', '5', '0', '4'],
+      ['English (United Kingdom)', '2', '1', '1'],
+    ]);
+    // No game in a Christmas room yet: the row of totals alone, all nought.
+    expect(tableOf(render(), 'The Christmas 2026 edition')).toEqual([['All', '0', '0', '0']]);
+  });
+
   it('draws the days as lines, and gives their numbers in a table, newest first', () => {
     const root = render();
     expect(root.querySelectorAll('.chart svg[role="img"] polyline')).toHaveLength(3);

@@ -15,9 +15,13 @@
 // Keeps the i18n notice in sync with the in-app SourceFooter via the same
 // `footer.contentNotice` key, fixed to the story's own language (B-15) via
 // `i18n.getFixedT`, not the active UI locale — same fix as the still's footer.
+//
+// Step 117: a golden story's video names the Christmas 2026 edition and leads
+// to its page, as its still does — the caller passes the label and the URL
+// text (downloadStory.ts `footerTarget`).
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
-import { LANDING_URL_TEXT } from './landingUrl';
+import { LANDING_URL_TEXT, type FooterTarget } from './landingUrl';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
 const QR_SIZE = 120;
@@ -158,16 +162,88 @@ export function drawStoryText(
   return y;
 }
 
+// Step 117 (owner decision D1 A): the ending of a Christmas story whose ending
+// has no picture of its own — a slice story's, or a golden one's whose picture
+// could not be had — drawn as a card in the picture's square. The bell above
+// it, the ending in the story's own family below, as large as fits.
+const CARD_PINK = '#ec4899';
+const CARD_MAX_PX = 52;
+const CARD_MIN_PX = 26;
+
+export function drawEndingCard(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  opts: { x: number; y: number; size: number; language: AuthoredLanguage },
+): void {
+  const { x, y, size, language } = opts;
+  const r = 36;
+  const inset = 6;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + size - r, y);
+  ctx.quadraticCurveTo(x + size, y, x + size, y + r);
+  ctx.lineTo(x + size, y + size - r);
+  ctx.quadraticCurveTo(x + size, y + size, x + size - r, y + size);
+  ctx.lineTo(x + r, y + size);
+  ctx.quadraticCurveTo(x, y + size, x, y + size - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.lineWidth = inset;
+  ctx.strokeStyle = CARD_PINK;
+  ctx.stroke();
+
+  const cx = x + size / 2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.direction = textDirection(language);
+  ctx.font = '72px system-ui, sans-serif';
+  ctx.fillStyle = CARD_PINK;
+  const bellTop = y + 56;
+  ctx.fillText('🔔', cx, bellTop);
+
+  const textTop = bellTop + 110;
+  const maxHeight = y + size - 56 - textTop;
+  let fontPx = CARD_MAX_PX;
+  let lines: string[] = [];
+  let lineHeight = 0;
+  for (; fontPx >= CARD_MIN_PX; fontPx -= 2) {
+    ctx.font = `${fontPx}px ${proseFontFamily(language)}`;
+    lines = wrapText(ctx, text, size - 2 * 56);
+    lineHeight = Math.round(fontPx * STORY_LINE_RATIO);
+    if (lines.length * lineHeight <= maxHeight) break;
+  }
+  ctx.fillStyle = INK;
+  // Centred in the space under the bell.
+  let lineY = textTop + Math.max(0, (maxHeight - lines.length * lineHeight) / 2);
+  for (const line of lines) {
+    ctx.fillText(line, cx, lineY);
+    lineY += lineHeight;
+  }
+  ctx.restore();
+  ctx.textAlign = 'left';
+}
+
 // Renders the QR + notice + label/URL block with its top edge at `topY`.
 // Same content and layout the downloadable PNG carries, scaled up for the
-// 720×1280 video canvas.
+// 720×1280 video canvas. `labelKey` and `urlText` default to the family's
+// name and the landing page.
 export function drawAttribution(
   ctx: CanvasRenderingContext2D,
   qrCanvas: HTMLCanvasElement,
-  opts: { topY: number; canvasWidth: number; language: AuthoredLanguage },
+  opts: {
+    topY: number;
+    canvasWidth: number;
+    language: AuthoredLanguage;
+    labelKey?: FooterTarget['labelKey'];
+    urlText?: string;
+  },
 ): void {
   const { topY, canvasWidth, language } = opts;
-  const familyLabel = i18n.getFixedT(language)('footer.family');
+  const familyLabel = i18n.getFixedT(language)(opts.labelKey ?? 'footer.family');
   const dir = textDirection(language);
 
   // The notice and label keep the story's direction, as on the still
@@ -200,6 +276,6 @@ export function drawAttribution(
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 6);
+  ctx.fillText(opts.urlText ?? LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 6);
   ctx.textAlign = 'left';
 }

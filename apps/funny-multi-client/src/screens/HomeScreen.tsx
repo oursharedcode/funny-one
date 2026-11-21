@@ -164,6 +164,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
         multiLanguage,
         myLanguage: language,
         players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
+        pack: null,
       });
     });
   }
@@ -216,6 +217,7 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
         multiLanguage: multi,
         myLanguage,
         players: ack.players,
+        pack: null,
       });
     });
   }

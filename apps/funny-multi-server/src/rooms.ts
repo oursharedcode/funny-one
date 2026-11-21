@@ -15,8 +15,8 @@
 // which is written from the spec rather than copied.
 
 import { customAlphabet } from 'nanoid';
-import { AUTHORED_LANGUAGES, type AuthoredLanguage } from '@funny/shared';
-import type { ErrorCode, Language, Player, Room } from './types.js';
+import { AUTHORED_LANGUAGES, packForRoom, type AuthoredLanguage } from '@funny/shared';
+import type { ErrorCode, Language, Player, Room, RoomPack } from './types.js';
 
 // Constants from spec §17.
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -94,6 +94,23 @@ export function isValidLanguage(value: unknown): value is AuthoredLanguage {
   return typeof value === 'string' && (AUTHORED_LANGUAGES as readonly string[]).includes(value);
 }
 
+/**
+ * The pack a new room is offered (Step 117, owner decisions 3A and 4A): by its
+ * language and the date (`packForRoom`, FM-PACK-5/6), and on from the start —
+ * the host switches it off in the lobby. Read per room, not at boot, so the
+ * date is checked at every creation.
+ *
+ * `PACK_ROOMS=off` turns every new room into an ordinary one: a lever for a
+ * launch that goes wrong (set it in the VM's .env and restart), and the
+ * default of this workspace's tests, which play the base pools unless a test
+ * turns packs back on.
+ */
+export function packOffer(language: Language, now = Date.now()): RoomPack | null {
+  if (process.env.PACK_ROOMS === 'off') return null;
+  const id = packForRoom(language, now);
+  return id ? { id, on: true } : null;
+}
+
 export function createRoom(
   nickname: string,
   language: Language,
@@ -112,6 +129,7 @@ export function createRoom(
     hostId: hostSocketId,
     language,
     multiLanguage,
+    pack: packOffer(language),
     players: [player],
     phase: 'lobby',
     currentRound: 0,

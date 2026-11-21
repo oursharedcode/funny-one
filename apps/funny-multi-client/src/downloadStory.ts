@@ -19,9 +19,15 @@
 // asset moves out of the in-app context where the source footer would
 // otherwise carry it. SRC's code led to the source repository; since
 // 2026-10-29 it leads to the landing page, under its name (landingUrl.ts).
+//
+// Step 117 (B-29): a golden story's still carries its ending picture under the
+// scene, and its footer names the Christmas 2026 edition and leads to the
+// edition's page — on the website; inside the Android app the code keeps the
+// landing page (landingUrl.ts). No price (owner decision 5A), and never a room
+// or unlock code: the file leaves the room.
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
-import { LANDING_URL, LANDING_URL_TEXT } from './landingUrl';
+import { footerTarget } from './landingUrl';
 import { downloadFile } from './share';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
 
@@ -83,7 +89,7 @@ async function loadPictureBitmap(pictureUrl: string | null): Promise<ImageBitmap
   return createImageBitmap(blob);
 }
 
-export async function buildStoryImageFile(opts: {
+export interface StoryImageOptions {
   nickname: string;
   prose: string;
   pictureUrl: string | null;
@@ -91,8 +97,16 @@ export async function buildStoryImageFile(opts: {
    *  from the interface's. The footer notice and the prose/nickname
    *  direction both follow it, not the active UI locale. */
   language: AuthoredLanguage;
-}): Promise<File> {
+  /** Step 117: a golden story (FM-PACK-3), whose footer is the edition's. */
+  golden?: boolean;
+  /** Step 117: a golden story's ending picture, drawn under the scene. */
+  endingUrl?: string | null;
+}
+
+export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
+  const golden = opts.golden === true;
+  const target = footerTarget(golden);
 
   // Translated content-responsibility notice — must accompany the image
   // wherever it goes (item 6 of BUGS_AND_IMPROVEMENTS_02.md). Pulled from
@@ -101,18 +115,22 @@ export async function buildStoryImageFile(opts: {
   // carries the notice in the language its prose is written in.
   const fixedT = i18n.getFixedT(language);
   const notice = fixedT('footer.contentNotice');
-  const familyLabel = fixedT('footer.family');
+  const familyLabel = fixedT(target.labelKey);
   const dir = textDirection(language);
   const proseFont = `${PROSE_SIZE} ${proseFontFamily(language)}`;
   const noticeFont = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
 
-  // Load the picture first (if any) so its drawn height is known.
+  // Load the pictures first (if any) so their drawn height is known: the
+  // scene, and a golden story's ending under it. The ending is best-effort —
+  // without it the still is the scene and the story, as for any other story.
   const picture = await loadPictureBitmap(pictureUrl);
-  const pictureHeight = picture ? WIDTH : 0;
+  const ending = golden ? await loadPictureBitmap(opts.endingUrl ?? null).catch(() => null) : null;
+  const pictures = [picture, ending].filter((p): p is ImageBitmap => p !== null);
+  const pictureHeight = pictures.length * WIDTH;
 
-  // QR code for the landing page — rendered to an offscreen canvas, then
+  // QR code for the footer's target — rendered to an offscreen canvas, then
   // drawn onto the composite below.
-  const qrCanvas = await renderQrCanvas(LANDING_URL);
+  const qrCanvas = await renderQrCanvas(target.url);
 
   // Right-column geometry: the notice and the source label/URL sit to the
   // right of the QR. The notice stacks at the top of the column; the source
@@ -152,7 +170,7 @@ export async function buildStoryImageFile(opts: {
 
   ctx.fillStyle = CREAM;
   ctx.fillRect(0, 0, WIDTH, height);
-  if (picture) ctx.drawImage(picture, 0, 0, WIDTH, pictureHeight);
+  pictures.forEach((p, i) => ctx.drawImage(p, 0, i * WIDTH, WIDTH, WIDTH));
 
   // The prose and nickname render in the story's own direction (B-15 can
   // put a Hebrew story on screen under any interface language); `start`
@@ -206,7 +224,7 @@ export async function buildStoryImageFile(opts: {
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(target.urlText, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
   ctx.textAlign = 'left';
 
   const blob = await new Promise<Blob | null>((resolve) => {
@@ -219,11 +237,6 @@ export async function buildStoryImageFile(opts: {
 // Composites the story into a PNG and triggers a browser download
 // (spec §24). Thin wrapper over buildStoryImageFile so the same composite
 // can instead be handed to the native share sheet (see share.ts).
-export async function downloadStoryImage(opts: {
-  nickname: string;
-  prose: string;
-  pictureUrl: string | null;
-  language: AuthoredLanguage;
-}): Promise<void> {
+export async function downloadStoryImage(opts: StoryImageOptions): Promise<void> {
   downloadFile(await buildStoryImageFile(opts));
 }

@@ -91,10 +91,18 @@ describe('setup', () => {
     const { io, eventsFor } = makeIo();
     startGame(room, io);
 
+    // Step 117: one per player, to that player's socket, since each story's
+    // options can come from a different pool.
     const starts = eventsFor('round:start');
-    expect(starts).toHaveLength(1);
-    expect(starts[0]!.payload).toMatchObject({ roundNumber: 0, question: 'Кто?' });
-    expect((starts[0]!.payload as { deadline: number }).deadline).toBeGreaterThan(Date.now() - 1);
+    expect(starts.map((s) => s.target)).toEqual(['s0', 's1', 's2']);
+    for (const start of starts) {
+      expect(start.payload).toMatchObject({
+        roundNumber: 0,
+        question: 'Кто?',
+        content: { kind: 'base' },
+      });
+      expect((start.payload as { deadline: number }).deadline).toBeGreaterThan(Date.now() - 1);
+    }
   });
 });
 

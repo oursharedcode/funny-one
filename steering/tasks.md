@@ -765,6 +765,26 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     can come out old. The same day the owner took R2 Edit off the token again (checked: R2
     answers 403, Workers AI still works) and cancelled Workers Paid, which runs out on
     3 December 2026. **Next:** Step 117, packs in rooms.
+  - *Decisions 2026-11-21, third set (owner, on Step 117's plan):*
+    - **D1 A — the share video shows the scene, then the ending**: a golden story's aftermath
+      picture, a text card for every other Christmas story. No sound; sleigh bells come with the
+      paid half.
+    - **D2 A — the Christmas funnel counts from Step 117**: a game in a room offered the
+      stories (switch on or off) and a golden story's cartoon seen, per language; landing views
+      with Step 119; the payment steps with the paid half.
+    - **D3 A — Christmas rooms are on from the deploy** (Step 120, a quiet hour before
+      29 November); no server-checked start date. `PACK_ROOMS=off` in the VM's .env is the lever.
+  - **Packs in rooms done 2026-11-21 (Step 117)** — design §4.4 "In rooms" and "On the client",
+    §5's amendment. Every new room in a chr26 language that has the pack's texts is offered
+    chr26, on — en and ru today, the other 18 once Step 118 drafts theirs; the host's lobby
+    switch; two golden stories per game, at random, last in the gallery, their aftermath drawn
+    after the scene (a card if it cannot be had); the slice in every other story. Reveal and
+    gallery show the ending under the scene; a golden story's still and 5 s video carry it, with
+    "Christmas 2026 edition" (ru «Новый год 2027») and a QR to `/xmas` on the website — the
+    landing page in the Android app. No price, no code in any download (tested). `xm_game` and
+    `xm_gold` counted, a `/stats/` section per language, the privacy page in 23 languages.
+    The 6 new interface lines: en and ru the agent's, the other 21 machine drafts on B-3's pile.
+    **Next:** Step 118, the other 18 languages' pack texts.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

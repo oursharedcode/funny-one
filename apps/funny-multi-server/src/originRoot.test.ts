@@ -73,6 +73,14 @@ describe('privacy.html', () => {
     expect(html).toContain('or from the Android app');
   });
 
+  it('names the Christmas funnel among the website counts (Step 117)', () => {
+    const flat = html.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      "a game begun in a room offered the Christmas stories (and whether its host switched them off) and a Christmas story's cartoon seen",
+    );
+    expect(flat).toContain('истории «Новый год 2027» (и выключил ли их ведущий)');
+  });
+
   it('loads nothing: no scripts, stylesheets, images, fonts or frames', () => {
     // The page states that the game makes no third-party requests; it must not
     // make any of its own, to anyone.

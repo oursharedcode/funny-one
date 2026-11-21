@@ -490,6 +490,42 @@ function languageTable(rows: readonly Row[], names: Record<string, string>): HTM
   );
 }
 
+// Step 117 (B-29, D2 A): the Christmas 2026 edition's funnel, per language.
+// Website only, like every count but a visit: the Android app sends neither.
+function christmasSection(rows: readonly Row[], names: Record<string, string>): HTMLElement {
+  const columns: readonly Match[] = [
+    { e: 'xm_game', t: 'on' },
+    { e: 'xm_game', t: 'off' },
+    { e: 'xm_gold' },
+  ];
+  const sumsFor = (match: Match): number[] =>
+    columns.map((column) => total(rows, { ...column, ...match }));
+  const codes = [...new Set([...Object.keys(names), ...rows.map((row) => row.l)])].filter(Boolean);
+  const body = codes
+    .map((code) => ({ code, sums: sumsFor({ l: code }) }))
+    .filter(({ sums }) => sums.some((value) => value > 0))
+    .sort((a, b) => (b.sums[0] ?? 0) - (a.sums[0] ?? 0) || (b.sums[2] ?? 0) - (a.sums[2] ?? 0))
+    .map(({ code, sums }): Child[] => [
+      Object.hasOwn(names, code) ? (names[code] ?? code) : code,
+      ...sums.map(num),
+    ]);
+  return section(
+    'The Christmas 2026 edition',
+    table(
+      [
+        'Language',
+        'Games with the Christmas stories',
+        'Games with them switched off',
+        'Christmas cartoon seen',
+      ],
+      [['All', ...sumsFor({}).map(num)], ...body],
+    ),
+    note(
+      'Website only. Each player’s tab counts a game once, when its first round starts, with the host’s switch as it stood then; and a golden story’s cartoon once, in the reveal or the gallery. The language is the one each player’s screen is in.',
+    ),
+  );
+}
+
 /** The whole page below the period buttons. */
 export function renderStats(summary: Summary, names: Record<string, string>): DocumentFragment {
   const rows = rowsOf(summary);
@@ -572,6 +608,8 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
       ),
     ),
   );
+
+  fragment.append(christmasSection(rows, names));
 
   const arms = (['a', 'b'] as const).map((v) => ({
     v,

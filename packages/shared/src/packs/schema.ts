@@ -13,7 +13,8 @@
 //     equal a base id.
 //   - **A story's content**, decided per story rather than per room: a free
 //     room's ordinary stories take only the pack's prose slots (the *slice*),
-//     its one golden story and every story of a paid room take the whole pack.
+//     its two golden stories (owner decision 1C, 2026-11-21) and every story
+//     of a paid room take the whole pack.
 //   - **An ending drawn as an aftermath** (slot 6's `aftermathEn`): the place
 //     and what is left there, no characters. The model draws every picture
 //     from its prompt alone, so a second picture of the same characters would
@@ -44,6 +45,16 @@ export interface PackConfig {
   /** The slots a free room's ordinary story takes from the pack. */
   readonly sliceSlots: readonly SlotIndex[];
   readonly pools: PackPools;
+  /**
+   * The last day of the pack's free part, `YYYY-MM-DD` (FM-PACK-6): the slice
+   * and the golden stories. Honoured through the whole of that day anywhere on
+   * Earth, so the server's cut-off is noon UTC the next day (`cutoffOf`).
+   * After it a new room is not offered the pack, a game starting plays the
+   * base pools, and the pack is no longer sold.
+   */
+  readonly freeUntil: string;
+  /** The last day a paid code works, `YYYY-MM-DD`, honoured the same way. */
+  readonly paidUntil: string;
 }
 
 /**
@@ -51,10 +62,15 @@ export interface PackConfig {
  *
  *   base  — the base pools in every slot: a room without a pack;
  *   slice — the base pools on the picture slots and the pack's on when, why
- *           and the ending: every story of a free room except its golden one.
- *           Its picture is therefore one the library already holds;
- *   full  — the pack's options in every slot: a free game's golden story, and
- *           every story of a paid room.
+ *           and the ending: every story of a free room except its two golden
+ *           ones. Its picture is therefore one the library already holds, and
+ *           its ending is a text card;
+ *   full  — the pack's options in every slot: a free game's two golden
+ *           stories, and every story of a paid room. Its ending is drawn too,
+ *           as an aftermath.
+ *
+ * Until the paid half there is no paid room, so `full` is exactly a golden
+ * story and a client reads "golden" off the content alone (`isGolden`).
  */
 export type StoryContent =
   { readonly kind: 'base' } | { readonly kind: 'slice' | 'full'; readonly pack: PackId };
@@ -66,6 +82,12 @@ export type StoryContent =
  * grow without another batch.
  */
 export const PACK_OPTIONS_PER_SLOT = 5;
+
+/**
+ * Golden stories in every free game, at every room size (owner decision 1C,
+ * 2026-11-21): picked at random, revealed last, the pack's in every slot.
+ */
+export const GOLDEN_STORIES = 2;
 
 /** The slots an aftermath draws: the place (2) and the ending (6). */
 export const AFTERMATH_SLOTS: readonly SlotIndex[] = [2, 6];

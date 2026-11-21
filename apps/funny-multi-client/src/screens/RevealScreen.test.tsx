@@ -8,14 +8,19 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, fireEvent } from '@testing-library/react';
-import { POOLS, SLOT_COUNT } from '@funny/shared';
+import { POOLS, SLOT_COUNT, optionsFor } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
-import { renderStory } from '../storyLanguage';
-import type { AuthoredLanguage, RevealStartPayload, SlotIndex } from '@funny/shared';
+import { endingText, renderStory } from '../storyLanguage';
+import type { AuthoredLanguage, RevealStartPayload, SlotIndex, StoryContent } from '@funny/shared';
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
+const trackGoldenCartoon = vi.fn();
+vi.mock('../funnel', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../funnel')>()),
+  trackGoldenCartoon,
+}));
 
 const { default: RevealScreen } = await import('./RevealScreen');
 
@@ -29,6 +34,7 @@ const REVEAL: RevealStartPayload = {
   answers: ['a grumpy pirate', 'a battered toaster'],
   prose: 'Once upon a time, a grumpy pirate met a battered toaster.',
   optionIds: IDS,
+  content: { kind: 'base' },
 };
 
 const PICTURE = { url: 'https://worker.example.com/i/abc.png', width: 1024, height: 1024 };
@@ -72,6 +78,7 @@ function switchStoryTo(languageName: string): void {
 
 beforeEach(async () => {
   socketMock.reset();
+  trackGoldenCartoon.mockReset();
   await i18n.changeLanguage('en');
 });
 
@@ -256,5 +263,107 @@ describe('story language (B-15)', () => {
     switchStoryTo('עברית (ישראל)');
     expect(storyBlock(container).getAttribute('dir')).toBe('rtl');
     expect(document.documentElement.dir).toBe('ltr');
+  });
+});
+
+// Step 117 (B-29): a Christmas story's ending shows under the scene once the
+// scene has come; a golden story says so above its text.
+describe('Christmas stories (Step 117)', () => {
+  const GOLDEN: StoryContent = { kind: 'full', pack: 'chr26' };
+  const SLICE: StoryContent = { kind: 'slice', pack: 'chr26' };
+  const idsFor = (content: StoryContent) =>
+    Array.from({ length: SLOT_COUNT }, (_, i) => optionsFor(i as SlotIndex, content)[0]!.id);
+  const revealOf = (content: StoryContent): RevealStartPayload => {
+    const optionIds = idsFor(content);
+    return { ...renderStory('en', optionIds), optionIds, content };
+  };
+  const ENDING = { url: 'https://worker.example.com/i/end.png', width: 1024, height: 1024 };
+  const ENDING_ALT = 'AI-generated cartoon of how your story ended';
+
+  it('marks a golden story above its text, and no other', () => {
+    renderReveal(revealOf(GOLDEN));
+    expect(screen.getByText('🔔 A Christmas story')).toBeTruthy();
+  });
+
+  it('shows no badge on a slice story or a base one', () => {
+    const { unmount } = renderReveal(revealOf(SLICE));
+    expect(screen.queryByText('🔔 A Christmas story')).toBeNull();
+    unmount();
+    renderReveal();
+    expect(screen.queryByText('🔔 A Christmas story')).toBeNull();
+  });
+
+  it("shows a golden story's ending picture under the scene once both have come", () => {
+    renderReveal(revealOf(GOLDEN));
+    expect(screen.queryByAltText(ENDING_ALT)).toBeNull();
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p', ending: ENDING });
+    const ending = screen.getByAltText<HTMLImageElement>(ENDING_ALT);
+    expect(ending.src).toBe(ENDING.url);
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+  });
+
+  it("shows a golden story's ending as a card when its picture could not be had", () => {
+    const reveal = revealOf(GOLDEN);
+    renderReveal(reveal);
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p', ending: null });
+    expect(screen.getByTestId('ending-card').textContent).toContain(endingText(reveal, 'en'));
+  });
+
+  it("shows a slice story's ending as a card once its scene has come", () => {
+    const reveal = revealOf(SLICE);
+    renderReveal(reveal);
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p' });
+    const card = screen.getByTestId('ending-card');
+    expect(card.textContent).toContain(endingText(reveal, 'en'));
+    expect(card.getAttribute('lang')).toBe('en');
+  });
+
+  it('leaves room under an ending card for the floating Continue button, not under a picture', () => {
+    // In the browser the button, 20vh off the bottom, covered the card's words.
+    const { unmount } = renderReveal(revealOf(SLICE));
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p' });
+    expect(screen.getByTestId('ending-card').nextElementSibling).toBe(
+      screen.getByTestId('ending-room'),
+    );
+    unmount();
+    renderReveal(revealOf(GOLDEN));
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p', ending: ENDING });
+    expect(screen.queryByTestId('ending-room')).toBeNull();
+  });
+
+  it('shows no ending while the scene failed', () => {
+    renderReveal(revealOf(SLICE));
+    socketMock.fire('reveal:pictureError', { code: 'GENERIC', message: 'x' });
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+  });
+
+  it('shows no ending for a base story', () => {
+    renderReveal();
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p' });
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+    expect(screen.queryByAltText(ENDING_ALT)).toBeNull();
+  });
+
+  it("retells the ending card in the story's switched language", () => {
+    const reveal = revealOf(SLICE);
+    renderReveal(reveal);
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p' });
+    switchStoryTo('Deutsch (Deutschland)');
+    const card = screen.getByTestId('ending-card');
+    expect(card.getAttribute('lang')).toBe('de');
+    expect(card.textContent).toContain(endingText(renderStory('de', reveal.optionIds), 'de'));
+  });
+
+  it("counts a golden story's cartoon once it has come, and no other story's", () => {
+    const { unmount } = renderReveal(revealOf(SLICE));
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p' });
+    expect(trackGoldenCartoon).not.toHaveBeenCalled();
+    unmount();
+
+    renderReveal(revealOf(GOLDEN));
+    expect(trackGoldenCartoon).not.toHaveBeenCalled();
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p', ending: ENDING });
+    expect(trackGoldenCartoon).toHaveBeenCalled();
   });
 });

@@ -6,7 +6,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from './i18n';
 import { setUrl } from './testutils/socketMock';
-import { __resetFunnelForTest, initFunnel, trackGift, trackSupportOpen } from './funnel';
+import {
+  __resetFunnelForTest,
+  initFunnel,
+  trackChristmasGame,
+  trackGift,
+  trackGoldenCartoon,
+  trackSupportOpen,
+} from './funnel';
 
 let beacon: ReturnType<typeof vi.fn>;
 
@@ -85,6 +92,33 @@ describe('support and gifts', () => {
   });
 });
 
+// Step 117 (D2 A): the Christmas funnel's first two steps.
+describe('the Christmas 2026 edition', () => {
+  it('counts a Christmas game once per page load, switched on or off', () => {
+    setUrl('?from=hub&hv=b');
+    initFunnel();
+    trackChristmasGame(true);
+    trackChristmasGame(false);
+    expect(sent().slice(1)).toEqual([{ e: 'xm_game', s: 'hub', v: 'b', l: 'en', t: 'on' }]);
+  });
+
+  it('counts a game the host switched the Christmas stories off in', () => {
+    setUrl('');
+    initFunnel();
+    trackChristmasGame(false);
+    expect(sent().slice(1)).toEqual([{ e: 'xm_game', s: 'direct', l: 'en', t: 'off' }]);
+  });
+
+  it('counts the first golden cartoon of a page load, in the interface language', async () => {
+    setUrl('');
+    initFunnel();
+    await i18n.changeLanguage('ru');
+    trackGoldenCartoon();
+    trackGoldenCartoon();
+    expect(sent().slice(1)).toEqual([{ e: 'xm_gold', s: 'direct', l: 'ru' }]);
+  });
+});
+
 describe('inside the Android store app', () => {
   it('counts the visit as the app’s, without a variant, whatever the link says', () => {
     setUrl('?shell=android&from=hub&hv=a&lang=de');
@@ -104,11 +138,13 @@ describe('inside the Android store app', () => {
     expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
   });
 
-  it('counts nothing but the visit: the app offers no gifts', () => {
+  it("counts nothing but the visit: no gifts in the app, and the Christmas funnel is the website's", () => {
     setUrl('?shell=android');
     initFunnel();
     trackSupportOpen();
     trackGift('payid');
+    trackChristmasGame(true);
+    trackGoldenCartoon();
     expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
   });
 

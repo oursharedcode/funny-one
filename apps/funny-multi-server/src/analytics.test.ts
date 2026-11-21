@@ -87,6 +87,23 @@ describe('statKey', () => {
     expect(statKey({ e: 'fm_gift', s: 'direct', l: 'ta', t: 'fm' })).toBeNull();
   });
 
+  it('keys the Christmas funnel: a game with the switch, a golden cartoon (Step 117)', () => {
+    expect(statKey({ e: 'xm_game', s: 'hub', v: 'b', l: 'en', t: 'on' })).toBe(
+      'xm_game|b|en|hub|on||',
+    );
+    expect(statKey({ e: 'xm_game', s: 'direct', l: 'de', t: 'off' })).toBe(
+      'xm_game||de|direct|off||',
+    );
+    expect(statKey({ e: 'xm_gold', s: 'direct', l: 'ru' })).toBe('xm_gold||ru|direct|||');
+    // The switch is on or off, and a cartoon carries none.
+    expect(statKey({ e: 'xm_game', s: 'direct', l: 'en' })).toBeNull();
+    expect(statKey({ e: 'xm_game', s: 'direct', l: 'en', t: 'payid' })).toBeNull();
+    expect(statKey({ e: 'xm_gold', s: 'direct', l: 'en', t: 'on' })).toBeNull();
+    // Website only: the app sends its visit and nothing else.
+    expect(statKey({ e: 'xm_game', s: 'app', l: 'en', t: 'on' })).toBeNull();
+    expect(statKey({ e: 'xm_gold', s: 'app', l: 'en' })).toBeNull();
+  });
+
   it.each([
     ['an unknown event', { e: 'page_view', v: 'a', l: 'en', r: 'direct', d: 'm' }],
     ['an unknown field', { e: 'hub_view', v: 'a', l: 'en', r: 'direct', d: 'm', x: '1' }],

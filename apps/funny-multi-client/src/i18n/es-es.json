@@ -38,7 +38,9 @@
     "leave": "Salir",
     "host": "Anfitrión",
     "capReached": "La generación de imágenes no estará disponible durante las próximas ~{{hours}} horas. Podéis jugar igualmente — los jugadores verán el texto de la historia en lugar de los dibujos.",
-    "capReachedHost": "Pulsa Empezar partida cuando estés listo, o espera a que se restablezca el límite diario de imágenes."
+    "capReachedHost": "Pulsa Empezar partida cuando estés listo, o espera a que se restablezca el límite diario de imágenes.",
+    "christmasOn": "🔔 Esta partida tiene dos historias de Navidad",
+    "christmasSwitch": "Jugar con las historias de Navidad 2026"
   },
   "round": {
     "progress": "Ronda {{current}} de {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Aquí tienes vuestra historia",
+    "goldenStory": "🔔 Una historia de Navidad",
     "spinner": "Invocando el caos…",
     "retry": "Reintentar",
     "error": "Falló la generación. Inténtalo de nuevo.",
     "capReached": "El horno de dibujos está lleno. Nuevos dibujos en ~{{hours}} horas.",
     "pictureAlt": "Dibujo generado por IA de vuestra historia",
+    "endingAlt": "Dibujo generado por IA del final de vuestra historia",
     "continue": "Continuar"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Historia de {{nickname}}",
     "noPicture": "No hay imagen para esta historia",
     "pictureAlt": "Dibujo para la historia de {{nickname}}",
+    "endingAlt": "Dibujo del final de la historia de {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Historia anterior",
     "next": "Historia siguiente",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Fuente en GitHub",
     "family": "Familia Divertida",
+    "edition": "Edición Navidad 2026",
     "privacy": "Política de privacidad",
     "contentNotice": "Las respuestas de los jugadores y las imágenes de IA son responsabilidad del operador de este servidor, no del proyecto upstream."
   },

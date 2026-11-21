@@ -20,6 +20,11 @@
 // a switch beside the title retells it in any other; the picture stays as it
 // is, since it never carried text.
 //
+// Step 117 (B-29): a Christmas story shows its ending under the scene once the
+// scene has come — a golden story's ending picture, which `reveal:pictureReady`
+// brings with the scene, or the ending as a card (StoryEnding.tsx) — and a
+// golden story says so above its text.
+//
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
@@ -31,7 +36,10 @@ import WaitingMascot from '../components/art/WaitingMascot';
 import ErrorMascot from '../components/art/ErrorMascot';
 import { hoursUntilUtcMidnight } from '../capReset';
 import { textDirection } from '../i18n';
-import { storyIn } from '../storyLanguage';
+import StoryEnding from '../components/StoryEnding';
+import { trackGoldenCartoon } from '../funnel';
+import { endingText, storyIn } from '../storyLanguage';
+import { BASE_CONTENT, isGolden } from '@funny/shared';
 import type {
   AuthoredLanguage,
   PictureRef,
@@ -63,6 +71,10 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
   const [language, setLanguage] = useState<AuthoredLanguage>(defaultLanguage);
   const [status, setStatus] = useState<PictureStatus>('loading');
   const [picture, setPicture] = useState<PictureRef | null>(null);
+  const [ending, setEnding] = useState<PictureRef | null>(null);
+  // Older servers sent no content: a base story.
+  const content = reveal.content ?? BASE_CONTENT;
+  const golden = isGolden(content);
   const [errorMsg, setErrorMsg] = useState('');
   const [errorCode, setErrorCode] = useState<RevealPictureErrorCode | null>(null);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -73,6 +85,7 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
   useEffect(() => {
     const onReady = (data: RevealPictureReadyPayload): void => {
       setPicture(data.picture);
+      setEnding(data.ending ?? null);
       setStatus('ready');
     };
     const onError = (data: RevealPictureErrorPayload): void => {
@@ -114,6 +127,12 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
       : errorMsg || t('reveal.error');
 
   const story = storyIn(reveal, roomLanguage, language);
+  const showsCartoon = status === 'ready' && picture !== null;
+
+  // The Christmas funnel's golden step (D2 A): a golden story's cartoon seen.
+  useEffect(() => {
+    if (golden && showsCartoon) trackGoldenCartoon();
+  }, [golden, showsCartoon]);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col gap-6 p-6">
@@ -122,12 +141,14 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
         <StoryLanguageSwitch value={language} onChange={setLanguage} />
       </div>
 
+      {golden && <p className="-mb-3 font-semibold text-pink-600">{t('reveal.goldenStory')}</p>}
+
       {/* The story's own lang and dir, which can differ from the interface's. */}
       <div lang={language} dir={textDirection(language)}>
         <ProseText prose={story.prose} answers={story.answers} className="text-xl" />
       </div>
 
-      {status === 'ready' && picture ? (
+      {showsCartoon && picture ? (
         <div className="relative">
           <img
             src={picture.url}
@@ -163,6 +184,24 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
           <p className="text-gray-600">{t('reveal.spinner')}</p>
         </div>
       ) : null}
+
+      {showsCartoon && content.kind !== 'base' && (
+        <>
+          <StoryEnding
+            ending={ending}
+            text={endingText(story, language)}
+            language={language}
+            alt={t('reveal.endingAlt')}
+          />
+          {/* The Continue button below floats 20vh up, over whatever ends the
+              screen: fine over a picture, not over the ending card's words
+              (seen in the browser, Step 117). This much room lets the card
+              scroll clear of it. */}
+          {!ending && (
+            <div aria-hidden="true" data-testid="ending-room" className="h-[20vh] shrink-0" />
+          )}
+        </>
+      )}
 
       {/* Continue link ("ДАЛЬШЕ" etc). Pinned near the bottom of the scroll
           viewport (sticky) so it stays visible without scrolling past a tall

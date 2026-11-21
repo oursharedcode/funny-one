@@ -283,6 +283,7 @@ export async function buildServer({
     const payload: LobbyUpdatePayload = {
       players: room.players,
       hostId: room.hostId,
+      pack: room.pack,
     };
     io.to(room.code).emit('lobby:update', payload);
   }
@@ -448,6 +449,29 @@ export async function buildServer({
       disconnects.cancel(socket.id);
       const result = finalizePlayerRemoval(socket.id);
       if (result) socket.leave(result.room.code);
+    });
+
+    // Step 117 (owner decision 3A): the host's Christmas switch, in the lobby
+    // only — "one more game" restarts without a lobby and keeps the switch as
+    // it was. A room offered no pack has nothing to switch, and a payload that
+    // is not a boolean changes nothing.
+    socket.on('room:setPack', (payload) => {
+      const room = findRoomForSocket(socket.id);
+      if (!room) {
+        socket.emit('error', { code: 'ROOM_NOT_FOUND', message: 'No room.' });
+        return;
+      }
+      if (room.hostId !== socket.id) {
+        socket.emit('error', { code: 'NOT_HOST', message: 'Only the host can change this.' });
+        return;
+      }
+      if (room.phase !== 'lobby') {
+        socket.emit('error', { code: 'ROOM_LOCKED', message: 'Game already started.' });
+        return;
+      }
+      if (!room.pack || typeof payload?.on !== 'boolean') return;
+      room.pack = { ...room.pack, on: payload.on };
+      broadcastLobby(room);
     });
 
     socket.on('game:start', () => {

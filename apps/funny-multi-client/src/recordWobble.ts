@@ -25,12 +25,19 @@
 // which now ships (T-7.2, same placeholder asset as `<LogoStamp />`'s in-app
 // overlay). Still wrapped in a try/catch: a deployer who removes the file
 // without replacing it degrades to "no stamp" rather than a broken export.
+//
+// Step 117 (owner decision D1 A): a Christmas story's clip plays its scene for
+// the first half, then its ending for the second — a golden story's ending
+// picture, or the ending as a text card (videoFooter.ts `drawEndingCard`) —
+// still five seconds, still silent: the sleigh bells come with the paid half.
+// A golden story's footer is the edition's (landingUrl.ts `footerTarget`).
 
-import { LANDING_URL } from './landingUrl';
+import { footerTarget } from './landingUrl';
 import { withBase } from './basePath';
 import { downloadFile } from './share';
 import {
   drawAttribution,
+  drawEndingCard,
   drawStoryText,
   measureAttributionHeight,
   renderQrCanvas,
@@ -42,6 +49,9 @@ const W = 720;
 const H = 1280;
 const FPS = 30;
 const DURATION_MS = 5000;
+// A Christmas story's ending takes over halfway, fading in over FADE_MS.
+const ENDING_AT_MS = DURATION_MS / 2;
+const FADE_MS = 300;
 const CREAM = '#fef3c7';
 const PINK = '#ec4899';
 
@@ -119,7 +129,14 @@ export function isVideoRecordingSupported(): boolean {
   );
 }
 
-export async function buildWobbleVideoFile(opts: {
+/** A Christmas story's ending (Step 117): its picture when it has one. */
+export interface VideoEnding {
+  pictureUrl: string | null;
+  /** The ending in the story's language, for the card. */
+  text: string;
+}
+
+export interface WobbleVideoOptions {
   nickname: string;
   prose: string;
   pictureUrl: string;
@@ -127,8 +144,16 @@ export async function buildWobbleVideoFile(opts: {
    *  from the interface's. The footer notice follows it, not the active
    *  UI locale. */
   language: AuthoredLanguage;
-}): Promise<File> {
+  /** Step 117: a golden story, whose footer is the edition's. */
+  golden?: boolean;
+  /** Step 117: a Christmas story's ending, shown for the clip's second half. */
+  ending?: VideoEnding | null;
+}
+
+export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
+  const ending = opts.ending ?? null;
+  const target = footerTarget(opts.golden === true);
   const mime = pickMime();
   if (!mime) throw new Error('MediaRecorder not supported in this browser');
 
@@ -149,8 +174,17 @@ export async function buildWobbleVideoFile(opts: {
   } catch {
     monkey = null;
   }
+  // The ending's picture is best-effort as well: without it, the card.
+  let endingPicture: HTMLImageElement | null = null;
+  if (ending?.pictureUrl) {
+    try {
+      endingPicture = await loadImage(ending.pictureUrl);
+    } catch {
+      endingPicture = null;
+    }
+  }
   // QR code rendered once, then blitted onto every recorded frame.
-  const qrCanvas = await renderQrCanvas(LANDING_URL);
+  const qrCanvas = await renderQrCanvas(target.url);
 
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -211,11 +245,30 @@ export async function buildWobbleVideoFile(opts: {
     // Picture with the four-axis transform — composed around its own centre.
     const cx = picX + picSize / 2;
     const cy = picY + picSize / 2;
+    // How far the ending has faded in: 0 for the scene, 1 once it has.
+    const endingShown = ending ? Math.min(1, Math.max(0, (elapsed - ENDING_AT_MS) / FADE_MS)) : 0;
     ctx!.save();
     ctx!.translate(cx + w.dx, cy + w.dy);
     ctx!.rotate(w.rot);
     ctx!.scale(w.scale, w.scale);
-    ctx!.drawImage(picture, -picSize / 2, -picSize / 2, picSize, picSize);
+    if (endingShown < 1) {
+      ctx!.globalAlpha = 1 - endingShown;
+      ctx!.drawImage(picture, -picSize / 2, -picSize / 2, picSize, picSize);
+    }
+    if (ending && endingShown > 0) {
+      ctx!.globalAlpha = endingShown;
+      if (endingPicture) {
+        ctx!.drawImage(endingPicture, -picSize / 2, -picSize / 2, picSize, picSize);
+      } else {
+        drawEndingCard(ctx!, ending.text, {
+          x: -picSize / 2,
+          y: -picSize / 2,
+          size: picSize,
+          language,
+        });
+      }
+    }
+    ctx!.globalAlpha = 1;
     // Deployer logo stamp (25×25, bottom-right of the picture rect).
     if (logo) {
       ctx!.drawImage(logo, picSize / 2 - 33, picSize / 2 - 33, 25, 25);
@@ -257,7 +310,13 @@ export async function buildWobbleVideoFile(opts: {
 
     // Static attribution footer matching the downloadable PNG's footer:
     // wrapped content-responsibility notice + QR + source label + URL.
-    drawAttribution(ctx!, qrCanvas, { topY: storyBottom + STORY_GAP, canvasWidth: W, language });
+    drawAttribution(ctx!, qrCanvas, {
+      topY: storyBottom + STORY_GAP,
+      canvasWidth: W,
+      language,
+      labelKey: target.labelKey,
+      urlText: target.urlText,
+    });
 
     if (elapsed >= DURATION_MS) {
       recorder.stop();
@@ -279,11 +338,6 @@ export async function buildWobbleVideoFile(opts: {
 // Records the wobble clip and saves it to disk. Thin wrapper over
 // buildWobbleVideoFile so the same recording can instead be handed to the
 // native share sheet (see share.ts).
-export async function recordWobbleVideo(opts: {
-  nickname: string;
-  prose: string;
-  pictureUrl: string;
-  language: AuthoredLanguage;
-}): Promise<void> {
+export async function recordWobbleVideo(opts: WobbleVideoOptions): Promise<void> {
   downloadFile(await buildWobbleVideoFile(opts));
 }

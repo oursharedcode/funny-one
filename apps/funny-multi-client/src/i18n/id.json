@@ -38,7 +38,9 @@
     "leave": "Keluar",
     "host": "Tuan rumah",
     "capReached": "Pembuatan gambar tidak tersedia selama ~{{hours}} jam ke depan. Kalian masih bisa bermain — pemain akan melihat teks cerita tanpa gambar.",
-    "capReachedHost": "Tekan Mulai permainan kalau siap, atau tunggu kuota gambar harian kembali."
+    "capReachedHost": "Tekan Mulai permainan kalau siap, atau tunggu kuota gambar harian kembali.",
+    "christmasOn": "🔔 Permainan ini punya dua cerita Natal",
+    "christmasSwitch": "Main dengan cerita Natal 2026"
   },
   "round": {
     "progress": "Ronde {{current}} dari {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Ini ceritamu",
+    "goldenStory": "🔔 Cerita Natal",
     "spinner": "Memanggil kekacauan…",
     "retry": "Coba lagi",
     "error": "Pembuatan gagal. Coba lagi.",
     "capReached": "Oven gambar sedang penuh. Gambar baru sekitar ~{{hours}} jam lagi.",
     "pictureAlt": "Gambar kartun ceritamu yang dibuat AI",
+    "endingAlt": "Gambar kartun akhir ceritamu yang dibuat AI",
     "continue": "Lanjut"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Cerita {{nickname}}",
     "noPicture": "Tidak ada gambar untuk cerita ini",
     "pictureAlt": "Gambar untuk cerita {{nickname}}",
+    "endingAlt": "Gambar akhir cerita {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Cerita sebelumnya",
     "next": "Cerita berikutnya",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Sumber di GitHub",
     "family": "Keluarga Lucu",
+    "edition": "Edisi Natal 2026",
     "privacy": "Kebijakan privasi",
     "contentNotice": "Jawaban pemain dan gambar AI adalah tanggung jawab operator server ini, bukan proyek hulu."
   },

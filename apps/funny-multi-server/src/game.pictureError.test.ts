@@ -38,7 +38,7 @@ vi.mock('./image.js', () => {
 });
 
 import { handlePictureRequest } from './game.js';
-import type { Player, Room, Story } from './types.js';
+import type { Player, Room, RoomStory } from './types.js';
 import * as imageModule from './image.js';
 
 type ImageMockExtras = {
@@ -49,20 +49,21 @@ const imageMock = imageModule as unknown as typeof imageModule & ImageMockExtras
 // A story with every visual slot filled from real pool ids — buildPrompt
 // (called for real, unmocked) needs a genuine option id per visual slot, and
 // this is the fixture-equivalent of "seven rounds happened".
-function completeStory(): Story {
+function completeStory(): RoomStory {
   const answers: (OptionId | null)[] = new Array(7).fill(null);
   for (const slot of VISUAL_SLOTS) {
     answers[slot] = POOLS[slot as SlotIndex][0]!.id;
   }
-  return { answers, picture: null };
+  return { answers, picture: null, content: { kind: 'base' }, ending: null };
 }
 
-function makeRoom(players: Player[], stories: Story[]): Room {
+function makeRoom(players: Player[], stories: RoomStory[]): Room {
   return {
     code: 'ABCDEF',
     hostId: players[0]!.id,
     language: 'en',
     multiLanguage: false,
+    pack: null,
     players,
     phase: 'reveal',
     currentRound: 7,

@@ -43,6 +43,7 @@ function lobby(overrides: Partial<LobbyState> = {}): LobbyState {
     multiLanguage: false,
     myLanguage: 'en',
     players: players({ id: 's0' }, { id: 's1' }, { id: 's2' }),
+    pack: null,
     ...overrides,
   };
 }
@@ -59,6 +60,8 @@ const GALLERY: GalleryReadyPayload = {
       answers: ['a pirate'],
       prose: 'a pirate did stuff.',
       optionIds: IDS,
+      content: { kind: 'base' },
+      ending: null,
       picture: null,
     },
   ],
@@ -72,6 +75,8 @@ const GALLERY_TWO: GalleryReadyPayload = {
       answers: ['a pirate'],
       prose: 'a pirate did stuff.',
       optionIds: IDS,
+      content: { kind: 'base' },
+      ending: null,
       picture: { url: 'https://worker.example.com/i/p0.png', width: 1024, height: 768 },
     },
     {
@@ -80,6 +85,8 @@ const GALLERY_TWO: GalleryReadyPayload = {
       answers: ['a robot'],
       prose: 'a robot did other stuff.',
       optionIds: IDS,
+      content: { kind: 'base' },
+      ending: null,
       picture: null,
     },
   ],

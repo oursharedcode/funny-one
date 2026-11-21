@@ -38,7 +38,9 @@
     "leave": "Jáde",
     "host": "Agbàlejò",
     "capReached": "A kò lè ṣe àwòrán fún bí wákàtí {{hours}} tó ń bọ̀. Ẹ ṣì lè ṣeré — àwọn òṣèré yóò rí ọ̀rọ̀ ìtàn dípò àwòrán efe.",
-    "capReachedHost": "Tẹ “Bẹ̀rẹ̀ eré” nígbà tí o bá ṣetán, tàbí dúró títí ìpín àwòrán efe òòjọ́ yóò fi bẹ̀rẹ̀ padà."
+    "capReachedHost": "Tẹ “Bẹ̀rẹ̀ eré” nígbà tí o bá ṣetán, tàbí dúró títí ìpín àwòrán efe òòjọ́ yóò fi bẹ̀rẹ̀ padà.",
+    "christmasOn": "🔔 Ìtàn Kérésìmesì méjì wà nínú eré yìí",
+    "christmasSwitch": "Ṣeré pẹ̀lú àwọn ìtàn Kérésìmesì 2026"
   },
   "round": {
     "progress": "Ìyípo {{current}} nínú {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Ìtàn yín nìyí",
+    "goldenStory": "🔔 Ìtàn Kérésìmesì kan",
     "spinner": "À ń pe wàhálà wá…",
     "retry": "Tún gbìyànjú",
     "error": "A kò rí àwòrán náà ṣe. Tún gbìyànjú.",
     "capReached": "Ìkòkò àwòrán efe ti kún. Àwòrán efe tuntun yóò dé lẹ́yìn bí wákàtí {{hours}}.",
     "pictureAlt": "Àwòrán efe ìtàn yín tí ọgbọ́n àtọwọ́dá ya",
+    "endingAlt": "Àwòrán efe òpin ìtàn yín tí ọgbọ́n àtọwọ́dá ya",
     "continue": "Tẹ̀síwájú"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Ìtàn {{nickname}}",
     "noPicture": "Kò sí àwòrán fún ìtàn yìí",
     "pictureAlt": "Àwòrán efe fún ìtàn {{nickname}}",
+    "endingAlt": "Àwòrán efe òpin ìtàn {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Ìtàn tó ṣáájú",
     "next": "Ìtàn tó kàn",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Kóòdù orísun lórí GitHub",
     "family": "Ìdílé Aláwàdà",
+    "edition": "Ẹ̀dà Kérésìmesì 2026",
     "privacy": "Ìlànà ìpamọ́ àṣírí",
     "contentNotice": "Àṣàyàn àwọn òṣèré àti àwòrán ọgbọ́n àtọwọ́dá jẹ́ ojúṣe ẹni tó ń bójú tó sẹ́fà yìí, kì í ṣe ti iṣẹ́ àkànṣe ìpilẹ̀ṣẹ̀."
   },

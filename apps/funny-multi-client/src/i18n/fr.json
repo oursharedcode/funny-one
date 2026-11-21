@@ -38,7 +38,9 @@
     "leave": "Quitter",
     "host": "Hôte",
     "capReached": "La génération d'images est indisponible pour les ~{{hours}} prochaines heures. Vous pouvez encore jouer — le texte de l'histoire s'affichera à la place des dessins.",
-    "capReachedHost": "Appuie sur Lancer la partie quand tu es prêt, ou attends que le quota quotidien d'images se réinitialise."
+    "capReachedHost": "Appuie sur Lancer la partie quand tu es prêt, ou attends que le quota quotidien d'images se réinitialise.",
+    "christmasOn": "🔔 Cette partie a deux histoires de Noël",
+    "christmasSwitch": "Jouer avec les histoires de Noël 2026"
   },
   "round": {
     "progress": "Manche {{current}} sur {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Voici ton histoire",
+    "goldenStory": "🔔 Une histoire de Noël",
     "spinner": "Convocation du chaos…",
     "retry": "Réessayer",
     "error": "La génération a échoué. Réessaie.",
     "capReached": "Le four à dessins est plein. De nouveaux dessins dans ~{{hours}} heures.",
     "pictureAlt": "Dessin généré par IA de ton histoire",
+    "endingAlt": "Dessin généré par IA de la fin de ton histoire",
     "continue": "Continuer"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Histoire de {{nickname}}",
     "noPicture": "Pas d'image pour cette histoire",
     "pictureAlt": "Dessin pour l'histoire de {{nickname}}",
+    "endingAlt": "Dessin de la fin de l'histoire de {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Histoire précédente",
     "next": "Histoire suivante",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Source sur GitHub",
     "family": "Drôle de famille",
+    "edition": "Édition Noël 2026",
     "privacy": "Politique de confidentialité",
     "contentNotice": "Les réponses des joueurs et les images IA sont sous la responsabilité de l'opérateur de ce serveur, pas du projet en amont."
   },

@@ -10,10 +10,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { POOLS, SLOT_COUNT } from '@funny/shared';
+import { POOLS, SLOT_COUNT, optionsFor } from '@funny/shared';
 import i18n from '../i18n';
-import { renderStory } from '../storyLanguage';
-import type { AuthoredLanguage, GalleryEntry, SlotIndex } from '@funny/shared';
+import { endingText, renderStory } from '../storyLanguage';
+import type { AuthoredLanguage, GalleryEntry, SlotIndex, StoryContent } from '@funny/shared';
 
 const buildStoryImageFile = vi.fn();
 const downloadStoryImage = vi.fn();
@@ -27,6 +27,12 @@ const canShareFiles = vi.fn(() => false);
 const downloadFile = vi.fn();
 const shareFiles = vi.fn();
 vi.mock('../share', () => ({ canShareFiles, downloadFile, shareFiles }));
+
+const trackGoldenCartoon = vi.fn();
+vi.mock('../funnel', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../funnel')>()),
+  trackGoldenCartoon,
+}));
 
 const { default: RoomGallery } = await import('./RoomGallery');
 
@@ -43,6 +49,8 @@ const WITH_PICTURE: GalleryEntry = {
   prose: 'a pirate did stuff.',
   optionIds: IDS,
   picture: { url: 'https://img.example/i/abc.png', width: 1024, height: 1024 },
+  content: { kind: 'base' },
+  ending: null,
 };
 
 const NO_PICTURE: GalleryEntry = {
@@ -52,6 +60,8 @@ const NO_PICTURE: GalleryEntry = {
   prose: 'a robot did stuff.',
   optionIds: OTHER_IDS,
   picture: null,
+  content: { kind: 'base' },
+  ending: null,
 };
 
 function renderGallery(entries: GalleryEntry[], defaultLanguage: AuthoredLanguage = 'en') {
@@ -88,6 +98,7 @@ beforeEach(async () => {
   canShareFiles.mockReset().mockReturnValue(false);
   downloadFile.mockReset();
   shareFiles.mockReset().mockResolvedValue('shared');
+  trackGoldenCartoon.mockReset();
 });
 
 describe('empty gallery', () => {
@@ -129,6 +140,8 @@ describe('download button', () => {
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
+      golden: false,
+      endingUrl: null,
     });
   });
 
@@ -161,6 +174,8 @@ describe('share button', () => {
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
+      golden: false,
+      endingUrl: null,
     });
     expect(shareFiles).toHaveBeenCalledWith([file], {
       title: 'Funny Multi',
@@ -209,6 +224,8 @@ describe('video button', () => {
       prose: 'a pirate did stuff.',
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
+      golden: false,
+      ending: null,
     });
   });
 
@@ -293,5 +310,124 @@ describe('story language (B-15)', () => {
     expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
     expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
     expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
+  });
+});
+
+// Step 117 (B-29): a Christmas story's ending under its scene — the aftermath
+// picture for a golden story, a card for a slice one — and what its exports get.
+describe('Christmas stories (Step 117)', () => {
+  const GOLDEN: StoryContent = { kind: 'full', pack: 'chr26' };
+  const SLICE: StoryContent = { kind: 'slice', pack: 'chr26' };
+  const idsFor = (content: StoryContent) =>
+    Array.from({ length: SLOT_COUNT }, (_, i) => optionsFor(i as SlotIndex, content)[0]!.id);
+  const GOLDEN_IDS = idsFor(GOLDEN);
+  const SLICE_IDS = idsFor(SLICE);
+  const ENDING = { url: 'https://img.example/i/end.png', width: 1024, height: 1024 };
+  const SCENE = { url: 'https://img.example/i/scene.png', width: 1024, height: 1024 };
+
+  const GOLDEN_ENTRY: GalleryEntry = {
+    nickname: 'Mika',
+    isBot: false,
+    ...renderStory('en', GOLDEN_IDS),
+    optionIds: GOLDEN_IDS,
+    picture: SCENE,
+    content: GOLDEN,
+    ending: ENDING,
+  };
+  const SLICE_ENTRY: GalleryEntry = {
+    nickname: 'Rin',
+    isBot: false,
+    ...renderStory('en', SLICE_IDS),
+    optionIds: SLICE_IDS,
+    picture: SCENE,
+    content: SLICE,
+    ending: null,
+  };
+
+  it("shows a golden story's badge and its ending picture under the scene", () => {
+    renderGallery([GOLDEN_ENTRY]);
+    expect(screen.getByText('🔔 A Christmas story')).toBeTruthy();
+    const ending = screen.getByAltText<HTMLImageElement>("Cartoon of how Mika's story ended");
+    expect(ending.src).toBe(ENDING.url);
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+  });
+
+  it("shows a golden story's ending as a card when its picture could not be had", () => {
+    renderGallery([{ ...GOLDEN_ENTRY, ending: null }]);
+    const card = screen.getByTestId('ending-card');
+    expect(card.textContent).toContain(endingText(renderStory('en', GOLDEN_IDS), 'en'));
+  });
+
+  it("shows a slice story's ending as a card, with no badge", () => {
+    renderGallery([SLICE_ENTRY]);
+    expect(screen.queryByText('🔔 A Christmas story')).toBeNull();
+    const card = screen.getByTestId('ending-card');
+    expect(card.textContent).toContain(endingText(renderStory('en', SLICE_IDS), 'en'));
+    expect(screen.queryByAltText("Cartoon of how Rin's story ended")).toBeNull();
+  });
+
+  it('shows no ending at all for a base story', () => {
+    renderGallery([WITH_PICTURE]);
+    expect(screen.queryByTestId('ending-card')).toBeNull();
+    expect(screen.queryByAltText("Cartoon of how Mika's story ended")).toBeNull();
+    expect(screen.queryByText('🔔 A Christmas story')).toBeNull();
+  });
+
+  it('retells the ending card in the language the story is switched to', () => {
+    renderGallery([SLICE_ENTRY]);
+    switchStoryTo('Deutsch (Deutschland)');
+    const card = screen.getByTestId('ending-card');
+    expect(card.getAttribute('lang')).toBe('de');
+    expect(card.textContent).toContain(endingText(renderStory('de', SLICE_IDS), 'de'));
+  });
+
+  it("hands a golden story's ending to its still and its video", async () => {
+    canShareFiles.mockReturnValue(true);
+    isVideoRecordingSupported.mockReturnValue(true);
+    renderGallery([GOLDEN_ENTRY]);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+
+    await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
+    const still = { golden: true, endingUrl: ENDING.url, pictureUrl: SCENE.url };
+    expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject(still);
+    expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject(still);
+    expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({
+      golden: true,
+      ending: {
+        pictureUrl: ENDING.url,
+        text: endingText(renderStory('en', GOLDEN_IDS), 'en'),
+      },
+    });
+  });
+
+  it("ends a slice story's video on its card, with no edition footer", async () => {
+    isVideoRecordingSupported.mockReturnValue(true);
+    renderGallery([SLICE_ENTRY]);
+    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
+    expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({
+      golden: false,
+      ending: { pictureUrl: null, text: endingText(renderStory('en', SLICE_IDS), 'en') },
+    });
+  });
+
+  it("counts a golden story's cartoon, and no other", () => {
+    const { unmount } = renderGallery([WITH_PICTURE, SLICE_ENTRY]);
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(trackGoldenCartoon).not.toHaveBeenCalled();
+    unmount();
+
+    renderGallery([{ ...GOLDEN_ENTRY, picture: null }]);
+    expect(trackGoldenCartoon).not.toHaveBeenCalled();
+  });
+
+  it('counts a golden cartoon once it is on screen', () => {
+    renderGallery([WITH_PICTURE, GOLDEN_ENTRY]);
+    expect(trackGoldenCartoon).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(trackGoldenCartoon).toHaveBeenCalled();
   });
 });

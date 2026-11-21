@@ -8,6 +8,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
+import { setUrl } from './testutils/socketMock';
+import { LANDING_URL, LANDING_URL_TEXT, XMAS_URL, XMAS_URL_TEXT } from './landingUrl';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -252,5 +254,120 @@ describe('recordWobbleVideo', () => {
     });
     expect(downloadFile).toHaveBeenCalledTimes(1);
     expect(downloadFile.mock.calls[0]?.[0]).toBeInstanceOf(File);
+  });
+});
+
+// Step 117 (B-29): a Christmas story's clip shows the scene for its first half
+// and its ending for the second — the golden story's ending picture, or the
+// ending as a card — and a golden story's footer names the edition.
+describe('a Christmas story in the clip (Step 117)', () => {
+  const ENDING_URL = 'https://img.example/i/end.png';
+  const TEXT = 'Everyone sang carols.';
+  let ctx: Canvas2DStub;
+
+  beforeEach(() => {
+    ctx = installCanvasStub();
+    toCanvas.mockClear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    sessionStorage.clear();
+    setUrl('');
+  });
+
+  function drawsOf(src: string): number {
+    return ctx.calls.filter(
+      (c) =>
+        c.method === 'drawImage' && c.args[0] instanceof HTMLImageElement && c.args[0].src === src,
+    ).length;
+  }
+
+  function bells(): number {
+    return ctx.calls.filter((c) => c.method === 'fillText' && c.args[0] === '🔔').length;
+  }
+
+  function texts(): string[] {
+    return ctx.calls.filter((c) => c.method === 'fillText').map((c) => String(c.args[0]));
+  }
+
+  it('shows the scene for the whole clip when the story is not a Christmas one', async () => {
+    installRecorderEnv();
+    await buildWobbleVideoFile(story);
+    expect(drawsOf(story.pictureUrl)).toBe(25);
+    expect(bells()).toBe(0);
+  });
+
+  // Frames land every 200 ms; the ending fades in from 2.5 s over 0.3 s, so
+  // the 2.6 s frame shows both and every later one the ending alone.
+  it("hands a golden story's second half to its ending picture", async () => {
+    installRecorderEnv();
+    await buildWobbleVideoFile({
+      ...story,
+      golden: true,
+      ending: { pictureUrl: ENDING_URL, text: TEXT },
+    });
+    expect(drawsOf(story.pictureUrl)).toBe(13);
+    expect(drawsOf(ENDING_URL)).toBe(13);
+    expect(bells()).toBe(0);
+  });
+
+  it("ends a slice story's clip on its ending card", async () => {
+    installRecorderEnv();
+    await buildWobbleVideoFile({ ...story, ending: { pictureUrl: null, text: TEXT } });
+    expect(drawsOf(story.pictureUrl)).toBe(13);
+    expect(bells()).toBe(13);
+    expect(texts()).toContain(TEXT);
+  });
+
+  it('falls back to the card when the ending picture cannot be had', async () => {
+    installRecorderEnv({ failing: ['deployer-logo', '/end.png'] });
+    const file = await buildWobbleVideoFile({
+      ...story,
+      golden: true,
+      ending: { pictureUrl: ENDING_URL, text: TEXT },
+    });
+    expect(file.name).toBe('funny-stories-Mika.webm');
+    expect(drawsOf(ENDING_URL)).toBe(0);
+    expect(bells()).toBe(13);
+  });
+
+  it("leads a golden story's clip to the edition's page on the website", async () => {
+    installRecorderEnv();
+    await buildWobbleVideoFile({ ...story, golden: true, ending: null });
+    expect(toCanvas).toHaveBeenCalledWith(expect.anything(), XMAS_URL, expect.anything());
+    expect(texts()).toContain('Christmas 2026 edition');
+    expect(texts()).toContain(XMAS_URL_TEXT);
+  });
+
+  it('keeps the landing page in the Android app', async () => {
+    setUrl('?shell=android');
+    installRecorderEnv();
+    await buildWobbleVideoFile({ ...story, golden: true, ending: null });
+    expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
+    expect(texts()).toContain('Christmas 2026 edition');
+    expect(texts()).toContain(LANDING_URL_TEXT);
+  });
+
+  // A download leaves the room: never its code, nor a link holding one, nor a
+  // price in the free half (owner decision 5A).
+  it.each([
+    ['a base story on the website', '?room=WXYZ', false],
+    ['a golden story on the website', '?room=WXYZ', true],
+    ['a golden story in the Android app', '?room=WXYZ&shell=android', true],
+  ])('carries no code and no price: %s', async (_name, search, golden) => {
+    setUrl(search);
+    installRecorderEnv();
+    await buildWobbleVideoFile({
+      ...story,
+      golden,
+      ending: golden ? { pictureUrl: ENDING_URL, text: TEXT } : null,
+    });
+    const encoded = toCanvas.mock.calls.map((c) => String(c[1]));
+    expect(encoded).toHaveLength(1);
+    for (const text of [...encoded, ...texts()]) {
+      expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock/i);
+      expect(text).not.toMatch(/[$€£₽¥₹]|A\$|AUD|USD/);
+    }
   });
 });

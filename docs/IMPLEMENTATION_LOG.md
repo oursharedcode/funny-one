@@ -7426,16 +7426,105 @@ agent's memory) and stops with a plain message when it is unset; the path stays 
 typecheck 0, lint 0, format:check clean, `npm test` 1739/1739 across the 6 workspaces,
 `npm audit --omit=dev` 0; CI pending the push.
 
-**RESUME HERE (2026-11-21, after Step 116; its follow-up not yet pushed).** Step 116 is pushed
-and green (`2d4a149`). **B-29's 650 pictures are in the bucket; the token is back to no R2; Workers Paid
-runs out on 3 December.** **Next, Step 117 (the agent's) — packs in rooms**, for 29 November:
-3A's Christmas room by default in the 20 languages with the host's switch; 4A's room-language
-rule with English for ar, he and fa; the Christmas when/why/ending words; **two golden stories**
-drawing the stored pictures; FM-PACK-6's two dates, server-checked, with `schema.ts`'s comments;
-5A's download footer ("Christmas 2026 edition" and the QR to `/xmas`), no price. Then 118 the
-other 18 languages' machine drafts, 119 the `?pack=chr26` landing variant and `/xmas`, 120 the
-deploy at a quiet hour before 29 November; if 117–119 are not passing by Friday 27 November, the
-owner chooses between 6 December and a smaller launch. Then the paid code and the rails by about
-10 December. **Owed, the owner's:** the live-badge look; Funny Multi's trader confirmation
-before 1 Feb 2027; for the rails, the Sponsors tier (its text naming 1 August 2027) and webhook
-and the Lightning service.
+~~RESUME HERE (2026-11-21, after Step 116; its follow-up not yet pushed)~~ — the follow-up
+pushed as `9cfca32`, CI green (run 44867650484); carried into Step 117's note.
+
+## Step 117 (task B-29) — packs in rooms (2026-11-21)
+
+**Owner decisions, 2026-11-21 (`/morning`), on Step 117's plan:** **D1 A** — the share video
+shows the scene, then the ending: a golden story's aftermath picture, a text card for every
+other Christmas story; no sound (sleigh bells come with the paid half). **D2 A** — the Christmas
+funnel counts from this step: a game in a room offered the stories (switch on or off) and a
+golden story's cartoon seen, per language; landing views with Step 119, the payment steps with
+the paid half. **D3 A** — Christmas rooms are on from the deploy (Step 120), with no
+server-checked start date; `PACK_ROOMS=off` in the VM's .env is the lever. All in B-29's block.
+
+**Shipped:**
+
+- **Shared** (`packs/index.ts`, `packs/schema.ts`, `events.ts`): `packForRoom(language, now)` —
+  the first pack that names the room's language, has its texts in it and is still free
+  (FM-PACK-6, `cutoffOf`'s "last day anywhere on Earth"); `freeGameContents` — two golden stories
+  at random (1C), `full`, the rest the `slice`; `isGolden`; `optionTexts(lang)` reads a pack's
+  words in English where the language has none (4A). Wire: `room:setPack {on}` (host, lobby
+  only), `LobbyUpdatePayload.pack`, `round:start.content` per player, `reveal:start.content`,
+  `reveal:pictureReady.ending`, gallery entries with their content and ending. `schema.ts`'s
+  comments say two golden stories.
+- **Server** (`rooms.ts`, `game.ts`, `index.ts`): `packOffer` gives a new room its pack, on;
+  `PACK_ROOMS=off` makes every new room ordinary (and is this workspace's test default, the pack
+  suites turning it back on). At each game start the contents are drawn afresh — "one more game"
+  included — and FM-PACK-6 is checked again, for a lobby left open across the cut-off. Each
+  player gets the options of the story it writes; picks and bot fills are checked against
+  `optionsFor(slot, content)` (a pack slot of 5 can run out of unused ids in a room of 6–7: the
+  draw then repeats one rather than throwing). A golden story's aftermath is asked for after its
+  scene and sent with it — an `/exists` hit on the stored 25, no cap slot; any failure leaves it
+  null and the client shows the card. The gallery lists the golden stories last.
+- **Client:** the lobby's line "🔔 This game has two Christmas stories" (ru «🔔 В этой игре две
+  новогодние истории») for everyone and the host's switch "Play with the Christmas 2026 stories"
+  (ru «Играть с историями «Новый год 2027»»); the round screen offers each story's own options;
+  reveal and gallery show "🔔 A Christmas story" on a golden story and the ending under the scene
+  (new `StoryEnding.tsx`: the picture, or the ending as a card); `endingText` in
+  `storyLanguage.ts`. **Downloads:** a golden story's still stacks the ending under the scene
+  (best-effort: without it, the plain still); the video stays 5 s and silent, the ending fading
+  in at 2.5 s (a card for the slice); a golden story's footer reads "Christmas 2026 edition" with
+  a QR to `/xmas` on the website, the landing page inside the Android app (`?shell=android`, kept
+  in sessionStorage; `landingUrl.ts` `footerTarget`). No price anywhere, no room or unlock code
+  in any file (tested).
+- **Funnel** (D2 A): `xm_game` (`t` on/off, the switch as it stood when the first round began)
+  and `xm_gold`, once per page load each, website only; the server's allowlist takes them (its
+  header's count of combinations, already stale, now 86 a language a day); `/stats/` gains "The
+  Christmas 2026 edition", per language. **Privacy page** (`deploy/origin-root/funny37/`): the
+  two counts named in all 23 languages, dated 2026-11-21, with a test on en and ru.
+- **Interface lines:** 6 new keys in all 23 catalogues — en and ru the agent's, the other 21
+  machine drafts on B-3's pile.
+- **Docs:** design §4.4 "In rooms" and "On the client", §5's amendment, §11's `PACK_ROOMS` row;
+  B-29's Step 117 line in tasks.md.
+- **Tests:** 1739 → 1840 — shared 299 → 317, server 330 → 358 (new `game.pack.test.ts` and
+  `pack.socket.test.ts`, the latter over real sockets), client 397 → 451, family site 447 → 448.
+
+**Language reach today:** only **en and ru** rooms are offered the pack — `packForRoom` needs a
+language's own texts, and the other 18 of the edition's 20 come with Step 118. A German room is
+an ordinary room until then; an ar, he or fa room never gets one.
+
+**Verified in the browser** (`.screens/step117-check.mjs`, gitignored: the production build on
+3000, the real `cloudflare/worker.js` stand-in on 5185 over the live library, Chromium at
+360 × 740; every run `problems: []`, no console errors, every picture a library hit):
+
+- **A, an en room of 3, pack on:** the host sees the line and the checked switch, guests the line
+  only; every round mixes two golden stories and one slice, and every player's options match
+  `optionsFor` (5 pack options, or 10 base in a slice's base slots). Golden reveals: badge and
+  a decoded ending picture; the slice: a card ("🔔 The Christmas tree fell over, very slowly").
+  Gallery: the slice, then the two golden stories. Downloads: a golden still on the web — scene
+  and ending, "Christmas 2026 edition", `www.funny-family.oursharedcode.com/xmas`; the same with
+  `?shell=android` — the landing address; a slice still; the video — the scene at 1 s, the
+  ending at 4 s (ffmpeg frames), the edition's footer. File names carry no room code.
+- **B, switch off:** no line; every story base, no badge, no card.
+- **C, a ru room:** the ru lines, the pack words in Russian, golden endings drawn, the slice's
+  card «🔔 Дед Мороз оставил только пустой мешок и вежливую записку».
+- **D:** ar and de lobbies — no line, no switch, pack null.
+- **E, an en room with a ru and an ar player:** all see the line, only the host the switch; the
+  ru player reads the pack in Russian, the ar player in English (4A) on an RTL screen — the
+  English runs sit in the right order inside the Arabic sentence, punctuation where Arabic puts
+  it.
+- **Found and fixed in the browser:** the reveal's Continue button floats 20vh up and covered the
+  ending card's words; a spacer under a card (not under a picture) lets the card scroll clear of
+  it, with a test.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test` 1840/1840 across 6 workspaces
+(448 funny-family-site, 451 funny-multi-client, 358 funny-multi-server, 178 funny-one-client,
+317 shared, 88 cloudflare); `npm audit --omit=dev` 0; full `npm audit` 9 moderate under exactly
+the two accepted ids (GHSA-3g3m-2fjr-6pw4 glob, GHSA-g3hv-75wg-m249 minimatch); CI pending the
+push.
+
+**Owed:** nothing of this step's; the 21 machine-drafted interface lines join B-3's pile. The
+owner's lines are unchanged.
+
+**RESUME HERE (2026-11-21, after Step 117; not yet pushed).** Step 116 and its follow-up are
+pushed and green (`9cfca32`). **Packs are in rooms, en and ru only until their texts exist.**
+**Next, Step 118 (the agent's) — the other 18 languages' chr26 texts**, machine drafts of the
+pack's words, so `packForRoom` offers the pack in all 20; then 119 the `?pack=chr26` landing variant and `/xmas` (its landing views counted, D2
+A), 120 the deploy at a quiet hour before 29 November (rooms on from then, D3 A). If 117–119 are
+not passing by Friday 27 November, the owner chooses between 6 December and a smaller launch.
+Then the paid code and the rails by about 10 December, the date on every pay screen, and how
+the agent retires chr26's Sponsors tier on 1 July 2027. **Owed, the owner's:** the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier (its
+text naming 1 August 2027) and webhook and the Lightning service.

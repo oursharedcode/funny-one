@@ -37,7 +37,9 @@
     "leave": "Leave",
     "host": "Host",
     "capReached": "Picture generation is unavailable for the next ~{{hours}} hours. You can still play — players will see story text in place of cartoons.",
-    "capReachedHost": "Tap Start Game when ready, or wait until the daily cartoon allowance resets."
+    "capReachedHost": "Tap Start Game when ready, or wait until the daily cartoon allowance resets.",
+    "christmasOn": "🔔 This game has two Christmas stories",
+    "christmasSwitch": "Play with the Christmas 2026 stories"
   },
   "round": {
     "progress": "Round {{current}} of {{total}}",
@@ -56,11 +58,13 @@
   },
   "reveal": {
     "title": "Here's your story",
+    "goldenStory": "🔔 A Christmas story",
     "spinner": "Summoning chaos…",
     "retry": "Try again",
     "error": "Generation failed. Try again.",
     "capReached": "The cartoon oven is full. New cartoons in ~{{hours}} hours.",
     "pictureAlt": "AI-generated cartoon of your story",
+    "endingAlt": "AI-generated cartoon of how your story ended",
     "continue": "Continue"
   },
   "end": {
@@ -102,6 +106,7 @@
     "storyBy": "{{nickname}}'s story",
     "noPicture": "No picture for this story",
     "pictureAlt": "Cartoon for {{nickname}}'s story",
+    "endingAlt": "Cartoon of how {{nickname}}'s story ended",
     "counter": "{{index}} / {{total}}",
     "prev": "Previous story",
     "next": "Next story",
@@ -118,6 +123,7 @@
   "footer": {
     "source": "Source on GitHub",
     "family": "Funny Family",
+    "edition": "Christmas 2026 edition",
     "privacy": "Privacy policy",
     "contentNotice": "Player picks and AI pictures are the responsibility of the operator of this server, not of the upstream project."
   },

@@ -6,6 +6,10 @@
 // slice that never touches the picture. Then the Christmas 2026 edition's
 // drafted texts against the base templates' rules, and `optionsFor`.
 //
+// Then the rules that bring a pack into a room (Step 117): the dates
+// (FM-PACK-6), which room is offered it, the two golden stories, and the
+// display texts with the English fallback (owner decision 4A).
+//
 // The prompts — 625 scenes, 25 aftermaths, the length cap, the refusals — are
 // tested with the rest of the prompt builder, in the server's prompt.test.ts.
 //
@@ -33,8 +37,19 @@ import type { OptionId, SlotIndex } from '../pools/schema.js';
 import { POOL_TEXTS } from '../pools/text/index.js';
 import { CHR26_TEXTS } from './chr26/text/index.js';
 import type { Chr26DraftedLanguage } from './chr26/text/index.js';
-import { CHR26_LANGUAGES, PACKS, PACK_TEXTS, optionsFor } from './index.js';
-import { PACK_IDS, PACK_OPTIONS_PER_SLOT } from './schema.js';
+import {
+  CHR26_LANGUAGES,
+  PACKS,
+  PACK_TEXTS,
+  cutoffOf,
+  freeGameContents,
+  isGolden,
+  isPackFree,
+  optionTexts,
+  optionsFor,
+  packForRoom,
+} from './index.js';
+import { GOLDEN_STORIES, PACK_IDS, PACK_OPTIONS_PER_SLOT } from './schema.js';
 import type { StoryContent } from './schema.js';
 
 function expectFragment(id: OptionId, fragment: string | undefined): void {
@@ -281,6 +296,118 @@ describe('optionsFor (FM-PACK-4)', () => {
   it('offers the pack in every slot of a full story', () => {
     for (const config of SLOTS) {
       expect(optionsFor(config.slot, { kind: 'full', pack: 'chr26' })).toBe(pack[config.slot]);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Packs in rooms (Step 117) — dates, offer, golden stories, texts
+// ---------------------------------------------------------------------------
+
+describe('the dates (FM-PACK-6)', () => {
+  it('ends a last day at noon UTC the next day, when it has ended everywhere on Earth', () => {
+    expect(new Date(cutoffOf('2027-07-01')).toISOString()).toBe('2027-07-02T12:00:00.000Z');
+    expect(new Date(cutoffOf('2027-08-01')).toISOString()).toBe('2027-08-02T12:00:00.000Z');
+  });
+
+  it("dates chr26's free part to 1 July 2027 and its paid codes to 1 August 2027", () => {
+    expect(PACKS.chr26.freeUntil).toBe('2027-07-01');
+    expect(PACKS.chr26.paidUntil).toBe('2027-08-01');
+  });
+
+  it('refuses anything but a YYYY-MM-DD day', () => {
+    expect(() => cutoffOf('2027-7-1')).toThrow();
+    expect(() => cutoffOf('not a day')).toThrow();
+  });
+
+  it('keeps the free part on to the last millisecond before the cut-off, and off from it', () => {
+    const cutoff = Date.parse('2027-07-02T12:00:00Z');
+    expect(isPackFree('chr26', Date.parse('2026-11-29T00:00:00Z'))).toBe(true);
+    expect(isPackFree('chr26', cutoff - 1)).toBe(true);
+    expect(isPackFree('chr26', cutoff)).toBe(false);
+  });
+});
+
+describe('packForRoom (owner decisions 3A and 4A)', () => {
+  const now = Date.parse('2026-11-29T00:00:00Z');
+
+  it('offers chr26 to a room in every language with its texts', () => {
+    for (const language of Object.keys(PACK_TEXTS.chr26) as Chr26DraftedLanguage[]) {
+      expect(packForRoom(language, now), language).toBe('chr26');
+    }
+  });
+
+  it('offers no pack to ar, he and fa, nor to a language whose texts are not drafted yet', () => {
+    for (const language of AUTHORED_LANGUAGES) {
+      const drafted = (PACK_TEXTS.chr26 as Record<string, unknown>)[language] !== undefined;
+      expect(packForRoom(language, now), language).toBe(drafted ? 'chr26' : null);
+    }
+    for (const language of ['ar', 'he', 'fa'] as const) {
+      expect(packForRoom(language, now)).toBeNull();
+    }
+  });
+
+  it('offers it no longer once the free part has ended', () => {
+    expect(packForRoom('en', Date.parse('2027-07-02T11:59:59Z'))).toBe('chr26');
+    expect(packForRoom('en', Date.parse('2027-07-02T12:00:00Z'))).toBeNull();
+  });
+});
+
+describe('freeGameContents (FM-PACK-4, owner decision 1C)', () => {
+  it.each([3, 4, 5, 6, 7])('makes two golden stories in a game of %i, the rest the slice', (n) => {
+    for (let run = 0; run < 50; run++) {
+      const contents = freeGameContents('chr26', n);
+      expect(contents).toHaveLength(n);
+      expect(contents.filter(isGolden)).toHaveLength(GOLDEN_STORIES);
+      for (const content of contents) {
+        expect(content).toEqual({ kind: isGolden(content) ? 'full' : 'slice', pack: 'chr26' });
+      }
+    }
+  });
+
+  it('can make any story golden', () => {
+    const seen = new Set<number>();
+    for (let run = 0; run < 400; run++) {
+      freeGameContents('chr26', 7).forEach((content, i) => {
+        if (isGolden(content)) seen.add(i);
+      });
+    }
+    expect([...seen].sort()).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it('ends whatever the random source returns', () => {
+    expect(freeGameContents('chr26', 5, () => 0).filter(isGolden)).toHaveLength(2);
+    expect(freeGameContents('chr26', 5, () => 0.999999).filter(isGolden)).toHaveLength(2);
+    expect(freeGameContents('chr26', 5, () => 1).filter(isGolden)).toHaveLength(2);
+  });
+
+  it('marks only a full story golden', () => {
+    expect(isGolden({ kind: 'base' })).toBe(false);
+    expect(isGolden({ kind: 'slice', pack: 'chr26' })).toBe(false);
+    expect(isGolden({ kind: 'full', pack: 'chr26' })).toBe(true);
+  });
+});
+
+describe('optionTexts (owner decision 4A)', () => {
+  const packIds = Object.values(PACKS.chr26.pools).flatMap((options) => options.map((o) => o.id));
+
+  it("resolves every base id to the language's own text", () => {
+    for (const language of AUTHORED_LANGUAGES) {
+      for (const id of ALL_OPTION_IDS) {
+        expect(optionTexts(language)[id]).toBe(POOL_TEXTS[language][id]);
+      }
+    }
+  });
+
+  it("resolves every pack id to the language's own text where it has one", () => {
+    for (const language of Object.keys(CHR26_TEXTS) as Chr26DraftedLanguage[]) {
+      for (const id of packIds) expect(optionTexts(language)[id]).toBe(CHR26_TEXTS[language][id]);
+    }
+  });
+
+  it('resolves every pack id to English in a language without its texts', () => {
+    for (const language of ['ar', 'he', 'fa', 'de'] as const) {
+      for (const id of packIds) expect(optionTexts(language)[id]).toBe(CHR26_TEXTS.en[id]);
     }
   });
 });

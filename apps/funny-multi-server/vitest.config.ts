@@ -15,5 +15,9 @@ export default defineConfig({
     testTimeout: 20_000,
     // afterEach closes a live server and waits for its sockets to unwind.
     hookTimeout: 20_000,
+    // Step 117: every room the suites create is an ordinary one, so the
+    // fixtures that pick base options keep working. The pack tests turn packs
+    // back on for themselves (vi.stubEnv('PACK_ROOMS', 'on')).
+    env: { PACK_ROOMS: 'off' },
   },
 });

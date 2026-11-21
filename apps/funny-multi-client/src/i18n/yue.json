@@ -38,7 +38,9 @@
     "leave": "離開",
     "host": "房主",
     "capReached": "之後大約 {{hours}} 個鐘都冇得整圖。你照樣可以玩 — 玩家會見到故事文字，代替漫畫。",
-    "capReachedHost": "準備好就撳「開始遊戲」，或者等每日漫畫額度重設。"
+    "capReachedHost": "準備好就撳「開始遊戲」，或者等每日漫畫額度重設。",
+    "christmasOn": "🔔 呢局有兩個聖誕故事",
+    "christmasSwitch": "玩 2026 聖誕故事"
   },
   "round": {
     "progress": "第 {{current}} 輪，共 {{total}} 輪",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "你嘅故事嚟喇",
+    "goldenStory": "🔔 聖誕故事",
     "spinner": "召喚混亂中…",
     "retry": "再試一次",
     "error": "整唔到。再試一次啦。",
     "capReached": "漫畫焗爐滿晒喇。大約 {{hours}} 個鐘之後先有新漫畫。",
     "pictureAlt": "AI 幫你個故事畫嘅漫畫",
+    "endingAlt": "AI 幫你個故事結局畫嘅漫畫",
     "continue": "繼續"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "{{nickname}} 嘅故事",
     "noPicture": "呢個故事冇圖",
     "pictureAlt": "{{nickname}} 個故事嘅漫畫",
+    "endingAlt": "{{nickname}} 個故事結局嘅漫畫",
     "counter": "{{index}} / {{total}}",
     "prev": "上一個故事",
     "next": "下一個故事",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "GitHub 上嘅原始碼",
     "family": "搞笑一家親",
+    "edition": "2026 聖誕特別版",
     "privacy": "私隱政策",
     "contentNotice": "玩家揀嘅答案同 AI 圖片，由呢個伺服器嘅營運者負責，同上游項目無關。"
   },

@@ -38,7 +38,9 @@
     "leave": "Verlassen",
     "host": "Host",
     "capReached": "Bildgenerierung ist für die nächsten ~{{hours}} Stunden nicht verfügbar. Ihr könnt trotzdem spielen — die Spieler sehen Story-Text statt Zeichnungen.",
-    "capReachedHost": "Tippe auf Spiel starten, wenn du bereit bist, oder warte, bis das Tageslimit für Bilder zurückgesetzt wird."
+    "capReachedHost": "Tippe auf Spiel starten, wenn du bereit bist, oder warte, bis das Tageslimit für Bilder zurückgesetzt wird.",
+    "christmasOn": "🔔 Dieses Spiel hat zwei Weihnachtsgeschichten",
+    "christmasSwitch": "Mit den Weihnachtsgeschichten 2026 spielen"
   },
   "round": {
     "progress": "Runde {{current}} von {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Hier ist eure Geschichte",
+    "goldenStory": "🔔 Eine Weihnachtsgeschichte",
     "spinner": "Beschwöre Chaos…",
     "retry": "Erneut versuchen",
     "error": "Generierung fehlgeschlagen. Versuch es nochmal.",
     "capReached": "Der Zeichen-Ofen ist voll. Neue Zeichnungen in ~{{hours}} Stunden.",
     "pictureAlt": "KI-generierte Zeichnung eurer Geschichte",
+    "endingAlt": "KI-generierte Zeichnung vom Ende eurer Geschichte",
     "continue": "Weiter"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Geschichte von {{nickname}}",
     "noPicture": "Kein Bild für diese Geschichte",
     "pictureAlt": "Zeichnung zur Geschichte von {{nickname}}",
+    "endingAlt": "Zeichnung vom Ende der Geschichte von {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Vorherige Geschichte",
     "next": "Nächste Geschichte",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Quelle auf GitHub",
     "family": "Familienquatsch",
+    "edition": "Weihnachtsausgabe 2026",
     "privacy": "Datenschutzerklärung",
     "contentNotice": "Spielerantworten und KI-Bilder liegen in der Verantwortung des Betreibers dieses Servers, nicht des Upstream-Projekts."
   },

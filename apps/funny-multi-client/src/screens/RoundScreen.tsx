@@ -11,7 +11,8 @@
 // `RoundScreen.test.tsx` asserts that structurally rather than trusting review.
 //
 // Options are not on the wire (DD-2): `round:start` carries only the round
-// number, the question and the deadline. The client bundles the same
+// number, the question, the deadline and, since Step 117, the content of the
+// story this player writes this round (base, slice or golden). The client bundles the same
 // `@funny/shared` build as the server, so it renders the pool for
 // (roundNumber, room language) locally — the protocol does not grow with pool
 // size, and the two sides cannot disagree about pool content because they ship
@@ -31,7 +32,14 @@ import ScrollBox from '../components/ScrollBox';
 import SubmitConfirm from '../components/art/SubmitConfirm';
 import { socket } from '../socket';
 import { snappy } from '../styles/motion';
-import { LANGUAGES, POOLS, POOL_TEXTS, QUESTIONS, isVisualSlot } from '@funny/shared';
+import {
+  BASE_CONTENT,
+  LANGUAGES,
+  QUESTIONS,
+  isVisualSlot,
+  optionTexts,
+  optionsFor,
+} from '@funny/shared';
 import type { AuthoredLanguage, OptionId, RoundStartPayload, SlotIndex } from '@funny/shared';
 
 interface Props {
@@ -85,13 +93,22 @@ export default function RoundScreen({ round, language, multiLanguage = false, is
   // every re-render within a round. Reshuffling on render would reorder the
   // list under the player's finger each time the selection changed, which is
   // both unusable and a way to mis-tap an answer you cannot take back.
+  //
+  // The pool is the one this round's story offers (`optionsFor`, Step 117):
+  // a Christmas room's stories differ slot by slot, golden or the slice, and
+  // the server checks the pick against the same pool. A pack's words read in
+  // English where `language` has none of the pack's texts (owner decision 4A).
+  const content = round.content ?? BASE_CONTENT;
   const options = useMemo(
-    () =>
-      shuffled(POOLS[slot]).map((option) => ({
+    () => {
+      const texts = optionTexts(language);
+      return shuffled(optionsFor(slot, content)).map((option) => ({
         id: option.id,
-        text: POOL_TEXTS[language][option.id],
-      })),
-    [slot, language],
+        text: texts[option.id] ?? '',
+      }));
+    },
+    // `content` is one object per `round:start`, so it is stable for the round.
+    [slot, language, content],
   );
 
   useEffect(() => {

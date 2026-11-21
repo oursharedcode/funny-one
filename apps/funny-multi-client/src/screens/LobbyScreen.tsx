@@ -7,6 +7,12 @@
 //    since it was the payload's only member, the payload type with it.
 // 2. `StatsPayload` comes from `@funny/shared`.
 //
+// Step 117 (owner decision 3A): a room in one of the Christmas edition's
+// languages is a Christmas room unless its host switches it off here. Every
+// player sees "🔔 This game has two Christmas stories" while it is on; only the
+// host sees the switch, and a guest sees nothing once it is off. The switch
+// shows the server's state, so every lobby agrees on it.
+//
 // The cap banner is carried as-is. At T-3.2 it was inert — no server
 // `stats:get` handler, so the ack never fired and `isCapReached(null)` was
 // false. T-5.3 wired the handler; this file did not need to change.
@@ -88,6 +94,10 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
     socket.emit('game:start');
   }
 
+  function setPack(on: boolean): void {
+    socket.emit('room:setPack', { on });
+  }
+
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-6">
       <div className="text-center">
@@ -111,6 +121,27 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
       >
         {copied ? t('lobby.copied') : t('lobby.copyLink')}
       </button>
+
+      {lobby.pack && (lobby.pack.on || isHost) && (
+        <div className="flex flex-col gap-2 rounded border border-amber-300 bg-white p-3">
+          {lobby.pack.on && (
+            <p className="text-center font-semibold text-pink-600" role="status">
+              {t('lobby.christmasOn')}
+            </p>
+          )}
+          {isHost && (
+            <label className="flex items-center gap-3 text-gray-800">
+              <input
+                type="checkbox"
+                className="h-5 w-5 flex-shrink-0 accent-pink-500"
+                checked={lobby.pack.on}
+                onChange={(e) => setPack(e.target.checked)}
+              />
+              <span>{t('lobby.christmasSwitch')}</span>
+            </label>
+          )}
+        </div>
+      )}
 
       <PlayerList players={lobby.players} hostId={lobby.hostId} />
 

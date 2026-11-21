@@ -27,6 +27,11 @@ const socketMock = createSocketMock();
 vi.mock('./socket', () => ({ socket: socketMock }));
 const setReloadSafe = vi.fn();
 vi.mock('./swReload', () => ({ setReloadSafe }));
+const trackChristmasGame = vi.fn();
+vi.mock('./funnel', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./funnel')>()),
+  trackChristmasGame,
+}));
 
 const { default: App } = await import('./App');
 
@@ -37,6 +42,7 @@ const REVEAL: RevealStartPayload = {
   answers: ['a grumpy pirate'],
   prose: 'A grumpy pirate and a haunted toaster were in a lighthouse.',
   optionIds: IDS,
+  content: { kind: 'base' },
 };
 
 /** Render App and take it as far as the lobby, which most phases require. */
@@ -253,6 +259,28 @@ describe('lobby:update', () => {
     // Host moved to s2, so this client is no longer the host and loses Start.
     expect(screen.queryByText('Start Game')).toBeNull();
     expect(screen.getByText('Waiting for host to start…')).toBeTruthy();
+  });
+
+  // Step 117 (D2 A): the Christmas funnel counts a game under way in a room
+  // that was offered the stories, whichever way its host left the switch.
+  it('counts a game in a Christmas room once it starts, with the switch as the host left it', () => {
+    trackChristmasGame.mockReset();
+    renderInLobby();
+    socketMock.fire('lobby:update', {
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+      hostId: 's1',
+      pack: { id: 'chr26', on: false },
+    });
+    expect(trackChristmasGame).not.toHaveBeenCalled();
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    expect(trackChristmasGame).toHaveBeenCalledWith(false);
+  });
+
+  it('counts nothing in a room offered no pack', () => {
+    trackChristmasGame.mockReset();
+    renderInLobby();
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    expect(trackChristmasGame).not.toHaveBeenCalled();
   });
 });
 

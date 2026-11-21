@@ -282,6 +282,23 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   type. **The room's language decides whether the pack is on** (owner decision 4A, 2026-11-21);
   in a multi-language room (DD-13) a player whose own language the pack lacks reads its words in
   English.
+- **In rooms** (Step 117, owner decisions 1C, 3A, 4A, 5A). `packOffer` (rooms.ts) offers a new
+  room its language's pack while the free part lasts, switched on; the host's lobby switch
+  (`room:setPack`, §5) turns it off and on until the game starts, and it carries over to "one
+  more game". At each start `freeGameContents` picks two golden stories at random and gives
+  every other story the slice; the free cut-off is checked again there, for a lobby left open
+  across it. The gallery lists the golden stories last. A golden story's aftermath is asked for
+  after its scene (`endingFor`, an `/exists` hit) and sent with it; any failure leaves
+  `ending: null`, and the client shows the ending as the text card a slice story gets.
+  `PACK_ROOMS=off` (§11) makes every new room an ordinary one.
+- **On the client** (Step 117): the lobby's line and the host's switch; each round's options
+  from `optionsFor(slot, content)`; the ending under the scene in the reveal and the gallery —
+  a picture for a golden story, a card otherwise (`StoryEnding`); "🔔 A Christmas story" over a
+  golden one. A golden story's still stacks the ending under the scene, best-effort; its 5 s
+  video switches to the ending at 2.5 s, a card when there is no picture, with no sound (sleigh
+  bells come with the paid half). Their footer names the edition and leads to `/xmas` on the
+  website, to the landing page inside the Android app (`footerTarget`). **No price anywhere in
+  the free half (5A), and no download ever carries a room or unlock code** — both tested.
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 
@@ -324,6 +341,15 @@ the story's seven picks as ids — on `reveal:start` and on every `GalleryEntry`
 room-language `answers`/`prose`, which are unchanged. `round:start` is still unchanged: in a
 multi-language room the client takes the question from the shared `QUESTIONS` table in its own
 player's language and ignores `question` (§8.1).
+
+**Amended 2026-11-21 (Step 117, B-29 — packs in rooms, §4.4):** one new event and four fields.
+`room:setPack { on }` — host only, lobby only, answered with `lobby:update`, ignored in a room
+offered no pack. `Room.pack: { id, on } | null`, also on `LobbyUpdatePayload` and so in the
+`room:join` ack. `round:start` gains `content: StoryContent` — the content of the story *this*
+player writes — so it now goes to each player on its own rather than to the room.
+`reveal:start` and every `GalleryEntry` gain `content`; `reveal:pictureReady` and every
+`GalleryEntry` gain `ending: PictureRef | null`, a golden story's aftermath. The room keeps
+`RoomStory` (`Story` + `content` + `ending`); Funny One's stories stay plain `Story`.
 
 ## 6. Server design — `apps/funny-multi-server`
 
@@ -651,6 +677,7 @@ retired by D-6; nothing of it was built.*
 | `DEPLOYER_SPONSORS_URL` | server | support rails (§10.2): GitHub Sponsors profile |
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 | `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
+| `PACK_ROOMS` | server | `off` makes every new room an ordinary one (Step 117, §4.4) — the launch's lever; unset = packs offered |
 
 R2 bucket (`IMAGES`) and KV (`STATS_KV`) are wrangler.toml bindings, not env vars.
 

@@ -25,6 +25,7 @@ function roundPayload(over: Partial<RoundStartPayload> = {}): RoundStartPayload 
     roundNumber: 0,
     question: 'Who?',
     deadline: Date.now() + 60_000,
+    content: { kind: 'base' },
     ...over,
   };
 }

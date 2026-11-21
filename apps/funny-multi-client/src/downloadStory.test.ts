@@ -8,8 +8,9 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
+import { setUrl } from './testutils/socketMock';
 import i18n from './i18n/index';
-import { LANDING_URL, LANDING_URL_TEXT } from './landingUrl';
+import { LANDING_URL, LANDING_URL_TEXT, XMAS_URL, XMAS_URL_TEXT } from './landingUrl';
 
 const toCanvas = vi.fn().mockResolvedValue(undefined);
 vi.mock('qrcode', () => ({ default: { toCanvas } }));
@@ -184,6 +185,163 @@ describe('buildStoryImageFile', () => {
         language: 'en',
       });
       expect(drawn).toContainEqual(['story', '22px Georgia, serif']);
+    });
+  });
+
+  // Step 117 (B-29): a golden story's still names the Christmas 2026 edition
+  // and carries its ending picture under the scene.
+  describe('a golden story (Step 117)', () => {
+    const SCENE_URL = 'https://img.example/i/scene.png';
+    const ENDING_URL = 'https://img.example/i/end.png';
+    const scene = { close: () => {} } as unknown as ImageBitmap;
+    const ending = { close: () => {} } as unknown as ImageBitmap;
+
+    function pictureFetches(): void {
+      const blobs: Record<string, Blob> = {
+        [SCENE_URL]: new Blob(['scene']),
+        [ENDING_URL]: new Blob(['ending']),
+      };
+      fetchMock.mockImplementation((url: string) =>
+        blobs[url]
+          ? Promise.resolve({ blob: () => Promise.resolve(blobs[url]) })
+          : Promise.reject(new Error('no such picture')),
+      );
+      createImageBitmap.mockImplementation((blob: Blob) =>
+        Promise.resolve(blob === blobs[SCENE_URL] ? scene : ending),
+      );
+    }
+
+    function texts(): string[] {
+      return ctx.calls.filter((c) => c.method === 'fillText').map((c) => String(c.args[0]));
+    }
+
+    beforeEach(() => {
+      toCanvas.mockClear();
+      pictureFetches();
+    });
+
+    afterEach(async () => {
+      sessionStorage.clear();
+      setUrl('');
+      await i18n.changeLanguage('en');
+    });
+
+    it("leads to the edition's page on the website, under the edition's name", async () => {
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'x',
+        pictureUrl: null,
+        language: 'en',
+        golden: true,
+      });
+      expect(toCanvas).toHaveBeenCalledWith(expect.anything(), XMAS_URL, expect.anything());
+      expect(texts()).toContain(XMAS_URL_TEXT);
+      expect(texts()).toContain('Christmas 2026 edition');
+      expect(texts()).not.toContain('Funny Family');
+    });
+
+    it('keeps the landing page inside the Android app, where no payment address may go', async () => {
+      setUrl('?shell=android');
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'x',
+        pictureUrl: null,
+        language: 'en',
+        golden: true,
+      });
+      expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
+      expect(texts()).toContain(LANDING_URL_TEXT);
+      expect(texts()).toContain('Christmas 2026 edition');
+      expect(texts().some((t) => t.includes('/xmas'))).toBe(false);
+    });
+
+    it('names the edition «Новый год 2027» in Russian', async () => {
+      await buildStoryImageFile({
+        nickname: 'Мика',
+        prose: 'x',
+        pictureUrl: null,
+        language: 'ru',
+        golden: true,
+      });
+      expect(texts()).toContain('«Новый год 2027»');
+    });
+
+    it('draws the ending picture under the scene, the whole width', async () => {
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'x',
+        pictureUrl: SCENE_URL,
+        language: 'en',
+        golden: true,
+        endingUrl: ENDING_URL,
+      });
+      const drawn = ctx.calls.filter((c) => c.method === 'drawImage');
+      expect(drawn[0]?.args).toEqual([scene, 0, 0, 512, 512]);
+      expect(drawn[1]?.args).toEqual([ending, 0, 512, 512, 512]);
+      // The prose starts under both pictures.
+      const prose = ctx.calls.find((c) => c.method === 'fillText' && c.args[0] === 'x');
+      expect(prose?.args[2]).toBe(1024 + 28);
+    });
+
+    it('still builds the scene and the story when the ending picture cannot be had', async () => {
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'x',
+        pictureUrl: SCENE_URL,
+        language: 'en',
+        golden: true,
+        endingUrl: 'https://img.example/i/gone.png',
+      });
+      const drawn = ctx.calls.filter((c) => c.method === 'drawImage');
+      expect(drawn.map((c) => c.args[0])).toEqual([scene, expect.anything()]);
+    });
+
+    it('never draws an ending for a story that is not golden', async () => {
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'x',
+        pictureUrl: SCENE_URL,
+        language: 'en',
+        endingUrl: ENDING_URL,
+      });
+      expect(fetchMock).not.toHaveBeenCalledWith(ENDING_URL);
+      expect(texts()).toContain('Funny Family');
+      expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
+    });
+  });
+
+  // Step 117: a download leaves the room, so it never carries the room's code
+  // or a link holding one — nor, in the free half, a price (owner decision 5A).
+  describe('no code and no price on a still', () => {
+    afterEach(() => {
+      sessionStorage.clear();
+      setUrl('');
+    });
+
+    it.each([
+      ['a base story on the website', '?room=WXYZ', false],
+      ['a golden story on the website', '?room=WXYZ', true],
+      ['a base story in the Android app', '?room=WXYZ&shell=android', false],
+      ['a golden story in the Android app', '?room=WXYZ&shell=android', true],
+    ])('%s', async (_name, search, golden) => {
+      setUrl(search);
+      toCanvas.mockClear();
+      await buildStoryImageFile({
+        nickname: 'Mika',
+        prose: 'a pirate did stuff.',
+        pictureUrl: null,
+        language: 'en',
+        golden,
+      });
+      const encoded = toCanvas.mock.calls.map((c) => String(c[1]));
+      const printed = ctx.calls
+        .filter((c) => c.method === 'fillText')
+        .map((c) => String(c.args[0]));
+      for (const text of [...encoded, ...printed]) {
+        expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock/i);
+        expect(text).not.toMatch(/[$€£₽¥₹]|A\$|AUD|USD/);
+      }
+      expect(encoded).toHaveLength(1);
     });
   });
 });

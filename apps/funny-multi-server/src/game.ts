@@ -40,6 +40,16 @@
 //     pure, synchronous function of four option ids (DD-8, FM-ANS-1), so the
 //     only two outcomes here are "generated" and "the Worker/cap failed".
 //
+//  6. **Packs in rooms** (Step 117, B-29, DD-16). A room offered a pack and
+//     left on by its host plays two golden stories — the pack in every slot,
+//     the ending drawn too — and the slice in every other (`freeGameContents`).
+//     Each story carries its `content`, so a pick is checked and a bot fills
+//     against `optionsFor(slot, content)`, `round:start` goes to each player
+//     with the content of the story it writes, and the texts resolve through
+//     `optionTexts`, which reads the pack's words in English where the room
+//     language has none. A golden story gets its aftermath right after its
+//     scene, and the gallery lists the golden stories last.
+//
 // Also not here, by deliberate choice rather than boundary: SRC also called
 // `broadcastStats` from this pipeline, right after `reserveImageSlot()`
 // succeeded, so the Home-screen image counter ticked live mid-generation
@@ -52,16 +62,21 @@
 
 import type { Server as SocketIOServer } from 'socket.io';
 import {
-  POOLS,
-  POOL_TEXTS,
+  BASE_CONTENT,
   QUESTIONS,
   SLOT_COUNT,
+  freeGameContents,
+  isGolden,
+  isPackFree,
+  optionTexts,
+  optionsFor,
   polishProse,
   renderProse,
   requireAuthoredLanguage,
   storyIndex,
   type OptionId,
   type SlotIndex,
+  type StoryContent,
 } from '@funny/shared';
 import type {
   ClientToServerEvents,
@@ -69,10 +84,10 @@ import type {
   GalleryReadyPayload,
   PictureRef,
   Room,
+  RoomStory,
   ServerToClientEvents,
-  Story,
 } from './types.js';
-import { buildPrompt } from './prompt.js';
+import { buildAftermathPrompt, buildPrompt } from './prompt.js';
 import { ImageCapReachedError, generateImage } from './image.js';
 
 // One round per pool slot. Tied to the shared schema rather than restated, so
@@ -82,13 +97,43 @@ export const ROUND_DURATION_MS = Number(process.env.ROUND_DURATION_MS ?? 60_000)
 
 type IO = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 
-// Membership lookup per slot, built once. `submitAnswer` runs on every player
-// keystroke-equivalent (one per round per player), so this stays O(1) rather
-// than scanning a 22-element array.
-const POOL_IDS: readonly ReadonlySet<OptionId>[] = Array.from(
-  { length: SLOT_COUNT },
-  (_, slot) => new Set(POOLS[slot as SlotIndex].map((o) => o.id)),
-);
+// Membership lookup per content and slot, built once per content. `submitAnswer`
+// runs once per round per player, so this stays O(1) rather than scanning a
+// 22-element array.
+const OPTION_IDS = new Map<string, readonly ReadonlySet<OptionId>[]>();
+
+function optionIdsFor(slot: SlotIndex, content: StoryContent): ReadonlySet<OptionId> {
+  const key = content.kind === 'base' ? 'base' : `${content.kind}:${content.pack}`;
+  let sets = OPTION_IDS.get(key);
+  if (!sets) {
+    sets = Array.from(
+      { length: SLOT_COUNT },
+      (_, i) => new Set(optionsFor(i as SlotIndex, content).map((o) => o.id)),
+    );
+    OPTION_IDS.set(key, sets);
+  }
+  return sets[slot]!;
+}
+
+/**
+ * Each story's content for a game starting now (Step 117): two golden stories
+ * and the slice when the room's pack is on and its free part has not ended
+ * (FM-PACK-6, checked here as well as at the room's creation, for a lobby left
+ * open across the cut-off), the base pools otherwise. Drawn afresh at every
+ * start, "one more game" included, so the golden stories move between games.
+ */
+function contentsFor(room: Room): StoryContent[] {
+  const pack = room.pack;
+  if (pack?.on && isPackFree(pack.id, Date.now())) {
+    return freeGameContents(pack.id, room.players.length);
+  }
+  return room.players.map(() => BASE_CONTENT);
+}
+
+// The story player `playerIdx` writes in this round (spec §4 rotation).
+function storyWrittenBy(room: Room, playerIdx: number): RoomStory | undefined {
+  return room.stories[storyIndex(playerIdx, room.currentRound, room.players.length)];
+}
 
 function slotOf(round: number): SlotIndex {
   return round as SlotIndex;
@@ -102,9 +147,11 @@ export function startGame(room: Room, io: IO): void {
   room.phase = 'playing';
   room.currentRound = 0;
   room.galleryShared = false; // reset for a restarted game
-  room.stories = room.players.map<Story>(() => ({
+  room.stories = contentsFor(room).map<RoomStory>((content) => ({
     answers: new Array<OptionId | null>(ROUNDS).fill(null),
     picture: null,
+    content,
+    ending: null,
   }));
   startRound(room, io);
 }
@@ -119,10 +166,18 @@ function startRound(room: Room, io: IO): void {
 
   room.roundDeadline = Date.now() + ROUND_DURATION_MS;
 
-  io.to(room.code).emit('round:start', {
-    roundNumber: room.currentRound,
-    question: QUESTIONS[requireAuthoredLanguage(room.language)][room.currentRound] ?? '???',
-    deadline: room.roundDeadline,
+  // To each player on its own (Step 117): the story it writes this round may
+  // be golden, the slice or the base pools, and its options follow.
+  const question = QUESTIONS[requireAuthoredLanguage(room.language)][room.currentRound] ?? '???';
+  const deadline = room.roundDeadline;
+  room.players.forEach((player, i) => {
+    if (player.isBot) return;
+    io.to(player.id).emit('round:start', {
+      roundNumber: room.currentRound,
+      question,
+      deadline,
+      content: storyWrittenBy(room, i)?.content ?? BASE_CONTENT,
+    });
   });
 
   clearRoundTimer(room);
@@ -155,7 +210,9 @@ export function submitAnswer(room: Room, socketId: string, optionId: unknown, io
   if (player.isBot) return; // already auto-filled at round start
 
   const slot = slotOf(room.currentRound);
-  if (typeof optionId !== 'string' || !POOL_IDS[slot]!.has(optionId)) {
+  const story = storyWrittenBy(room, playerIdx);
+  if (!story) return;
+  if (typeof optionId !== 'string' || !optionIdsFor(slot, story.content).has(optionId)) {
     io.to(socketId).emit('error', {
       code: 'INVALID_OPTION',
       message: 'That answer is not one of this round’s options.',
@@ -163,8 +220,7 @@ export function submitAnswer(room: Room, socketId: string, optionId: unknown, io
     return;
   }
 
-  const storyIdx = storyIndex(playerIdx, room.currentRound, room.players.length);
-  room.stories[storyIdx]!.answers[room.currentRound] = optionId;
+  story.answers[room.currentRound] = optionId;
   room.submittedThisRound.add(socketId);
 
   broadcastWaiting(room, io);
@@ -174,16 +230,17 @@ export function submitAnswer(room: Room, socketId: string, optionId: unknown, io
 /**
  * Bot and timer-expiry fill (FM-BOT-2, design §6).
  *
- * Draws uniformly from this round's pool, preferring ids not already used at
+ * Draws uniformly from the pool this story offers at this round's slot
+ * (`optionsFor`, Step 117), preferring ids not already used at
  * this slot by another story in this room this round. Without that exclusion a
  * room with several bots would routinely hand out the same "who" to three
  * different stories, which reads as a bug on the reveal screen even though the
  * draw was fair.
  *
- * The exclusion cannot run dry in practice: the smallest pool is 10 (visual
- * slots) against a 7-player maximum, so there are always unused ids left. The
- * fallback to the full pool exists so a future pool edit that breaks that
- * invariant degrades to SRC's plain-uniform behaviour instead of throwing.
+ * The exclusion cannot run dry in a base game: the smallest base pool is 10
+ * (visual slots) against a 7-player maximum. A pack slot holds 5 (FM-PACK-1),
+ * so in a room of 6 or 7 it can: the fallback to the whole pool then repeats
+ * a pick, as SRC's plain-uniform draw did, rather than throwing.
  */
 function autoFillFor(room: Room, socketId: string): void {
   if (room.submittedThisRound.has(socketId)) return;
@@ -191,7 +248,9 @@ function autoFillFor(room: Room, socketId: string): void {
   if (playerIdx === -1) return;
 
   const slot = slotOf(room.currentRound);
-  const pool = POOLS[slot];
+  const story = storyWrittenBy(room, playerIdx);
+  if (!story) return;
+  const pool = optionsFor(slot, story.content);
   const used = new Set<OptionId>();
   for (const story of room.stories) {
     const taken = story.answers[room.currentRound];
@@ -201,8 +260,7 @@ function autoFillFor(room: Room, socketId: string): void {
   const from = candidates.length > 0 ? candidates : pool;
   const pick = from[Math.floor(Math.random() * from.length)]!;
 
-  const storyIdx = storyIndex(playerIdx, room.currentRound, room.players.length);
-  room.stories[storyIdx]!.answers[room.currentRound] = pick.id;
+  story.answers[room.currentRound] = pick.id;
   room.submittedThisRound.add(socketId);
 }
 
@@ -253,13 +311,17 @@ function clearRoundTimer(room: Room): void {
  * readable, and it is why a room's content language can differ from any
  * player's UI language.
  *
+ * A pack id resolves through `optionTexts`, in English where the room language
+ * has none of the pack's texts — not reached today, since a room is offered a
+ * pack only in a language with its texts (`packForRoom`).
+ *
  * An unfilled slot resolves to '' rather than throwing: every slot is filled by
  * `advanceRound` before reveal, so a null here would mean a bug upstream, and
  * an empty slot degrades to a slightly odd sentence rather than a crash on the
  * payoff screen. `polishProse` collapses the double space it leaves behind.
  */
-export function resolveAnswers(room: Room, story: Story | undefined): string[] {
-  const texts = POOL_TEXTS[requireAuthoredLanguage(room.language)];
+export function resolveAnswers(room: Room, story: RoomStory | undefined): string[] {
+  const texts = optionTexts(requireAuthoredLanguage(room.language));
   return Array.from({ length: ROUNDS }, (_, i) => {
     const id = story?.answers[i];
     return id ? (texts[id] ?? '') : '';
@@ -269,7 +331,7 @@ export function resolveAnswers(room: Room, story: Story | undefined): string[] {
 // The same story as option ids, always ROUNDS long, for the client to render
 // in a language of its own (B-15). A copy, so a payload never aliases the
 // room's live story.
-export function storyOptionIds(story: Story | undefined): (OptionId | null)[] {
+export function storyOptionIds(story: RoomStory | undefined): (OptionId | null)[] {
   return Array.from({ length: ROUNDS }, (_, i) => story?.answers[i] ?? null);
 }
 
@@ -300,6 +362,7 @@ export function enterRevealPhase(room: Room, io: IO): void {
       answers,
       prose: revealProse(room, answers),
       optionIds: storyOptionIds(room.stories[i]),
+      content: room.stories[i]?.content ?? BASE_CONTENT,
     });
   });
 }
@@ -311,8 +374,8 @@ export function enterRevealPhase(room: Room, io: IO): void {
 // Outcome of a single picture-generation attempt. Lets the caller decide
 // whether to notify a specific socket (human path) or stay silent (bot path).
 type PictureOutcome =
-  | { kind: 'cached'; picture: PictureRef; imagePrompt: string }
-  | { kind: 'ready'; picture: PictureRef; imagePrompt: string }
+  | { kind: 'cached'; picture: PictureRef; imagePrompt: string; ending: PictureRef | null }
+  | { kind: 'ready'; picture: PictureRef; imagePrompt: string; ending: PictureRef | null }
   | { kind: 'capped' }
   | { kind: 'failed' };
 
@@ -329,7 +392,7 @@ type PictureOutcome =
  * itself. `generateImage` owns the whole exists→reserve→generate→refund flow
  * (design §7.3, T-4.3); this function's only job is to route its outcome.
  */
-async function generateStoryPicture(story: Story): Promise<PictureOutcome> {
+async function generateStoryPicture(story: RoomStory): Promise<PictureOutcome> {
   let prompt: string;
   try {
     prompt = buildPrompt(story);
@@ -340,17 +403,39 @@ async function generateStoryPicture(story: Story): Promise<PictureOutcome> {
   // Write-once cache (spec-carried behaviour): a retry after a picture
   // already landed just re-serves it rather than spending a second slot.
   if (story.picture) {
-    return { kind: 'cached', picture: story.picture, imagePrompt: prompt };
+    const ending = await endingFor(story);
+    return { kind: 'cached', picture: story.picture, imagePrompt: prompt, ending };
   }
 
+  let picture: PictureRef;
   try {
-    const picture = await generateImage(prompt);
+    picture = await generateImage(prompt);
     story.picture = picture;
-    return { kind: 'ready', picture, imagePrompt: prompt };
   } catch (err) {
     if (err instanceof ImageCapReachedError) return { kind: 'capped' };
     return { kind: 'failed' };
   }
+  const ending = await endingFor(story);
+  return { kind: 'ready', picture, imagePrompt: prompt, ending };
+}
+
+/**
+ * A golden story's ending picture, its aftermath (Step 117, FM-PACK-3): asked
+ * for after the scene, never instead of it, and sent with it. Every pack's
+ * aftermaths are drawn before it ships (chr26's 25 at Step 116), so this is an
+ * `/exists` hit that spends no cap slot. Any failure — a miss with generation
+ * off, the cap, the Worker — leaves it null, and the client shows the ending
+ * as the text card every other story has; the scene is still sent. Write-once
+ * like the scene: a retry asks again only while it is null.
+ */
+async function endingFor(story: RoomStory): Promise<PictureRef | null> {
+  if (!isGolden(story.content) || story.ending) return story.ending;
+  try {
+    story.ending = await generateImage(buildAftermathPrompt(story));
+  } catch {
+    // The text card.
+  }
+  return story.ending;
 }
 
 /**
@@ -371,6 +456,7 @@ export async function handlePictureRequest(room: Room, socketId: string, io: IO)
       io.to(socketId).emit('reveal:pictureReady', {
         picture: outcome.picture,
         imagePrompt: outcome.imagePrompt,
+        ending: outcome.ending,
       });
       // A late picture keeps an already-shared gallery fresh (spec §24). Only
       // 'ready' — a picture generated by *this* call — can change the
@@ -442,15 +528,21 @@ export async function generateBotStoryPictures(room: Room, io: IO): Promise<void
 // ============================================================================
 
 // Builds the whole-room gallery: one entry per player slot in players[]
-// order, pairing each story (stories[i] ↔ players[i], spec §4) with its owner
+// order, the golden stories moved to the end (Step 117, owner decision 1C:
+// "revealed last"), pairing each story (stories[i] ↔ players[i], spec §4) with its owner
 // and any generated picture. Bot slots and ungenerated stories carry
 // picture: null. Reuses resolveAnswers/revealProse (above) rather than
 // SRC's inline `.map((a) => a ?? '')`, since this repo's answers are option
 // ids that still need resolving to display text — SRC's were already text.
 export function buildGallery(room: Room): GalleryReadyPayload {
+  const golden = (i: number): boolean => isGolden(room.stories[i]?.content ?? BASE_CONTENT);
+  const slots = room.players.map((_, i) => i);
+  const revealOrder = [...slots.filter((i) => !golden(i)), ...slots.filter(golden)];
   return {
-    entries: room.players.map((player, i) => {
-      const answers = resolveAnswers(room, room.stories[i]);
+    entries: revealOrder.map((i) => {
+      const player = room.players[i]!;
+      const story = room.stories[i];
+      const answers = resolveAnswers(room, story);
       return {
         nickname: player.nickname,
         isBot: player.isBot,
@@ -459,8 +551,10 @@ export function buildGallery(room: Room): GalleryReadyPayload {
         // downloadable image and video (T-5.2) embed the story with the same
         // punctuation the player already saw.
         prose: revealProse(room, answers),
-        optionIds: storyOptionIds(room.stories[i]),
-        picture: room.stories[i]?.picture ?? null,
+        optionIds: storyOptionIds(story),
+        picture: story?.picture ?? null,
+        content: story?.content ?? BASE_CONTENT,
+        ending: story?.ending ?? null,
       };
     }),
   };
@@ -484,7 +578,7 @@ export function shareGallery(room: Room, socketId: string, io: IO): void {
 
 // stories[i] belongs to players[i] (spec §4). A player's own story is at
 // their index in the players array.
-export function getStoryForPlayer(room: Room, socketId: string): Story | null {
+export function getStoryForPlayer(room: Room, socketId: string): RoomStory | null {
   const idx = room.players.findIndex((p) => p.id === socketId);
   if (idx === -1) return null;
   return room.stories[idx] ?? null;

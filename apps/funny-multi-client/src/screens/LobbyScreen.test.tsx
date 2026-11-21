@@ -4,12 +4,12 @@
 // the wire: SRC emitted `game:start` with `{ wobbleEngine: 'lottie' }`, and
 // this server's handler takes no payload at all.
 
-import { describe, expect, it, beforeEach, vi } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Player } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import type { LobbyState } from '../App';
-import '../i18n';
+import i18n from '../i18n';
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
@@ -33,6 +33,7 @@ function lobbyState(over: Partial<LobbyState> = {}): LobbyState {
     multiLanguage: false,
     myLanguage: 'en',
     players: players(3),
+    pack: null,
     ...over,
   };
 }
@@ -207,5 +208,64 @@ describe('cap banner', () => {
       imagesLimit: 50,
     });
     expect(screen.getByRole('status')).toBeTruthy();
+  });
+});
+
+// Step 117 (owner decision 3A): every room in the edition's languages is a
+// Christmas room, and its host can switch the stories off here.
+describe('Christmas stories (Step 117)', () => {
+  const ON = { id: 'chr26', on: true } as const;
+  const OFF = { id: 'chr26', on: false } as const;
+  const LINE = '🔔 This game has two Christmas stories';
+  const SWITCH = 'Play with the Christmas 2026 stories';
+
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
+  it('tells everyone, and shows the host the switch, on', () => {
+    renderLobby({ pack: ON });
+    expect(screen.getByText(LINE)).toBeTruthy();
+    expect(screen.getByLabelText<HTMLInputElement>(SWITCH).checked).toBe(true);
+  });
+
+  it("sends the host's switch to the server and shows the server's state, not its own", () => {
+    renderLobby({ pack: ON });
+    fireEvent.click(screen.getByLabelText(SWITCH));
+    expect(socketMock.onlyEmitOf('room:setPack').args).toEqual([{ on: false }]);
+    // Still on until the server's lobby:update says otherwise.
+    expect(screen.getByLabelText<HTMLInputElement>(SWITCH).checked).toBe(true);
+  });
+
+  it('lets the host switch the stories back on', () => {
+    renderLobby({ pack: OFF });
+    expect(screen.queryByText(LINE)).toBeNull();
+    fireEvent.click(screen.getByLabelText(SWITCH));
+    expect(socketMock.onlyEmitOf('room:setPack').args).toEqual([{ on: true }]);
+  });
+
+  it('shows a guest the line and no switch', () => {
+    renderLobby({ pack: ON, socketId: 's1', hostId: 's0' });
+    expect(screen.getByText(LINE)).toBeTruthy();
+    expect(screen.queryByLabelText(SWITCH)).toBeNull();
+  });
+
+  it('shows a guest nothing once the host has switched them off', () => {
+    renderLobby({ pack: OFF, socketId: 's1', hostId: 's0' });
+    expect(screen.queryByText(LINE)).toBeNull();
+    expect(screen.queryByLabelText(SWITCH)).toBeNull();
+  });
+
+  it('shows nothing in a room offered no pack', () => {
+    renderLobby({ pack: null });
+    expect(screen.queryByText(LINE)).toBeNull();
+    expect(screen.queryByLabelText(SWITCH)).toBeNull();
+  });
+
+  it('names the edition «Новый год 2027» in Russian', async () => {
+    await i18n.changeLanguage('ru');
+    renderLobby({ pack: ON, language: 'ru', myLanguage: 'ru' });
+    expect(screen.getByText('🔔 В этой игре две новогодние истории')).toBeTruthy();
+    expect(screen.getByLabelText('Играть с историями «Новый год 2027»')).toBeTruthy();
   });
 });

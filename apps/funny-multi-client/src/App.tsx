@@ -21,7 +21,7 @@ import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
 import SupportScreen from './components/SupportScreen';
 import { hasAnyRail } from './support';
-import { trackSupportOpen } from './funnel';
+import { trackChristmasGame, trackSupportOpen } from './funnel';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { setReloadSafe } from './swReload';
@@ -37,6 +37,7 @@ import type {
   PlayerLostPayload,
   RevealStartPayload,
   RoundStartPayload,
+  RoomPack,
   RoundWaitingPayload,
   SupportConfig,
 } from '@funny/shared';
@@ -69,6 +70,12 @@ export interface LobbyState {
    */
   myLanguage: AuthoredLanguage;
   players: Player[];
+  /**
+   * The Christmas pack the room was offered and whether the host has it on
+   * (Step 117, owner decision 3A); null for a room offered none. From
+   * `lobby:update`, which every player gets right after creating or joining.
+   */
+  pack: RoomPack | null;
 }
 
 export default function App() {
@@ -144,6 +151,7 @@ export default function App() {
               ...prev,
               players: data.players,
               hostId: data.hostId,
+              pack: data.pack ?? null,
             }
           : prev,
       );
@@ -194,6 +202,15 @@ export default function App() {
   useEffect(() => {
     setReloadSafe(phase === 'home' && !supportOpen);
   }, [phase, supportOpen]);
+
+  // Step 117 (D2 A): the Christmas funnel's first step — a game under way in a
+  // room that was offered the Christmas stories, switched on or off. The
+  // funnel counts it once per page load.
+  const pack = lobby?.pack ?? null;
+  const roundNumber = round?.roundNumber ?? null;
+  useEffect(() => {
+    if (phase === 'writing' && roundNumber === 0 && pack) trackChristmasGame(pack.on);
+  }, [phase, roundNumber, pack]);
 
   // "Create a new room" on the host notice (spec §12): end the current game
   // for everyone (game:end → game:over → room deleted), then reload to a fresh

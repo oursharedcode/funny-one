@@ -20,11 +20,17 @@
 //      `GameStartPayload` held nothing else and is dropped with it; `game:start`
 //      now takes no payload.
 //
+//   6. Packs in rooms (Step 117, B-29, DD-16): `Room.pack` and
+//      `room:setPack`, the host's Christmas switch; each story's `content`
+//      on `round:start`, `reveal:start` and every gallery entry; a golden
+//      story's `ending` picture beside its scene.
+//
 // Deliberately NOT here: `entitlementToken` on `room:create` and `Room.premium`.
 // The Polar premium design (design §10) they belonged to was superseded by
 // D-6's support rails (`SupportConfig` below) before either shipped.
 
 import type { Language } from './languages.js';
+import type { PackId, StoryContent } from './packs/schema.js';
 import type { OptionId } from './pools/schema.js';
 
 // ============================================================================
@@ -73,6 +79,31 @@ export interface Story {
   picture: PictureRef | null;
 }
 
+/**
+ * A story as a room keeps it (Step 117): `Story` plus where its options come
+ * from and its ending's own picture. Funny One's stories stay plain `Story`.
+ */
+export interface RoomStory extends Story {
+  // Set at game start (DD-16, FM-PACK-4): base without a pack; with one, the
+  // slice, or the whole pack for each of the two golden stories.
+  content: StoryContent;
+  // A golden story's aftermath (FM-PACK-3): the place and the ending, drawn
+  // once the scene is. Null for every other story, whose ending is a text
+  // card, and for a golden one whose ending picture could not be had (the
+  // client falls back to the card). Set once, never overwritten.
+  ending: PictureRef | null;
+}
+
+/**
+ * A room's pack (Step 117, owner decisions 3A and 4A): offered when the room
+ * is created, by its language and the date (`packForRoom`); on until the
+ * host switches it off in the lobby. A room with no offer has `pack: null`.
+ */
+export interface RoomPack {
+  id: PackId;
+  on: boolean;
+}
+
 // Opaque server-side timer handle. Treat as unknown on the client;
 // cast to NodeJS.Timeout on the server where @types/node is available.
 export type ServerTimerHandle = unknown;
@@ -91,13 +122,16 @@ export interface Room {
   // its own language from the same shared build; the server still renders
   // `round:start.question` and the reveal/gallery texts in `language`.
   multiLanguage: boolean;
+  // The Christmas switch (Step 117): null when the room was offered no pack.
+  // Kept across "one more game", which restarts without a lobby.
+  pack: RoomPack | null;
   // Locked at game:start; order drives rotation.
   players: Player[];
   phase: RoomPhase;
   // 0–6 = writing rounds; 7 = reveal.
   currentRound: number;
   // stories[i] belongs to players[i] at round 0.
-  stories: Story[];
+  stories: RoomStory[];
   // socket.ids that have submitted this round.
   submittedThisRound: Set<string>;
   // Epoch ms.
@@ -168,6 +202,12 @@ export type RoomJoinAck =
       multiLanguage: boolean;
     };
 
+// Host only, lobby only (Step 117): the Christmas switch. Ignored in a room
+// offered no pack.
+export interface RoomSetPackPayload {
+  on: boolean;
+}
+
 export interface RoundSubmitPayload {
   /**
    * The picked option's id, which must belong to the current round's slot pool
@@ -189,6 +229,9 @@ export interface GameReadyPayload {
 export interface LobbyUpdatePayload {
   players: Player[];
   hostId: string;
+  // Step 117: the room's Christmas switch, for the lobby's line and the
+  // host's toggle. Null in a room offered no pack.
+  pack: RoomPack | null;
 }
 
 // The `support` object of the GET /config response (T-9.3, FM-TIER-3, design
@@ -213,10 +256,15 @@ export interface RoundStartPayload {
   question: string;
   // Epoch ms; client computes remaining time from its own Date.now().
   deadline: number;
+  // Step 117: the content of the story *this* player writes in this round,
+  // which decides the options it is offered (`optionsFor`). So `round:start`
+  // goes to each player on its own rather than to the room.
+  content: StoryContent;
 }
 
 // Unchanged from SRC, and deliberately so (DD-2): the options themselves are
-// NOT on this payload. The client bundles the same @funny/shared build as the
+// NOT on this payload — only the story's content (Step 117), from which the
+// client picks the pools. The client bundles the same @funny/shared build as the
 // server and renders the combobox for (roundNumber, room.language) locally, so
 // the protocol does not grow with pool size and the two sides cannot disagree
 // about pool content — they ship as one unit. The same holds for the question
@@ -246,6 +294,9 @@ export interface RevealStartPayload {
    * on-page language switch picks.
    */
   optionIds: (OptionId | null)[];
+  // Step 117: where the story's options came from; `full` is a golden story,
+  // whose ending arrives as a picture with `reveal:pictureReady`.
+  content: StoryContent;
 }
 
 export interface RevealPictureReadyPayload {
@@ -253,6 +304,9 @@ export interface RevealPictureReadyPayload {
   // The exact prompt sent to the image Worker — displayed under the
   // picture for debugging which slots the model honored.
   imagePrompt: string;
+  // A golden story's ending picture (Step 117), null for every other story
+  // and when the ending could not be had (the client shows the text card).
+  ending: PictureRef | null;
 }
 
 // Discriminator for the reveal:pictureError UX (item 4 of
@@ -311,10 +365,16 @@ export interface GalleryEntry {
   // null when no picture exists — a bot slot, or a human whose generation was
   // skipped or failed.
   picture: PictureRef | null;
+  // Step 117 — same contract as RevealStartPayload.content and
+  // RevealPictureReadyPayload.ending above.
+  content: StoryContent;
+  ending: PictureRef | null;
 }
 
 export interface GalleryReadyPayload {
-  // One entry per player slot, in players[] order.
+  // One entry per player slot, in players[] order — except that the golden
+  // stories come last (owner decision 1C: "revealed last"), in players[] order
+  // among themselves.
   entries: GalleryEntry[];
 }
 
@@ -326,6 +386,8 @@ export interface ClientToServerEvents {
   'room:create': (payload: RoomCreatePayload, ack: (response: RoomCreateAck) => void) => void;
   'room:join': (payload: RoomJoinPayload, ack: (response: RoomJoinAck) => void) => void;
   'room:leave': () => void;
+  // Host only, lobby only (Step 117); answered with `lobby:update`.
+  'room:setPack': (payload: RoomSetPackPayload) => void;
   // Payload-free since the wobbleEngine choice was removed (DD-9).
   'game:start': () => void;
   'round:submit': (payload: RoundSubmitPayload) => void;

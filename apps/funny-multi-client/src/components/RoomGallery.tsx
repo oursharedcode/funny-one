@@ -19,18 +19,26 @@
 // and a switch beside "Story by …" retells that story in any other. The
 // gallery remembers the choice per story while it is open, and the download,
 // share and video buttons export the story in the language on screen.
+//
+// Step 117 (B-29): a Christmas story shows its ending under the scene
+// (StoryEnding.tsx), a golden one says so; the server lists the golden stories
+// last. A golden story's still carries its ending picture and the edition's
+// footer, and every Christmas story's video ends on its ending.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ProseText from './ProseText';
 import ShareButton from './ShareButton';
 import LogoStamp from './LogoStamp';
 import StoryLanguageSwitch from './StoryLanguageSwitch';
+import StoryEnding from './StoryEnding';
 import { buildStoryImageFile, downloadStoryImage } from '../downloadStory';
 import { textDirection } from '../i18n';
 import { buildWobbleVideoFile, isVideoRecordingSupported } from '../recordWobble';
+import { trackGoldenCartoon } from '../funnel';
 import { canShareFiles, downloadFile, shareFiles } from '../share';
-import { storyIn } from '../storyLanguage';
+import { endingText, storyIn } from '../storyLanguage';
+import { BASE_CONTENT, isGolden } from '@funny/shared';
 import type { AuthoredLanguage, GalleryEntry } from '@funny/shared';
 
 interface Props {
@@ -54,14 +62,34 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
   // on mobile + Chromium desktop and absent on desktop Firefox; there the
   // download buttons alone remain. It's a static browser capability.
   const shareSupported = canShareFiles();
-
-  if (entries.length === 0) return null;
   // entries is re-broadcast as late pictures arrive (self-heal, spec §24);
   // keep the index valid if a shorter list were ever re-shared.
   const safeIndex = Math.min(index, entries.length - 1);
-  const entry = entries[safeIndex]!;
+  const entry = entries[safeIndex];
+  // Older servers sent no content: a base story.
+  const content = entry?.content ?? BASE_CONTENT;
+  const golden = isGolden(content);
+  const goldenCartoon = golden && Boolean(entry?.picture);
+
+  // The Christmas funnel's golden step (D2 A): a golden story's cartoon seen.
+  useEffect(() => {
+    if (goldenCartoon) trackGoldenCartoon();
+  }, [goldenCartoon]);
+
+  if (!entry) return null;
   const language = languages[safeIndex] ?? defaultLanguage;
   const story = storyIn(entry, roomLanguage, language);
+  const christmas = content.kind !== 'base';
+  const ending = entry.ending ?? null;
+  // What every export of this story shares: its still and its video.
+  const still = {
+    nickname: entry.nickname,
+    prose: story.prose,
+    pictureUrl: entry.picture?.url ?? null,
+    language,
+    golden,
+    endingUrl: ending?.url ?? null,
+  };
 
   function step(delta: number): void {
     setIndex((safeIndex + delta + entries.length) % entries.length);
@@ -79,17 +107,12 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
   // Native-share the still image; fall back to a download if the platform
   // declines the file (so the button is never a dead end).
   async function shareImage(): Promise<void> {
-    const file = await buildStoryImageFile({
-      nickname: entry.nickname,
-      prose: story.prose,
-      pictureUrl: entry.picture?.url ?? null,
-      language,
-    });
+    const file = await buildStoryImageFile(still);
     if ((await shareFiles([file], shareMeta())) === 'unsupported') downloadFile(file);
   }
 
   async function downloadVideo(): Promise<void> {
-    if (!entry.picture || recording) return;
+    if (!entry?.picture || recording) return;
     setRecording(true);
     try {
       const file = await buildWobbleVideoFile({
@@ -97,6 +120,10 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
         prose: story.prose,
         pictureUrl: entry.picture.url,
         language,
+        golden,
+        ending: christmas
+          ? { pictureUrl: ending?.url ?? null, text: endingText(story, language) }
+          : null,
       });
       downloadFile(file);
     } finally {
@@ -109,9 +136,14 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
       <h3 className="font-display text-xl font-semibold text-pink-500">{t('gallery.title')}</h3>
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-gray-600">
-          {t('gallery.storyBy', { nickname: entry.nickname })}
-        </p>
+        <div className="flex flex-col">
+          <p className="text-sm text-gray-600">
+            {t('gallery.storyBy', { nickname: entry.nickname })}
+          </p>
+          {golden && (
+            <p className="text-sm font-semibold text-pink-600">{t('reveal.goldenStory')}</p>
+          )}
+        </div>
         <StoryLanguageSwitch
           value={language}
           onChange={(next) => setLanguages((chosen) => ({ ...chosen, [safeIndex]: next }))}
@@ -143,6 +175,15 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
         </div>
       )}
 
+      {christmas && (
+        <StoryEnding
+          ending={ending}
+          text={endingText(story, language)}
+          language={language}
+          alt={t('gallery.endingAlt', { nickname: entry.nickname })}
+        />
+      )}
+
       {/* The story's own lang and dir, which can differ from the interface's. */}
       <div lang={language} dir={textDirection(language)}>
         <ProseText prose={story.prose} answers={story.answers} className="text-lg" />
@@ -153,14 +194,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
       <div className="flex gap-2">
         <button
           className="flex-1 rounded border border-amber-300 bg-white px-4 py-3 font-semibold text-pink-500"
-          onClick={() =>
-            void downloadStoryImage({
-              nickname: entry.nickname,
-              prose: story.prose,
-              pictureUrl: entry.picture?.url ?? null,
-              language,
-            })
-          }
+          onClick={() => void downloadStoryImage(still)}
         >
           {entry.picture ? t('gallery.download') : t('gallery.downloadStoryOnly')}
         </button>

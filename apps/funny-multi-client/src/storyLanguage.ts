@@ -12,8 +12,8 @@
 import {
   AUTHORED_LANGUAGES,
   LANGUAGES,
-  POOL_TEXTS,
   SLOT_COUNT,
+  optionTexts,
   polishProse,
   renderProse,
 } from '@funny/shared';
@@ -47,11 +47,14 @@ export interface WireStory extends StoryText {
 // An unfilled slot resolves to '' rather than throwing, as on the server: the
 // server fills every slot before reveal, so a gap here would mean a bug
 // upstream, and '' degrades to a slightly odd sentence rather than a crash.
+// A pack's option reads in `language` where the pack has its texts, in English
+// otherwise (`optionTexts`, owner decision 4A): an ar player in an en
+// Christmas room reads the Christmas words in English.
 export function renderStory(
   language: AuthoredLanguage,
   optionIds: readonly (OptionId | null)[],
 ): StoryText {
-  const texts = POOL_TEXTS[language];
+  const texts = optionTexts(language);
   const answers = Array.from({ length: SLOT_COUNT }, (_, i) => {
     const id = optionIds[i];
     return id ? (texts[id] ?? '') : '';
@@ -70,4 +73,14 @@ export function storyIn(
 ): StoryText {
   if (language === roomLanguage) return { answers: story.answers, prose: story.prose };
   return renderStory(language, story.optionIds);
+}
+
+/**
+ * Step 117: a Christmas story's ending on its own, for the card that stands in
+ * for an ending picture — the last slot's text, opening with a capital. The
+ * prose reads it after "In the end, "; alone, it starts the sentence.
+ */
+export function endingText(story: StoryText, language: AuthoredLanguage): string {
+  const [first = '', ...rest] = story.answers[SLOT_COUNT - 1] ?? '';
+  return first.toLocaleUpperCase(language) + rest.join('');
 }

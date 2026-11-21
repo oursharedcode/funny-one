@@ -12,7 +12,7 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (73 combinations per language a
+// into the file and the key space is closed (86 combinations per language a
 // day at most).
 //
 // Step 79 (B-20): a visit — hub_view or fm_view, not a click or a gift — also
@@ -32,7 +32,15 @@ import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { LANGUAGES } from '@funny/shared';
 
-export const STAT_EVENTS = ['hub_view', 'hub_click', 'fm_view', 'fm_support', 'fm_gift'] as const;
+export const STAT_EVENTS = [
+  'hub_view',
+  'hub_click',
+  'fm_view',
+  'fm_support',
+  'fm_gift',
+  'xm_game',
+  'xm_gold',
+] as const;
 export type StatEvent = (typeof STAT_EVENTS)[number];
 
 /** The labels an event can carry, in key order after the event itself. */
@@ -67,6 +75,11 @@ const HUB_TARGETS = [
   'support',
   ...GIFT_TARGETS,
 ] as const;
+// Step 117 (B-29, D2 A): the Christmas 2026 edition's funnel. A game played in
+// a room offered the Christmas stories, with the host's switch as it stood
+// when the game began; and a golden story's cartoon seen. Website only, like
+// every event but the visit: the app sends neither.
+const PACK_SWITCH = ['on', 'off'] as const;
 
 // Each event's own labels. Every one listed is required, except that a Funny
 // Multi event carries `v` only when it came through the hub — a visit that did
@@ -77,6 +90,8 @@ const SPEC: Record<StatEvent, Partial<Record<Field, readonly string[]>>> = {
   fm_view: { v: VARIANTS, l: LANGUAGE_CODES, s: VISIT_SOURCES },
   fm_support: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   fm_gift: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: GIFT_TARGETS },
+  xm_game: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: PACK_SWITCH },
+  xm_gold: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
 };
 
 /** Step 79: the events whose country is counted — the visits. */

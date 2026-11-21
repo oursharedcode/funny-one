@@ -38,7 +38,9 @@
     "leave": "退出",
     "host": "ホスト",
     "capReached": "画像生成は今後約{{hours}}時間使えません。プレイは続けられますが、絵の代わりに物語のテキストが表示されます。",
-    "capReachedHost": "準備ができたらゲーム開始を押すか、1日の画像枠が回復するまで待ってください。"
+    "capReachedHost": "準備ができたらゲーム開始を押すか、1日の画像枠が回復するまで待ってください。",
+    "christmasOn": "🔔 このゲームにはクリスマスの物語が2つあります",
+    "christmasSwitch": "2026年クリスマスの物語で遊ぶ"
   },
   "round": {
     "progress": "ラウンド {{current}} / {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "あなたの物語です",
+    "goldenStory": "🔔 クリスマスの物語",
     "spinner": "カオスを召喚中…",
     "retry": "もう一度",
     "error": "生成に失敗しました。もう一度試してください。",
     "capReached": "絵のオーブンが満杯です。新しい絵は約{{hours}}時間後に。",
     "pictureAlt": "AI生成のあなたの物語の絵",
+    "endingAlt": "AI生成のあなたの物語の結末の絵",
     "continue": "続ける"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "{{nickname}}の物語",
     "noPicture": "この物語の絵はありません",
     "pictureAlt": "{{nickname}}の物語の絵",
+    "endingAlt": "{{nickname}}の物語の結末の絵",
     "counter": "{{index}} / {{total}}",
     "prev": "前の物語",
     "next": "次の物語",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "GitHub のソース",
     "family": "おもしろファミリー",
+    "edition": "2026年クリスマス版",
     "privacy": "プライバシーポリシー",
     "contentNotice": "プレイヤーの回答とAI画像は、上流プロジェクトではなく、このサーバーの運営者の責任です。"
   },

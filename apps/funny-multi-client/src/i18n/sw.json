@@ -38,7 +38,9 @@
     "leave": "Ondoka",
     "host": "Mwenyeji",
     "capReached": "Utengenezaji wa picha haupatikani kwa takriban saa {{hours}} zijazo. Bado mnaweza kucheza — wachezaji wataona maandishi ya hadithi badala ya katuni.",
-    "capReachedHost": "Gusa Anzisha mchezo ukiwa tayari, au subiri hadi kikomo cha katuni cha kila siku kianze upya."
+    "capReachedHost": "Gusa Anzisha mchezo ukiwa tayari, au subiri hadi kikomo cha katuni cha kila siku kianze upya.",
+    "christmasOn": "🔔 Mchezo huu una hadithi mbili za Krismasi",
+    "christmasSwitch": "Cheza na hadithi za Krismasi 2026"
   },
   "round": {
     "progress": "Raundi {{current}} kati ya {{total}}",
@@ -57,11 +59,13 @@
   },
   "reveal": {
     "title": "Hii hapa hadithi yenu",
+    "goldenStory": "🔔 Hadithi ya Krismasi",
     "spinner": "Tunaandaa vituko…",
     "retry": "Jaribu tena",
     "error": "Utengenezaji umeshindikana. Jaribu tena.",
     "capReached": "Jiko la katuni limejaa. Katuni mpya baada ya takriban saa {{hours}}.",
     "pictureAlt": "Katuni ya hadithi yenu iliyochorwa na akili bandia",
+    "endingAlt": "Katuni ya mwisho wa hadithi yenu iliyochorwa na akili bandia",
     "continue": "Endelea"
   },
   "end": {
@@ -103,6 +107,7 @@
     "storyBy": "Hadithi ya {{nickname}}",
     "noPicture": "Hakuna picha ya hadithi hii",
     "pictureAlt": "Katuni ya hadithi ya {{nickname}}",
+    "endingAlt": "Katuni ya mwisho wa hadithi ya {{nickname}}",
     "counter": "{{index}} / {{total}}",
     "prev": "Hadithi iliyotangulia",
     "next": "Hadithi inayofuata",
@@ -119,6 +124,7 @@
   "footer": {
     "source": "Msimbo chanzo kwenye GitHub",
     "family": "Familia ya Kicheko",
+    "edition": "Toleo la Krismasi 2026",
     "privacy": "Sera ya faragha",
     "contentNotice": "Majibu ya wachezaji na picha za akili bandia ni jukumu la mwendeshaji wa seva hii, si la mradi wa asili."
   },

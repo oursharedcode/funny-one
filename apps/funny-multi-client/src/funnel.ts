@@ -15,6 +15,12 @@
 // browser asks not to be tracked (Do Not Track, Global Privacy Control), or
 // without sendBeacon. deploy/origin-root/funny37/privacy.html says the same;
 // change both together.
+//
+// Step 117 (B-29, owner decision D2 A): the Christmas 2026 edition's funnel
+// starts here, on the website only like every count but the visit — a game
+// played in a room that was offered the Christmas stories, with the host's
+// switch on or off (`xm_game`), and a golden story's cartoon seen (`xm_gold`),
+// each at most once per page load. /stats/ shows them per language.
 
 import { isLanguage, type Language } from '@funny/shared';
 import i18n from './i18n';
@@ -28,6 +34,8 @@ type Origin = { s: 'direct' } | { s: 'app' } | { s: 'hub'; v: 'a' | 'b' };
 let origin: Origin = { s: 'direct' };
 let supportSent = false;
 let giftSent = false;
+let christmasGameSent = false;
+let goldenSent = false;
 
 function trackingRefused(): boolean {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
@@ -92,8 +100,24 @@ export function trackGift(rail: GiftRail): void {
   send({ e: 'fm_gift', t: rail });
 }
 
+/** A game started in a room offered the Christmas stories (Step 117). */
+export function trackChristmasGame(on: boolean): void {
+  if (christmasGameSent) return;
+  christmasGameSent = true;
+  send({ e: 'xm_game', t: on ? 'on' : 'off' });
+}
+
+/** A golden story's cartoon on screen, in the reveal or the gallery. */
+export function trackGoldenCartoon(): void {
+  if (goldenSent) return;
+  goldenSent = true;
+  send({ e: 'xm_gold' });
+}
+
 export function __resetFunnelForTest(): void {
   origin = { s: 'direct' };
   supportSent = false;
   giftSent = false;
+  christmasGameSent = false;
+  goldenSent = false;
 }

@@ -48,9 +48,30 @@ export { POOL_TEXTS } from './pools/text/index.js';
 
 // Step 103 (B-29) — packs: a second set of the seven pools a story can be
 // played from, the first the Christmas 2026 edition (DD-16).
-export { AFTERMATH_SLOTS, PACK_IDS, PACK_OPTIONS_PER_SLOT } from './packs/schema.js';
+// Step 117 brings them into rooms: which room is offered one and until when
+// (FM-PACK-5/6), its golden stories, and the display texts with the English
+// fallback (owner decision 4A).
+export {
+  AFTERMATH_SLOTS,
+  GOLDEN_STORIES,
+  PACK_IDS,
+  PACK_OPTIONS_PER_SLOT,
+} from './packs/schema.js';
 export type { PackConfig, PackId, PackOption, PackPools, StoryContent } from './packs/schema.js';
-export { CHR26_LANGUAGES, PACKS, PACK_TEXTS, optionsFor } from './packs/index.js';
+export {
+  BASE_CONTENT,
+  CHR26_LANGUAGES,
+  PACKS,
+  PACK_TEXTS,
+  cutoffOf,
+  freeGameContents,
+  isGolden,
+  isPackFree,
+  optionTexts,
+  optionsFor,
+  packForRoom,
+} from './packs/index.js';
+export type { PackTexts } from './packs/index.js';
 
 // T-FO-2.1 — prose rendering (FO-ARC-2), promoted from
 // `apps/funny-multi-server/src/i18n/` and `.../grammar.ts` so both products
@@ -96,6 +117,9 @@ export type {
   RevealPictureReadyPayload,
   RevealStartPayload,
   Room,
+  RoomPack,
+  RoomSetPackPayload,
+  RoomStory,
   RoomCreateAck,
   RoomCreatePayload,
   RoomJoinAck,

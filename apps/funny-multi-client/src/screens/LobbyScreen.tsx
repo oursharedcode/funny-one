@@ -13,6 +13,10 @@
 // host sees the switch, and a guest sees nothing once it is off. The switch
 // shows the server's state, so every lobby agrees on it.
 //
+// Step 122 (B-29): a paid room's box says every story is a Christmas one, and
+// any player whose phone keeps a paid code can open the room with it
+// (PackUnlock) — which also shows why the code Home sent did not.
+//
 // The cap banner is carried as-is. At T-3.2 it was inert — no server
 // `stats:get` handler, so the ack never fired and `isCapReached(null)` was
 // false. T-5.3 wired the handler; this file did not need to change.
@@ -23,6 +27,7 @@ import { socket } from '../socket';
 import { homeUrl } from '../basePath';
 import PlayerList from '../components/PlayerList';
 import QRCode from '../components/QRCode';
+import PackUnlock from '../components/PackUnlock';
 import { hoursUntilUtcMidnight, isCapReached } from '../capReset';
 import type { LobbyState } from '../App';
 import type { StatsPayload } from '@funny/shared';
@@ -126,7 +131,7 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
         <div className="flex flex-col gap-2 rounded border border-amber-300 bg-white p-3">
           {lobby.pack.on && (
             <p className="text-center font-semibold text-pink-600" role="status">
-              {t('lobby.christmasOn')}
+              {lobby.pack.paid ? t('lobby.christmasPaid') : t('lobby.christmasOn')}
             </p>
           )}
           {isHost && (
@@ -142,6 +147,8 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
           )}
         </div>
       )}
+
+      <PackUnlock lobby={lobby} initialError={lobby.codeError ?? null} />
 
       <PlayerList players={lobby.players} hostId={lobby.hostId} />
 

@@ -7,9 +7,10 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import { Server as SocketIOServer } from 'socket.io';
-import { normalizeBasePath } from '@funny/shared';
+import { isPackFree, normalizeBasePath } from '@funny/shared';
 import type {
   ClientToServerEvents,
+  ErrorPayload,
   LobbyUpdatePayload,
   Room,
   ServerToClientEvents,
@@ -17,11 +18,13 @@ import type {
 } from './types.js';
 import {
   RoomError,
+  allRooms,
   createRoom,
   deleteRoom,
   findRoomForSocket,
   isValidLanguage,
   joinRoom,
+  openPaidPack,
   removePlayer,
   validateNickname,
   type RemoveResult,
@@ -35,15 +38,20 @@ import {
   shareGallery,
   startGame,
   submitAnswer,
+  takePaidGameRecord,
 } from './game.js';
 import { createDisconnectRegistry, type DisconnectRegistry } from './disconnect.js';
 import {
   RATE_WINDOW_MS,
   ROOM_CREATE_PER_MINUTE,
   ROOM_JOIN_PER_MINUTE,
+  WRONG_CODES_PER_HOUR,
+  WRONG_CODE_WINDOW_MS,
   clientIp,
   createRateLimiter,
 } from './rateLimit.js';
+import { browserFamily, openReceiptLog, type ReceiptLog } from './receipts.js';
+import { createPackCodes, type CodeError, type PackCodes } from './codes.js';
 import { maybeSyncImageCounter, syncImageCounterFromWorker } from './image.js';
 import { buildStats, broadcastStats } from './stats.js';
 import { createStatsStore, isBotAgent, summaryDays } from './analytics.js';
@@ -105,6 +113,24 @@ const STATS_FILE = process.env.STATS_FILE || null;
 // stats volume.
 const GEO_DIR = process.env.GEO_DIR || null;
 
+// Step 122 (B-29): the paid codes' receipt log (receipts.ts). Unset keeps it in
+// memory only; docker-compose.yml points it into the stats volume.
+const RECEIPTS_FILE = process.env.RECEIPTS_FILE || null;
+
+// Step 122: the secret every paid code is signed with (codes.ts). Unset, or
+// shorter than 16 characters, every code is refused as not a code. In the
+// VM's .env only, never in the repository: a new secret voids every code.
+const PACK_CODE_SECRET = process.env.PACK_CODE_SECRET || null;
+
+// The English wire text of a refused code; the client shows its own words.
+const CODE_MESSAGES: Record<CodeError | 'PACK_UNAVAILABLE', string> = {
+  CODE_INVALID: 'That code is not right.',
+  CODE_BLOCKED: 'This code no longer works.',
+  CODE_ENDED: 'This edition has ended.',
+  CODE_PENDING: 'This code is waiting for its payment.',
+  PACK_UNAVAILABLE: 'This room cannot play the pack.',
+};
+
 // Visit and funnel events per IP per minute. A hub visit sends one or two and
 // a game one a handful, so this only stops a script, while a family or a
 // school behind one address stays far below it.
@@ -124,6 +150,9 @@ export interface BuiltServer {
   io: GameIO;
   /** Pending disconnect-grace timers (T-2.4), exposed for tests. */
   disconnects: DisconnectRegistry;
+  /** Step 122: the paid codes' receipt log and the codes, exposed for tests. */
+  receipts: ReceiptLog;
+  codes: PackCodes;
 }
 
 // Split out of SRC's monolithic main() so the transport shell is testable
@@ -148,6 +177,10 @@ export interface BuildServerOptions {
    * lookup, tests a stand-in.
    */
   countryOf?: (ip: string) => string | null;
+  /** Step 122: overrides the RECEIPTS_FILE env var; null keeps the log in memory. */
+  receiptsFile?: string | null;
+  /** Step 122: overrides the PACK_CODE_SECRET env var; null turns paid codes off. */
+  packCodeSecret?: string | null;
 }
 
 export async function buildServer({
@@ -156,6 +189,8 @@ export async function buildServer({
   basePath = BASE_PATH,
   statsFile = STATS_FILE,
   countryOf,
+  receiptsFile = RECEIPTS_FILE,
+  packCodeSecret = PACK_CODE_SECRET,
 }: BuildServerOptions = {}): Promise<BuiltServer> {
   const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
@@ -279,6 +314,93 @@ export async function buildServer({
     joinLimiter.stop();
   });
 
+  // ---- Step 122: the paid code (B-29) -------------------------------------
+  //
+  // A code arrives with room:create (the website remembers it, or its link
+  // carries it) or with any player's room:unlock. A good one opens the room's
+  // pack from its next game; each opening and each paid game is a receipt
+  // record. Wrong codes are limited per address (rateLimit.ts): only a wrong
+  // one takes a token, so a family's good code never waits.
+  const receipts = openReceiptLog({
+    file: receiptsFile,
+    onError: (err) => fastify.log.error(err, 'receipt log'),
+  });
+  const codes = createPackCodes({ secret: packCodeSecret, log: receipts });
+  if (!codes.enabled) {
+    fastify.log.warn(
+      'PACK_CODE_SECRET is unset or under 16 characters: every paid code is refused',
+    );
+  }
+  const wrongCodeLimiter = createRateLimiter({
+    capacity: WRONG_CODES_PER_HOUR,
+    intervalMs: WRONG_CODE_WINDOW_MS,
+  });
+
+  /** Writes the receipt record of a paid game being left, if it was one. */
+  function flushPaidGame(room: Room): void {
+    const record = takePaidGameRecord(room);
+    if (record) receipts.append(record);
+  }
+  fastify.addHook('onClose', async () => {
+    wrongCodeLimiter.stop();
+    // A deploy ends every game in progress (B-27): a paid one keeps its record.
+    for (const room of allRooms()) flushPaidGame(room);
+  });
+
+  /**
+   * A paid code offered for `room` at its creation or by room:unlock: null
+   * when it opened the room's pack, or a code already had; otherwise why not.
+   */
+  function applyCode(
+    room: Room,
+    raw: unknown,
+    how: 'create' | 'unlock',
+    ip: string,
+    userAgent: string | undefined,
+  ): ErrorPayload | null {
+    if (!wrongCodeLimiter.peek(ip)) {
+      return { code: 'RATE_LIMITED', message: 'Too many wrong codes. Try again later.' };
+    }
+    const verdict = codes.check(raw);
+    if (!verdict.ok) {
+      if (verdict.error === 'CODE_INVALID') wrongCodeLimiter.take(ip);
+      return { code: verdict.error, message: CODE_MESSAGES[verdict.error] };
+    }
+    const opened = openPaidPack(room, verdict.pack, verdict.code);
+    if (opened === false) {
+      return { code: 'PACK_UNAVAILABLE', message: CODE_MESSAGES.PACK_UNAVAILABLE };
+    }
+    if (opened === 'opened') {
+      const country = countryOf?.(ip) ?? null;
+      receipts.append({
+        type: 'room',
+        code: verdict.code,
+        how,
+        room: room.code,
+        lang: room.language,
+        players: room.players.filter((p) => !p.isBot).length,
+        country: country && /^[A-Z]{2}$/u.test(country) ? country : 'ZZ',
+        browser: browserFamily(userAgent),
+      });
+    }
+    return null;
+  }
+
+  /**
+   * A paid room's code, checked again just before each game: one blocked,
+   * lapsed (a PayID claim's 48 hours) or ended since the room opened plays
+   * the free part from this game on — or no pack at all once the free part
+   * has ended too, so no lobby promises golden stories the game cannot have.
+   * True when the room changed.
+   */
+  function recheckCode(room: Room): boolean {
+    if (!room.pack?.paid) return false;
+    if (room.packCode && codes.check(room.packCode).ok) return false;
+    room.pack = isPackFree(room.pack.id, Date.now()) ? { ...room.pack, paid: false } : null;
+    room.packCode = null;
+    return true;
+  }
+
   function broadcastLobby(room: Room): void {
     const payload: LobbyUpdatePayload = {
       players: room.players,
@@ -329,6 +451,8 @@ export async function buildServer({
     }
 
     if (!result.deleted) broadcastLobby(result.room);
+    // A room gone with its last player takes its paid game's record along.
+    if (result.deleted) flushPaidGame(result.room);
     // Room count only changes when the room itself is gone (spec's
     // "action changes the counter" rule) — covers both the all-bot deletion
     // above and the lobby-phase empty-room deletion in `removePlayer`. This
@@ -361,6 +485,7 @@ export async function buildServer({
     }
 
     const ip = clientIp(socket.handshake, TRUSTED_PROXY_HOPS);
+    const userAgent = socket.handshake.headers['user-agent'];
 
     socket.on('room:create', (payload, ack) => {
       // Rate check first: a limited caller must not consume a room slot or a
@@ -389,7 +514,14 @@ export async function buildServer({
           payload.multiLanguage === true,
         );
         socket.join(room.code);
-        ack({ roomCode: room.code, socketId: socket.id });
+        // Step 122: a refused code still makes the room, a free one, and the
+        // ack says why: the error event is for no room at all.
+        const code = payload.code;
+        const codeError =
+          typeof code === 'string' && code.trim() !== ''
+            ? applyCode(room, code, 'create', ip, userAgent)
+            : null;
+        ack({ roomCode: room.code, socketId: socket.id, ...(codeError ? { codeError } : {}) });
         broadcastLobby(room);
         broadcastStats(io);
       } catch (err) {
@@ -474,6 +606,34 @@ export async function buildServer({
       broadcastLobby(room);
     });
 
+    // Step 122 (B-29 #4, "unlock the room you're in"): any player, at any
+    // point of the room. The code opens the pack from the next game, the
+    // first if the room is still in its lobby, and nobody leaves or rejoins.
+    socket.on('room:unlock', (payload, ack) => {
+      const reply = typeof ack === 'function' ? ack : () => {};
+      const room = findRoomForSocket(socket.id);
+      if (!room || room.phase === 'ended') {
+        reply({ error: { code: 'ROOM_NOT_FOUND', message: 'No room.' } });
+        return;
+      }
+      const error = applyCode(room, payload?.code, 'unlock', ip, userAgent);
+      if (error) {
+        reply({ error });
+        return;
+      }
+      reply({ ok: true });
+      broadcastLobby(room);
+    });
+
+    // Step 122: a paid story saved or shared, for its game's receipt record.
+    socket.on('story:exported', (payload) => {
+      const room = findRoomForSocket(socket.id);
+      const game = room?.phase === 'reveal' ? room.paidGame : null;
+      if (!game) return;
+      if (payload?.kind === 'download') game.downloads++;
+      else if (payload?.kind === 'share') game.shares++;
+    });
+
     socket.on('game:start', () => {
       const room = findRoomForSocket(socket.id);
       if (!room) {
@@ -497,7 +657,9 @@ export async function buildServer({
       }
       // SRC hard-locked room.wobbleEngine here and re-broadcast the lobby so
       // every joiner recorded with the same engine. Both are gone with the
-      // field (DD-9), and with them the only reason this handler broadcast.
+      // field (DD-9). Step 122 broadcasts again, only when a paid room's code
+      // no longer works, so every client knows this game is not paid.
+      if (recheckCode(room)) broadcastLobby(room);
       startGame(room, io);
     });
 
@@ -549,6 +711,8 @@ export async function buildServer({
         socket.emit('error', result.error);
         return;
       }
+      flushPaidGame(room);
+      recheckCode(room);
       broadcastLobby(room);
       startGame(room, io);
     });
@@ -560,6 +724,7 @@ export async function buildServer({
         socket.emit('error', { code: 'NOT_HOST', message: 'Only the host can end the game.' });
         return;
       }
+      flushPaidGame(room);
       room.phase = 'ended';
       io.to(room.code).emit('game:over');
       deleteRoom(room.code);
@@ -583,7 +748,7 @@ export async function buildServer({
     });
   });
 
-  return { fastify, io, disconnects };
+  return { fastify, io, disconnects, receipts, codes };
 }
 
 async function main(): Promise<void> {

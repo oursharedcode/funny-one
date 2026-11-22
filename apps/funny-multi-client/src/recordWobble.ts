@@ -31,6 +31,8 @@
 // picture, or the ending as a text card (videoFooter.ts `drawEndingCard`) —
 // still five seconds, still silent: the sleigh bells come with the paid half.
 // A golden story's footer is the edition's (landingUrl.ts `footerTarget`).
+// Step 122: a paid story's footer is the buyer's thank-you, measured with the
+// same label it is drawn with, since that one can wrap.
 
 import { footerTarget } from './landingUrl';
 import { withBase } from './basePath';
@@ -146,6 +148,8 @@ export interface WobbleVideoOptions {
   language: AuthoredLanguage;
   /** Step 117: a golden story, whose footer is the edition's. */
   golden?: boolean;
+  /** Step 122: a story of a paid game, whose footer is the buyer's thank-you. */
+  paid?: boolean;
   /** Step 117: a Christmas story's ending, shown for the clip's second half. */
   ending?: VideoEnding | null;
 }
@@ -153,7 +157,7 @@ export interface WobbleVideoOptions {
 export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
   const ending = opts.ending ?? null;
-  const target = footerTarget(opts.golden === true);
+  const target = footerTarget(opts.golden === true, opts.paid === true);
   const mime = pickMime();
   if (!mime) throw new Error('MediaRecorder not supported in this browser');
 
@@ -214,7 +218,7 @@ export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<Fi
   const BOTTOM_MARGIN = 40;
   const badgeY = picY + picSize + 50;
   const storyTop = badgeY + 40;
-  const attributionHeight = measureAttributionHeight(ctx, W, language);
+  const attributionHeight = measureAttributionHeight(ctx, W, language, target.labelKey);
   const maxStoryHeight = H - BOTTOM_MARGIN - attributionHeight - STORY_GAP - storyTop;
 
   const stream = canvas.captureStream(FPS);

@@ -64,9 +64,18 @@ const NO_PICTURE: GalleryEntry = {
   ending: null,
 };
 
-function renderGallery(entries: GalleryEntry[], defaultLanguage: AuthoredLanguage = 'en') {
+function renderGallery(
+  entries: GalleryEntry[],
+  defaultLanguage: AuthoredLanguage = 'en',
+  onExported?: (kind: 'download' | 'share') => void,
+) {
   return render(
-    <RoomGallery entries={entries} roomLanguage="en" defaultLanguage={defaultLanguage} />,
+    <RoomGallery
+      entries={entries}
+      roomLanguage="en"
+      defaultLanguage={defaultLanguage}
+      onExported={onExported}
+    />,
   );
 }
 
@@ -141,6 +150,7 @@ describe('download button', () => {
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
       golden: false,
+      paid: false,
       endingUrl: null,
     });
   });
@@ -175,6 +185,7 @@ describe('share button', () => {
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
       golden: false,
+      paid: false,
       endingUrl: null,
     });
     expect(shareFiles).toHaveBeenCalledWith([file], {
@@ -225,6 +236,7 @@ describe('video button', () => {
       pictureUrl: 'https://img.example/i/abc.png',
       language: 'en',
       golden: false,
+      paid: false,
       ending: null,
     });
   });
@@ -429,5 +441,100 @@ describe('Christmas stories (Step 117)', () => {
     expect(trackGoldenCartoon).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
     expect(trackGoldenCartoon).toHaveBeenCalled();
+  });
+
+  // Step 122 (B-29): every story of a paid game is the whole pack's.
+  describe('a paid story (Step 122)', () => {
+    const PAID: StoryContent = { kind: 'paid', pack: 'chr26' };
+    const PAID_IDS = idsFor(PAID);
+    const PAID_ENTRY: GalleryEntry = {
+      nickname: 'Mika',
+      isBot: false,
+      ...renderStory('en', PAID_IDS),
+      optionIds: PAID_IDS,
+      picture: SCENE,
+      content: PAID,
+      ending: ENDING,
+    };
+
+    it('shows its ending picture, but no golden badge and no golden count', () => {
+      renderGallery([PAID_ENTRY]);
+      expect(screen.queryByText('🔔 A Christmas story')).toBeNull();
+      const ending = screen.getByAltText<HTMLImageElement>("Cartoon of how Mika's story ended");
+      expect(ending.src).toBe(ENDING.url);
+      expect(trackGoldenCartoon).not.toHaveBeenCalled();
+    });
+
+    it('hands its ending and the paid footer to its still and its video', async () => {
+      canShareFiles.mockReturnValue(true);
+      isVideoRecordingSupported.mockReturnValue(true);
+      renderGallery([PAID_ENTRY]);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+
+      await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
+      const still = { golden: false, paid: true, endingUrl: ENDING.url, pictureUrl: SCENE.url };
+      expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject(still);
+      expect(buildStoryImageFile.mock.calls[0]?.[0]).toMatchObject(still);
+      expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({
+        golden: false,
+        paid: true,
+        ending: { pictureUrl: ENDING.url, text: endingText(renderStory('en', PAID_IDS), 'en') },
+      });
+    });
+
+    it('reports each download, share and video once it is done', async () => {
+      canShareFiles.mockReturnValue(true);
+      isVideoRecordingSupported.mockReturnValue(true);
+      const onExported = vi.fn();
+      renderGallery([PAID_ENTRY], 'en', onExported);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
+      await waitFor(() => expect(onExported).toHaveBeenCalledTimes(1));
+      expect(onExported).toHaveBeenLastCalledWith('download');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+      await waitFor(() => expect(onExported).toHaveBeenCalledTimes(2));
+      expect(onExported).toHaveBeenLastCalledWith('share');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+      await waitFor(() => expect(onExported).toHaveBeenCalledTimes(3));
+      expect(onExported).toHaveBeenLastCalledWith('download');
+    });
+
+    it('reports a declined share as the download it became, a dismissed one not at all', async () => {
+      canShareFiles.mockReturnValue(true);
+      const onExported = vi.fn();
+      renderGallery([PAID_ENTRY], 'en', onExported);
+
+      shareFiles.mockResolvedValue('unsupported');
+      fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+      await waitFor(() => expect(onExported).toHaveBeenCalledWith('download'));
+
+      shareFiles.mockResolvedValue('cancelled');
+      fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+      await waitFor(() => expect(shareFiles).toHaveBeenCalledTimes(2));
+      expect(onExported).toHaveBeenCalledTimes(1);
+    });
+
+    it('never reports a free story', async () => {
+      canShareFiles.mockReturnValue(true);
+      isVideoRecordingSupported.mockReturnValue(true);
+      const onExported = vi.fn();
+      renderGallery([GOLDEN_ENTRY, WITH_PICTURE], 'en', onExported);
+
+      for (let i = 0; i < 2; i++) {
+        fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+        await waitFor(() => expect(downloadFile).toHaveBeenCalledTimes(i + 1));
+        fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+      }
+      expect(downloadStoryImage).toHaveBeenCalledTimes(2);
+      expect(shareFiles).toHaveBeenCalledTimes(2);
+      expect(onExported).not.toHaveBeenCalled();
+    });
   });
 });

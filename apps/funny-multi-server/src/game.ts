@@ -50,6 +50,12 @@
 //     language has none. A golden story gets its aftermath right after its
 //     scene, and the gallery lists the golden stories last.
 //
+//  7. **A paid game** (Step 122, B-29). A room a code has opened plays the
+//     whole pack in every story (`paidGameContents`, content `paid`): every
+//     ending drawn as a golden story's is (`drawsEnding`), none of them golden.
+//     The game's counts — its players, the picks they made — go into its
+//     receipt record (`takePaidGameRecord`, receipts.ts) when it is left.
+//
 // Also not here, by deliberate choice rather than boundary: SRC also called
 // `broadcastStats` from this pipeline, right after `reserveImageSlot()`
 // succeeded, so the Home-screen image counter ticked live mid-generation
@@ -65,11 +71,14 @@ import {
   BASE_CONTENT,
   QUESTIONS,
   SLOT_COUNT,
+  drawsEnding,
   freeGameContents,
   isGolden,
   isPackFree,
+  isPackPaid,
   optionTexts,
   optionsFor,
+  paidGameContents,
   polishProse,
   renderProse,
   requireAuthoredLanguage,
@@ -89,6 +98,7 @@ import type {
 } from './types.js';
 import { buildAftermathPrompt, buildPrompt } from './prompt.js';
 import { ImageCapReachedError, generateImage } from './image.js';
+import type { ReceiptInput } from './receipts.js';
 
 // One round per pool slot. Tied to the shared schema rather than restated, so
 // adding a slot cannot silently leave a round unplayed.
@@ -121,10 +131,18 @@ function optionIdsFor(slot: SlotIndex, content: StoryContent): ReadonlySet<Optio
  * (FM-PACK-6, checked here as well as at the room's creation, for a lobby left
  * open across the cut-off), the base pools otherwise. Drawn afresh at every
  * start, "one more game" included, so the golden stories move between games.
+ *
+ * Step 122: the whole pack in every story when a code has opened it and its
+ * paid part has not ended — the code itself is checked again by the caller
+ * just before (index.ts), for one blocked or lapsed since.
  */
 function contentsFor(room: Room): StoryContent[] {
   const pack = room.pack;
-  if (pack?.on && isPackFree(pack.id, Date.now())) {
+  const now = Date.now();
+  if (pack?.on && pack.paid && isPackPaid(pack.id, now)) {
+    return paidGameContents(pack.id, room.players.length);
+  }
+  if (pack?.on && isPackFree(pack.id, now)) {
     return freeGameContents(pack.id, room.players.length);
   }
   return room.players.map(() => BASE_CONTENT);
@@ -147,12 +165,19 @@ export function startGame(room: Room, io: IO): void {
   room.phase = 'playing';
   room.currentRound = 0;
   room.galleryShared = false; // reset for a restarted game
-  room.stories = contentsFor(room).map<RoomStory>((content) => ({
+  const contents = contentsFor(room);
+  room.stories = contents.map<RoomStory>((content) => ({
     answers: new Array<OptionId | null>(ROUNDS).fill(null),
     picture: null,
     content,
     ending: null,
   }));
+  // A paid game's counts for its receipt record (Step 122); the caller has
+  // taken the last game's record already.
+  const paid = room.packCode !== null && contents.some((c) => c.kind === 'paid');
+  room.paidGame = paid
+    ? { startedAt: Date.now(), players: room.players.length, picks: 0, downloads: 0, shares: 0 }
+    : null;
   startRound(room, io);
 }
 
@@ -222,6 +247,7 @@ export function submitAnswer(room: Room, socketId: string, optionId: unknown, io
 
   story.answers[room.currentRound] = optionId;
   room.submittedThisRound.add(socketId);
+  if (room.paidGame) room.paidGame.picks++;
 
   broadcastWaiting(room, io);
   maybeAdvance(room, io);
@@ -420,7 +446,8 @@ async function generateStoryPicture(story: RoomStory): Promise<PictureOutcome> {
 }
 
 /**
- * A golden story's ending picture, its aftermath (Step 117, FM-PACK-3): asked
+ * A golden story's ending picture, its aftermath (Step 117, FM-PACK-3) — and,
+ * since Step 122, every paid story's (`drawsEnding`): asked
  * for after the scene, never instead of it, and sent with it. Every pack's
  * aftermaths are drawn before it ships (chr26's 25 at Step 116), so this is an
  * `/exists` hit that spends no cap slot. Any failure — a miss with generation
@@ -429,7 +456,7 @@ async function generateStoryPicture(story: RoomStory): Promise<PictureOutcome> {
  * like the scene: a retry asks again only while it is null.
  */
 async function endingFor(story: RoomStory): Promise<PictureRef | null> {
-  if (!isGolden(story.content) || story.ending) return story.ending;
+  if (!drawsEnding(story.content) || story.ending) return story.ending;
   try {
     story.ending = await generateImage(buildAftermathPrompt(story));
   } catch {
@@ -612,6 +639,30 @@ export function handleReadyToggle(room: Room, socketId: string, ready: boolean, 
   io.to(room.code).emit('game:restartReady', {
     readyIds: [...room.readyForRestart],
   });
+}
+
+/**
+ * The receipt record of the paid game being left (Step 122) — at "one more
+ * game", the host's end, the room's last player gone, the server's shutdown —
+ * with the room's counts cleared; null when the game was not paid. Its rounds
+ * are those begun, all of them once the reveal is reached; its cartoons the
+ * stories with a picture.
+ */
+export function takePaidGameRecord(room: Room): ReceiptInput | null {
+  const game = room.paidGame;
+  room.paidGame = null;
+  if (!game || !room.packCode) return null;
+  return {
+    type: 'game',
+    code: room.packCode,
+    room: room.code,
+    players: game.players,
+    rounds: room.phase === 'playing' ? room.currentRound + 1 : ROUNDS,
+    picks: game.picks,
+    cartoons: room.stories.filter((story) => story.picture !== null).length,
+    downloads: game.downloads,
+    shares: game.shares,
+  };
 }
 
 // Validates a host's restart request and, on success, resets the room to a

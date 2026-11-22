@@ -9,6 +9,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "prompts": "npm run build && node scripts/samplePrompts.mjs",
+    "mint-code": "npm run build && node scripts/mintCode.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"

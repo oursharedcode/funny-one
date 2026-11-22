@@ -6,13 +6,20 @@
 // than through the socket double's `fire`. Only the outgoing emits
 // (game:restart, game:end, game:ready, gallery:share) go through the mock.
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { POOLS, SLOT_COUNT } from '@funny/shared';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { POOLS, SLOT_COUNT, optionsFor } from '@funny/shared';
 import { createSocketMock } from '../testutils/socketMock';
 import i18n from '../i18n';
+import { __resetPackCodeForTest, forgetPackCode, rememberPackCode } from '../packCode';
 import { renderStory } from '../storyLanguage';
-import type { GalleryReadyPayload, Player, SlotIndex, SupportConfig } from '@funny/shared';
+import type {
+  GalleryReadyPayload,
+  Player,
+  SlotIndex,
+  StoryContent,
+  SupportConfig,
+} from '@funny/shared';
 import type { LobbyState } from '../App';
 
 const NO_RAILS: SupportConfig = {
@@ -27,6 +34,11 @@ const NO_RAILS: SupportConfig = {
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
+
+// The still itself is downloadStory.ts's own suite's business; here only that
+// a paid story's download is reported.
+const downloadStoryImage = vi.fn(async () => {});
+vi.mock('../downloadStory', () => ({ buildStoryImageFile: vi.fn(), downloadStoryImage }));
 
 const { default: EndScreen } = await import('./EndScreen');
 
@@ -313,5 +325,88 @@ describe('support entry point (T-9.4)', () => {
     });
     fireEvent.click(screen.getByText('Support this server'));
     expect(onOpenSupport).toHaveBeenCalledTimes(1);
+  });
+});
+
+// Step 122 (B-29): a paid room's next game, a code for the next game, and a
+// paid story saved for the game's receipt record.
+describe('the paid code (Step 122)', () => {
+  const CODE = 'XMAS26-K7QM-3FPA';
+  const ON = { id: 'chr26', on: true, paid: false } as const;
+  const PAID = { id: 'chr26', on: true, paid: true } as const;
+  const NEXT = '🔔 Next game: every story is a Christmas story';
+  const USE = '🔔 Use my Christmas pack here';
+
+  const PAID_CONTENT: StoryContent = { kind: 'paid', pack: 'chr26' };
+  const PAID_IDS = Array.from(
+    { length: SLOT_COUNT },
+    (_, i) => optionsFor(i as SlotIndex, PAID_CONTENT)[0]!.id,
+  );
+  const PAID_GALLERY: GalleryReadyPayload = {
+    entries: [
+      {
+        nickname: 'p0',
+        isBot: false,
+        ...renderStory('en', PAID_IDS),
+        optionIds: PAID_IDS,
+        content: PAID_CONTENT,
+        ending: null,
+        picture: null,
+      },
+    ],
+  };
+
+  function resetCode(): void {
+    forgetPackCode();
+    __resetPackCodeForTest();
+  }
+
+  beforeEach(() => {
+    resetCode();
+    downloadStoryImage.mockClear();
+    vi.useFakeTimers({ now: Date.parse('2026-12-20T09:00:00Z'), toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    resetCode();
+  });
+
+  it('says the next game of a paid room is all Christmas stories', () => {
+    renderEnd({ lobby: lobby({ pack: PAID }) });
+    expect(screen.getByText(NEXT)).toBeTruthy();
+  });
+
+  it('says nothing of the kind once the game is over, switched off or free', () => {
+    const { unmount } = renderEnd({ lobby: lobby({ pack: PAID }), gameOver: true });
+    expect(screen.queryByText(NEXT)).toBeNull();
+    unmount();
+    renderEnd({ lobby: lobby({ pack: { ...PAID, on: false } }) });
+    expect(screen.queryByText(NEXT)).toBeNull();
+    renderEnd({ lobby: lobby({ pack: ON }) });
+    expect(screen.queryByText(NEXT)).toBeNull();
+  });
+
+  it("opens the room's next game with this phone's code, until the game is over", () => {
+    rememberPackCode(CODE);
+    const { unmount } = renderEnd({ lobby: lobby({ socketId: 's1', hostId: 's0', pack: ON }) });
+    fireEvent.click(screen.getByText(USE));
+    expect(socketMock.onlyEmitOf('room:unlock').args[0]).toEqual({ code: CODE });
+    unmount();
+
+    renderEnd({ lobby: lobby({ pack: ON }), gameOver: true });
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it("reports a paid story saved, for the game's record, and no free one", async () => {
+    const { unmount } = renderEnd({ lobby: lobby({ pack: PAID }), gallery: PAID_GALLERY });
+    fireEvent.click(screen.getByText('Download story'));
+    await waitFor(() => expect(socketMock.emitsOf('story:exported')).toHaveLength(1));
+    expect(socketMock.emitsOf('story:exported')[0]!.args).toEqual([{ kind: 'download' }]);
+    unmount();
+
+    renderEnd({ gallery: GALLERY });
+    fireEvent.click(screen.getByText('Download story'));
+    await waitFor(() => expect(downloadStoryImage).toHaveBeenCalledTimes(2));
+    expect(socketMock.emitsOf('story:exported')).toHaveLength(1);
   });
 });

@@ -25,7 +25,11 @@
     "uiLanguage": "Tippen, um die Sprache der Oberfläche zu ändern",
     "unsupportedLanguage": "Dieser Raum ist in einer Sprache, die diese App-Version noch nicht abspielen kann. Aktualisiere die Seite oder erstelle einen neuen Raum.",
     "multiLanguage": "Mehrsprachiger Raum",
-    "multiLanguageHint": "Jeder spielt in der oben per Flagge gewählten Sprache."
+    "multiLanguageHint": "Jeder spielt in der oben per Flagge gewählten Sprache.",
+    "packCode": "🔔 Dein Weihnachtspaket: {{code}}",
+    "packCodeHint": "Jeder Raum, den du auf diesem Handy erstellst, hat bis zum {{date}} alle Weihnachtsgeschichten.",
+    "packCodeRemove": "Entfernen",
+    "packEnded": "Deine Weihnachtsausgabe 2026 ist zu Ende. Danke fürs Spielen!"
   },
   "lobby": {
     "roomCodeLabel": "Raumcode",
@@ -40,7 +44,9 @@
     "capReached": "Bildgenerierung ist für die nächsten ~{{hours}} Stunden nicht verfügbar. Ihr könnt trotzdem spielen — die Spieler sehen Story-Text statt Zeichnungen.",
     "capReachedHost": "Tippe auf Spiel starten, wenn du bereit bist, oder warte, bis das Tageslimit für Bilder zurückgesetzt wird.",
     "christmasOn": "🔔 Dieses Spiel hat zwei Weihnachtsgeschichten",
-    "christmasSwitch": "Mit den Weihnachtsgeschichten 2026 spielen"
+    "christmasSwitch": "Mit den Weihnachtsgeschichten 2026 spielen",
+    "christmasPaid": "🔔 Dieses Spiel hat nur Weihnachtsgeschichten",
+    "usePack": "🔔 Mein Weihnachtspaket hier nutzen"
   },
   "round": {
     "progress": "Runde {{current}} von {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Bereit ✓",
     "waitingForHost": "Warten auf den Host…",
     "needPlayers": "Mindestens 3 Spieler für ein neues Spiel nötig",
-    "waitingForReady": "Warten, bis alle bereit sind"
+    "waitingForReady": "Warten, bis alle bereit sind",
+    "nextPaid": "🔔 Nächstes Spiel: nur Weihnachtsgeschichten"
   },
   "endScreen": {
     "supportServer": "Diesen Server unterstützen"
@@ -125,6 +132,7 @@
     "source": "Quelle auf GitHub",
     "family": "Familienquatsch",
     "edition": "Weihnachtsausgabe 2026",
+    "paid": "Eure Weihnachtsgeschichten 2026 in jedem Spiel. Frohes Fest :))",
     "privacy": "Datenschutzerklärung",
     "contentNotice": "Spielerantworten und KI-Bilder liegen in der Verantwortung des Betreibers dieses Servers, nicht des Upstream-Projekts."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Ungültiger Name",
     "INVALID_OPTION": "Diese Antwort ist nicht mehr verfügbar — wähle eine andere",
     "RATE_LIMITED": "Mal kurz langsamer",
-    "SERVER_BUSY": "Server ist beschäftigt"
+    "SERVER_BUSY": "Server ist beschäftigt",
+    "CODE_INVALID": "Dieser Weihnachtscode stimmt nicht. Prüf ihn und versuch es nochmal.",
+    "CODE_BLOCKED": "Dieser Weihnachtscode funktioniert nicht mehr.",
+    "CODE_ENDED": "Die Weihnachtsausgabe 2026 ist zu Ende.",
+    "CODE_PENDING": "Dieser Weihnachtscode wartet noch auf seine Zahlung.",
+    "PACK_UNAVAILABLE": "Weihnachtsgeschichten sind in diesem Raum nicht verfügbar."
   }
 }

@@ -223,7 +223,7 @@ scene `SKELETON`, `STYLE_SUFFIX` and 500-character cap.
 export type PackId = 'chr26';
 export interface PackOption extends AnswerOption { aftermathEn?: string }  // slot 6 only
 export interface PackConfig { id; languages; sliceSlots; pools }           // chr26: slices 3, 5, 6
-export type StoryContent = { kind: 'base' } | { kind: 'slice' | 'full'; pack: PackId };
+export type StoryContent = { kind: 'base' } | { kind: 'slice' | 'full' | 'paid'; pack: PackId };
 export function optionsFor(slot: SlotIndex, content: StoryContent): readonly AnswerOption[];
 ```
 
@@ -235,8 +235,10 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   without a pack; `slice` for a free room's ordinary stories — the pack's when, why and ending,
   the base pools' four picture slots, so the scene is one the library already holds and the
   ending is a text card; `full` for a free game's two golden stories (one until the owner's
-  decision of 2026-11-21) and every story of a paid room. A test holds every pack's `sliceSlots`
-  apart from `VISUAL_SLOTS`.
+  decision of 2026-11-21); `paid` for every story of a paid room (Step 122) — `full`'s options
+  and ending picture, but not golden, since every story is one: no "🔔 A Christmas story" over
+  it and no golden-last order in the gallery. A test holds every pack's `sliceSlots` apart from
+  `VISUAL_SLOTS`.
 - **Dated** (FM-PACK-6, owner decision 2026-11-21): a pack carries the last day of its free part
   and the last day a paid code works — chr26: 2027-07-01 and 2027-08-01. Each is honoured through
   the whole of that day anywhere on Earth, so the server's cut-off is noon UTC the next day. The
@@ -317,6 +319,46 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   referrer as `xmas`, takes the mark off the address, and from the cut-off says the edition has
   ended in place of the button. ar, he and fa land on their own pages, which have no buttons.
   The paid half swaps the line for its own ("Christmas pack — try it free").
+- **The paid code** (Step 122, owner decisions of 2026-11-22). `XMAS26-XXXX-XXXX`: the pack's
+  prefix and eight Crockford base32 characters — a 16-bit id, then a 24-bit tag, the first three
+  bytes of HMAC-SHA256 over `<pack>:<id>` with `PACK_CODE_SECRET` (§11). `parseCode` (shared)
+  reads what a person types or a link carries: any case, any separators, O for 0, I and L for 1,
+  a bare body as chr26's. The server's `codes.ts` checks the tag with its secret alone, then the
+  receipt log for what the secret cannot know; the verdict, in this order: `CODE_INVALID`,
+  `CODE_ENDED` (past `paidUntil`), `CODE_BLOCKED`, `CODE_PENDING` (a PayID code neither received
+  nor claimed within 48 hours), good. A code the log has never seen is good:
+  `npm run mint-code -w apps/funny-multi-server` mints one for a test and logs nothing; a
+  buyer's is issued and logged by the server (Steps 124 and 125). Only a wrong code takes a token
+  from the per-address limiter, 10 an hour (`RATE_LIMITED`), so a family's good code never waits.
+- **Paid rooms** (Step 122). A code comes with `room:create` (the website remembers it) or with
+  any player's `room:unlock` (§5). A good one opens the room's pack — `{ id, on: true, paid:
+  true }` — from its next game: the first, in the lobby; the next, on the end screen; "one more
+  game" keeps it. A refused code still creates the room, unpaid, and the ack's `codeError` says
+  why. The host's switch stays (3A of 2026-11-21): off, the room keeps its code and plays an
+  ordinary game, no `game` record; on again, the pack. Every game's start checks the code again:
+  one blocked, lapsed or ended since plays the free part, or no pack once the free part has
+  ended too. A room whose language the pack lacks, or any room under `PACK_ROOMS=off`, answers
+  `PACK_UNAVAILABLE`.
+- **The receipt log** (Step 122, `receipts.ts`, `RECEIPTS_FILE`): one JSON record per line —
+  `issue` (the rail, its reference, the amount, where the code was delivered, the refund
+  policy's version, pending or received), `claim`, `received`, `block` (refund, reversed,
+  leaked, asked), `room` (each room a code opened: its code, language and players, the
+  address's country or `ZZ`, the browser's family — never the address) and `game` (each paid
+  game when it is left: players, rounds, picks, cartoons, downloads, shares; a client reports a
+  paid story's download or share with `story:exported`). It serves a buyer's question or
+  refund and spots a leaked code (its rooms in many countries at once); records older than 18
+  months go at each start. The privacy policy describes it.
+- **The code on the client** (Step 122): `packCode.ts` takes `?code=` off the address before
+  the first render and keeps it in localStorage. Home shows it with the last paid day and a
+  Remove, sends it with `room:create`, and says so when a link's code is not one. The lobby and
+  the end screen offer "🔔 Use my Christmas pack here" to any player whose phone keeps a code
+  that could open the room (`PackUnlock`). The last paid day is written as the interface's
+  language writes a date, Gregorian in all of them and British English in en; where a browser
+  has no dates in that language (Chrome has none in yo or yue) it falls back to the nearest it
+  has, Hong Kong Chinese for yue, then British English. A paid story's still and video carry
+  `footer.paid` and lead to `/x26`. **The Android app ignores codes entirely** (Play's payments
+  policy): it neither keeps one from a link nor sends one Chrome remembers from the website,
+  and a room someone else paid for plays paid there under the landing page's footer.
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 
@@ -368,6 +410,16 @@ player writes — so it now goes to each player on its own rather than to the ro
 `reveal:start` and every `GalleryEntry` gain `content`; `reveal:pictureReady` and every
 `GalleryEntry` gain `ending: PictureRef | null`, a golden story's aftermath. The room keeps
 `RoomStory` (`Story` + `content` + `ending`); Funny One's stories stay plain `Story`.
+
+**Amended 2026-11-22 (Step 122, B-29 — the paid code, §4.4):** two events and four fields.
+`RoomCreatePayload.code?` — the website's remembered code, never sent by the Android app — and
+`RoomCreateAck.codeError?`, absent when no code came or it worked. `room:unlock { code }`, any
+player, answered `{ ok: true } | { error }` (`ROOM_NOT_FOUND` without a room or once it has
+ended), followed by `lobby:update` when it opened the pack. `story:exported { kind: 'download' |
+'share' }`, sent for a paid story only and counted only in a paid game's reveal. `RoomPack.paid`;
+`StoryContent` gains `paid`; the server-only `Room.packCode` and `Room.paidGame` are never sent.
+Five error codes: `CODE_INVALID`, `CODE_BLOCKED`, `CODE_ENDED`, `CODE_PENDING`,
+`PACK_UNAVAILABLE`; too many wrong codes answer `RATE_LIMITED`.
 
 ## 6. Server design — `apps/funny-multi-server`
 
@@ -696,6 +748,8 @@ retired by D-6; nothing of it was built.*
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 | `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
 | `PACK_ROOMS` | server | `off` makes every new room an ordinary one (Step 117, §4.4) — the launch's lever; unset = packs offered |
+| `PACK_CODE_SECRET` | server | signs and checks the paid codes (Step 122, §4.4); under 16 characters, every code is refused. The VM's `.env` only, never the repository: a new one voids every code sold |
+| `RECEIPTS_FILE` | server | the paid codes' receipt log, JSONL (Step 122, §4.4); compose sets `/data/receipts.jsonl` in the stats volume; unset = memory only |
 
 R2 bucket (`IMAGES`) and KV (`STATS_KV`) are wrangler.toml bindings, not env vars.
 

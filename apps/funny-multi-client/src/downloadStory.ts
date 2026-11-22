@@ -25,6 +25,10 @@
 // edition's page — on the website; inside the Android app the code keeps the
 // landing page (landingUrl.ts). No price (owner decision 5A), and never a room
 // or unlock code: the file leaves the room.
+//
+// Step 122: a paid story's still carries its ending too, and its footer the
+// buyer's thank-you line, wrapped when it is longer than the column — still
+// without a price or a code.
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
 import { footerTarget } from './landingUrl';
@@ -51,6 +55,8 @@ const QR_SIZE = 96;
 const QR_TEXT_GAP = 14;
 const SOURCE_LABEL_FONT = 'bold 13px system-ui, sans-serif';
 const SOURCE_LABEL_HEIGHT = 16;
+// A label too long for the column (a paid story's thank-you) wraps.
+const LABEL_LINE_HEIGHT = 18;
 const URL_FONT = '12px ui-monospace, "SF Mono", Consolas, monospace';
 const URL_LINE_HEIGHT = 16;
 // Minimum gap between the notice (top of the right column) and the source
@@ -99,14 +105,17 @@ export interface StoryImageOptions {
   language: AuthoredLanguage;
   /** Step 117: a golden story (FM-PACK-3), whose footer is the edition's. */
   golden?: boolean;
-  /** Step 117: a golden story's ending picture, drawn under the scene. */
+  /** Step 122: a story of a paid game, whose footer is the buyer's thank-you. */
+  paid?: boolean;
+  /** Step 117: a golden or paid story's ending picture, drawn under the scene. */
   endingUrl?: string | null;
 }
 
 export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
   const golden = opts.golden === true;
-  const target = footerTarget(golden);
+  const paid = opts.paid === true;
+  const target = footerTarget(golden, paid);
 
   // Translated content-responsibility notice — must accompany the image
   // wherever it goes (item 6 of BUGS_AND_IMPROVEMENTS_02.md). Pulled from
@@ -121,10 +130,11 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   const noticeFont = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
 
   // Load the pictures first (if any) so their drawn height is known: the
-  // scene, and a golden story's ending under it. The ending is best-effort —
+  // scene, and a golden or paid story's ending under it. The ending is best-effort —
   // without it the still is the scene and the story, as for any other story.
   const picture = await loadPictureBitmap(pictureUrl);
-  const ending = golden ? await loadPictureBitmap(opts.endingUrl ?? null).catch(() => null) : null;
+  const ending =
+    golden || paid ? await loadPictureBitmap(opts.endingUrl ?? null).catch(() => null) : null;
   const pictures = [picture, ending].filter((p): p is ImageBitmap => p !== null);
   const pictureHeight = pictures.length * WIDTH;
 
@@ -144,14 +154,19 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   const proseLines = wrapText(scratch, prose, WIDTH - PAD * 2);
   scratch.font = noticeFont;
   const noticeLines = wrapText(scratch, notice, rightColWidth);
+  scratch.font = SOURCE_LABEL_FONT;
+  const labelLines = wrapText(scratch, familyLabel, rightColWidth);
 
   // Footer row: QR on the left; right column = notice (top) + source label
   // dropped to the QR's bottom edge + URL below it. The source label sits at
   // `QR_SIZE - SOURCE_LABEL_HEIGHT` from the row top, unless a tall notice
   // pushes it lower. The URL drops below, so the row can exceed the QR height.
   const noticeHeight = noticeLines.length * NOTICE_LINE_HEIGHT;
+  // A wrapped label's lines past its first push the URL down with them.
   const sourceLabelTop = Math.max(QR_SIZE - SOURCE_LABEL_HEIGHT, noticeHeight + NOTICE_SOURCE_GAP);
-  const footerRowHeight = Math.max(QR_SIZE, sourceLabelTop + URL_LINE_HEIGHT + 4 + URL_LINE_HEIGHT);
+  const labelExtra = Math.max(0, labelLines.length - 1) * LABEL_LINE_HEIGHT;
+  const urlTop = sourceLabelTop + labelExtra + URL_LINE_HEIGHT + 4;
+  const footerRowHeight = Math.max(QR_SIZE, urlTop + URL_LINE_HEIGHT);
 
   const height =
     pictureHeight +
@@ -220,11 +235,11 @@ export async function buildStoryImageFile(opts: StoryImageOptions): Promise<File
   const sourceLabelY = rowTop + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(familyLabel, colX, sourceLabelY);
+  labelLines.forEach((line, i) => ctx.fillText(line, colX, sourceLabelY + i * LABEL_LINE_HEIGHT));
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(target.urlText, colX, sourceLabelY + URL_LINE_HEIGHT + 4);
+  ctx.fillText(target.urlText, colX, rowTop + urlTop);
   ctx.textAlign = 'left';
 
   const blob = await new Promise<Blob | null>((resolve) => {

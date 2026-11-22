@@ -76,6 +76,12 @@ export interface LobbyState {
    * `lobby:update`, which every player gets right after creating or joining.
    */
   pack: RoomPack | null;
+  /**
+   * Why the code Home sent with `room:create` did not make the room paid
+   * (Step 122): shown once in the lobby, next to the unlock button. Absent
+   * for a joiner and for a room the code opened.
+   */
+  codeError?: ErrorPayload | null;
 }
 
 export default function App() {

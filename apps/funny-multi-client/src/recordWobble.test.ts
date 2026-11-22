@@ -273,6 +273,7 @@ describe('a Christmas story in the clip (Step 117)', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     sessionStorage.clear();
+    localStorage.clear();
     setUrl('');
   });
 
@@ -349,24 +350,50 @@ describe('a Christmas story in the clip (Step 117)', () => {
     expect(texts()).toContain(LANDING_URL_TEXT);
   });
 
+  // Step 122: a paid story's clip thanks its buyer on the website; in the
+  // Android app it reads as a golden story's.
+  it("thanks a paid story's buyer and leads to the edition's page on the website", async () => {
+    installRecorderEnv();
+    await buildWobbleVideoFile({ ...story, paid: true, ending: null });
+    expect(toCanvas).toHaveBeenCalledWith(expect.anything(), XMAS_URL, expect.anything());
+    expect(texts().some((t) => t.startsWith('Your Christmas 2026 stories'))).toBe(true);
+    expect(texts()).toContain(XMAS_URL_TEXT);
+    expect(texts()).not.toContain('Christmas 2026 edition');
+  });
+
+  it("names the edition and keeps the landing page for a paid story's clip in the Android app", async () => {
+    setUrl('?shell=android');
+    installRecorderEnv();
+    await buildWobbleVideoFile({ ...story, paid: true, ending: null });
+    expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
+    expect(texts()).toContain('Christmas 2026 edition');
+    expect(texts()).toContain(LANDING_URL_TEXT);
+    expect(texts().some((t) => t.startsWith('Your Christmas'))).toBe(false);
+  });
+
   // A download leaves the room: never its code, nor a link holding one, nor a
-  // price in the free half (owner decision 5A).
+  // price in the free half (owner decision 5A) — nor, from Step 122, the paid
+  // code this phone keeps, and a paid story no price.
   it.each([
-    ['a base story on the website', '?room=WXYZ', false],
-    ['a golden story on the website', '?room=WXYZ', true],
-    ['a golden story in the Android app', '?room=WXYZ&shell=android', true],
-  ])('carries no code and no price: %s', async (_name, search, golden) => {
+    ['a base story on the website', '?room=WXYZ', false, false],
+    ['a golden story on the website', '?room=WXYZ', true, false],
+    ['a paid story on the website', '?room=WXYZ', false, true],
+    ['a golden story in the Android app', '?room=WXYZ&shell=android', true, false],
+    ['a paid story in the Android app', '?room=WXYZ&shell=android', false, true],
+  ])('carries no code and no price: %s', async (_name, search, golden, paid) => {
     setUrl(search);
+    localStorage.setItem('funny37.packCode', 'XMAS26-K7QM-3FPA');
     installRecorderEnv();
     await buildWobbleVideoFile({
       ...story,
       golden,
-      ending: golden ? { pictureUrl: ENDING_URL, text: TEXT } : null,
+      paid,
+      ending: golden || paid ? { pictureUrl: ENDING_URL, text: TEXT } : null,
     });
     const encoded = toCanvas.mock.calls.map((c) => String(c[1]));
     expect(encoded).toHaveLength(1);
     for (const text of [...encoded, ...texts()]) {
-      expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock/i);
+      expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock|XMAS26|K7QM/i);
       expect(text).not.toMatch(/[$€£₽¥₹]|A\$|AUD|USD/);
     }
   });

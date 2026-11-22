@@ -25,7 +25,11 @@
     "uiLanguage": "撳一下轉介面語言",
     "unsupportedLanguage": "呢個房間用嘅語言，呢個版本嘅 app 仲未玩得。試吓更新頁面，或者建立一個新房間。",
     "multiLanguage": "多語言房間",
-    "multiLanguageHint": "每個玩家都用自己喺上面旗仔揀咗嘅語言嚟玩。"
+    "multiLanguageHint": "每個玩家都用自己喺上面旗仔揀咗嘅語言嚟玩。",
+    "packCode": "🔔 你嘅聖誕故事包：{{code}}",
+    "packCodeHint": "你喺呢部手機建立嘅每個房間，都會玩齊所有聖誕故事，直到 {{date}}為止。",
+    "packCodeRemove": "移除",
+    "packEnded": "你嘅 2026 聖誕特別版已經完咗。多謝你嚟玩！"
   },
   "lobby": {
     "roomCodeLabel": "房間代碼",
@@ -40,7 +44,9 @@
     "capReached": "之後大約 {{hours}} 個鐘都冇得整圖。你照樣可以玩 — 玩家會見到故事文字，代替漫畫。",
     "capReachedHost": "準備好就撳「開始遊戲」，或者等每日漫畫額度重設。",
     "christmasOn": "🔔 呢局有兩個聖誕故事",
-    "christmasSwitch": "玩 2026 聖誕故事"
+    "christmasSwitch": "玩 2026 聖誕故事",
+    "christmasPaid": "🔔 呢局每個故事都係聖誕故事",
+    "usePack": "🔔 喺呢度用我嘅聖誕故事包"
   },
   "round": {
     "progress": "第 {{current}} 輪，共 {{total}} 輪",
@@ -77,7 +83,8 @@
     "readyActive": "準備好 ✓",
     "waitingForHost": "等緊房主…",
     "needPlayers": "再玩一局最少要 3 個玩家",
-    "waitingForReady": "等緊大家準備好"
+    "waitingForReady": "等緊大家準備好",
+    "nextPaid": "🔔 下一局：每個故事都係聖誕故事"
   },
   "endScreen": {
     "supportServer": "支持呢個伺服器"
@@ -125,6 +132,7 @@
     "source": "GitHub 上嘅原始碼",
     "family": "搞笑一家親",
     "edition": "2026 聖誕特別版",
+    "paid": "你哋嘅 2026 聖誕故事：局局都有，派對玩得開心 :))",
     "privacy": "私隱政策",
     "contentNotice": "玩家揀嘅答案同 AI 圖片，由呢個伺服器嘅營運者負責，同上游項目無關。"
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "花名無效",
     "INVALID_OPTION": "呢個答案已經冇咗 — 揀過第二個啦",
     "RATE_LIMITED": "慢慢嚟，唞一唞先",
-    "SERVER_BUSY": "伺服器好忙"
+    "SERVER_BUSY": "伺服器好忙",
+    "CODE_INVALID": "呢個聖誕代碼唔啱。檢查吓再試一次啦。",
+    "CODE_BLOCKED": "呢個聖誕代碼已經用唔到。",
+    "CODE_ENDED": "2026 聖誕特別版已經完咗。",
+    "CODE_PENDING": "呢個聖誕代碼仲等緊付款。",
+    "PACK_UNAVAILABLE": "呢個房間用唔到聖誕故事。"
   }
 }

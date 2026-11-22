@@ -25,7 +25,11 @@
     "uiLanguage": "Touche pour changer la langue de l'interface",
     "unsupportedLanguage": "Cette salle est dans une langue que cette version de l'application ne peut pas encore afficher. Essaie de recharger la page, ou crée une nouvelle salle.",
     "multiLanguage": "Salle multilingue",
-    "multiLanguageHint": "Chaque joueur joue dans la langue choisie avec les drapeaux ci-dessus."
+    "multiLanguageHint": "Chaque joueur joue dans la langue choisie avec les drapeaux ci-dessus.",
+    "packCode": "🔔 Ton pack de Noël : {{code}}",
+    "packCodeHint": "Chaque salle que tu crées sur ce téléphone a toutes les histoires de Noël, jusqu'au {{date}}.",
+    "packCodeRemove": "Supprimer",
+    "packEnded": "Ton édition Noël 2026 est terminée. Merci d'avoir joué !"
   },
   "lobby": {
     "roomCodeLabel": "Code de la salle",
@@ -40,7 +44,9 @@
     "capReached": "La génération d'images est indisponible pour les ~{{hours}} prochaines heures. Vous pouvez encore jouer — le texte de l'histoire s'affichera à la place des dessins.",
     "capReachedHost": "Appuie sur Lancer la partie quand tu es prêt, ou attends que le quota quotidien d'images se réinitialise.",
     "christmasOn": "🔔 Cette partie a deux histoires de Noël",
-    "christmasSwitch": "Jouer avec les histoires de Noël 2026"
+    "christmasSwitch": "Jouer avec les histoires de Noël 2026",
+    "christmasPaid": "🔔 Cette partie n'a que des histoires de Noël",
+    "usePack": "🔔 Utiliser mon pack de Noël ici"
   },
   "round": {
     "progress": "Manche {{current}} sur {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Prêt ✓",
     "waitingForHost": "En attente de l'hôte…",
     "needPlayers": "Il faut au moins 3 joueurs pour une autre partie",
-    "waitingForReady": "On attend que tout le monde soit prêt"
+    "waitingForReady": "On attend que tout le monde soit prêt",
+    "nextPaid": "🔔 Prochaine partie : rien que des histoires de Noël"
   },
   "endScreen": {
     "supportServer": "Soutenir ce serveur"
@@ -125,6 +132,7 @@
     "source": "Source sur GitHub",
     "family": "Drôle de famille",
     "edition": "Édition Noël 2026",
+    "paid": "Vos histoires de Noël 2026 dans chaque partie. Joyeuses fêtes :))",
     "privacy": "Politique de confidentialité",
     "contentNotice": "Les réponses des joueurs et les images IA sont sous la responsabilité de l'opérateur de ce serveur, pas du projet en amont."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Pseudo invalide",
     "INVALID_OPTION": "Cette réponse n'est plus disponible — choisis-en une autre",
     "RATE_LIMITED": "Du calme une seconde",
-    "SERVER_BUSY": "Le serveur est occupé"
+    "SERVER_BUSY": "Le serveur est occupé",
+    "CODE_INVALID": "Ce code de Noël est incorrect. Vérifie-le et réessaie.",
+    "CODE_BLOCKED": "Ce code de Noël ne fonctionne plus.",
+    "CODE_ENDED": "L'édition Noël 2026 est terminée.",
+    "CODE_PENDING": "Ce code de Noël est en attente de paiement.",
+    "PACK_UNAVAILABLE": "Les histoires de Noël ne sont pas disponibles dans cette salle."
   }
 }

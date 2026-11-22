@@ -183,6 +183,58 @@ describe('drawAttribution for the Christmas 2026 edition', () => {
   });
 });
 
+// Step 122 (B-29): a paid story's thank-you can be longer than the column: it
+// wraps, its lines past the first drop the address with them, and the block is
+// measured with the label it draws.
+describe('drawAttribution for a paid story', () => {
+  const LABEL_FONT = 'bold 24px system-ui, sans-serif';
+
+  interface Drawn {
+    text: string;
+    font: string;
+    y: number;
+  }
+
+  /** Draws a Russian paid story's footer; returns each text with its font and top. */
+  function drawPaid(ctx: Canvas2DStub): Drawn[] {
+    const drawn: Drawn[] = [];
+    ctx.fillText = (text: string, _x: number, y: number) => {
+      drawn.push({ text, font: String(ctx.font), y });
+    };
+    drawAttribution(ctx as unknown as CanvasRenderingContext2D, document.createElement('canvas'), {
+      topY: 0,
+      canvasWidth: 720,
+      language: 'ru',
+      labelKey: 'footer.paid',
+      urlText: XMAS_URL_TEXT,
+    });
+    return drawn;
+  }
+
+  it('wraps a label longer than the column and drops the address under its last line', () => {
+    const drawn = drawPaid(installCanvasStub());
+    const label = drawn.filter((d) => d.font === LABEL_FONT);
+    expect(label.length).toBeGreaterThan(1);
+    expect(label.map((d) => d.text).join(' ')).toBe(
+      'Ваши истории «Новый год 2027»: каждая игра, весёлого праздника :))',
+    );
+    label.slice(1).forEach((line, i) => expect(line.y - label[i]!.y).toBe(30));
+    // As far under the last line as under a one-line label: URL_LINE_HEIGHT + 6.
+    const url = drawn.find((d) => d.text === XMAS_URL_TEXT);
+    expect(url!.y - label[label.length - 1]!.y).toBe(32);
+  });
+
+  it('measures the block with the label it draws', () => {
+    const ctx = installCanvasStub();
+    const lines = drawPaid(ctx).filter((d) => d.font === LABEL_FONT).length;
+    const c = ctx as unknown as CanvasRenderingContext2D;
+    const paid = measureAttributionHeight(c, 720, 'ru', 'footer.paid');
+    const edition = measureAttributionHeight(c, 720, 'ru', 'footer.edition');
+    expect(lines).toBeGreaterThan(1);
+    expect(paid - edition).toBe((lines - 1) * 30);
+  });
+});
+
 // Step 117: the card a Christmas story's clip ends on when it has no ending
 // picture — the bell over the ending, centred in the picture's square.
 describe('drawEndingCard', () => {

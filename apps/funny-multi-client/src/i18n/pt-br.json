@@ -25,7 +25,11 @@
     "uiLanguage": "Toque para mudar o idioma da interface",
     "unsupportedLanguage": "Esta sala está em um idioma que esta versão do app ainda não consegue exibir. Tente atualizar a página, ou crie uma nova sala.",
     "multiLanguage": "Sala multilíngue",
-    "multiLanguageHint": "Cada jogador joga no idioma escolhido nas bandeiras acima."
+    "multiLanguageHint": "Cada jogador joga no idioma escolhido nas bandeiras acima.",
+    "packCode": "🔔 Seu pacote de Natal: {{code}}",
+    "packCodeHint": "Toda sala que você criar neste celular tem todas as histórias de Natal, até {{date}}.",
+    "packCodeRemove": "Remover",
+    "packEnded": "Sua edição de Natal 2026 terminou. Obrigado por jogar!"
   },
   "lobby": {
     "roomCodeLabel": "Código da sala",
@@ -40,7 +44,9 @@
     "capReached": "A geração de imagens não estará disponível pelas próximas ~{{hours}} horas. Vocês podem jogar mesmo assim — os jogadores verão o texto da história no lugar dos desenhos.",
     "capReachedHost": "Toque em Começar o jogo quando estiver pronto, ou espere a cota diária de imagens ser redefinida.",
     "christmasOn": "🔔 Este jogo tem duas histórias de Natal",
-    "christmasSwitch": "Jogar com as histórias de Natal 2026"
+    "christmasSwitch": "Jogar com as histórias de Natal 2026",
+    "christmasPaid": "🔔 Este jogo tem só histórias de Natal",
+    "usePack": "🔔 Usar meu pacote de Natal aqui"
   },
   "round": {
     "progress": "Rodada {{current}} de {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Pronto ✓",
     "waitingForHost": "Esperando o anfitrião…",
     "needPlayers": "Precisa de pelo menos 3 jogadores para outro jogo",
-    "waitingForReady": "Esperando todo mundo ficar pronto"
+    "waitingForReady": "Esperando todo mundo ficar pronto",
+    "nextPaid": "🔔 Próximo jogo: só histórias de Natal"
   },
   "endScreen": {
     "supportServer": "Apoie este servidor"
@@ -125,6 +132,7 @@
     "source": "Fonte no GitHub",
     "family": "Família Divertida",
     "edition": "Edição de Natal 2026",
+    "paid": "Suas histórias de Natal 2026 em cada jogo. Boas festas :))",
     "privacy": "Política de privacidade",
     "contentNotice": "As respostas dos jogadores e as imagens de IA são responsabilidade do operador deste servidor, não do projeto upstream."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Apelido inválido",
     "INVALID_OPTION": "Essa resposta não está mais disponível — escolha outra",
     "RATE_LIMITED": "Calma um instante",
-    "SERVER_BUSY": "O servidor está ocupado"
+    "SERVER_BUSY": "O servidor está ocupado",
+    "CODE_INVALID": "Este código de Natal está incorreto. Confira e tente de novo.",
+    "CODE_BLOCKED": "Este código de Natal não funciona mais.",
+    "CODE_ENDED": "A edição de Natal 2026 terminou.",
+    "CODE_PENDING": "Este código de Natal está aguardando o pagamento.",
+    "PACK_UNAVAILABLE": "As histórias de Natal não estão disponíveis nesta sala."
   }
 }

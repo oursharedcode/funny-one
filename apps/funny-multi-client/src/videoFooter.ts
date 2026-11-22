@@ -19,6 +19,10 @@
 // Step 117: a golden story's video names the Christmas 2026 edition and leads
 // to its page, as its still does — the caller passes the label and the URL
 // text (downloadStory.ts `footerTarget`).
+//
+// Step 122: a label too long for the column — a paid story's thank-you —
+// wraps, and its lines past the first push the URL down; the caller measures
+// the block with the same label it draws.
 
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
 import { LANDING_URL_TEXT, type FooterTarget } from './landingUrl';
@@ -34,6 +38,7 @@ const SOURCE_LABEL_FONT = 'bold 24px system-ui, sans-serif';
 const URL_FONT = '20px ui-monospace, "SF Mono", Consolas, monospace';
 const URL_LINE_HEIGHT = 26;
 const SOURCE_LABEL_HEIGHT = 28;
+const LABEL_LINE_HEIGHT = 30;
 // Minimum gap so a long notice never overlaps the source label that's
 // dropped to the QR's bottom edge.
 const NOTICE_SOURCE_GAP = 16;
@@ -64,8 +69,10 @@ export async function renderQrCanvas(value: string): Promise<HTMLCanvasElement> 
 
 interface FooterLayout {
   noticeLines: string[];
+  labelLines: string[];
   rightColX: number;
   sourceLabelTop: number;
+  urlTop: number;
   footerRowHeight: number;
 }
 
@@ -82,16 +89,23 @@ function computeLayout(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
   language: AuthoredLanguage,
+  labelKey: FooterTarget['labelKey'] = 'footer.family',
 ): FooterLayout {
-  const notice = i18n.getFixedT(language)('footer.contentNotice');
+  const t = i18n.getFixedT(language);
+  const notice = t('footer.contentNotice');
   const rightColX = PAD + QR_SIZE + QR_TEXT_GAP;
   const rightColWidth = canvasWidth - rightColX - PAD;
+  // The label first, so the font left set is the notice's.
+  ctx.font = SOURCE_LABEL_FONT;
+  const labelLines = wrapText(ctx, t(labelKey), rightColWidth);
   ctx.font = `${NOTICE_STYLE} ${proseFontFamily(language)}`;
   const noticeLines = wrapText(ctx, notice, rightColWidth);
   const noticeHeight = noticeLines.length * NOTICE_LINE_HEIGHT;
   const sourceLabelTop = Math.max(QR_SIZE - SOURCE_LABEL_HEIGHT, noticeHeight + NOTICE_SOURCE_GAP);
-  const footerRowHeight = Math.max(QR_SIZE, sourceLabelTop + URL_LINE_HEIGHT + 6 + URL_LINE_HEIGHT);
-  return { noticeLines, rightColX, sourceLabelTop, footerRowHeight };
+  const labelExtra = Math.max(0, labelLines.length - 1) * LABEL_LINE_HEIGHT;
+  const urlTop = sourceLabelTop + labelExtra + URL_LINE_HEIGHT + 6;
+  const footerRowHeight = Math.max(QR_SIZE, urlTop + URL_LINE_HEIGHT);
+  return { noticeLines, labelLines, rightColX, sourceLabelTop, urlTop, footerRowHeight };
 }
 
 // Returns the total height the attribution block occupies given the canvas
@@ -101,8 +115,9 @@ export function measureAttributionHeight(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
   language: AuthoredLanguage,
+  labelKey?: FooterTarget['labelKey'],
 ): number {
-  return computeLayout(ctx, canvasWidth, language).footerRowHeight;
+  return computeLayout(ctx, canvasWidth, language, labelKey).footerRowHeight;
 }
 
 // Picks the largest story font (STORY_MAX_PX → STORY_MIN_PX) whose wrapped
@@ -243,7 +258,6 @@ export function drawAttribution(
   },
 ): void {
   const { topY, canvasWidth, language } = opts;
-  const familyLabel = i18n.getFixedT(language)(opts.labelKey ?? 'footer.family');
   const dir = textDirection(language);
 
   // The notice and label keep the story's direction, as on the still
@@ -252,7 +266,12 @@ export function drawAttribution(
   ctx.textAlign = dir === 'rtl' ? 'right' : 'left';
   ctx.textBaseline = 'top';
 
-  const { noticeLines, rightColX, sourceLabelTop } = computeLayout(ctx, canvasWidth, language);
+  const { noticeLines, labelLines, rightColX, sourceLabelTop, urlTop } = computeLayout(
+    ctx,
+    canvasWidth,
+    language,
+    opts.labelKey,
+  );
 
   const colX = dir === 'rtl' ? canvasWidth - PAD : rightColX;
 
@@ -272,10 +291,10 @@ export function drawAttribution(
   const sourceLabelY = topY + sourceLabelTop;
   ctx.fillStyle = INK;
   ctx.font = SOURCE_LABEL_FONT;
-  ctx.fillText(familyLabel, colX, sourceLabelY);
+  labelLines.forEach((line, i) => ctx.fillText(line, colX, sourceLabelY + i * LABEL_LINE_HEIGHT));
 
   ctx.direction = 'ltr';
   ctx.font = URL_FONT;
-  ctx.fillText(opts.urlText ?? LANDING_URL_TEXT, colX, sourceLabelY + URL_LINE_HEIGHT + 6);
+  ctx.fillText(opts.urlText ?? LANDING_URL_TEXT, colX, topY + urlTop);
   ctx.textAlign = 'left';
 }

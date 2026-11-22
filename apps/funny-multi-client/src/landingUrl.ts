@@ -29,8 +29,8 @@ export interface FooterTarget {
   url: string;
   /** The address printed under the label. */
   urlText: string;
-  /** The label above it: the family's name, or the edition's. */
-  labelKey: 'footer.family' | 'footer.edition';
+  /** The label above it: the family's name, the edition's, or a paid story's thank-you. */
+  labelKey: 'footer.family' | 'footer.edition' | 'footer.paid';
 }
 
 /**
@@ -38,11 +38,22 @@ export interface FooterTarget {
  * golden story names the edition and, on the website, leads to its page; every
  * other story keeps the landing page under the family's name. The still
  * (downloadStory.ts) and the video (recordWobble.ts) both ask here.
+ *
+ * Step 122: a paid story leads to the edition's page too, under the buyer's
+ * thank-you line — on the website. In the Android app, where a room someone
+ * else paid for still plays paid, it reads as a golden story's: the edition's
+ * name and LANDING_URL, with nothing that points at a purchase.
  */
-export function footerTarget(golden: boolean): FooterTarget {
-  if (!golden) return { url: LANDING_URL, urlText: LANDING_URL_TEXT, labelKey: 'footer.family' };
+export function footerTarget(golden: boolean, paid = false): FooterTarget {
+  if (!golden && !paid) {
+    return { url: LANDING_URL, urlText: LANDING_URL_TEXT, labelKey: 'footer.family' };
+  }
   if (isStoreShell()) {
     return { url: LANDING_URL, urlText: LANDING_URL_TEXT, labelKey: 'footer.edition' };
   }
-  return { url: XMAS_URL, urlText: XMAS_URL_TEXT, labelKey: 'footer.edition' };
+  return {
+    url: XMAS_URL,
+    urlText: XMAS_URL_TEXT,
+    labelKey: paid ? 'footer.paid' : 'footer.edition',
+  };
 }

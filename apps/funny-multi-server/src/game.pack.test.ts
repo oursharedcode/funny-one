@@ -122,7 +122,7 @@ afterEach(() => {
 describe('the offer (owner decisions 3A, 4A)', () => {
   it('offers a new room in any of its 20 languages the Christmas pack, switched on', () => {
     for (const language of ['en', 'ru', 'de', 'ja', 'yo'] as const) {
-      expect(makeRoom(3, language).pack, language).toEqual({ id: 'chr26', on: true });
+      expect(makeRoom(3, language).pack, language).toEqual({ id: 'chr26', on: true, paid: false });
     }
   });
 
@@ -138,7 +138,7 @@ describe('the offer (owner decisions 3A, 4A)', () => {
   });
 
   it('offers nothing from the free cut-off on', () => {
-    expect(packOffer('en', FREE_CUTOFF - 1)).toEqual({ id: 'chr26', on: true });
+    expect(packOffer('en', FREE_CUTOFF - 1)).toEqual({ id: 'chr26', on: true, paid: false });
     expect(packOffer('en', FREE_CUTOFF)).toBeNull();
   });
 });
@@ -159,7 +159,7 @@ describe('a free game’s stories (owner decision 1C)', () => {
 
   it('plays the base pools when the host switched the pack off', () => {
     const room = makeRoom(4);
-    room.pack = { id: 'chr26', on: false };
+    room.pack = { id: 'chr26', on: false, paid: false };
     startGame(room, makeIo().io);
     expect(kinds(room)).toEqual(['base', 'base', 'base', 'base']);
   });
@@ -168,7 +168,7 @@ describe('a free game’s stories (owner decision 1C)', () => {
     vi.useFakeTimers();
     vi.setSystemTime(FREE_CUTOFF - 60_000);
     const room = makeRoom(3);
-    expect(room.pack).toEqual({ id: 'chr26', on: true });
+    expect(room.pack).toEqual({ id: 'chr26', on: true, paid: false });
     vi.setSystemTime(FREE_CUTOFF);
     startGame(room, makeIo().io);
     expect(kinds(room)).toEqual(['base', 'base', 'base']);
@@ -176,7 +176,7 @@ describe('a free game’s stories (owner decision 1C)', () => {
 
   it('keeps the switch on "one more game" and draws the golden stories afresh', () => {
     const room = makeRoom(3);
-    room.pack = { id: 'chr26', on: false };
+    room.pack = { id: 'chr26', on: false, paid: false };
     const { io } = makeIo();
     startGame(room, io);
     playThrough(room, io);
@@ -184,10 +184,10 @@ describe('a free game’s stories (owner decision 1C)', () => {
 
     expect(prepareRestart(room, 's0')).toEqual({ ok: true });
     startGame(room, io);
-    expect(room.pack).toEqual({ id: 'chr26', on: false });
+    expect(room.pack).toEqual({ id: 'chr26', on: false, paid: false });
     expect(kinds(room)).toEqual(['base', 'base', 'base']);
 
-    room.pack = { id: 'chr26', on: true };
+    room.pack = { id: 'chr26', on: true, paid: false };
     playThrough(room, io);
     prepareRestart(room, 's0');
     startGame(room, io);

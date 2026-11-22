@@ -12,12 +12,19 @@
 // bare key and fails here. `catalogs.test.ts` checks en/ru agree with each
 // other; this checks the screens agree with the catalogue.
 
-import { describe, expect, it, beforeEach, vi } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import { AUTHORED_LANGUAGES, LANGUAGES } from '@funny/shared';
 import type { SupportConfig } from '@funny/shared';
 import { createSocketMock, setUrl } from '../testutils/socketMock';
 import i18n from '../i18n';
+import {
+  __resetPackCodeForTest,
+  capturePackCodeFromUrl,
+  forgetPackCode,
+  readPackCode,
+  rememberPackCode,
+} from '../packCode';
 
 const NO_RAILS: SupportConfig = {
   payId: null,
@@ -567,5 +574,140 @@ describe('stats', () => {
     setUrl('?room=abcd');
     renderHome();
     expect(socketMock.emitsOf('stats:get')).toHaveLength(0);
+  });
+});
+
+describe('the paid code (Step 122)', () => {
+  const CODE = 'XMAS26-K7QM-3FPA';
+
+  function resetCode(): void {
+    forgetPackCode();
+    __resetPackCodeForTest();
+    sessionStorage.clear();
+  }
+
+  beforeEach(() => {
+    resetCode();
+    // A December day, whatever day the suite runs on: the paid part lasts
+    // until noon UTC on 2 August 2027.
+    vi.useFakeTimers({ now: Date.parse('2026-12-20T09:00:00Z'), toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    resetCode();
+  });
+
+  it('shows the code this phone keeps with its last day, and sends it with room:create', () => {
+    rememberPackCode(CODE);
+    const { onJoined } = renderHome();
+    const line = screen.getByText(
+      (_, el) => el?.tagName === 'P' && /Christmas pack/.test(el.textContent ?? ''),
+    );
+    expect(line.textContent).toBe(`🔔 Your Christmas pack: ${CODE}`);
+    // The code never breaks across lines.
+    expect(screen.getByText(CODE).className).toContain('whitespace-nowrap');
+    expect(
+      screen.getByText(
+        'Every room you create on this phone plays all the Christmas stories, until 1 August 2027.',
+      ),
+    ).toBeTruthy();
+
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    expect(socketMock.onlyEmitOf('room:create').args[0]).toMatchObject({
+      nickname: 'hostie',
+      code: CODE,
+    });
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ roomCode: 'WXYZ', codeError: null });
+  });
+
+  it("hands the lobby a refused code's reason with the room", () => {
+    rememberPackCode(CODE);
+    const { onJoined } = renderHome();
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    const codeError = { code: 'CODE_BLOCKED', message: 'blocked' };
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1', codeError });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ roomCode: 'WXYZ', codeError });
+  });
+
+  it('forgets the code on Remove, and creates the next room without it', () => {
+    rememberPackCode(CODE);
+    renderHome();
+    fireEvent.click(screen.getByText('Remove'));
+    expect(screen.queryByText(/Your Christmas pack/)).toBeNull();
+    expect(readPackCode()).toBeNull();
+
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    expect(socketMock.onlyEmitOf('room:create').args[0]).not.toHaveProperty('code');
+  });
+
+  it('says the edition has ended once the paid part is over, sends nothing, and still removes', () => {
+    vi.setSystemTime(Date.parse('2027-08-02T12:00:00Z'));
+    rememberPackCode(CODE);
+    renderHome();
+    expect(
+      screen.getByText('Your Christmas 2026 edition has ended. Thank you for playing!'),
+    ).toBeTruthy();
+    expect(screen.queryByText(/Your Christmas pack/)).toBeNull();
+
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    expect(socketMock.onlyEmitOf('room:create').args[0]).not.toHaveProperty('code');
+    fireEvent.click(screen.getByText('Remove'));
+    expect(screen.queryByText(/edition has ended/)).toBeNull();
+  });
+
+  it("writes the last day the way the interface's language does", async () => {
+    rememberPackCode(CODE);
+    renderHome();
+    await chooseContentLanguage('de');
+    expect(screen.getByText(/1\. August 2027/)).toBeTruthy();
+  });
+
+  it('falls back to the nearest date the browser has, as Chrome has none in Yoruba or Cantonese', async () => {
+    // Node knows both languages; Chrome skips them in a list, as this does.
+    const Real = Intl.DateTimeFormat;
+    class ChromeLike extends Real {
+      constructor(locales?: string | string[], options?: Intl.DateTimeFormatOptions) {
+        super(
+          [locales ?? []].flat().filter((l) => !/^(yo|yue)-/.test(l)),
+          options,
+        );
+      }
+    }
+    Intl.DateTimeFormat = ChromeLike as unknown as typeof Intl.DateTimeFormat;
+    try {
+      rememberPackCode(CODE);
+      renderHome();
+      await chooseContentLanguage('yo');
+      expect(screen.getByText(/di 1 August 2027\.$/)).toBeTruthy();
+      await chooseContentLanguage('yue');
+      expect(screen.getByText(/直到 2027年8月1日為止/)).toBeTruthy();
+    } finally {
+      Intl.DateTimeFormat = Real;
+    }
+  });
+
+  it("says so when the page's link carried something that is not a code", () => {
+    setUrl('?code=XMAS26-K7QM');
+    capturePackCodeFromUrl();
+    renderHome();
+    expect(
+      screen.getByText("That Christmas code isn't right. Check it and try again."),
+    ).toBeTruthy();
+    expect(screen.queryByText('Remove')).toBeNull();
+  });
+
+  it('shows and sends nothing in the Android app, whatever Chrome keeps', () => {
+    rememberPackCode(CODE);
+    setUrl('?shell=android');
+    renderHome();
+    expect(screen.queryByText(/Your Christmas pack/)).toBeNull();
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    expect(socketMock.onlyEmitOf('room:create').args[0]).not.toHaveProperty('code');
   });
 });

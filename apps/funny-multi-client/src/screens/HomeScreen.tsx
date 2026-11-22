@@ -36,6 +36,12 @@
 // not always in English, and the create screen's flag starts on it, so a host
 // who taps no flag creates the room in the language they read. A link's
 // `?lang=` still wins — an invite's room language, or the landing page's.
+//
+// Step 122 (B-29): the paid code this phone keeps (packCode.ts) shows above
+// Create, with the last day it works and a Remove button, and goes with every
+// room created while the pack's paid part lasts. A refused code still creates
+// the room; the ack says why and the lobby shows it. Once the paid part has
+// ended the box says so instead, and nothing is sent.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,9 +55,23 @@ import LanguageList from '../components/LanguageList';
 import SupportHeart from '../components/SupportHeart';
 import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
-import { LANGUAGES, NICKNAME_MAX, NICKNAME_MIN, isLanguage } from '@funny/shared';
+import { forgetPackCode, linkCodeRefused, readPackCode } from '../packCode';
+import {
+  LANGUAGES,
+  NICKNAME_MAX,
+  NICKNAME_MIN,
+  PACKS,
+  isLanguage,
+  isPackPaid,
+} from '@funny/shared';
 import type { LobbyState } from '../App';
-import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
+import type {
+  AuthoredLanguage,
+  Language,
+  PackId,
+  StatsPayload,
+  SupportConfig,
+} from '@funny/shared';
 
 interface Props {
   onJoined: (state: LobbyState) => void;
@@ -59,6 +79,48 @@ interface Props {
   // tests that don't care about the support screen need not pass it.
   support?: SupportConfig | null;
   onOpenSupport?: () => void;
+}
+
+/**
+ * Where a browser has no dates of a language's own — Chrome, and so the
+ * Android app, lacks Cantonese and Yoruba — the nearest it has, before
+ * British English: without a list, Chrome writes "2027 M08 1".
+ */
+const DATE_FALLBACKS: Partial<Record<string, string>> = { yue: 'zh-HK' };
+
+/**
+ * A pack's last paid day, as the interface language writes a date: British
+ * English, as the game's English is, and the Gregorian calendar in every
+ * language (Persian would otherwise default to its own), as the pay page's.
+ */
+function lastPaidDay(pack: PackId, language: string): string {
+  const own = language === 'en' ? 'en-GB' : language;
+  const locales = [own, DATE_FALLBACKS[language], 'en-GB'].filter((l): l is string => !!l);
+  return new Intl.DateTimeFormat(
+    locales.map((l) => `${l}-u-ca-gregory`),
+    { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' },
+  ).format(new Date(`${PACKS[pack].paidUntil}T00:00:00Z`));
+}
+
+// Stands in for the code while the pack line is split around it.
+const CODE_MARK = '\u0000';
+
+/**
+ * The pack line with its code on one line: a code broken at a hyphen
+ * ("XMAS26-" / "K7QM-3FPA") reads as two. The translated line is split at its
+ * placeholder, so each language keeps its own word order, and a copied code
+ * keeps its plain hyphens.
+ */
+function PackCodeLine({ code }: { code: string }) {
+  const { t } = useTranslation();
+  const [before = '', after = ''] = t('home.packCode', { code: CODE_MARK }).split(CODE_MARK);
+  return (
+    <p className="font-semibold text-pink-600">
+      {before}
+      <span className="whitespace-nowrap">{code}</span>
+      {after}
+    </p>
+  );
 }
 
 export default function HomeScreen({ onJoined, support = null, onOpenSupport = () => {} }: Props) {
@@ -94,6 +156,9 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   // A joiner who explicitly cycles the UI language must keep that choice — it
   // must not be clobbered by the room's content language on join (see join()).
   const [uiLangTouched, setUiLangTouched] = useState(false);
+  // Step 122: the paid code, and the same code while it still works.
+  const [packCode, setPackCode] = useState(readPackCode);
+  const liveCode = packCode && isPackPaid(packCode.pack, Date.now()) ? packCode : null;
 
   // When the invite link carries the room language (`?room=CODE&lang=ru`),
   // render the join screen in that language immediately rather than waiting for
@@ -151,22 +216,37 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
     void i18n.changeLanguage(lang);
   }
 
+  function removeCode(): void {
+    forgetPackCode();
+    setPackCode(null);
+  }
+
   function create(): void {
     setError(null);
     setBusy(true);
-    socket.emit('room:create', { nickname: nickname.trim(), language, multiLanguage }, (ack) => {
-      setBusy(false);
-      onJoined({
-        roomCode: ack.roomCode,
-        socketId: ack.socketId,
-        hostId: ack.socketId,
+    socket.emit(
+      'room:create',
+      {
+        nickname: nickname.trim(),
         language,
         multiLanguage,
-        myLanguage: language,
-        players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
-        pack: null,
-      });
-    });
+        ...(liveCode ? { code: liveCode.code } : {}),
+      },
+      (ack) => {
+        setBusy(false);
+        onJoined({
+          roomCode: ack.roomCode,
+          socketId: ack.socketId,
+          hostId: ack.socketId,
+          language,
+          multiLanguage,
+          myLanguage: language,
+          players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
+          pack: null,
+          codeError: ack.codeError ?? null,
+        });
+      },
+    );
   }
 
   function join(): void {
@@ -294,6 +374,36 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
               <span className="block text-sm text-gray-600">{t('home.multiLanguageHint')}</span>
             </span>
           </label>
+
+          {/* Step 122: the paid code this phone keeps; Remove forgets it. */}
+          {packCode ? (
+            <div className="flex w-full items-start gap-3 rounded border border-amber-300 bg-white p-3">
+              <div className="min-w-0 flex-1 break-words">
+                {liveCode ? (
+                  <>
+                    <PackCodeLine code={packCode.code} />
+                    <p className="text-sm text-gray-600">
+                      {t('home.packCodeHint', { date: lastPaidDay(packCode.pack, i18n.language) })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-gray-700">{t('home.packEnded')}</p>
+                )}
+              </div>
+              <button
+                className="flex-shrink-0 text-sm text-gray-600 underline"
+                onClick={removeCode}
+              >
+                {t('home.packCodeRemove')}
+              </button>
+            </div>
+          ) : (
+            linkCodeRefused() && (
+              <p className="w-full text-center text-sm text-red-600" role="alert">
+                {t('errors.CODE_INVALID')}
+              </p>
+            )
+          )}
 
           <button
             className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:bg-gray-300 disabled:text-gray-500"

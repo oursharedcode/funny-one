@@ -3,7 +3,8 @@
 // The pack registry (DD-16, design §4.4): each pack's configuration and display
 // texts, the one function that says which options a story offers, and the
 // rules that bring a pack into a room (Step 117): which room is offered one,
-// until when, and which of its stories are golden.
+// until when, and which of its stories are golden — or, in a game a code has
+// paid for, that every story is the pack's (Step 122).
 
 import { POOLS } from '../pools/options.js';
 import { PROSE_SLOTS } from '../pools/schema.js';
@@ -88,11 +89,22 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 export const BASE_CONTENT: StoryContent = { kind: 'base' };
 
 /**
- * A golden story (FM-PACK-4): the pack in every slot, its ending drawn. Until
- * the paid half there is no paid room, so every `full` story is golden.
+ * A golden story (FM-PACK-4): one of a free game's two samples of the whole
+ * pack, its ending drawn. A paid game's stories have the same options but are
+ * not golden (Step 122): nothing in them asks to be unlocked.
  */
 export function isGolden(content: StoryContent): boolean {
   return content.kind === 'full';
+}
+
+/** A story whose ending is drawn as an aftermath: a golden one or a paid one. */
+export function drawsEnding(content: StoryContent): boolean {
+  return content.kind === 'full' || content.kind === 'paid';
+}
+
+/** Every story of a game a code has paid for (Step 122): the whole pack. */
+export function paidGameContents(pack: PackId, storyCount: number): StoryContent[] {
+  return Array.from({ length: storyCount }, (): StoryContent => ({ kind: 'paid', pack }));
 }
 
 // ---------------------------------------------------------------------------
@@ -119,6 +131,20 @@ export function isPackFree(id: PackId, now: number): boolean {
   return now < cutoffOf(PACKS[id].freeUntil);
 }
 
+/** True while a pack's paid codes work (FM-PACK-6): a month past the free part for chr26. */
+export function isPackPaid(id: PackId, now: number): boolean {
+  return now < cutoffOf(PACKS[id].paidUntil);
+}
+
+/**
+ * True when a room in `language` can play pack `id`: the pack names the
+ * language and has its texts in it (see `packForRoom`). A paid code opens its
+ * pack only in such a room.
+ */
+export function packHasLanguage(id: PackId, language: AuthoredLanguage): boolean {
+  return PACKS[id].languages.includes(language) && PACK_TEXTS[id][language] !== undefined;
+}
+
 /**
  * The pack a new room in `language` is offered, or null (FM-PACK-5/6, owner
  * decisions 3A and 4A, 2026-11-21): the first pack that names the language,
@@ -134,8 +160,7 @@ export function isPackFree(id: PackId, now: number): boolean {
  */
 export function packForRoom(language: AuthoredLanguage, now: number): PackId | null {
   for (const id of PACK_IDS) {
-    if (!PACKS[id].languages.includes(language)) continue;
-    if (!PACK_TEXTS[id][language]) continue;
+    if (!packHasLanguage(id, language)) continue;
     if (!isPackFree(id, now)) continue;
     return id;
   }

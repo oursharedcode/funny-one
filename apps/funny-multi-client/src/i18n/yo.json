@@ -25,7 +25,11 @@
     "uiLanguage": "Tẹ̀ láti yí èdè ojú-ìwé yìí padà",
     "unsupportedLanguage": "Ẹ̀dà áàpù yìí kò tíì lè ṣeré ní èdè tí yàrá yìí ń lò. Gbìyànjú láti tún ojú-ìwé náà ṣí, tàbí ṣẹ̀dá yàrá tuntun.",
     "multiLanguage": "Yàrá onírúurú èdè",
-    "multiLanguageHint": "Òṣèré kọ̀ọ̀kan ń ṣeré ní èdè tó yàn pẹ̀lú àwọn àsíá lókè."
+    "multiLanguageHint": "Òṣèré kọ̀ọ̀kan ń ṣeré ní èdè tó yàn pẹ̀lú àwọn àsíá lókè.",
+    "packCode": "🔔 Àpò Kérésìmesì rẹ: {{code}}",
+    "packCodeHint": "Gbogbo yàrá tí o bá ṣẹ̀dá lórí fóònù yìí yóò ní gbogbo àwọn ìtàn Kérésìmesì, títí di {{date}}.",
+    "packCodeRemove": "Yọ kúrò",
+    "packEnded": "Ẹ̀dà Kérésìmesì 2026 rẹ ti parí. O ṣeun fún ṣíṣeré!"
   },
   "lobby": {
     "roomCodeLabel": "Kóòdù yàrá",
@@ -40,7 +44,9 @@
     "capReached": "A kò lè ṣe àwòrán fún bí wákàtí {{hours}} tó ń bọ̀. Ẹ ṣì lè ṣeré — àwọn òṣèré yóò rí ọ̀rọ̀ ìtàn dípò àwòrán efe.",
     "capReachedHost": "Tẹ “Bẹ̀rẹ̀ eré” nígbà tí o bá ṣetán, tàbí dúró títí ìpín àwòrán efe òòjọ́ yóò fi bẹ̀rẹ̀ padà.",
     "christmasOn": "🔔 Ìtàn Kérésìmesì méjì wà nínú eré yìí",
-    "christmasSwitch": "Ṣeré pẹ̀lú àwọn ìtàn Kérésìmesì 2026"
+    "christmasSwitch": "Ṣeré pẹ̀lú àwọn ìtàn Kérésìmesì 2026",
+    "christmasPaid": "🔔 Ìtàn Kérésìmesì ni gbogbo ìtàn inú eré yìí",
+    "usePack": "🔔 Lo àpò Kérésìmesì mi níbí"
   },
   "round": {
     "progress": "Ìyípo {{current}} nínú {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Mo ti ṣetán ✓",
     "waitingForHost": "À ń dúró de agbàlejò…",
     "needPlayers": "Ó kéré tán, òṣèré 3 ni a nílò fún eré mìíràn",
-    "waitingForReady": "À ń dúró kí gbogbo èèyàn ṣetán"
+    "waitingForReady": "À ń dúró kí gbogbo èèyàn ṣetán",
+    "nextPaid": "🔔 Eré tó kàn: ìtàn Kérésìmesì ni gbogbo ìtàn"
   },
   "endScreen": {
     "supportServer": "Ti sẹ́fà yìí lẹ́yìn"
@@ -125,6 +132,7 @@
     "source": "Kóòdù orísun lórí GitHub",
     "family": "Ìdílé Aláwàdà",
     "edition": "Ẹ̀dà Kérésìmesì 2026",
+    "paid": "Ìtàn Kérésìmesì 2026 yín: ní gbogbo eré, ẹ gbádùn àríyá yín :))",
     "privacy": "Ìlànà ìpamọ́ àṣírí",
     "contentNotice": "Àṣàyàn àwọn òṣèré àti àwòrán ọgbọ́n àtọwọ́dá jẹ́ ojúṣe ẹni tó ń bójú tó sẹ́fà yìí, kì í ṣe ti iṣẹ́ àkànṣe ìpilẹ̀ṣẹ̀."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Orúkọ ìnagijẹ yìí kò ṣeé lò",
     "INVALID_OPTION": "Ìdáhùn yẹn kò sí mọ́ — yan òmíràn",
     "RATE_LIMITED": "Rọra díẹ̀",
-    "SERVER_BUSY": "Ọwọ́ sẹ́fà dí"
+    "SERVER_BUSY": "Ọwọ́ sẹ́fà dí",
+    "CODE_INVALID": "Kóòdù Kérésìmesì yìí kò tọ̀nà. Ṣàyẹ̀wò rẹ̀, kí o sì tún gbìyànjú.",
+    "CODE_BLOCKED": "Kóòdù Kérésìmesì yìí kò ṣiṣẹ́ mọ́.",
+    "CODE_ENDED": "Ẹ̀dà Kérésìmesì 2026 ti parí.",
+    "CODE_PENDING": "Kóòdù Kérésìmesì yìí ń dúró de ìsanwó rẹ̀.",
+    "PACK_UNAVAILABLE": "Kò sí àwọn ìtàn Kérésìmesì nínú yàrá yìí."
   }
 }

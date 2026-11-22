@@ -7,9 +7,10 @@
 import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Player } from '@funny/shared';
-import { createSocketMock } from '../testutils/socketMock';
+import { createSocketMock, setUrl } from '../testutils/socketMock';
 import type { LobbyState } from '../App';
 import i18n from '../i18n';
+import { __resetPackCodeForTest, forgetPackCode, rememberPackCode } from '../packCode';
 
 const socketMock = createSocketMock();
 vi.mock('../socket', () => ({ socket: socketMock }));
@@ -214,8 +215,8 @@ describe('cap banner', () => {
 // Step 117 (owner decision 3A): every room in the edition's languages is a
 // Christmas room, and its host can switch the stories off here.
 describe('Christmas stories (Step 117)', () => {
-  const ON = { id: 'chr26', on: true } as const;
-  const OFF = { id: 'chr26', on: false } as const;
+  const ON = { id: 'chr26', on: true, paid: false } as const;
+  const OFF = { id: 'chr26', on: false, paid: false } as const;
   const LINE = '🔔 This game has two Christmas stories';
   const SWITCH = 'Play with the Christmas 2026 stories';
 
@@ -267,5 +268,133 @@ describe('Christmas stories (Step 117)', () => {
     renderLobby({ pack: ON, language: 'ru', myLanguage: 'ru' });
     expect(screen.getByText('🔔 В этой игре две новогодние истории')).toBeTruthy();
     expect(screen.getByLabelText('Играть с историями «Новый год 2027»')).toBeTruthy();
+  });
+});
+
+// Step 122 (B-29): a paid room says so, and any player whose phone keeps a
+// paid code can open the room with it.
+describe('the paid code (Step 122)', () => {
+  const CODE = 'XMAS26-K7QM-3FPA';
+  const ON = { id: 'chr26', on: true, paid: false } as const;
+  const PAID = { id: 'chr26', on: true, paid: true } as const;
+  const USE = '🔔 Use my Christmas pack here';
+  const SWITCH = 'Play with the Christmas 2026 stories';
+
+  function resetCode(): void {
+    forgetPackCode();
+    __resetPackCodeForTest();
+    sessionStorage.clear();
+  }
+
+  beforeEach(() => {
+    resetCode();
+    // A December day, whatever day the suite runs on.
+    vi.useFakeTimers({ now: Date.parse('2026-12-20T09:00:00Z'), toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    resetCode();
+  });
+
+  it('says every story is a Christmas one in a paid room, and offers no code there', () => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: PAID });
+    expect(screen.getByText('🔔 Every story in this game is a Christmas story')).toBeTruthy();
+    expect(screen.queryByText('🔔 This game has two Christmas stories')).toBeNull();
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  // Owner decision 3A: the host can play without the pack, in a paid room too.
+  it("keeps the host's switch in a paid room", () => {
+    renderLobby({ pack: PAID });
+    const toggle = screen.getByLabelText<HTMLInputElement>(SWITCH);
+    expect(toggle.checked).toBe(true);
+    fireEvent.click(toggle);
+    expect(socketMock.onlyEmitOf('room:setPack').args).toEqual([{ on: false }]);
+  });
+
+  it('says nothing of the pack in a paid room switched off, and offers no code there', () => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: { ...PAID, on: false } });
+    expect(screen.getByLabelText<HTMLInputElement>(SWITCH).checked).toBe(false);
+    expect(screen.queryByText('🔔 Every story in this game is a Christmas story')).toBeNull();
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it('offers nothing to a phone that keeps no code', () => {
+    renderLobby({ pack: ON });
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it("sends a guest's code to the server, and waits for its answer", () => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: ON, socketId: 's1', hostId: 's0' });
+    const button = screen.getByText<HTMLButtonElement>(USE);
+    fireEvent.click(button);
+    expect(socketMock.onlyEmitOf('room:unlock').args[0]).toEqual({ code: CODE });
+    expect(button.disabled).toBe(true);
+
+    socketMock.ackFor('room:unlock')({ ok: true });
+    expect(button.disabled).toBe(false);
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it.each([
+    ['CODE_INVALID', "That Christmas code isn't right. Check it and try again."],
+    ['CODE_BLOCKED', 'This Christmas code no longer works.'],
+    ['CODE_ENDED', 'The Christmas 2026 edition has ended.'],
+    ['PACK_UNAVAILABLE', "Christmas stories aren't available in this room."],
+  ])('says why %s, and takes the button away', (code, text) => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: ON });
+    fireEvent.click(screen.getByText(USE));
+    socketMock.ackFor('room:unlock')({ error: { code, message: 'raw server text' } });
+    expect(screen.getByRole('alert').textContent).toBe(text);
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it.each([
+    ['CODE_PENDING', 'This Christmas code is waiting for its payment.'],
+    ['RATE_LIMITED', 'Slow down a moment'],
+  ])('keeps the button after %s, which a later tap can get past', (code, text) => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: ON });
+    fireEvent.click(screen.getByText(USE));
+    socketMock.ackFor('room:unlock')({ error: { code, message: 'raw server text' } });
+    expect(screen.getByRole('alert').textContent).toBe(text);
+    expect(screen.getByText<HTMLButtonElement>(USE).disabled).toBe(false);
+  });
+
+  it('shows why the code Home sent did not open the room', () => {
+    rememberPackCode(CODE);
+    renderLobby({ pack: ON, codeError: { code: 'CODE_BLOCKED', message: 'blocked' } });
+    expect(screen.getByRole('alert').textContent).toBe('This Christmas code no longer works.');
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it('drops an old refusal once someone else has paid for the room', () => {
+    rememberPackCode(CODE);
+    const codeError = { code: 'CODE_PENDING', message: 'pending' } as const;
+    const { rerender } = render(
+      <LobbyScreen lobby={lobbyState({ pack: ON, codeError })} onLeave={vi.fn()} />,
+    );
+    expect(screen.getByRole('alert')).toBeTruthy();
+    rerender(<LobbyScreen lobby={lobbyState({ pack: PAID, codeError })} onLeave={vi.fn()} />);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByText(USE)).toBeNull();
+  });
+
+  it('offers a code to a room with no pack once the free part has ended', () => {
+    rememberPackCode(CODE);
+    vi.setSystemTime(Date.parse('2027-07-15T09:00:00Z'));
+    renderLobby({ pack: null });
+    expect(screen.getByText(USE)).toBeTruthy();
+  });
+
+  it('offers no code in the Android app', () => {
+    rememberPackCode(CODE);
+    setUrl('?shell=android');
+    renderLobby({ pack: ON });
+    expect(screen.queryByText(USE)).toBeNull();
   });
 });

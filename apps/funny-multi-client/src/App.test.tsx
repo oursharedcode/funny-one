@@ -269,7 +269,7 @@ describe('lobby:update', () => {
     socketMock.fire('lobby:update', {
       players: [{ id: 's1', nickname: 'hostie', isBot: false }],
       hostId: 's1',
-      pack: { id: 'chr26', on: false },
+      pack: { id: 'chr26', on: false, paid: false },
     });
     expect(trackChristmasGame).not.toHaveBeenCalled();
     socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });

@@ -25,6 +25,11 @@
 //      on `round:start`, `reveal:start` and every gallery entry; a golden
 //      story's `ending` picture beside its scene.
 //
+//   7. The paid code (Step 122, B-29): `RoomCreatePayload.code` and the ack's
+//      `codeError`, `room:unlock` for any player, `RoomPack.paid`, the
+//      server-only `Room.packCode` and `Room.paidGame`, `story:exported` for a
+//      paid game's receipt record, and five error codes for a refused code.
+//
 // Deliberately NOT here: `entitlementToken` on `room:create` and `Room.premium`.
 // The Polar premium design (design §10) they belonged to was superseded by
 // D-6's support rails (`SupportConfig` below) before either shipped.
@@ -98,10 +103,28 @@ export interface RoomStory extends Story {
  * A room's pack (Step 117, owner decisions 3A and 4A): offered when the room
  * is created, by its language and the date (`packForRoom`); on until the
  * host switches it off in the lobby. A room with no offer has `pack: null`.
+ *
+ * `paid` (Step 122): a code opened the whole pack — at the room's creation or
+ * by any player's `room:unlock` — so every game from the next one is all the
+ * pack's while the switch is on. The code itself never leaves the server.
  */
 export interface RoomPack {
   id: PackId;
   on: boolean;
+  paid: boolean;
+}
+
+/**
+ * A paid game's counts for its receipt-log record (Step 122, B-29's receipt
+ * log): the players it began with, the picks they made (not the fills), and
+ * the downloads and shares their clients report through `story:exported`.
+ */
+export interface PaidGameCounts {
+  startedAt: number;
+  players: number;
+  picks: number;
+  downloads: number;
+  shares: number;
 }
 
 // Opaque server-side timer handle. Treat as unknown on the client;
@@ -125,6 +148,12 @@ export interface Room {
   // The Christmas switch (Step 117): null when the room was offered no pack.
   // Kept across "one more game", which restarts without a lobby.
   pack: RoomPack | null;
+  // Server only, never sent (Step 122): the code that made `pack.paid`, for
+  // its receipt records and the check at every game's start; null otherwise.
+  packCode: string | null;
+  // Server only (Step 122): the counts of a game being played paid, null in
+  // any other game. Written to the receipt log when the game is left.
+  paidGame: PaidGameCounts | null;
   // Locked at game:start; order drives rotation.
   players: Player[];
   phase: RoomPhase;
@@ -162,7 +191,16 @@ export type ErrorCode =
   // cannot produce it: the options come from the same shared package the server
   // validates against. A dishonest one gets no submitted mark and is
   // timer-autofilled like anyone who never answered.
-  | 'INVALID_OPTION';
+  | 'INVALID_OPTION'
+  // NEW (Step 122) — a paid code refused: not a code at all or a forged one;
+  // one the owner blocked; one past its pack's last day; one whose PayID
+  // payment has not been confirmed (or whose 48 hours ran out); and a room that
+  // has no pack for a code to open (its language, or `PACK_ROOMS=off`).
+  | 'CODE_INVALID'
+  | 'CODE_BLOCKED'
+  | 'CODE_ENDED'
+  | 'CODE_PENDING'
+  | 'PACK_UNAVAILABLE';
 
 export interface ErrorPayload {
   code: ErrorCode;
@@ -178,11 +216,17 @@ export interface RoomCreatePayload {
   language: Language;
   // B-15. Absent (an older client) means false.
   multiLanguage?: boolean;
+  // Step 122: the paid code the website remembers or its link carries. Never
+  // sent by the Android app. A refused code still creates the room, unpaid.
+  code?: string;
 }
 
 export interface RoomCreateAck {
   roomCode: string;
   socketId: string;
+  // Step 122: why `code` did not make the room paid; absent when no code was
+  // sent or it did.
+  codeError?: ErrorPayload;
 }
 
 export interface RoomJoinPayload {
@@ -206,6 +250,21 @@ export type RoomJoinAck =
 // offered no pack.
 export interface RoomSetPackPayload {
   on: boolean;
+}
+
+// Any player, any phase but 'ended' (Step 122, B-29 #4 "unlock the room
+// you're in"): a code opens the room's pack from its next game — the first,
+// in the lobby — and the switch goes on. "One more game" keeps it.
+export interface RoomUnlockPayload {
+  code: string;
+}
+
+export type RoomUnlockAck = { ok: true } | { error: ErrorPayload };
+
+// Step 122: a player saved or shared a paid story — counted in the game's
+// receipt record, nothing else. Sent for paid stories only.
+export interface StoryExportedPayload {
+  kind: 'download' | 'share';
 }
 
 export interface RoundSubmitPayload {
@@ -388,6 +447,8 @@ export interface ClientToServerEvents {
   'room:leave': () => void;
   // Host only, lobby only (Step 117); answered with `lobby:update`.
   'room:setPack': (payload: RoomSetPackPayload) => void;
+  'room:unlock': (payload: RoomUnlockPayload, ack: (response: RoomUnlockAck) => void) => void;
+  'story:exported': (payload: StoryExportedPayload) => void;
   // Payload-free since the wobbleEngine choice was removed (DD-9).
   'game:start': () => void;
   'round:submit': (payload: RoundSubmitPayload) => void;

@@ -40,6 +40,12 @@ interface Bucket {
 export interface RateLimiter {
   /** Consumes one token. False = limit exceeded, caller must not process. */
   take(key: string): boolean;
+  /**
+   * True when `take` would succeed, consuming nothing (Step 122): for a limit
+   * on failures only — a wrong paid code — the caller checks first and takes a
+   * token only when the attempt fails.
+   */
+  peek(key: string): boolean;
   /** Evicts fully-refilled buckets; called on a timer in production. */
   sweep(): void;
   /** Number of tracked keys — memory-growth assertions. */
@@ -84,6 +90,13 @@ export function createRateLimiter(options: RateLimiterOptions): RateLimiter {
     return true;
   }
 
+  function peek(key: string): boolean {
+    const bucket = buckets.get(key);
+    if (!bucket) return true;
+    refill(bucket, now());
+    return bucket.tokens >= 1;
+  }
+
   function sweep(): void {
     const at = now();
     for (const [key, bucket] of buckets) {
@@ -102,6 +115,7 @@ export function createRateLimiter(options: RateLimiterOptions): RateLimiter {
 
   return {
     take,
+    peek,
     sweep,
     size: () => buckets.size,
     stop: () => clearInterval(timer),
@@ -112,6 +126,12 @@ export function createRateLimiter(options: RateLimiterOptions): RateLimiter {
 export const ROOM_CREATE_PER_MINUTE = 5;
 export const ROOM_JOIN_PER_MINUTE = 30;
 export const RATE_WINDOW_MS = 60_000;
+// Step 122: wrong paid codes per IP per hour. A code's 24-bit signature leaves
+// one chance in 16.7 million per guess, so at this rate one address would
+// guess for some 190 years to hit a working code; a family that mistypes ten
+// times in an hour waits six minutes for the next try.
+export const WRONG_CODES_PER_HOUR = 10;
+export const WRONG_CODE_WINDOW_MS = 60 * 60_000;
 
 /**
  * Client IP for bucketing, read from `x-forwarded-for` counting from the

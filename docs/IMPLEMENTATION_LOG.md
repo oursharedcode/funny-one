@@ -7760,6 +7760,10 @@ green run; `npm audit` unchanged (the two accepted ids); CI pending the push.
 ru), and the Christmas switch in a new Funny Multi room's lobby. B-29 stays open: the paid half
 remains.
 
+~~RESUME HERE (2026-11-21, after Step 121; not yet pushed)~~ — pushed as `4b99d64`, CI green
+(run 44904743259), and its phone check passed (the owner, 2026-11-22: "ok"); carried into Step
+122's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-21, after Step 121; not yet pushed).** Step 120 is pushed and green
 (`f707819`, CI run 44903068306). **Steps 117–120 are live: Christmas rooms, the 18 languages'
 texts, the landing buttons and `/x26`, two-character nicknames.** `PACK_ROOMS=off` in the VM's
@@ -7768,3 +7772,138 @@ paid code and the rails, the date on every pay screen, and how the agent retires
 Sponsors tier on 1 July 2027. **Owed, the owner's:** the phone check above; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027; for the rails, the Sponsors tier
 (its text naming 1 August 2027) and webhook and the Lightning service.
+
+## Step 122 (task B-29) — the paid code, end to end, with no payment yet (2026-11-22)
+
+**Owner decisions, 2026-11-22 (`/morning`, on Step 122's plan)** — B-29's block in tasks.md holds
+the binding text: **D1** one deploy of the whole paid half, as soon as it is ready; **D2 A** the
+owner's admin surface is a private phone page behind a secret link (Step 124); **D3 A** no email
+copy of the code; **D4 A** Lightning is not a rail for the pack — Australia pays by PayID,
+everyone else through Sponsors, and Lightning stays a gift link; **D5 A** a new US$2 one-time
+Sponsors tier, "Christmas 2026 edition", its text naming 1 August 2027, with a webhook; **D6 A**
+the agent retires it on 1 July 2027. Five steps: 122 the code end to end; 123 the pay card after
+a free game and `/x26` as the pay page; 124 PayID and the admin page; 125 Sponsors; 126 sleigh
+bells and the landing line "Christmas pack — try it free", then the deploy. From the agent's 17
+improvements the owner took #11, #2 and #15 into Steps 123 and 126, #1, #10, #9 and #7 for a
+second deploy by 23 December, #16 as a rule, and #17, #13 and #14 for later. **#16: no deploys
+24–26 December, 31 December–1 January or 6–7 January.** Step 121's phone check passed.
+
+**Shipped:**
+
+- **Shared** (`packages/shared`): `packs/code.ts` (new) — a code is `XMAS26-K7QM-3FPA`, the pack's
+  prefix and eight Crockford base32 characters, 40 bits: a 16-bit id and a 24-bit tag. `parseCode`
+  reads what a person types or a link carries — any case, spaces, dashes, dots or underscores
+  anywhere, the prefix or none, O for 0, I and L for 1 — and `formatCode` writes the canonical
+  form. `StoryContent` gains `paid` (`full`'s options and drawn ending, none golden:
+  `paidGameContents`, `drawsEnding`); `isPackPaid`, `packHasLanguage`; `RoomPack.paid`;
+  `room:create`'s `code` and the ack's `codeError`, `room:unlock`, `story:exported`; five error
+  codes — `CODE_INVALID`, `CODE_BLOCKED`, `CODE_ENDED`, `CODE_PENDING`, `PACK_UNAVAILABLE`.
+- **Server** (`apps/funny-multi-server`): `codes.ts` (new) signs and checks — the tag is the first
+  three bytes of HMAC-SHA256(`PACK_CODE_SECRET`, `<pack>:<id>`), so a check needs the secret and
+  nothing else. The verdict runs `CODE_INVALID`, `CODE_ENDED` (past the pack's `paidUntil`),
+  `CODE_BLOCKED`, `CODE_PENDING` (a PayID code not received, or not claimed within 48 hours),
+  good; a code the log has never seen is good; a secret under 16 characters refuses every code,
+  and the boot log says so. `receipts.ts` (new) is the receipt log — JSON lines in
+  `RECEIPTS_FILE` (compose: `/data/receipts.jsonl`, the stats volume), records `issue`, `claim`,
+  `received`, `block`, `room` and `game`, kept 18 months, never an address — the country or `ZZ`,
+  the browser's family. `rateLimit.ts` gains `peek` and `WRONG_CODES_PER_HOUR` (10 per address):
+  only a wrong code takes a token, a good one costs nothing, and one address guessing a 24-bit
+  tag at that rate needs some 190 years. `rooms.ts`: `openPaidPack` (`{ id, on: true, paid: true
+  }` and the room's `packCode`; `PACK_UNAVAILABLE` where the room's language has no texts of the
+  pack — ar, he and fa for chr26 — or `PACK_ROOMS=off`), `allRooms`. `game.ts`: a paid game's
+  stories are the `paid` content, picks are counted, and `takePaidGameRecord` hands over the
+  `game` record — rounds, picks, cartoons, downloads, shares — when the game is left (one more
+  game, the host's end, the last player gone, the shutdown), for `index.ts` to append. `index.ts`:
+  `room:create` takes the code — a refused one still makes the room, unpaid, and the ack says
+  why — `room:unlock` for any player until the room has ended, `story:exported`, and a second
+  check of the code at every game's start (`recheckCode`: one blocked, lapsed or ended since plays
+  the free part, or no pack once that has ended too); paid games are flushed to the log at
+  shutdown. `scripts/mintCode.mjs` and `npm run mint-code -w apps/funny-multi-server` (`--count`,
+  `--pack`) mint a test code where the secret is, logging nothing. `.env.example` (both new
+  variables, commented out) and `docker-compose.yml` (`RECEIPTS_FILE`).
+- **Client** (`apps/funny-multi-client`): `packCode.ts` (new) takes `?code=` off the address bar
+  before the first render (`main.tsx`) — so an invitation never copies it — and keeps it in
+  localStorage; the Android app ignores codes entirely, neither keeping one from a link nor
+  sending one Chrome remembers (Play's payments policy). Home's card shows "🔔 Your Christmas
+  pack:" with the code, its last paid day as the interface's language writes a date, and Remove;
+  the code goes with `room:create`; a link whose code is not one says so. `PackUnlock.tsx` (new)
+  — "🔔 Use my Christmas pack here" — in the lobby and on the end screen, for any player whose
+  phone keeps a code that could open the room; a refusal a retry cannot change takes the button
+  away, and the lobby shows the create ack's `codeError`. A paid room says every story is a
+  Christmas story (`lobby.christmasPaid`, `end.nextPaid`). A paid story's still and video carry
+  the buyer's thank-you (`footer.paid`) over `/x26`, wrapped where it is longer than the column,
+  with no price or code; each paid story saved or shared is reported with `story:exported` (a
+  share the person dismisses is not one).
+- **Texts:** 13 interface keys in all 23 catalogues — `errors.CODE_INVALID`, `CODE_BLOCKED`,
+  `CODE_ENDED`, `CODE_PENDING`, `PACK_UNAVAILABLE`; `home.packCode`, `packCodeHint`,
+  `packCodeRemove`, `packEnded`; `lobby.christmasPaid`, `usePack`; `end.nextPaid`; `footer.paid` —
+  and the privacy policy's receipt-log section in all 23 languages (`privacy.html`). en and ru
+  the agent's, the other 21 machine drafts (sub-agents) on B-3's pile; the drafters' notes for
+  the reviewer are in tasks.md's Step 122 line. `catalogs.test.ts` requires an `errors.*` line
+  for each new error code in every catalogue.
+- **Docs:** design §4.4 (the paid code, paid rooms, the receipt log, the code on the client), §5's
+  protocol amendment and §11's two variables; tasks.md — the 2026-11-22 decisions and the Step
+  122 line.
+
+**Settled in the step:**
+
+- The host's switch stays in a paid room (3A of 2026-11-21): off, the room plays an ordinary
+  game, keeps its code and writes no `game` record; on again, the pack.
+- A date is British English in en and Gregorian in every language (fa would otherwise take the
+  Persian calendar). Chrome — and so the Android app — has no dates in Yoruba or Cantonese: a
+  plain locale wrote "2027 M08 1" on Home's card. A locale list now falls back, yue to Hong Kong
+  Chinese and yo to British English: "2027年8月1日" and "1 August 2027".
+- Home never breaks the code at a hyphen (`PackCodeLine`).
+
+**Verified in phone-sized Chromium** (390 px, en-AU; `.screens/step122-check.mjs`, gitignored):
+the real server on 3000 under a random throwaway `PACK_CODE_SECRET` set in the process
+environment only, a code minted with `mint-code` for the run (neither is in the repo or in .env),
+and Vite on 5183. All 28 checks pass: a pay link with the code in lower case is kept, shown,
+taken off the address and survives a reload; the host's paid room says every story is Christmas
+with the switch on; a guest without a code sees the paid line, is offered nothing, and the code
+is nowhere in the guest's page; a 3-player paid game starts, all three phones at round 1 of 7;
+in a free room a guest whose phone keeps a code opens it for everyone, nobody leaving, and the
+offer goes; the Android shell (`?shell=android`) shows and keeps no code and its room is free; a
+link with a broken code says so on Home and keeps nothing; Remove forgets the code, also after a
+reload. Home's card was then shot in he 390, fa 360, ar 360 (right to left, the code inside the
+card), ta 320, yo 320 and yue 360 px (`.screens/step122-home-cards-check.mjs`), and
+`.screens/step122-dates-check.mjs` writes 1 August 2027 in each of the 23 languages with the
+browser's locale en-US and the language's own. Not in the browser: a paid game's end (the still's
+thank-you footer, the `game` record) — the unit and socket tests cover it.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test`, outside the sandbox, 2187 across 6
+workspaces (533 funny-family-site, 523 funny-multi-client — 62 more, 418 funny-multi-server — 52
+more, 178 funny-one-client, 447 shared, 88 cloudflare); `npm audit --omit=dev` 0, and the full
+audit 9 moderate under exactly the two accepted ids (GHSA-3g3m-2fjr-6pw4 glob,
+GHSA-g3hv-75wg-m249 minimatch), no dependency changed; CI pending the push.
+
+**Owed, the agent's:** Steps 123–126 above, then the one deploy (D1) — the server's log checked
+first for a game in progress (B-27), `deploy/ship.sh` and `deploy/ship-funny-family.sh`. The
+policy's receipt-log section goes live with the next `ship.sh` (it streams
+`deploy/origin-root/funny37`) — the paid half's deploy, or an earlier fix's, and harmless then:
+with no `PACK_CODE_SECRET` every code is refused, so no paid room opens and the receipt log stays
+empty. B-29 stays open.
+
+**Owed, the owner's:** before the deploy, `PACK_CODE_SECRET` in the VM's `.env` — 16 characters
+or more, e.g. `openssl rand -base64 24`, copied at once to the other `.env` backups, since a new
+secret voids every code sold (a `*_SECRET=` line is the owner's to write: one command, when Step
+126 is ready); the Sponsors tier (US$2 one-time, "Christmas 2026 edition", its text naming 1
+August 2027) and its webhook, at Step 125; the live-badge look; Funny Multi's trader confirmation
+before 1 February 2027; B-3's native reviewers now also have the 13 lines and the policy's
+section in 21 languages. The Lightning service is no longer owed (D4 A).
+
+**RESUME HERE (2026-11-22, after Step 122; not yet pushed).** Step 121 is pushed and green
+(`4b99d64`, CI run 44904743259) and its phone check passed. **The paid code works end to end,
+with no payment:** a signed `XMAS26-XXXX-XXXX` opens a room from `room:create` or any player's
+`room:unlock`; the room's stories play the `paid` content; a receipt log keeps each code's rooms
+and games; the website remembers a pay link's code and the Android app ignores it. Nothing of it
+is live — Steps 122–126 deploy together (D1). **Next, Step 123 (the agent's) — the pay card
+after a free game and `/x26` as the pay page,** with #11's Sponsors guide ("3 steps, about 3
+minutes", in the buyer's language) outside Australia and the date on every pay screen; ar, he and
+fa rooms cannot play the pack (a code there says `PACK_UNAVAILABLE`), so settle what their
+players are shown rather than sell them a code. Then 124 PayID and the admin page, 125 Sponsors,
+126 sleigh bells, the landing line "Christmas pack — try it free", #2's Christmas invitation,
+#15's uptime alarm and the one deploy by about 10 December — no deploys 24–26 December, 31
+December–1 January or 6–7 January (#16). **Owed, the owner's:** `PACK_CODE_SECRET` in the VM's
+`.env` before the deploy; the Sponsors tier and its webhook; the live-badge look; Funny Multi's
+trader confirmation before 1 Feb 2027.

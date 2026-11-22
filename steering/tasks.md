@@ -840,6 +840,72 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     bodies to `NUL` under Git Bash (`/dev/null` failed the `/x26` check). **Next:** the paid
     half by about 10 December — the paid code and the rails, the date on every pay screen,
     and how chr26's Sponsors tier retires on 1 July 2027.
+  - *Decisions 2026-11-22 (owner, on Step 122's plan — the paid half):*
+    - **D1 — one deploy of the whole paid half, as soon as it is ready**: right after the last
+      paid step's push and green CI, the server's log checked first for a game in progress
+      (B-27), as in Step 121. Not A (PayID around 3 December, Sponsors in a second deploy).
+    - **D2 A — the owner's admin surface is a private phone page behind a secret link**: the
+      pending PayID claims with their time left, Received, Block and New code, and the
+      lost-code lookup — a 48 h claim cannot wait for a session. Built in Step 124.
+    - **D3 A — no email copy of the code**: it is on screen, remembered by the phone, in the
+      payment's history and found by the lost-code lookup; no address kept, no sending service.
+      Drops "email the backup copy" (*Refunds*) and "the optional email backup".
+    - **D4 A — Lightning is not a rail for the pack**: Australia pays by PayID, everyone else
+      through Sponsors; Lightning stays a gift link. A code paid over Lightning would be a
+      direct sale abroad (*Rejected on the way*: tax registration from the first sale), where
+      Sponsors makes GitHub the merchant of record. Replaces "anywhere — Lightning" (*Rails and
+      posture*) and the wallet's history (*The payment is the receipt*).
+    - **D5 A — a new US$2 one-time Sponsors tier**, "Christmas 2026 edition", its text naming
+      1 August 2027, with a webhook, retired on its own. The code comes back through the
+      checkout link's `metadata_code=`, or the buyer's GitHub name if the webhook lacks it.
+    - **D6 A — the agent retires the tier on 1 July 2027** in one call with the owner's `gh`
+      login, from a reminder; until then the server issues no code for a late sponsorship and
+      lists it on the admin page for a refund. No long-lived token anywhere.
+    - **Five steps:** 122 the code end to end, no payment; 123 the pay card after a free game
+      and `/x26` as the pay page; 124 PayID and the admin page; 125 Sponsors; 126 sleigh bells
+      and the landing line "Christmas pack — try it free", then the deploy.
+    - **Improvements taken (owner, the same day, from the agent's 17; the slots the agent's):**
+      #11 a Sponsors guide on the pay page outside Australia ("3 steps, about 3 minutes", in the
+      buyer's language) in Step 123; #2 a Christmas invitation (a lobby Share button with a
+      festive line, and a join link's preview — a title and one of the 650 pictures) and #15 an
+      uptime alarm (a scheduled GitHub check every 30 minutes of the server's health page,
+      `/x26` and one Christmas picture, an email to the owner on a failure) in Step 126. After
+      the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 127; it
+      changes the 3-player rule), #10 gift a pack (Australia's gift-card law checked first — a
+      3-year expiry against 1 August 2027), #9 a festive room look (snow, off under reduced
+      motion; a festive ending card; a bell when a golden story is revealed), #7 the whole-game
+      video. **#16, a rule from today: no deploys 24–26 December, 31 December–1 January or
+      6–7 January** — until B-27 a deploy cuts off games in progress; `PACK_ROOMS=off` stays
+      the emergency lever. Later, in this order: #17 the server disk's backup schedule, #13 free
+      full Christmas on 25 December (only if live before the 24 December freeze), #14 a
+      back-translation check of the 18 machine drafts.
+  - **The paid code done 2026-11-22 (Step 122)** — end to end, no payment yet (design §4.4,
+    §5, §11). `XMAS26-XXXX-XXXX` is signed with `PACK_CODE_SECRET` (the VM's `.env` only) and
+    read by the shared `parseCode` (any case or separators, O for 0, I and L for 1); the
+    server's `codes.ts` gives the verdict, `receipts.ts` keeps the receipt log (`RECEIPTS_FILE`
+    in the stats volume, 18 months), and only a wrong code costs a token of the limiter. A room
+    opens paid from `room:create`'s code or any player's `room:unlock`; its stories play the new
+    `paid` content (`full`'s options and ending picture, none golden), and each game's start
+    checks the code again. The website keeps a pay link's `?code=`: Home's card shows the code,
+    its last paid day and Remove; "🔔 Use my Christmas pack here" in the lobby and on the end
+    screen; a paid story's still and video lead to `/x26`. The Android app ignores codes. The
+    privacy policy's receipt-log section is in all 23 languages; the 13 new texts and the
+    policy: en and ru the agent's, 21 machine drafts on B-3's pile. Settled in the step: the
+    host's switch stays in a paid room (3A of 2026-11-21) — off, an ordinary game with the code
+    kept; a date is British English in en and Gregorian in every language (Persian would take
+    its own calendar), and where Chrome has no dates in a language, the nearest it has (Hong
+    Kong Chinese for yue, British English for yo); Home never breaks the code at a hyphen.
+    Verified in phone-sized Chromium against a local server with a throwaway secret, 28 checks:
+    a pay link in lower case, a paid room for a guest without a code (offered nothing, the code
+    nowhere in the page), a 3-player paid game, a guest's code opening a free room for
+    everyone, the Android shell, a broken code, Remove; and Home's card in he, fa, ar, ta, yo
+    and yue at 320–390 px. The drafters' notes for B-3's reviewer: "receipt log" and "Home
+    screen" are new words in most languages; the buttons are informal and the policy formal in
+    fa and the Asian drafts, es-419's buttons say vos and its policy tú, de and it say du and tu
+    throughout, fr and uk vous and ви; fr's "pack de Noël" is an anglicism; bn names the pack
+    and the stories with two different words for Christmas; Tamil's footer line wraps on a
+    phone. **Next:** Step 123 — the pay card after a free game and `/x26` as the pay page, with
+    #11's Sponsors guide.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

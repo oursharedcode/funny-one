@@ -39,6 +39,10 @@ services:
       # finds a visit's country in (Step 79, geo.ts): in the same volume, so
       # a deploy does not download it again.
       GEO_DIR: /data/geo
+      # The paid Christmas codes' receipt log (Step 122, receipts.ts): in the
+      # same volume, so a deploy keeps its 18 months. PACK_CODE_SECRET, which
+      # signs the codes, comes from .env.
+      RECEIPTS_FILE: /data/receipts.jsonl
     volumes:
       - stats_data:/data
     restart: unless-stopped

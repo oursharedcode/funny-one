@@ -11,7 +11,8 @@
 //      that still set it would not typecheck).
 //
 // Since then (Step 120, B-29, D3 A): the nickname minimum is 2, not SRC's 3,
-// and both bounds come from @funny/shared.
+// and both bounds come from @funny/shared. Step 117 added the room's pack,
+// Step 122 a paid code that opens it (`openPaidPack`).
 //
 // NOT here: the §17 rate limiter. SRC's spec mandates it and SRC's own
 // DEPLOYMENT.md documents it, but SRC never implemented it — see rateLimit.ts,
@@ -23,7 +24,9 @@ import {
   NICKNAME_MAX,
   NICKNAME_MIN,
   packForRoom,
+  packHasLanguage,
   type AuthoredLanguage,
+  type PackId,
 } from '@funny/shared';
 import type { ErrorCode, Language, Player, Room, RoomPack } from './types.js';
 
@@ -53,6 +56,11 @@ export function findRoomForSocket(socketId: string): Room | null {
 
 export function roomCount(): number {
   return rooms.size;
+}
+
+/** Every room open now, for the paid games' receipts at shutdown (Step 122). */
+export function allRooms(): Room[] {
+  return [...rooms.values()];
 }
 
 export function getMaxRooms(): number {
@@ -117,7 +125,25 @@ export function isValidLanguage(value: unknown): value is AuthoredLanguage {
 export function packOffer(language: Language, now = Date.now()): RoomPack | null {
   if (process.env.PACK_ROOMS === 'off') return null;
   const id = packForRoom(language, now);
-  return id ? { id, on: true } : null;
+  return id ? { id, on: true, paid: false } : null;
+}
+
+/**
+ * Opens a paid code's pack in `room` (Step 122): every game from the next one
+ * is all the pack's, and the switch goes on. 'already' when a code has opened
+ * it before — the first code stays the room's, so its receipt records name
+ * one buyer — and false when the room cannot play the pack: its language has
+ * no texts of it (ar, he and fa for chr26), or `PACK_ROOMS=off`. A room past
+ * the free part's end was offered no pack at its creation; a paid code still
+ * opens one there, until its own last day (FM-PACK-6, checked by the caller).
+ */
+export function openPaidPack(room: Room, pack: PackId, code: string): 'opened' | 'already' | false {
+  if (process.env.PACK_ROOMS === 'off') return false;
+  if (!isValidLanguage(room.language) || !packHasLanguage(pack, room.language)) return false;
+  if (room.pack?.paid) return 'already';
+  room.pack = { id: pack, on: true, paid: true };
+  room.packCode = code;
+  return 'opened';
 }
 
 export function createRoom(
@@ -139,6 +165,8 @@ export function createRoom(
     language,
     multiLanguage,
     pack: packOffer(language),
+    packCode: null,
+    paidGame: null,
     players: [player],
     phase: 'lobby',
     currentRound: 0,

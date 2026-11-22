@@ -64,6 +64,8 @@ function makeRoom(players: Player[], stories: RoomStory[]): Room {
     language: 'en',
     multiLanguage: false,
     pack: null,
+    packCode: null,
+    paidGame: null,
     players,
     phase: 'reveal',
     currentRound: 7,

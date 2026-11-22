@@ -24,6 +24,11 @@
 // (StoryEnding.tsx), a golden one says so; the server lists the golden stories
 // last. A golden story's still carries its ending picture and the edition's
 // footer, and every Christmas story's video ends on its ending.
+//
+// Step 122 (B-29): a paid story's still carries its ending and the buyer's
+// thank-you footer, and each one saved or shared is reported (`onExported`)
+// for its game's receipt record — a count, nothing else. A share the person
+// dismisses is not one.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,11 +52,13 @@ interface Props {
   roomLanguage: AuthoredLanguage;
   /** The language every story opens in: App.tsx `myLanguage`. */
   defaultLanguage: AuthoredLanguage;
+  /** Step 122: a paid story saved or shared. Never called for any other. */
+  onExported?: (kind: 'download' | 'share') => void;
 }
 
 // The shared room gallery (spec §24): every story + its picture, browsed one
 // at a time. Bot slots and ungenerated stories show a no-picture placeholder.
-export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: Props) {
+export default function RoomGallery({ entries, roomLanguage, defaultLanguage, onExported }: Props) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   // Story index → the language the player switched that story to.
@@ -69,6 +76,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
   // Older servers sent no content: a base story.
   const content = entry?.content ?? BASE_CONTENT;
   const golden = isGolden(content);
+  const paid = content.kind === 'paid';
   const goldenCartoon = golden && Boolean(entry?.picture);
 
   // The Christmas funnel's golden step (D2 A): a golden story's cartoon seen.
@@ -88,6 +96,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
     pictureUrl: entry.picture?.url ?? null,
     language,
     golden,
+    paid,
     endingUrl: ending?.url ?? null,
   };
 
@@ -104,11 +113,26 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
     };
   }
 
+  function exported(kind: 'download' | 'share'): void {
+    if (paid) onExported?.(kind);
+  }
+
+  async function downloadImage(): Promise<void> {
+    await downloadStoryImage(still);
+    exported('download');
+  }
+
   // Native-share the still image; fall back to a download if the platform
   // declines the file (so the button is never a dead end).
   async function shareImage(): Promise<void> {
     const file = await buildStoryImageFile(still);
-    if ((await shareFiles([file], shareMeta())) === 'unsupported') downloadFile(file);
+    const result = await shareFiles([file], shareMeta());
+    if (result === 'unsupported') {
+      downloadFile(file);
+      exported('download');
+    } else if (result === 'shared') {
+      exported('share');
+    }
   }
 
   async function downloadVideo(): Promise<void> {
@@ -121,11 +145,13 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
         pictureUrl: entry.picture.url,
         language,
         golden,
+        paid,
         ending: christmas
           ? { pictureUrl: ending?.url ?? null, text: endingText(story, language) }
           : null,
       });
       downloadFile(file);
+      exported('download');
     } finally {
       setRecording(false);
     }
@@ -194,7 +220,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage }: 
       <div className="flex gap-2">
         <button
           className="flex-1 rounded border border-amber-300 bg-white px-4 py-3 font-semibold text-pink-500"
-          onClick={() => void downloadStoryImage(still)}
+          onClick={() => void downloadImage()}
         >
           {entry.picture ? t('gallery.download') : t('gallery.downloadStoryOnly')}
         </button>

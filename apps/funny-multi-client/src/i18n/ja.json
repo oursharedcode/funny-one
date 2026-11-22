@@ -25,7 +25,11 @@
     "uiLanguage": "タップして表示言語を変更",
     "unsupportedLanguage": "この部屋はこのバージョンのアプリではまだ再生できない言語です。ページを更新するか、新しい部屋を作成してください。",
     "multiLanguage": "多言語ルーム",
-    "multiLanguageHint": "各プレイヤーは上の旗で選んだ言語で遊びます。"
+    "multiLanguageHint": "各プレイヤーは上の旗で選んだ言語で遊びます。",
+    "packCode": "🔔 あなたのクリスマスパック: {{code}}",
+    "packCodeHint": "このスマホで作成するどのルームでも、{{date}}まで、すべてのクリスマスの物語で遊べます。",
+    "packCodeRemove": "削除",
+    "packEnded": "あなたの2026年クリスマス版は終了しました。遊んでいただき、ありがとうございました！"
   },
   "lobby": {
     "roomCodeLabel": "ルームコード",
@@ -40,7 +44,9 @@
     "capReached": "画像生成は今後約{{hours}}時間使えません。プレイは続けられますが、絵の代わりに物語のテキストが表示されます。",
     "capReachedHost": "準備ができたらゲーム開始を押すか、1日の画像枠が回復するまで待ってください。",
     "christmasOn": "🔔 このゲームにはクリスマスの物語が2つあります",
-    "christmasSwitch": "2026年クリスマスの物語で遊ぶ"
+    "christmasSwitch": "2026年クリスマスの物語で遊ぶ",
+    "christmasPaid": "🔔 このゲームの物語はすべてクリスマスの物語です",
+    "usePack": "🔔 自分のクリスマスパックをここで使う"
   },
   "round": {
     "progress": "ラウンド {{current}} / {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "準備完了 ✓",
     "waitingForHost": "ホストを待っています…",
     "needPlayers": "新しいゲームには最低3人のプレイヤーが必要です",
-    "waitingForReady": "全員の準備を待っています"
+    "waitingForReady": "全員の準備を待っています",
+    "nextPaid": "🔔 次のゲームでは、すべての物語がクリスマスの物語です"
   },
   "endScreen": {
     "supportServer": "このサーバーを応援する"
@@ -125,6 +132,7 @@
     "source": "GitHub のソース",
     "family": "おもしろファミリー",
     "edition": "2026年クリスマス版",
+    "paid": "みなさんの2026年クリスマスの物語: どのゲームでも。楽しいパーティーを :))",
     "privacy": "プライバシーポリシー",
     "contentNotice": "プレイヤーの回答とAI画像は、上流プロジェクトではなく、このサーバーの運営者の責任です。"
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "無効なニックネーム",
     "INVALID_OPTION": "この答えはもう選べません — 別のものを選んでください",
     "RATE_LIMITED": "少しゆっくりお願いします",
-    "SERVER_BUSY": "サーバーが混み合っています"
+    "SERVER_BUSY": "サーバーが混み合っています",
+    "CODE_INVALID": "このクリスマスコードは正しくありません。確認して、もう一度試してください。",
+    "CODE_BLOCKED": "このクリスマスコードはもう使えません。",
+    "CODE_ENDED": "2026年クリスマス版は終了しました。",
+    "CODE_PENDING": "このクリスマスコードは支払い待ちです。",
+    "PACK_UNAVAILABLE": "このルームではクリスマスの物語を利用できません。"
   }
 }

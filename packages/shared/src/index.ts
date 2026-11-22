@@ -67,14 +67,28 @@ export {
   PACKS,
   PACK_TEXTS,
   cutoffOf,
+  drawsEnding,
   freeGameContents,
   isGolden,
   isPackFree,
+  isPackPaid,
   optionTexts,
   optionsFor,
   packForRoom,
+  packHasLanguage,
+  paidGameContents,
 } from './packs/index.js';
 export type { PackTexts } from './packs/index.js';
+// Step 122 — the paid code's shape and its forgiving reading, shared so the
+// client and the server read a typed or linked code the same way.
+export {
+  CODE_ALPHABET,
+  CODE_BODY_LENGTH,
+  CODE_PREFIXES,
+  formatCode,
+  parseCode,
+} from './packs/code.js';
+export type { PackCode } from './packs/code.js';
 
 // T-FO-2.1 — prose rendering (FO-ARC-2), promoted from
 // `apps/funny-multi-server/src/i18n/` and `.../grammar.ts` so both products
@@ -112,6 +126,7 @@ export type {
   GameReadyPayload,
   GameRestartReadyPayload,
   LobbyUpdatePayload,
+  PaidGameCounts,
   PictureRef,
   Player,
   PlayerLostPayload,
@@ -128,6 +143,9 @@ export type {
   RoomJoinAck,
   RoomJoinPayload,
   RoomPhase,
+  RoomUnlockAck,
+  RoomUnlockPayload,
+  StoryExportedPayload,
   RoundStartPayload,
   RoundSubmitPayload,
   RoundWaitingPayload,

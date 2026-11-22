@@ -25,7 +25,11 @@
     "uiLanguage": "Ketuk untuk mengganti bahasa antarmuka",
     "unsupportedLanguage": "Ruangan ini menggunakan bahasa yang belum bisa dimainkan oleh versi aplikasi ini. Coba perbarui halaman, atau buat ruangan baru.",
     "multiLanguage": "Ruangan multibahasa",
-    "multiLanguageHint": "Setiap pemain bermain dalam bahasa yang dipilih dengan bendera di atas."
+    "multiLanguageHint": "Setiap pemain bermain dalam bahasa yang dipilih dengan bendera di atas.",
+    "packCode": "🔔 Paket Natalmu: {{code}}",
+    "packCodeHint": "Di setiap ruangan yang kamu buat di ponsel ini, semua cerita Natal bisa dimainkan sampai {{date}}.",
+    "packCodeRemove": "Hapus",
+    "packEnded": "Edisi Natal 2026 milikmu sudah berakhir. Terima kasih sudah bermain!"
   },
   "lobby": {
     "roomCodeLabel": "Kode ruangan",
@@ -40,7 +44,9 @@
     "capReached": "Pembuatan gambar tidak tersedia selama ~{{hours}} jam ke depan. Kalian masih bisa bermain — pemain akan melihat teks cerita tanpa gambar.",
     "capReachedHost": "Tekan Mulai permainan kalau siap, atau tunggu kuota gambar harian kembali.",
     "christmasOn": "🔔 Permainan ini punya dua cerita Natal",
-    "christmasSwitch": "Main dengan cerita Natal 2026"
+    "christmasSwitch": "Main dengan cerita Natal 2026",
+    "christmasPaid": "🔔 Semua cerita dalam permainan ini adalah cerita Natal",
+    "usePack": "🔔 Pakai paket Natalku di sini"
   },
   "round": {
     "progress": "Ronde {{current}} dari {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Siap ✓",
     "waitingForHost": "Menunggu tuan rumah…",
     "needPlayers": "Butuh minimal 3 pemain untuk permainan lagi",
-    "waitingForReady": "Menunggu semua orang siap"
+    "waitingForReady": "Menunggu semua orang siap",
+    "nextPaid": "🔔 Permainan berikutnya: semua cerita adalah cerita Natal"
   },
   "endScreen": {
     "supportServer": "Dukung server ini"
@@ -125,6 +132,7 @@
     "source": "Sumber di GitHub",
     "family": "Keluarga Lucu",
     "edition": "Edisi Natal 2026",
+    "paid": "Cerita Natal 2026 kalian: di tiap permainan, selamat berpesta :))",
     "privacy": "Kebijakan privasi",
     "contentNotice": "Jawaban pemain dan gambar AI adalah tanggung jawab operator server ini, bukan proyek hulu."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Nama panggilan tidak valid",
     "INVALID_OPTION": "Jawaban ini sudah tidak tersedia — pilih yang lain",
     "RATE_LIMITED": "Pelan-pelan sebentar",
-    "SERVER_BUSY": "Server sibuk"
+    "SERVER_BUSY": "Server sibuk",
+    "CODE_INVALID": "Kode Natal itu salah. Periksa lalu coba lagi.",
+    "CODE_BLOCKED": "Kode Natal ini sudah tidak berlaku.",
+    "CODE_ENDED": "Edisi Natal 2026 sudah berakhir.",
+    "CODE_PENDING": "Kode Natal ini masih menunggu pembayarannya.",
+    "PACK_UNAVAILABLE": "Cerita Natal tidak tersedia di ruangan ini."
   }
 }

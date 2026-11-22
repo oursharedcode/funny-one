@@ -168,6 +168,12 @@ describe('catalogue coverage', () => {
       INVALID_OPTION: true,
       RATE_LIMITED: true,
       SERVER_BUSY: true,
+      // Step 122: the paid code's refusals.
+      CODE_INVALID: true,
+      CODE_BLOCKED: true,
+      CODE_ENDED: true,
+      CODE_PENDING: true,
+      PACK_UNAVAILABLE: true,
     };
     for (const [code, catalog] of Object.entries(CATALOGS)) {
       const errors = catalog.errors as Record<string, string>;

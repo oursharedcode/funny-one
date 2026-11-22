@@ -25,7 +25,11 @@
     "uiLanguage": "Gusa ili kubadilisha lugha ya programu",
     "unsupportedLanguage": "Chumba hiki kinatumia lugha ambayo toleo hili la programu bado haliwezi kuicheza. Jaribu kupakia upya ukurasa, au unda chumba kipya.",
     "multiLanguage": "Chumba cha lugha nyingi",
-    "multiLanguageHint": "Kila mchezaji anacheza kwa lugha aliyoichagua kwa bendera zilizo juu."
+    "multiLanguageHint": "Kila mchezaji anacheza kwa lugha aliyoichagua kwa bendera zilizo juu.",
+    "packCode": "🔔 Kifurushi chako cha Krismasi: {{code}}",
+    "packCodeHint": "Kila chumba utakachounda kwenye simu hii kitakuwa na hadithi zote za Krismasi, hadi {{date}}.",
+    "packCodeRemove": "Ondoa",
+    "packEnded": "Toleo lako la Krismasi 2026 limekwisha. Asante kwa kucheza!"
   },
   "lobby": {
     "roomCodeLabel": "Msimbo wa chumba",
@@ -40,7 +44,9 @@
     "capReached": "Utengenezaji wa picha haupatikani kwa takriban saa {{hours}} zijazo. Bado mnaweza kucheza — wachezaji wataona maandishi ya hadithi badala ya katuni.",
     "capReachedHost": "Gusa Anzisha mchezo ukiwa tayari, au subiri hadi kikomo cha katuni cha kila siku kianze upya.",
     "christmasOn": "🔔 Mchezo huu una hadithi mbili za Krismasi",
-    "christmasSwitch": "Cheza na hadithi za Krismasi 2026"
+    "christmasSwitch": "Cheza na hadithi za Krismasi 2026",
+    "christmasPaid": "🔔 Kila hadithi katika mchezo huu ni hadithi ya Krismasi",
+    "usePack": "🔔 Tumia kifurushi changu cha Krismasi hapa"
   },
   "round": {
     "progress": "Raundi {{current}} kati ya {{total}}",
@@ -77,7 +83,8 @@
     "readyActive": "Tayari ✓",
     "waitingForHost": "Tunamsubiri mwenyeji…",
     "needPlayers": "Wanahitajika angalau wachezaji 3 kwa mchezo mwingine",
-    "waitingForReady": "Tunasubiri kila mtu awe tayari"
+    "waitingForReady": "Tunasubiri kila mtu awe tayari",
+    "nextPaid": "🔔 Mchezo ujao: kila hadithi ni hadithi ya Krismasi"
   },
   "endScreen": {
     "supportServer": "Changia seva hii"
@@ -125,6 +132,7 @@
     "source": "Msimbo chanzo kwenye GitHub",
     "family": "Familia ya Kicheko",
     "edition": "Toleo la Krismasi 2026",
+    "paid": "Hadithi zenu za Krismasi 2026: kila mchezo, furahieni sherehe :))",
     "privacy": "Sera ya faragha",
     "contentNotice": "Majibu ya wachezaji na picha za akili bandia ni jukumu la mwendeshaji wa seva hii, si la mradi wa asili."
   },
@@ -137,6 +145,11 @@
     "INVALID_NICKNAME": "Jina la utani si sahihi",
     "INVALID_OPTION": "Jibu hilo halipo tena — chagua jingine",
     "RATE_LIMITED": "Punguza kasi kidogo",
-    "SERVER_BUSY": "Seva ina shughuli nyingi"
+    "SERVER_BUSY": "Seva ina shughuli nyingi",
+    "CODE_INVALID": "Msimbo huu wa Krismasi si sahihi. Uangalie, kisha ujaribu tena.",
+    "CODE_BLOCKED": "Msimbo huu wa Krismasi haufanyi kazi tena.",
+    "CODE_ENDED": "Toleo la Krismasi 2026 limekwisha.",
+    "CODE_PENDING": "Msimbo huu wa Krismasi unasubiri malipo yake.",
+    "PACK_UNAVAILABLE": "Hadithi za Krismasi hazipatikani katika chumba hiki."
   }
 }

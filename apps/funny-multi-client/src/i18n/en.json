@@ -24,7 +24,11 @@
     "uiLanguage": "Tap to change the interface language",
     "unsupportedLanguage": "This room is in a language this app version cannot play yet. Try updating the page, or create a new room.",
     "multiLanguage": "Multi-language room",
-    "multiLanguageHint": "Each player plays in the language picked with the flags above."
+    "multiLanguageHint": "Each player plays in the language picked with the flags above.",
+    "packCode": "🔔 Your Christmas pack: {{code}}",
+    "packCodeHint": "Every room you create on this phone plays all the Christmas stories, until {{date}}.",
+    "packCodeRemove": "Remove",
+    "packEnded": "Your Christmas 2026 edition has ended. Thank you for playing!"
   },
   "lobby": {
     "roomCodeLabel": "Room code",
@@ -39,7 +43,9 @@
     "capReached": "Picture generation is unavailable for the next ~{{hours}} hours. You can still play — players will see story text in place of cartoons.",
     "capReachedHost": "Tap Start Game when ready, or wait until the daily cartoon allowance resets.",
     "christmasOn": "🔔 This game has two Christmas stories",
-    "christmasSwitch": "Play with the Christmas 2026 stories"
+    "christmasSwitch": "Play with the Christmas 2026 stories",
+    "christmasPaid": "🔔 Every story in this game is a Christmas story",
+    "usePack": "🔔 Use my Christmas pack here"
   },
   "round": {
     "progress": "Round {{current}} of {{total}}",
@@ -76,7 +82,8 @@
     "readyActive": "Ready ✓",
     "waitingForHost": "Waiting for host…",
     "needPlayers": "Need at least 3 players for another game",
-    "waitingForReady": "Waiting for everyone to be ready"
+    "waitingForReady": "Waiting for everyone to be ready",
+    "nextPaid": "🔔 Next game: every story is a Christmas story"
   },
   "endScreen": {
     "supportServer": "Support this server"
@@ -124,6 +131,7 @@
     "source": "Source on GitHub",
     "family": "Funny Family",
     "edition": "Christmas 2026 edition",
+    "paid": "Your Christmas 2026 stories: every game, enjoy your party :))",
     "privacy": "Privacy policy",
     "contentNotice": "Player picks and AI pictures are the responsibility of the operator of this server, not of the upstream project."
   },
@@ -136,6 +144,11 @@
     "INVALID_NICKNAME": "Invalid nickname",
     "INVALID_OPTION": "That answer is no longer available — pick another",
     "RATE_LIMITED": "Slow down a moment",
-    "SERVER_BUSY": "Server is busy"
+    "SERVER_BUSY": "Server is busy",
+    "CODE_INVALID": "That Christmas code isn't right. Check it and try again.",
+    "CODE_BLOCKED": "This Christmas code no longer works.",
+    "CODE_ENDED": "The Christmas 2026 edition has ended.",
+    "CODE_PENDING": "This Christmas code is waiting for its payment.",
+    "PACK_UNAVAILABLE": "Christmas stories aren't available in this room."
   }
 }

@@ -9,6 +9,8 @@ import {
   RATE_WINDOW_MS,
   ROOM_CREATE_PER_MINUTE,
   ROOM_JOIN_PER_MINUTE,
+  WRONG_CODES_PER_HOUR,
+  WRONG_CODE_WINDOW_MS,
   clientIp,
   createRateLimiter,
   type RateLimiter,
@@ -38,6 +40,11 @@ describe('spec §17 limits', () => {
     expect(ROOM_CREATE_PER_MINUTE).toBe(5);
     expect(ROOM_JOIN_PER_MINUTE).toBe(30);
     expect(RATE_WINDOW_MS).toBe(60_000);
+  });
+
+  it('pins Step 122’s wrong paid codes: 10 an hour', () => {
+    expect(WRONG_CODES_PER_HOUR).toBe(10);
+    expect(WRONG_CODE_WINDOW_MS).toBe(3_600_000);
   });
 });
 
@@ -95,6 +102,33 @@ describe('token bucket', () => {
     for (let i = 0; i < 5; i++) if (limiter.take('ip')) allowed++;
     expect(allowed).toBeLessThan(10);
     expect(allowed).toBe(5);
+  });
+});
+
+describe('peek (Step 122)', () => {
+  it('says whether take would pass, and spends nothing', () => {
+    const clock = makeClock();
+    const limiter = make(2, RATE_WINDOW_MS, clock.now);
+    expect(limiter.peek('ip')).toBe(true);
+    expect(limiter.size()).toBe(0);
+    for (let i = 0; i < 5; i++) expect(limiter.peek('ip')).toBe(true);
+    limiter.take('ip');
+    expect(limiter.peek('ip')).toBe(true);
+    limiter.take('ip');
+    expect(limiter.peek('ip')).toBe(false);
+    expect(limiter.take('ip')).toBe(false);
+  });
+
+  it('sees the refill', () => {
+    const clock = makeClock();
+    const limiter = make(2, RATE_WINDOW_MS, clock.now);
+    limiter.take('ip');
+    limiter.take('ip');
+    expect(limiter.peek('ip')).toBe(false);
+    clock.advance(RATE_WINDOW_MS / 2);
+    expect(limiter.peek('ip')).toBe(true);
+    expect(limiter.take('ip')).toBe(true);
+    expect(limiter.peek('ip')).toBe(false);
   });
 });
 

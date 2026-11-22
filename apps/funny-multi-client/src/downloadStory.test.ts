@@ -310,21 +310,140 @@ describe('buildStoryImageFile', () => {
     });
   });
 
+  // Step 122 (B-29): a paid story's still carries its ending, as a golden
+  // story's does, and its footer the buyer's thank-you — wrapped to the column
+  // when it is longer — leading to the edition's page, on the website.
+  describe('a paid story (Step 122)', () => {
+    const LABEL_FONT = 'bold 13px system-ui, sans-serif';
+    const THANKS = 'Your Christmas 2026 stories: every game, enjoy your party :))';
+    const story = { nickname: 'Mika', prose: 'x', pictureUrl: null, language: 'en' } as const;
+
+    interface Drawn {
+      text: string;
+      font: string;
+      y: number;
+    }
+
+    /** Every text the still draws from here on, with its font and its top. */
+    function recordTexts(): Drawn[] {
+      const drawn: Drawn[] = [];
+      ctx.fillText = (text: string, _x: number, y: number) => {
+        drawn.push({ text, font: String(ctx.font), y });
+      };
+      return drawn;
+    }
+
+    /** The height of each still built so far: its cream background's. */
+    function stillHeights(): number[] {
+      return ctx.calls
+        .filter((c) => c.method === 'fillRect' && c.args[0] === 0 && c.args[1] === 0)
+        .map((c) => Number(c.args[3]));
+    }
+
+    beforeEach(() => {
+      toCanvas.mockClear();
+    });
+
+    afterEach(async () => {
+      sessionStorage.clear();
+      setUrl('');
+      await i18n.changeLanguage('en');
+    });
+
+    it("thanks its buyer on the website and leads to the edition's page", async () => {
+      const drawn = recordTexts();
+      await buildStoryImageFile({ ...story, paid: true });
+      expect(toCanvas).toHaveBeenCalledWith(expect.anything(), XMAS_URL, expect.anything());
+      const label = drawn.filter((d) => d.font === LABEL_FONT).map((d) => d.text);
+      expect(label.join(' ')).toBe(THANKS);
+      expect(drawn.map((d) => d.text)).toContain(XMAS_URL_TEXT);
+      expect(drawn.map((d) => d.text)).not.toContain('Christmas 2026 edition');
+    });
+
+    it('wraps the thank-you to the column and drops the address under its last line', async () => {
+      const drawn = recordTexts();
+      await buildStoryImageFile({ ...story, paid: true });
+      const label = drawn.filter((d) => d.font === LABEL_FONT);
+      expect(label.length).toBeGreaterThan(1);
+      label.slice(1).forEach((line, i) => expect(line.y - label[i]!.y).toBe(18));
+      // As far under the last line as under a one-line label.
+      const url = drawn.find((d) => d.text === XMAS_URL_TEXT);
+      expect(url!.y - label[label.length - 1]!.y).toBe(20);
+    });
+
+    it('grows the still by the lines the thank-you wraps onto', async () => {
+      await buildStoryImageFile({ ...story, golden: true });
+      const drawn = recordTexts();
+      await buildStoryImageFile({ ...story, paid: true });
+      const lines = drawn.filter((d) => d.font === LABEL_FONT).length;
+      const [golden, paid] = stillHeights();
+      expect(paid! - golden!).toBe((lines - 1) * 18);
+    });
+
+    it("reads as a golden story's inside the Android app: the edition, the landing page", async () => {
+      setUrl('?shell=android');
+      const drawn = recordTexts();
+      await buildStoryImageFile({ ...story, paid: true });
+      expect(toCanvas).toHaveBeenCalledWith(expect.anything(), LANDING_URL, expect.anything());
+      const texts = drawn.map((d) => d.text);
+      expect(texts).toContain('Christmas 2026 edition');
+      expect(texts).toContain(LANDING_URL_TEXT);
+      expect(texts.some((t) => t.includes('/x26') || t.startsWith('Your Christmas'))).toBe(false);
+    });
+
+    it('thanks a Russian buyer in Russian', async () => {
+      const drawn = recordTexts();
+      await buildStoryImageFile({ ...story, nickname: 'Мика', language: 'ru', paid: true });
+      const label = drawn.filter((d) => d.font === LABEL_FONT).map((d) => d.text);
+      expect(label.join(' ')).toBe(
+        'Ваши истории «Новый год 2027»: каждая игра, весёлого праздника :))',
+      );
+    });
+
+    it('draws its ending picture under the scene, the whole width', async () => {
+      const scene = { close: () => {} } as unknown as ImageBitmap;
+      const ending = { close: () => {} } as unknown as ImageBitmap;
+      const blobs = { scene: new Blob(['scene']), ending: new Blob(['ending']) };
+      fetchMock.mockImplementation((url: string) =>
+        Promise.resolve({
+          blob: () => Promise.resolve(url.endsWith('/end.png') ? blobs.ending : blobs.scene),
+        }),
+      );
+      createImageBitmap.mockImplementation((blob: Blob) =>
+        Promise.resolve(blob === blobs.scene ? scene : ending),
+      );
+      await buildStoryImageFile({
+        ...story,
+        pictureUrl: 'https://img.example/i/scene.png',
+        paid: true,
+        endingUrl: 'https://img.example/i/end.png',
+      });
+      const drawn = ctx.calls.filter((c) => c.method === 'drawImage');
+      expect(drawn[0]?.args).toEqual([scene, 0, 0, 512, 512]);
+      expect(drawn[1]?.args).toEqual([ending, 0, 512, 512, 512]);
+    });
+  });
+
   // Step 117: a download leaves the room, so it never carries the room's code
   // or a link holding one — nor, in the free half, a price (owner decision 5A).
+  // Step 122: nor the paid code this phone keeps, and a paid story no price.
   describe('no code and no price on a still', () => {
     afterEach(() => {
       sessionStorage.clear();
+      localStorage.clear();
       setUrl('');
     });
 
     it.each([
-      ['a base story on the website', '?room=WXYZ', false],
-      ['a golden story on the website', '?room=WXYZ', true],
-      ['a base story in the Android app', '?room=WXYZ&shell=android', false],
-      ['a golden story in the Android app', '?room=WXYZ&shell=android', true],
-    ])('%s', async (_name, search, golden) => {
+      ['a base story on the website', '?room=WXYZ', false, false],
+      ['a golden story on the website', '?room=WXYZ', true, false],
+      ['a paid story on the website', '?room=WXYZ', false, true],
+      ['a base story in the Android app', '?room=WXYZ&shell=android', false, false],
+      ['a golden story in the Android app', '?room=WXYZ&shell=android', true, false],
+      ['a paid story in the Android app', '?room=WXYZ&shell=android', false, true],
+    ])('%s', async (_name, search, golden, paid) => {
       setUrl(search);
+      localStorage.setItem('funny37.packCode', 'XMAS26-K7QM-3FPA');
       toCanvas.mockClear();
       await buildStoryImageFile({
         nickname: 'Mika',
@@ -332,13 +451,14 @@ describe('buildStoryImageFile', () => {
         pictureUrl: null,
         language: 'en',
         golden,
+        paid,
       });
       const encoded = toCanvas.mock.calls.map((c) => String(c[1]));
       const printed = ctx.calls
         .filter((c) => c.method === 'fillText')
         .map((c) => String(c.args[0]));
       for (const text of [...encoded, ...printed]) {
-        expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock/i);
+        expect(text).not.toMatch(/WXYZ|room=|[?&]code=|unlock|XMAS26|K7QM/i);
         expect(text).not.toMatch(/[$€£₽¥₹]|A\$|AUD|USD/);
       }
       expect(encoded).toHaveLength(1);

@@ -56,7 +56,7 @@ describe('the Christmas switch (owner decision 3A)', () => {
   it('shows every player an en room’s pack, on', async () => {
     const { lobbies } = await lobbyOf('en');
     for (const seen of lobbies) {
-      expect(seen.at(-1)?.pack).toEqual({ id: 'chr26', on: true });
+      expect(seen.at(-1)?.pack).toEqual({ id: 'chr26', on: true, paid: false });
     }
   });
 
@@ -65,7 +65,7 @@ describe('the Christmas switch (owner decision 3A)', () => {
     const updates = sockets.map((s) => once<LobbyUpdatePayload>(s, 'lobby:update'));
     sockets[0]!.emit('room:setPack', { on: false });
     for (const update of await Promise.all(updates)) {
-      expect(update.pack).toEqual({ id: 'chr26', on: false });
+      expect(update.pack).toEqual({ id: 'chr26', on: false, paid: false });
     }
 
     const start = once<RoundStartPayload>(sockets[1]!, 'round:start');
@@ -79,7 +79,7 @@ describe('the Christmas switch (owner decision 3A)', () => {
     const error = once<{ code: string }>(sockets[1]!, 'error');
     sockets[1]!.emit('room:setPack', { on: false });
     expect((await error).code).toBe('NOT_HOST');
-    expect(getRoom(roomCode)!.pack).toEqual({ id: 'chr26', on: true });
+    expect(getRoom(roomCode)!.pack).toEqual({ id: 'chr26', on: true, paid: false });
   });
 
   it('refuses a change once the game has started', async () => {
@@ -90,7 +90,7 @@ describe('the Christmas switch (owner decision 3A)', () => {
     const error = once<{ code: string }>(sockets[0]!, 'error');
     sockets[0]!.emit('room:setPack', { on: false });
     expect((await error).code).toBe('ROOM_LOCKED');
-    expect(getRoom(roomCode)!.pack).toEqual({ id: 'chr26', on: true });
+    expect(getRoom(roomCode)!.pack).toEqual({ id: 'chr26', on: true, paid: false });
   });
 
   it('ignores a payload that is not a boolean, and a room with no pack', async () => {
@@ -101,7 +101,7 @@ describe('the Christmas switch (owner decision 3A)', () => {
     // A round trip after both, so the server has handled them.
     await roundTrip(en.sockets[0]!);
     expect(enLobby).toEqual([]);
-    expect(getRoom(en.roomCode)!.pack).toEqual({ id: 'chr26', on: true });
+    expect(getRoom(en.roomCode)!.pack).toEqual({ id: 'chr26', on: true, paid: false });
     await harness?.close();
     harness = null;
 

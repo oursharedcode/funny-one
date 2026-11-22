@@ -19,10 +19,16 @@
 //     verbatim at T-3.2, already used on HomeScreen) is that exact markup as
 //     a component; its own doc comment already names "the Home and End
 //     screens" as its two call sites.
+//
+// Step 122 (B-29): until the game is over, a paid room says its next game is
+// all Christmas stories, and a player whose phone keeps a paid code can open
+// the room for the next game (PackUnlock). The gallery reports each paid
+// story saved or shared (`story:exported`) for the game's receipt record.
 
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import EndMascots from '../components/art/EndMascots';
+import PackUnlock from '../components/PackUnlock';
 import RoomGallery from '../components/RoomGallery';
 import SourceFooter from '../components/SourceFooter';
 import { hasAnyRail } from '../support';
@@ -93,6 +99,7 @@ export default function EndScreen({
           entries={gallery.entries}
           roomLanguage={lobby.language}
           defaultLanguage={lobby.myLanguage}
+          onExported={(kind) => socket.emit('story:exported', { kind })}
         />
       ) : isHost && !gameOver ? (
         <button
@@ -102,6 +109,13 @@ export default function EndScreen({
           {t('gallery.share')}
         </button>
       ) : null}
+
+      {!gameOver && lobby.pack?.paid && lobby.pack.on && (
+        <p className="text-center font-semibold text-pink-600" role="status">
+          {t('end.nextPaid')}
+        </p>
+      )}
+      {!gameOver && <PackUnlock lobby={lobby} />}
 
       {gameOver ? null : isHost ? (
         <>

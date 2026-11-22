@@ -14,7 +14,7 @@
 //   - **A story's content**, decided per story rather than per room: a free
 //     room's ordinary stories take only the pack's prose slots (the *slice*),
 //     its two golden stories (owner decision 1C, 2026-11-21) and every story
-//     of a paid room take the whole pack.
+//     of a paid game (Step 122) take the whole pack.
 //   - **An ending drawn as an aftermath** (slot 6's `aftermathEn`): the place
 //     and what is left there, no characters. The model draws every picture
 //     from its prompt alone, so a second picture of the same characters would
@@ -66,14 +66,17 @@ export interface PackConfig {
  *           ones. Its picture is therefore one the library already holds, and
  *           its ending is a text card;
  *   full  — the pack's options in every slot: a free game's two golden
- *           stories, and every story of a paid room. Its ending is drawn too,
- *           as an aftermath.
+ *           stories. Its ending is drawn too, as an aftermath;
+ *   paid  — the same options and the same drawn ending, in every story of a
+ *           game a code has paid for (Step 122). Not golden: a golden story is
+ *           the free game's sample, and its downloads carry the edition's
+ *           address; a paid story's carry the buyer's thank-you line.
  *
- * Until the paid half there is no paid room, so `full` is exactly a golden
- * story and a client reads "golden" off the content alone (`isGolden`).
+ * So a client reads "golden" off the content alone (`isGolden`), and "drawn
+ * ending" off `drawsEnding`.
  */
 export type StoryContent =
-  { readonly kind: 'base' } | { readonly kind: 'slice' | 'full'; readonly pack: PackId };
+  { readonly kind: 'base' } | { readonly kind: 'slice' | 'full' | 'paid'; readonly pack: PackId };
 
 /**
  * Options per slot in every pack slot. B-29 sized the picture batch to it:

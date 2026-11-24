@@ -107,6 +107,28 @@
     "copy": "Nakili",
     "copied": "Imenakiliwa!"
   },
+  "pay": {
+    "card": "Umeona hadithi mbili za Krismasi. Fungua zote: {{price}}, kwenye kila mchezo, hadi {{date}}.",
+    "cardButton": "Fungua",
+    "pitch": "Hadithi zote za Krismasi, kwenye kila mchezo, hadi {{date}}. Malipo mara moja, bila usajili.",
+    "oncePayId": "Kwa PayID, kutoka benki yoyote ya Australia.",
+    "onceSponsors": "Kwa kadi kwenye GitHub Sponsors. Benki yako itabadilisha fedha.",
+    "guideTitle": "Hatua 3, takriban dakika 3:",
+    "guide1": "Ingia kwenye GitHub, au fungua akaunti ya bure.",
+    "guide2": "Chagua “{{tier}}”: {{price}}, mara moja.",
+    "guide3": "Lipa kisha rudi hapa: msimbo wako utatokea.",
+    "switchToSponsors": "Uko nje ya Australia?",
+    "switchToPayId": "Uko Australia?",
+    "otherLanguages": "Hadithi za Krismasi hazijaandikwa kwa lugha yako. Kifurushi hiki kinachezwa kwenye vyumba vya lugha hizi:",
+    "refunds": "Hakuna marejesho ukibadili mawazo. Kifurushi kisichofanya kazi kitarekebishwa au utarudishiwa pesa.",
+    "payPayId": "Lipa {{price}} kwa PayID",
+    "paySponsors": "Lipa {{price}} kwenye GitHub",
+    "failed": "Malipo hayawezi kuanza sasa hivi. Tafadhali jaribu tena baadaye kidogo.",
+    "playFree": "Cheza bure",
+    "haveTitle": "Tayari una kifurushi hiki.",
+    "ended": "Toleo la Krismasi 2026 haliuzwi tena.",
+    "closed": "Kifurushi hakiwezi kununuliwa kwa sasa. Tafadhali rudi baadaye."
+  },
   "gallery": {
     "share": "Shiriki picha za chumba",
     "shareButton": "Shiriki",

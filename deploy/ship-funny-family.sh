@@ -20,8 +20,9 @@
 #   3. copies docker-compose.yml and deploy/caddy/Caddyfile, brings the caddy
 #      service up and reloads the Caddyfile, as deploy/ship-funny-one.sh does;
 #   4. checks through Caddy the English and Russian pages, /stats/, a missing
-#      path (404 with the page that says so), /x26 and the Christmas
-#      buttons (Step 119), the trailer, the visit-count
+#      path (404 with the page that says so), /x26 (Step 119; its forward to
+#      Funny Multi's pay page, Step 123) and the Christmas buttons, the
+#      trailer, the visit-count
 #      summary (which crosses to the game's server), the bare-name redirect,
 #      and that Funny Multi's /health still answers.
 set -euo pipefail
@@ -116,9 +117,11 @@ check "$ORIGIN/stats/" 200 || ok=0
 check "$ORIGIN/no-such-page" 404 || ok=0
 has "$ORIGIN/no-such-page" 'noindex' || ok=0
 # Step 119: a golden story's QR code leads to /x26, which Caddy sends on to
-# /x26/ and that to the visitor's language; the pages carry the buttons.
+# /x26/; the pages carry the buttons. Step 123: /x26/ sends the visitor on to
+# the pay page in Funny Multi, so ship the game (deploy/ship.sh) before this
+# site: an older game opens its home screen for the link, with nothing to buy.
 check "$ORIGIN/x26" "308 $ORIGIN/x26/" || ok=0
-has "$ORIGIN/x26/" 'from=xmas' || ok=0
+has "$ORIGIN/x26/" 'pay=x26' || ok=0
 has "$ORIGIN/ru/" 'data-track="xm-top"' || ok=0
 got="$(curl -s -o "$DEVNULL" -w '%{http_code} %{content_type}' --max-time 10 "$ORIGIN/media/clip.mp4" || true)"
 echo "    $ORIGIN/media/clip.mp4 -> $got"

@@ -6,7 +6,8 @@
 // Step 79 their countries too, on a map of the page's own (worldMap.ts).
 // Step 119: the Christmas 2026 edition's two buttons on the landing page go
 // to Funny Multi too, so they count among its clicks, and /x26 among the
-// referrers.
+// referrers. Step 123: the edition's paying half — its pay card, its pay page
+// by the door it was opened from, and the pay button by the way to pay.
 // Built with DOM calls and text nodes only: nothing in the answer is ever
 // parsed as HTML.
 
@@ -513,30 +514,56 @@ function languageTable(rows: readonly Row[], names: Record<string, string>): HTM
 // Step 117 (B-29, D2 A): the Christmas 2026 edition's funnel, per language.
 // Website only, like every count but a visit: the Android app sends neither.
 // Step 119: the landing page's part of it first, visits sent by /x26 and
-// clicks on the edition's two buttons.
+// clicks on the edition's two buttons. Step 123: a second table for the
+// paying half — the pay card, the pay page by its door, the pay button by
+// its rail.
+type Column = (match: Match) => number;
+
+/**
+ * A table's rows, one per language that has any of the columns' counts, under
+ * a row of totals; the languages in the order of `order`, the columns to
+ * compare by, first to last.
+ */
+function byLanguage(
+  rows: readonly Row[],
+  names: Record<string, string>,
+  columns: readonly Column[],
+  order: readonly number[],
+): Child[][] {
+  const sumsFor = (match: Match): number[] => columns.map((column) => column(match));
+  const codes = [...new Set([...Object.keys(names), ...rows.map((row) => row.l)])].filter(Boolean);
+  const body = codes
+    .map((code) => ({ code, sums: sumsFor({ l: code }) }))
+    .filter(({ sums }) => sums.some((value) => value > 0))
+    .sort((a, b) => {
+      for (const column of order) {
+        const difference = (b.sums[column] ?? 0) - (a.sums[column] ?? 0);
+        if (difference) return difference;
+      }
+      return 0;
+    })
+    .map(({ code, sums }): Child[] => [
+      Object.hasOwn(names, code) ? (names[code] ?? code) : code,
+      ...sums.map(num),
+    ]);
+  return [['All', ...sumsFor({}).map(num)], ...body];
+}
+
 function christmasSection(rows: readonly Row[], names: Record<string, string>): HTMLElement {
-  const columns: readonly ((match: Match) => number)[] = [
+  const playing: readonly Column[] = [
     (match) => total(rows, { ...match, e: 'hub_view', r: 'xmas' }),
     (match) => clicksOn(rows, XMAS_BUTTONS, match),
     (match) => total(rows, { ...match, e: 'xm_game', t: 'on' }),
     (match) => total(rows, { ...match, e: 'xm_game', t: 'off' }),
     (match) => total(rows, { ...match, e: 'xm_gold' }),
   ];
-  const sumsFor = (match: Match): number[] => columns.map((column) => column(match));
-  const codes = [...new Set([...Object.keys(names), ...rows.map((row) => row.l)])].filter(Boolean);
-  const body = codes
-    .map((code) => ({ code, sums: sumsFor({ l: code }) }))
-    .filter(({ sums }) => sums.some((value) => value > 0))
-    .sort(
-      (a, b) =>
-        (b.sums[2] ?? 0) - (a.sums[2] ?? 0) ||
-        (b.sums[1] ?? 0) - (a.sums[1] ?? 0) ||
-        (b.sums[4] ?? 0) - (a.sums[4] ?? 0),
-    )
-    .map(({ code, sums }): Child[] => [
-      Object.hasOwn(names, code) ? (names[code] ?? code) : code,
-      ...sums.map(num),
-    ]);
+  const paying: readonly Column[] = [
+    (match) => total(rows, { ...match, e: 'xm_card' }),
+    (match) => total(rows, { ...match, e: 'xm_page', t: 'card' }),
+    (match) => total(rows, { ...match, e: 'xm_page', t: 'link' }),
+    (match) => total(rows, { ...match, e: 'xm_pay', t: 'payid' }),
+    (match) => total(rows, { ...match, e: 'xm_pay', t: 'sponsors' }),
+  ];
   return section(
     'The Christmas 2026 edition',
     table(
@@ -548,13 +575,28 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
         'Games with them switched off',
         'Christmas cartoon seen',
       ],
-      [['All', ...sumsFor({}).map(num)], ...body],
+      byLanguage(rows, names, playing, [2, 1, 4]),
     ),
     note(
       'Website only. Each player’s tab counts a game once, when its first round starts, with the host’s switch as it stood then; and a golden story’s cartoon once, in the reveal or the gallery. The language is the one each player’s screen is in.',
     ),
     note(
-      'The first two columns are the landing page’s: a visit sent there by the /x26 address (the QR code on a golden story’s download), and a click on one of the edition’s two buttons, in the page’s language. The buttons lead to Funny Multi, so their clicks count among its clicks above and below too.',
+      'The first two columns are the landing page’s: a visit sent there by the /x26 address (the QR code on a golden story’s download), and a click on one of the edition’s two buttons, in the page’s language. The buttons lead to Funny Multi, so their clicks count among its clicks above and below too. Once the pay page is live, /x26 leads to it and no longer to the landing page: its visits are then in the table below.',
+    ),
+    h('h3', {}, 'Paying for it'),
+    table(
+      [
+        'Language',
+        'Pay card shown',
+        'Pay page opened from the card',
+        'Pay page opened from /x26',
+        'Pay pressed: PayID',
+        'Pay pressed: GitHub Sponsors',
+      ],
+      byLanguage(rows, names, paying, [0, 2, 1]),
+    ),
+    note(
+      'Website only. Each tab counts the pay card once, shown on the end screen after a free Christmas game; the pay page once, by the door it was first opened from, the card’s button or the /x26 address; and the first press of its pay button, by the way to pay. A press is not a payment: payments are in the receipt log, not here.',
     ),
   );
 }

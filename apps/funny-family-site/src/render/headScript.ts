@@ -21,17 +21,21 @@
 //  4. (Step 119, B-29) On a page with the Christmas 2026 edition's buttons,
 //     the end of its free part: from the cut-off the page is marked
 //     <html data-xmas="over">, which hides them — "ended" instead for a
-//     visitor sent by /x26, who reads that the edition has ended. The page
-//     is built once, so the visitor's clock decides. Before job 2 too.
+//     visitor who arrives marked `?from=xmas`, who reads that the edition
+//     has ended. The page is built once, so the visitor's clock decides.
+//     Before job 2 too.
 //
 // /x26/ has a script of its own, xmasForwardScript(), which makes job 2's
-// choice of language and sends the visitor on to that page.
+// choice of language and sends the visitor on: until Step 123 to that
+// language's page here, marked `?from=xmas`; since then to the edition's pay
+// page in Funny Multi, so nothing arrives with the mark any more.
 //
 // Plain ES5 and every storage access guarded: it must not throw on any
 // browser, in a private window, or with storage blocked.
 
 import { cutoffOf, PACKS } from '@funny/shared';
 import { LANG_KEY, REFERRER_KEY, VARIANT_KEY } from '../keys.ts';
+import { FM_ORIGIN } from '../links.ts';
 import { LANGUAGE_CODES } from './locale.ts';
 
 const VARIANT = `
@@ -50,8 +54,17 @@ if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPo
 /** The moment the edition's buttons go: the free part's last day over everywhere. */
 export const XMAS_CUTOFF = cutoffOf(PACKS.chr26.freeUntil);
 
-/** The query that marks a visit sent by /x26/ (client/track.ts counts it so). */
+/**
+ * The query that marked a visit sent here by /x26/ (client/track.ts counts it
+ * so). /x26/ sent its visitors here until Step 123; see PAY_XMAS.
+ */
 export const FROM_XMAS = 'from=xmas';
+
+/**
+ * The query that opens the Christmas 2026 edition's pay page in Funny Multi
+ * (Step 123): the name its pay.ts knows the pack by.
+ */
+export const PAY_XMAS = 'pay=x26';
 
 const XMAS = `
 if (Date.now() >= ${XMAS_CUTOFF}) d.setAttribute('data-xmas', /[?&]${FROM_XMAS}(&|$)/.test(location.search) ? 'ended' : 'over');`;
@@ -109,11 +122,13 @@ export function headScript(options: { root: boolean; xmas: boolean }): string {
 }
 
 /**
- * /x26/'s script (Step 119): the visitor's language as `/` would choose it —
- * the one picked here before, else the browser's, else English — and on to
- * that page, marked as sent from here. Straight there, not by way of `/`:
- * `/` keeps a visitor arriving from this site's own pages in English. Hidden
+ * /x26/'s script (Step 119; Step 123, owner decision D1 A): the visitor's
+ * language as `/` would choose it — the one picked here before, else the
+ * browser's, else English — and on to the Christmas 2026 edition's pay page,
+ * which is a screen of Funny Multi, in that language. The game counts the
+ * visit as one from this address (its funnel's `xm_page`, by the link). Hidden
  * meanwhile, as `/` is, so its fallback for no script does not flash past.
+ * `target` is one of this site's own language codes, never the visitor's text.
  */
 export function xmasForwardScript(): string {
   return `(function () {${MATCH}
@@ -121,6 +136,6 @@ var d = document.documentElement;
 var target = saved() || browser() || 'en';
 d.style.visibility = 'hidden';
 setTimeout(function () { d.style.visibility = ''; }, 1500);
-location.replace((target === 'en' ? '/' : '/' + target + '/') + '?${FROM_XMAS}' + location.hash);
+location.replace('${FM_ORIGIN}/?${PAY_XMAS}&lang=' + target);
 })();`;
 }

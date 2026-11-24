@@ -76,9 +76,28 @@ describe('privacy.html', () => {
   it('names the Christmas funnel among the website counts (Step 117)', () => {
     const flat = html.replace(/\s+/g, ' ');
     expect(flat).toContain(
-      "a game begun in a room offered the Christmas stories (and whether its host switched them off) and a Christmas story's cartoon seen",
+      "a game begun in a room offered the Christmas stories (and whether its host switched them off), a Christmas story's cartoon seen",
     );
     expect(flat).toContain('истории «Новый год 2027» (и выключил ли их ведущий)');
+  });
+
+  it('names the paying counts too: the offer, the payment page, the pay button (Step 123)', () => {
+    const flat = html.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      "the Christmas pack's offer shown after a game, its payment page opened (from that offer or from a link) and its pay button pressed (for PayID or for GitHub Sponsors)",
+    );
+    expect(flat).toContain(
+      'сколько раз после игры показали предложение новогоднего набора, открыли страницу его оплаты (из этого предложения или по ссылке) и нажали на ней кнопку оплаты (через PayID или через GitHub Sponsors)',
+    );
+    // Every language's section names both ways to pay beside the counts.
+    const sections = html.split(/(?=<section id="privacy-)/).slice(1);
+    expect(sections).toHaveLength(23);
+    for (const section of sections) {
+      const counts = (section.match(/<li>[\s\S]*?<\/li>/g) ?? []).find((item) =>
+        item.includes('www.funny-family.oursharedcode.com'),
+      );
+      expect(counts, section.slice(0, 40)).toMatch(/PayID[\s\S]*GitHub\s+Sponsors/);
+    }
   });
 
   it('loads nothing: no scripts, stylesheets, images, fonts or frames', () => {

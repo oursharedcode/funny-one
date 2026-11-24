@@ -248,6 +248,35 @@ describe('renderStats', () => {
     ]);
   });
 
+  it('counts the edition’s pay card, pay page by its door and pay presses by rail (Step 123)', () => {
+    const root = render({
+      ...SUMMARY,
+      days: {
+        '2026-10-02': {
+          'xm_card||de|direct|||': 6,
+          'xm_card|a|en|hub|||': 2,
+          'xm_page||de|direct|card||': 3,
+          'xm_page||de|direct|link||': 1,
+          'xm_page||ar|direct|link||': 4,
+          'xm_pay||de|direct|sponsors||': 2,
+          'xm_pay|a|en|hub|payid||': 1,
+        },
+      },
+    });
+    expect(tableOf(root, 'The Christmas 2026 edition', 1)).toEqual([
+      ['All', '8', '3', '5', '1', '2'],
+      ['Deutsch (Deutschland)', '6', '3', '1', '0', '2'],
+      ['English (United Kingdom)', '2', '0', '0', '1', '0'],
+      ['ar', '0', '0', '4', '0', '0'],
+    ]);
+    // The paying half adds nothing to the playing half's table.
+    expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([['All', '0', '0', '0', '0', '0']]);
+    // Nothing paid for yet: the row of totals alone, all nought.
+    expect(tableOf(render(), 'The Christmas 2026 edition', 1)).toEqual([
+      ['All', '0', '0', '0', '0', '0'],
+    ]);
+  });
+
   it('draws the days as lines, and gives their numbers in a table, newest first', () => {
     const root = render();
     expect(root.querySelectorAll('.chart svg[role="img"] polyline')).toHaveLength(3);

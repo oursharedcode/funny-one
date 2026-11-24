@@ -23,6 +23,8 @@ import {
   AUTHORED_LANGUAGES,
   NICKNAME_MAX,
   NICKNAME_MIN,
+  PACK_IDS,
+  isPackFree,
   packForRoom,
   packHasLanguage,
   type AuthoredLanguage,
@@ -126,6 +128,17 @@ export function packOffer(language: Language, now = Date.now()): RoomPack | null
   if (process.env.PACK_ROOMS === 'off') return null;
   const id = packForRoom(language, now);
   return id ? { id, on: true, paid: false } : null;
+}
+
+/**
+ * The pack on sale (Step 123), or null: the first whose free part is on.
+ * Sales stop with the free part (FM-PACK-6), so every buyer gets at least the
+ * paid part's extra month, and the pay card only ever follows a free Christmas
+ * game. `PACK_ROOMS=off` stops sales with the rooms.
+ */
+export function packOnSale(now = Date.now()): PackId | null {
+  if (process.env.PACK_ROOMS === 'off') return null;
+  return PACK_IDS.find((id) => isPackFree(id, now)) ?? null;
 }
 
 /**

@@ -107,6 +107,28 @@
     "copy": "Copia",
     "copied": "Copiato!"
   },
+  "pay": {
+    "card": "Hai appena visto due storie di Natale. Sbloccale tutte: {{price}}, in ogni partita, fino al {{date}}.",
+    "cardButton": "Sblocca",
+    "pitch": "Tutte le storie di Natale, in ogni partita, fino al {{date}}. Un solo pagamento, nessun abbonamento.",
+    "oncePayId": "Con PayID, da qualsiasi banca australiana.",
+    "onceSponsors": "Con carta su GitHub Sponsors. La tua banca converte l'importo.",
+    "guideTitle": "3 passaggi, circa 3 minuti:",
+    "guide1": "Accedi a GitHub o crea un account gratuito.",
+    "guide2": "Scegli «{{tier}}»: {{price}}, una tantum.",
+    "guide3": "Paga e torna qui: comparirà il tuo codice.",
+    "switchToSponsors": "Non sei in Australia?",
+    "switchToPayId": "Sei in Australia?",
+    "otherLanguages": "Le storie di Natale non sono scritte nella tua lingua. Il pacchetto si gioca nelle stanze in queste lingue:",
+    "refunds": "Nessun rimborso se cambi semplicemente idea. Un pacchetto che non funziona viene riparato o rimborsato.",
+    "payPayId": "Paga {{price}} con PayID",
+    "paySponsors": "Paga {{price}} su GitHub",
+    "failed": "Al momento non si può avviare il pagamento. Riprova tra un po'.",
+    "playFree": "Gioca gratis",
+    "haveTitle": "Questo pacchetto ce l'hai già.",
+    "ended": "L'edizione Natale 2026 non è più in vendita.",
+    "closed": "Al momento il pacchetto non si può acquistare. Torna più tardi."
+  },
   "gallery": {
     "share": "Condividi le immagini della stanza",
     "shareButton": "Condividi",

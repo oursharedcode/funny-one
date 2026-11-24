@@ -107,6 +107,28 @@
     "copy": "Copier",
     "copied": "Copié !"
   },
+  "pay": {
+    "card": "Tu viens de voir deux histoires de Noël. Débloque-les toutes : {{price}}, dans chaque partie, jusqu'au {{date}}.",
+    "cardButton": "Débloquer",
+    "pitch": "Toutes les histoires de Noël, dans chaque partie, jusqu'au {{date}}. Un seul paiement, sans abonnement.",
+    "oncePayId": "Par PayID, depuis n'importe quelle banque australienne.",
+    "onceSponsors": "Par carte sur GitHub Sponsors. Ta banque convertit le montant.",
+    "guideTitle": "3 étapes, environ 3 minutes :",
+    "guide1": "Connecte-toi à GitHub ou crée un compte gratuit.",
+    "guide2": "Choisis « {{tier}} » : {{price}}, paiement unique.",
+    "guide3": "Paie et reviens ici : ton code apparaît.",
+    "switchToSponsors": "Pas en Australie ?",
+    "switchToPayId": "En Australie ?",
+    "otherLanguages": "Les histoires de Noël ne sont pas écrites dans ta langue. Le pack se joue dans des salles dans ces langues :",
+    "refunds": "Pas de remboursement si tu changes simplement d'avis. Un pack qui ne fonctionne pas est réparé ou remboursé.",
+    "payPayId": "Payer {{price}} par PayID",
+    "paySponsors": "Payer {{price}} sur GitHub",
+    "failed": "Impossible de lancer le paiement pour le moment. Réessaie un peu plus tard.",
+    "playFree": "Jouer gratuitement",
+    "haveTitle": "Tu as déjà ce pack.",
+    "ended": "L'édition Noël 2026 n'est plus en vente.",
+    "closed": "Le pack ne peut pas être acheté pour le moment. Reviens plus tard."
+  },
   "gallery": {
     "share": "Partager les images de la salle",
     "shareButton": "Partager",

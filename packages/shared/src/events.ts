@@ -35,7 +35,7 @@
 // D-6's support rails (`SupportConfig` below) before either shipped.
 
 import type { Language } from './languages.js';
-import type { PackId, StoryContent } from './packs/schema.js';
+import type { PackId, PayRail, StoryContent } from './packs/schema.js';
 import type { OptionId } from './pools/schema.js';
 
 // ============================================================================
@@ -307,6 +307,26 @@ export interface SupportConfig {
   kofiUrl: string | null;
   bmcUrl: string | null;
   donateUrl: string | null;
+}
+
+/**
+ * The `pay` object of the GET /config response (Step 123, B-29): the pack on
+ * sale and the rail this visitor is offered first — PayID where the server
+ * places their address in Australia, Sponsors anywhere else or when it cannot
+ * tell (owner decision D2 A; the pay page lets the buyer switch). Null when
+ * nothing is on sale: no usable secret to sign a code with, the packs
+ * switched off, or the pack's free part over. A per-visitor answer, so the
+ * route is never cached.
+ */
+export interface PayConfig {
+  pack: PackId;
+  rail: PayRail;
+}
+
+/** The GET /config response. */
+export interface ClientConfig {
+  support: SupportConfig;
+  pay: PayConfig | null;
 }
 
 export interface RoundStartPayload {

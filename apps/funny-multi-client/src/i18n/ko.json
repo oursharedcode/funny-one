@@ -107,6 +107,28 @@
     "copy": "복사",
     "copied": "복사됨!"
   },
+  "pay": {
+    "card": "크리스마스 이야기 두 개를 만나 봤어요. 전부 열어 보세요: {{price}}, 모든 게임에서 {{date}}까지.",
+    "cardButton": "잠금 해제",
+    "pitch": "모든 크리스마스 이야기를 모든 게임에서 {{date}}까지 즐겨요. 한 번만 결제하면 되고, 구독은 없어요.",
+    "oncePayId": "PayID로, 호주 내 어느 은행에서든 가능해요.",
+    "onceSponsors": "GitHub Sponsors에서 카드로 결제해요. 환전은 사용하시는 은행이 해 줘요.",
+    "guideTitle": "3단계, 약 3분:",
+    "guide1": "GitHub에 로그인하거나 무료 계정을 만드세요.",
+    "guide2": "“{{tier}}”를 고르세요: {{price}}, 1회 결제.",
+    "guide3": "결제하고 여기로 돌아오면 코드가 나타나요.",
+    "switchToSponsors": "호주가 아니신가요?",
+    "switchToPayId": "호주에 계신가요?",
+    "otherLanguages": "크리스마스 이야기가 아직 내 언어로는 없어요. 이 팩은 다음 언어의 방에서 플레이할 수 있어요:",
+    "refunds": "단순 변심으로는 환불되지 않아요. 팩이 작동하지 않으면 고쳐 드리거나 환불해 드려요.",
+    "payPayId": "PayID로 {{price}} 결제",
+    "paySponsors": "GitHub에서 {{price}} 결제",
+    "failed": "지금은 결제를 시작할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    "playFree": "무료로 플레이",
+    "haveTitle": "이 팩은 이미 가지고 계세요.",
+    "ended": "2026 크리스마스 에디션은 더 이상 판매하지 않아요.",
+    "closed": "지금은 팩을 구매할 수 없어요. 나중에 다시 와 주세요."
+  },
   "gallery": {
     "share": "방의 그림 공유",
     "shareButton": "공유",

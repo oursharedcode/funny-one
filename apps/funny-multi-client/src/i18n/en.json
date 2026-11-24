@@ -106,6 +106,28 @@
     "copy": "Copy",
     "copied": "Copied!"
   },
+  "pay": {
+    "card": "You just saw two Christmas stories. Unlock all of them: {{price}}, every game, until {{date}}.",
+    "cardButton": "Unlock",
+    "pitch": "All the Christmas stories, in every game, until {{date}}. One payment, no subscription.",
+    "oncePayId": "By PayID, from any Australian bank.",
+    "onceSponsors": "By card on GitHub Sponsors. Your bank converts it.",
+    "guideTitle": "3 steps, about 3 minutes:",
+    "guide1": "Sign in to GitHub, or create a free account.",
+    "guide2": "Choose “{{tier}}”: {{price}}, one time.",
+    "guide3": "Pay and come back here: your code appears.",
+    "switchToSponsors": "Not in Australia?",
+    "switchToPayId": "In Australia?",
+    "otherLanguages": "The Christmas stories are not written in your language. The pack plays in rooms in these languages:",
+    "refunds": "No refunds for a change of mind. A pack that doesn't work is fixed or refunded.",
+    "payPayId": "Pay {{price}} by PayID",
+    "paySponsors": "Pay {{price}} on GitHub",
+    "failed": "The payment can't be started right now. Please try again a little later.",
+    "playFree": "Play free",
+    "haveTitle": "You already have this pack.",
+    "ended": "The Christmas 2026 edition is no longer on sale.",
+    "closed": "The pack can't be bought right now. Please come back later."
+  },
   "gallery": {
     "share": "Share the room's pictures",
     "shareButton": "Share",

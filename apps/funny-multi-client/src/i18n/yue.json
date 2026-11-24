@@ -107,6 +107,28 @@
     "copy": "複製",
     "copied": "複製咗！"
   },
+  "pay": {
+    "card": "你啱啱睇咗兩個聖誕故事。解鎖全部：{{price}}，每局都玩到，直到 {{date}}為止。",
+    "cardButton": "解鎖",
+    "pitch": "全部聖誕故事，每局都玩到，直到 {{date}}為止。一次過付款，唔使訂閱。",
+    "oncePayId": "用 PayID 付款，任何澳洲銀行都得。",
+    "onceSponsors": "喺 GitHub Sponsors 用卡付款，由你嘅銀行幫你換算。",
+    "guideTitle": "3 步，大約 3 分鐘：",
+    "guide1": "登入 GitHub，或者開一個免費帳戶。",
+    "guide2": "揀「{{tier}}」：{{price}}，一次過付款。",
+    "guide3": "付款後返嚟呢度，你嘅解鎖碼就會出現。",
+    "switchToSponsors": "唔喺澳洲？",
+    "switchToPayId": "喺澳洲？",
+    "otherLanguages": "你嘅語言未有聖誕故事。聖誕故事包可以喺用以下語言嘅房間玩：",
+    "refunds": "因為改咗主意，唔會退款。故事包用唔到嘅話，我哋會修好或者退款。",
+    "payPayId": "用 PayID 付 {{price}}",
+    "paySponsors": "喺 GitHub 付 {{price}}",
+    "failed": "暫時開始唔到付款，請遲啲再試。",
+    "playFree": "免費玩",
+    "haveTitle": "你已經有呢個故事包喇。",
+    "ended": "2026 聖誕特別版已經停售。",
+    "closed": "暫時買唔到故事包，請遲啲再嚟。"
+  },
   "gallery": {
     "share": "分享呢個房間啲圖",
     "shareButton": "分享",

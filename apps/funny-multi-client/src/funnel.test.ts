@@ -2,6 +2,7 @@
 
 // Step 72: what Funny Multi reports to the visit funnel (funnel.ts), and when
 // it reports nothing at all. Step 85: what it reports inside the Android app.
+// Steps 117 and 123: the Christmas 2026 edition's counts, playing and paying.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from './i18n';
@@ -12,6 +13,9 @@ import {
   trackChristmasGame,
   trackGift,
   trackGoldenCartoon,
+  trackPayCard,
+  trackPayPage,
+  trackPayPress,
   trackSupportOpen,
 } from './funnel';
 
@@ -119,6 +123,57 @@ describe('the Christmas 2026 edition', () => {
   });
 });
 
+// Step 123: the paying half — the card, the page by its door, the press by its rail.
+describe("the Christmas 2026 edition's pay card and pay page", () => {
+  it('counts the pay card once per page load, in the interface language', async () => {
+    setUrl('?from=hub&hv=a');
+    initFunnel();
+    await i18n.changeLanguage('de');
+    trackPayCard();
+    trackPayCard();
+    expect(sent().slice(1)).toEqual([{ e: 'xm_card', s: 'hub', v: 'a', l: 'de' }]);
+  });
+
+  it('counts the pay page once per page load, by the door it was first opened from', () => {
+    setUrl('');
+    initFunnel();
+    trackPayPage('card');
+    trackPayPage('link');
+    expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'en', t: 'card' }]);
+  });
+
+  it("counts a link's page in the link's language, which the game has not switched to yet", () => {
+    setUrl('?pay=x26&lang=ja');
+    initFunnel();
+    trackPayPage('link');
+    expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'ja', t: 'link' }]);
+  });
+
+  it("counts a link's page in the interface language when the link names none it knows", () => {
+    setUrl('?pay=x26&lang=xx');
+    initFunnel();
+    trackPayPage('link');
+    expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'en', t: 'link' }]);
+  });
+
+  it("counts the card's page in the interface language, whatever the address says", async () => {
+    setUrl('?lang=ja');
+    initFunnel();
+    await i18n.changeLanguage('ru');
+    trackPayPage('card');
+    expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'ru', t: 'card' }]);
+  });
+
+  it('counts the first pay press of a page load, by its rail, and no other', () => {
+    setUrl('');
+    initFunnel();
+    trackPayPress('sponsors');
+    trackPayPress('sponsors');
+    trackPayPress('payid');
+    expect(sent().slice(1)).toEqual([{ e: 'xm_pay', s: 'direct', l: 'en', t: 'sponsors' }]);
+  });
+});
+
 describe('inside the Android store app', () => {
   it('counts the visit as the app’s, without a variant, whatever the link says', () => {
     setUrl('?shell=android&from=hub&hv=a&lang=de');
@@ -145,6 +200,9 @@ describe('inside the Android store app', () => {
     trackGift('payid');
     trackChristmasGame(true);
     trackGoldenCartoon();
+    trackPayCard();
+    trackPayPage('link');
+    trackPayPress('payid');
     expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
   });
 

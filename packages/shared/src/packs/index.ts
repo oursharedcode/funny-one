@@ -56,8 +56,17 @@ export const PACKS: Readonly<Record<PackId, PackConfig>> = {
     // a month more for a paid code, for Australia's Christmas-in-July parties.
     freeUntil: '2027-07-01',
     paidUntil: '2027-08-01',
+    prices: { payid: 'A$2.60', sponsors: 'US$2' },
   },
 };
+
+/**
+ * The version of the refund policy a buyer reads before paying (Step 123):
+ * the pay page's `pay.refunds` line in the client's catalogues. A code's
+ * issue record keeps it (the receipt log's `policy`), so a later wording
+ * never rewrites what an earlier buyer agreed to. Change it with the line.
+ */
+export const REFUND_POLICY_VERSION = '2026-11-24';
 
 /**
  * One pack's display texts: English always — the fallback a player reads the

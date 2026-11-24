@@ -81,11 +81,12 @@ ${languageList(null, 'Languages')}
 
 /**
  * /x26/ (Step 119, B-29): the address on every golden story's download, as a
- * QR code. Its script sends the visitor straight on to the landing page in
- * their language, marked as sent from here (render/headScript.ts), which
- * offers the Christmas stories — or, once the free part is over, says the
- * edition has ended. What shows without scripts is the languages to pick
- * from. Not in the sitemap: it is a door, not a page.
+ * QR code. Its script sends the visitor straight on to the edition's pay page
+ * — a screen of Funny Multi (Step 123) — in their language
+ * (render/headScript.ts); the pay page offers the pack, or the free game, or,
+ * once the free part is over, says the edition is no longer on sale. What
+ * shows without scripts is the languages to pick from, for the landing page:
+ * the game itself needs scripts. Not in the sitemap: it is a door, not a page.
  */
 export function renderXmasForward(assets: EntryAssets): string {
   return `<!doctype html>

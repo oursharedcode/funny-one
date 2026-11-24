@@ -304,8 +304,12 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   golden one. A golden story's still stacks the ending under the scene, best-effort; its 5 s
   video switches to the ending at 2.5 s, a card when there is no picture, with no sound (sleigh
   bells come with the paid half). Their footer names the edition and leads to `/x26` on the
-  website, to the landing page inside the Android app (`footerTarget`). **No price anywhere in
-  the free half (5A), and no download ever carries a room or unlock code** — both tested.
+  website, to the landing page inside the Android app (`footerTarget`). **No price in a free
+  game — its lobby, rounds, stories and downloads (5A) — and no download ever carries a room
+  or unlock code** — both tested. The first price a player sees is the pay card's, after the
+  game (Step 123, below). A golden story's download carries no price in the paid half either
+  (owner, 2026-11-25): its QR leads to the pay page, which shows the price for the viewer's
+  country.
 - **On the landing page** (Step 119, owner decisions D1 C and D2, 2026-11-21): every page in
   the edition's 20 languages carries two red buttons to Funny Multi, "🔔 Christmas stories —
   play free" (`xmasStrings.ts`), one under the header and one above the footer; the bell rings
@@ -314,10 +318,12 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   counts as one from the landing page, and the clicks (`xm-top`, `xm-foot`) count among its
   clicks to Funny Multi. The page is built once, so its head script hides the buttons from the
   free part's cut-off by the visitor's clock (`<html data-xmas>`). **`/x26/`** — the address a
-  golden story's QR leads to; Caddy adds the slash — sends the visitor straight on to their
-  language's page, as `/` would choose it, with `?from=xmas`; the page counts that visit's
-  referrer as `xmas`, takes the mark off the address, and from the cut-off says the edition has
-  ended in place of the button. ar, he and fa land on their own pages, which have no buttons.
+  golden story's QR leads to; Caddy adds the slash — sent the visitor on to their language's
+  page, as `/` would choose it, with `?from=xmas` until Step 123; since then it sends them, in
+  that language, to the pay page (below), live with the paid half's deploy. The landing page
+  still reads the mark — it counts that visit's referrer as `xmas`, takes the mark off the
+  address, and from the cut-off says the edition has ended in place of the button — for the
+  counts already made; no new visit arrives with it.
   The paid half swaps the line for its own ("Christmas pack — try it free").
 - **The paid code** (Step 122, owner decisions of 2026-11-22). `XMAS26-XXXX-XXXX`: the pack's
   prefix and eight Crockford base32 characters — a 16-bit id, then a 24-bit tag, the first three
@@ -359,6 +365,54 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   `footer.paid` and lead to `/x26`. **The Android app ignores codes entirely** (Play's payments
   policy): it neither keeps one from a link nor sends one Chrome remembers from the website,
   and a room someone else paid for plays paid there under the landing page's footer.
+- **What is on sale** (Step 123, owner decisions of 2026-11-24). `GET /config` answers
+  `{ support, pay }` (§10.2 has `support`); `pay` is `{ pack, rail }` or null. The pack is the
+  first whose free part is on (`packOnSale`): sales stop with the free part (FM-PACK-6), so
+  every buyer gets the paid part's extra month at least. The rail is the one this visitor is
+  offered first (D2 A): `payid` where `geo.ts` places the request's address in Australia,
+  `sponsors` anywhere else and wherever it cannot tell — Sponsors takes a payment from
+  Australia too, PayID from nowhere else. Null without a usable `PACK_CODE_SECRET` (no code
+  could be signed), under `PACK_ROOMS=off`, and after the free part. The answer differs per
+  visitor, so it is sent `no-store`; the address is looked up and dropped. The prices are the
+  pack's own (`PACKS.chr26.prices`): **A$2.60 by PayID, US$2 through Sponsors**, written the
+  same in every language and never converted (D3 A) — outside Australia the page says the
+  buyer's bank converts it.
+- **The pay card** (Step 123, `EndScreen`). After a free Christmas game — the room's pack on
+  and not paid — every player whose phone keeps no code reads "You just saw two Christmas
+  stories. Unlock all of them: {price}, every game, until {date}." over one button, "Unlock",
+  which opens the pay page. The price is their rail's; the date is the pack's last paid day as
+  their language writes it (`packDay.ts`). On the website only, and only while `pay` names the
+  room's pack: never in the Android app (FM-APP-3), in a paid room, with the host's switch
+  off, or in an ar, he or fa room, which was offered no pack. A phone that keeps a code is
+  offered "Use my Christmas pack here" instead. An ar, he or fa player in a room of one of
+  the pack's languages gets the card in their own language (D4 A).
+- **The pay page** (Step 123, D1 A; `PayScreen`, `pay.ts`). A screen of Funny Multi's website,
+  laid over whatever is open — not a page of the landing site. The card opens it, and so does
+  the link `?pay=x26`, which is where the landing site's `/x26/` forwards
+  (`<Funny Multi>/?pay=x26&lang=<code>`), so the QR on every shared golden story leads to it.
+  The link stays on the address while the page is open — a reload shows it again — and is
+  taken off when it closes; the app does not reload itself for an update under an open page.
+  Top to bottom: the edition's name; "All the Christmas stories, in every game, until {date}.
+  One payment, no subscription."; the price and how it is paid; outside Australia the Sponsors
+  guide — "3 steps, about 3 minutes", three text-only steps in the buyer's language (D5 A),
+  the tier named as GitHub shows it, in English (`SPONSORS_TIERS`: "Christmas 2026 edition",
+  between U+2068 and U+2069 so a right-to-left line keeps it whole); for an ar, he or fa
+  reader a note that the stories are not written in their language, with the pack's languages
+  under their own names (D4 A); the refund policy in one line, its version
+  (`REFUND_POLICY_VERSION`) the one the receipt log records with the sale; the pay button; a
+  small "In Australia?" / "Not in Australia?" switch to the other rail (D2 A); and Close —
+  "Play free" for a visitor the link brought. A phone that keeps a code reads "You already
+  have this pack." with the code and its last day; from the day after the free part's last
+  the page says the edition is no longer on sale; where `pay` is null, that the pack cannot be
+  bought right now. **The pay button starts nothing yet**: `startPayment` (`pay.ts`) is the
+  seam Steps 124 (PayID) and 125 (Sponsors) fill, and until then it answers not-ok and the
+  page says the payment cannot be started. Never in the Android app: `?pay=` is ignored there
+  and no price is shown (FM-APP-3).
+- **The paying half's counts** (Step 123, DD-15): `xm_card` (the pay card shown), `xm_page`
+  (the pay page opened; `t` is `card` or `link`) and `xm_pay` (the pay button pressed; `t` is
+  `payid` or `sponsors`), each once per page load, website only, with nothing about the buyer
+  or the payment. `/stats/` shows them per language in a second table of its Christmas
+  section, "Paying for it". A press is not a payment: payments are in the receipt log.
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 
@@ -701,7 +755,8 @@ retired by D-6; nothing of it was built.*
   boot and returned by a new `GET /config` REST route, not the `lobby:update` socket broadcast
   that carries `donateUrl` today (five static strings do not belong on a per-join payload, and
   Home needs them before any room exists). Shape: `{ support: { payId, payIdName, sponsorsUrl,
-  lightningAddress, donateUrl } }`, each `string|null`. T-9.4a moves `donateUrl` off
+  lightningAddress, donateUrl } }`, each `string|null` (Step 123 adds `pay` beside it, §4.4).
+  T-9.4a moves `donateUrl` off
   `lobby:update` onto this same route so there is one source of truth. Nothing else
   server-side: no accounts, no webhooks, no payment state. *(Corrected 2026-09-29 — no such
   endpoint existed until T-9.3.)*
@@ -748,7 +803,7 @@ retired by D-6; nothing of it was built.*
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 | `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
 | `PACK_ROOMS` | server | `off` makes every new room an ordinary one (Step 117, §4.4) — the launch's lever; unset = packs offered |
-| `PACK_CODE_SECRET` | server | signs and checks the paid codes (Step 122, §4.4); under 16 characters, every code is refused. The VM's `.env` only, never the repository: a new one voids every code sold |
+| `PACK_CODE_SECRET` | server | signs and checks the paid codes (Step 122, §4.4); under 16 characters, every code is refused and no pack is on sale (Step 123: `/config` answers `pay: null`). The VM's `.env` only, never the repository: a new one voids every code sold |
 | `RECEIPTS_FILE` | server | the paid codes' receipt log, JSONL (Step 122, §4.4); compose sets `/data/receipts.jsonl` in the stats volume; unset = memory only |
 
 R2 bucket (`IMAGES`) and KV (`STATS_KV`) are wrangler.toml bindings, not env vars.

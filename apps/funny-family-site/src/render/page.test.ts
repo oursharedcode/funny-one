@@ -457,7 +457,11 @@ describe('the Christmas 2026 edition’s buttons (Step 119)', () => {
     const scripts = [...doc.head.querySelectorAll('script:not([src])')];
     expect(scripts).toHaveLength(1);
     expect(scripts[0]?.textContent).toContain('location.replace');
-    expect(scripts[0]?.textContent).toContain('from=xmas');
+    // Step 123: on to Funny Multi's pay page, no longer to a page of this site.
+    expect(scripts[0]?.textContent).toContain(
+      'https://www.funny37.oursharedcode.com/?pay=x26&lang=',
+    );
+    expect(scripts[0]?.textContent).not.toContain('from=xmas');
     expect(doc.querySelector('meta[name="robots"]')?.getAttribute('content')).toContain('noindex');
     expect(
       [...doc.querySelectorAll<HTMLAnchorElement>('main a[data-lang]')].map((a) => a.dataset.lang),

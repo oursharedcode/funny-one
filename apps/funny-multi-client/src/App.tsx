@@ -19,9 +19,12 @@ import WaitingScreen from './screens/WaitingScreen';
 import RevealScreen from './screens/RevealScreen';
 import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
+import PayScreen from './components/PayScreen';
 import SupportScreen from './components/SupportScreen';
 import { hasAnyRail } from './support';
 import { trackChristmasGame, trackSupportOpen } from './funnel';
+import { clearPayLink, payLinkPack, type PayDoor } from './pay';
+import { isStoreShell } from './storeShell';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { setReloadSafe } from './swReload';
@@ -29,10 +32,13 @@ import { baseUrl, withBase, serverOrigin } from './basePath';
 import { APP_VERSION } from './version';
 import type {
   AuthoredLanguage,
+  ClientConfig,
   ErrorPayload,
   GalleryReadyPayload,
   GameRestartReadyPayload,
   LobbyUpdatePayload,
+  PackId,
+  PayConfig,
   Player,
   PlayerLostPayload,
   RevealStartPayload,
@@ -103,6 +109,21 @@ export default function App() {
   // or fails — either way that means "no rails, no ♥" (see hasAnyRail).
   const [support, setSupport] = useState<SupportConfig | null>(null);
   const [supportOpen, setSupportOpen] = useState(false);
+  // Step 123 (B-29): what the server sells this visitor and by which rail,
+  // from the same fetch — undefined until it answers, null when nothing is on
+  // sale or the server cannot be reached. And the pay page: open from the
+  // first render for a pay link (`?pay=x26`, where the landing site's /x26
+  // forwards), later from the end screen's pay card. Never in the Android app.
+  const [pay, setPay] = useState<PayConfig | null | undefined>(undefined);
+  const [payPage, setPayPage] = useState<{ pack: PackId; door: PayDoor } | null>(() => {
+    const linked = payLinkPack();
+    return linked ? { pack: linked, door: 'link' } : null;
+  });
+
+  function closePayPage(): void {
+    setPayPage(null);
+    clearPayLink();
+  }
 
   // Both entry points (Home's ♥, the end screen) open the sheet through here,
   // so the funnel counts an opening once, wherever it came from (Step 72).
@@ -119,11 +140,14 @@ export default function App() {
     // treats the same as "offline" — no rails, no ♥.
     fetch(serverOrigin() + withBase('config'))
       .then((res) => res.json())
-      .then((data: { support?: SupportConfig }) => {
-        if (!cancelled && data?.support) setSupport(data.support);
+      .then((data: Partial<ClientConfig> | null) => {
+        if (cancelled) return;
+        if (data?.support) setSupport(data.support);
+        setPay(data?.pay ?? null);
       })
       .catch(() => {
-        // No config route reachable — leave support at null.
+        // No config route reachable — leave support at null; nothing is on sale.
+        if (!cancelled) setPay(null);
       });
     return () => {
       cancelled = true;
@@ -204,10 +228,12 @@ export default function App() {
   }, []);
 
   // B-26: a new version reloads the page only on Home, with the support sheet
-  // shut — anywhere else the reload would drop this player out of the room.
+  // and the pay page shut — anywhere else the reload would drop this player
+  // out of the room, or take the page from under someone about to pay.
+  const payPageOpen = payPage !== null;
   useEffect(() => {
-    setReloadSafe(phase === 'home' && !supportOpen);
-  }, [phase, supportOpen]);
+    setReloadSafe(phase === 'home' && !supportOpen && !payPageOpen);
+  }, [phase, supportOpen, payPageOpen]);
 
   // Step 117 (D2 A): the Christmas funnel's first step — a game under way in a
   // room that was offered the Christmas stories, switched on or off. The
@@ -236,6 +262,8 @@ export default function App() {
         gallery={gallery}
         support={support}
         onOpenSupport={openSupport}
+        pay={pay ?? null}
+        onOpenPay={(pack) => setPayPage({ pack, door: 'card' })}
       />
     );
   } else if (phase === 'reveal' && reveal && lobby) {
@@ -339,6 +367,9 @@ export default function App() {
       )}
       {supportOpen && support && hasAnyRail(support) && (
         <SupportScreen support={support} onClose={() => setSupportOpen(false)} />
+      )}
+      {payPage && !isStoreShell() && (
+        <PayScreen pack={payPage.pack} pay={pay} door={payPage.door} onClose={closePayPage} />
       )}
     </MotionConfig>
   );

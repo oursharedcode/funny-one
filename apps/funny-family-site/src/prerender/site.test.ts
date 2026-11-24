@@ -135,7 +135,7 @@ describe('pageForPath (the dev server)', () => {
   it('answers /x26/, with a redirect to the trailing slash (Step 119)', () => {
     for (const path of ['/x26/', '/x26/index.html']) {
       expect(pageForPath(path), path).toMatchObject({
-        html: expect.stringContaining('from=xmas'),
+        html: expect.stringContaining('pay=x26'),
       });
     }
     expect(page('/x26')).toBe('→ /x26/');

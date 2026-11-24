@@ -16,7 +16,9 @@
 // download — comes marked `?from=xmas` and counts as one from there, whatever
 // the referrer says: /x26/ is this site's own page, whose referrer would
 // make it no new visit at all. The mark is taken off the address bar, so a
-// copied link does not carry it on.
+// copied link does not carry it on. From Step 123 /x26/ sends its visitors to
+// Funny Multi's pay page instead, which counts them itself, so no new visit
+// arrives with the mark; the reading stays for the counts already made.
 //
 // No URL, no identifier, no cookie; the referrer is classified here and only
 // its class is sent. Nothing at all is sent when the browser asks not to be

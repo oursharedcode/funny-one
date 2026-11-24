@@ -12,6 +12,7 @@
 // it in place of SRC's base64 pictureUrl.
 
 export type {
+  ClientConfig,
   ClientToServerEvents,
   ErrorCode,
   ErrorPayload,

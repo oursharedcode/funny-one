@@ -21,11 +21,17 @@
 // played in a room that was offered the Christmas stories, with the host's
 // switch on or off (`xm_game`), and a golden story's cartoon seen (`xm_gold`),
 // each at most once per page load. /stats/ shows them per language.
+//
+// Step 123 (B-29): the paying half, on the website only as well — the pay
+// card shown after a free Christmas game (`xm_card`), the pay page opened,
+// from that card or from a link (`xm_page`), and its pay button pressed, by
+// rail (`xm_pay`). Nothing about the buyer or the payment goes with them.
 
-import { isLanguage, type Language } from '@funny/shared';
+import { isLanguage, type Language, type PayRail } from '@funny/shared';
 import i18n from './i18n';
 import { serverOrigin, withBase } from './basePath';
 import { isStoreShell } from './storeShell';
+import type { PayDoor } from './pay';
 
 export type GiftRail = 'payid' | 'sponsors' | 'lightning' | 'kofi' | 'bmc' | 'donate';
 
@@ -36,6 +42,9 @@ let supportSent = false;
 let giftSent = false;
 let christmasGameSent = false;
 let goldenSent = false;
+let payCardSent = false;
+let payPageSent = false;
+let payPressSent = false;
 
 function trackingRefused(): boolean {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
@@ -114,10 +123,42 @@ export function trackGoldenCartoon(): void {
   send({ e: 'xm_gold' });
 }
 
+/** The pay card on screen, after a free Christmas game (Step 123). */
+export function trackPayCard(): void {
+  if (payCardSent) return;
+  payCardSent = true;
+  send({ e: 'xm_card' });
+}
+
+/**
+ * The pay page opened, by its door. A link's page opens with the first
+ * render, before HomeScreen has switched to the link's `?lang=`, so that
+ * language is read here, as the visit's is.
+ */
+export function trackPayPage(door: PayDoor): void {
+  if (payPageSent) return;
+  payPageSent = true;
+  const urlLanguage = new URLSearchParams(window.location.search).get('lang');
+  send(
+    { e: 'xm_page', t: door },
+    door === 'link' && isLanguage(urlLanguage) ? urlLanguage : currentLanguage(),
+  );
+}
+
+/** The pay page's pay button pressed. Only the first in a page load counts. */
+export function trackPayPress(rail: PayRail): void {
+  if (payPressSent) return;
+  payPressSent = true;
+  send({ e: 'xm_pay', t: rail });
+}
+
 export function __resetFunnelForTest(): void {
   origin = { s: 'direct' };
   supportSent = false;
   giftSent = false;
   christmasGameSent = false;
   goldenSent = false;
+  payCardSent = false;
+  payPageSent = false;
+  payPressSent = false;
 }

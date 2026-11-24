@@ -9,10 +9,11 @@
 // `npm run test -ws --if-present`, which treats a missing `test` script as a
 // pass — a bootstrap with no tests would look green while proving nothing.
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { io as ioClient, type Socket } from 'socket.io-client';
+import { PACKS, cutoffOf } from '@funny/shared';
 import { buildServer, type BuildServerOptions, type BuiltServer } from './index.js';
 import { ENV_PATH } from './env.js';
 import { __resetRoomsForTest } from './rooms.js';
@@ -146,6 +147,7 @@ describe('GET /config', () => {
         bmcUrl: null,
         donateUrl: null,
       },
+      pay: null,
     });
   });
 
@@ -181,6 +183,7 @@ describe('GET /config', () => {
         bmcUrl: NEW_RAILS.DEPLOYER_BMC_URL,
         donateUrl: DONATE_URL,
       },
+      pay: null,
     });
   });
 
@@ -205,6 +208,83 @@ describe('GET /config', () => {
     expect(hub.json<{ support: { kofiUrl: string } }>().support.kofiUrl).toBe(
       NEW_RAILS.DEPLOYER_KOFI_URL,
     );
+  });
+
+  // Step 123 (B-29): the pack on sale and the rail a visitor is offered first.
+  describe('pay', () => {
+    const SECRET = 'a-test-secret-of-some-length';
+    const AU_ADDRESS = '203.0.113.9';
+    const countryOf = (ip: string): string | null =>
+      ip === AU_ADDRESS ? 'AU' : ip === '198.51.100.7' ? 'DE' : null;
+
+    afterEach(() => vi.unstubAllEnvs());
+
+    async function payOf(
+      options: BuildServerOptions,
+      ip: string | null = null,
+      url = '/config',
+    ): Promise<unknown> {
+      built = await buildServer({ logger: false, receiptsFile: null, ...options });
+      const res = await built.fastify.inject({
+        method: 'GET',
+        url,
+        headers: ip ? { 'x-forwarded-for': ip } : {},
+      });
+      // Per visitor, so no proxy or browser may keep it.
+      expect(res.headers['cache-control']).toBe('no-store');
+      return res.json<{ pay: unknown }>().pay;
+    }
+
+    it('offers PayID to an Australian address and Sponsors to any other (D2 A)', async () => {
+      vi.stubEnv('PACK_ROOMS', 'on');
+      expect(await payOf({ packCodeSecret: SECRET, countryOf }, AU_ADDRESS)).toEqual({
+        pack: 'chr26',
+        rail: 'payid',
+      });
+      await built?.io.close();
+      await built?.fastify.close();
+      expect(await payOf({ packCodeSecret: SECRET, countryOf }, '198.51.100.7')).toEqual({
+        pack: 'chr26',
+        rail: 'sponsors',
+      });
+    });
+
+    it('offers Sponsors where the country is not known, and without a lookup', async () => {
+      vi.stubEnv('PACK_ROOMS', 'on');
+      expect(await payOf({ packCodeSecret: SECRET, countryOf }, '192.0.2.1')).toEqual({
+        pack: 'chr26',
+        rail: 'sponsors',
+      });
+      await built?.io.close();
+      await built?.fastify.close();
+      expect(await payOf({ packCodeSecret: SECRET }, AU_ADDRESS, '/api/config')).toEqual({
+        pack: 'chr26',
+        rail: 'sponsors',
+      });
+    });
+
+    it('sells nothing without a secret to sign a code with', async () => {
+      vi.stubEnv('PACK_ROOMS', 'on');
+      expect(await payOf({ packCodeSecret: null, countryOf }, AU_ADDRESS)).toBeNull();
+      await built?.io.close();
+      await built?.fastify.close();
+      expect(await payOf({ packCodeSecret: 'too short', countryOf }, AU_ADDRESS)).toBeNull();
+    });
+
+    it('sells nothing with the Christmas rooms switched off', async () => {
+      vi.stubEnv('PACK_ROOMS', 'off');
+      expect(await payOf({ packCodeSecret: SECRET, countryOf }, AU_ADDRESS)).toBeNull();
+    });
+
+    it('sells nothing once the free part is over, a month before the codes end', async () => {
+      vi.stubEnv('PACK_ROOMS', 'on');
+      vi.useFakeTimers({ toFake: ['Date'], now: cutoffOf(PACKS.chr26.freeUntil) });
+      try {
+        expect(await payOf({ packCodeSecret: SECRET, countryOf }, AU_ADDRESS)).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 
   it('never puts a support rail in any socket event or ack', async () => {

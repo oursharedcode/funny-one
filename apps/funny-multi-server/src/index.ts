@@ -3,12 +3,13 @@
 // MUST be first — loads .env into process.env before any other module reads it.
 import './env.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import { Server as SocketIOServer } from 'socket.io';
 import { isPackFree, normalizeBasePath } from '@funny/shared';
 import type {
+  ClientConfig,
   ClientToServerEvents,
   ErrorPayload,
   LobbyUpdatePayload,
@@ -25,6 +26,7 @@ import {
   isValidLanguage,
   joinRoom,
   openPaidPack,
+  packOnSale,
   removePlayer,
   validateNickname,
   type RemoveResult,
@@ -216,7 +218,39 @@ export async function buildServer({
     bmcUrl: process.env.DEPLOYER_BMC_URL || null,
     donateUrl: process.env.DEPLOYER_DONATE_URL || null,
   };
-  const config = async () => ({ support });
+
+  // Step 122 (B-29): the paid codes and their receipt log. Made here, before
+  // the routes, because /config says whether a pack is on sale (Step 123).
+  const receipts = openReceiptLog({
+    file: receiptsFile,
+    onError: (err) => fastify.log.error(err, 'receipt log'),
+  });
+  const codes = createPackCodes({ secret: packCodeSecret, log: receipts });
+  if (!codes.enabled) {
+    fastify.log.warn(
+      'PACK_CODE_SECRET is unset or under 16 characters: every paid code is refused and no pack is on sale',
+    );
+  }
+
+  // Step 123 (B-29): `pay`, the pack on sale and the rail this visitor is
+  // offered first (owner decision D2 A) — PayID where geo.ts places their
+  // address in Australia, Sponsors anywhere else and wherever it cannot tell:
+  // Sponsors takes a payment from Australia too, PayID from nowhere else. The
+  // pay page lets the buyer switch. Null — no pay card, no price on the pay
+  // page — without a secret to sign a code with, under PACK_ROOMS=off and
+  // once the pack's free part is over (rooms.ts, packOnSale). The address is
+  // looked up and dropped; the answer differs per visitor, so nothing may
+  // cache it.
+  const config = async (request: FastifyRequest, reply: FastifyReply): Promise<ClientConfig> => {
+    reply.header('cache-control', 'no-store');
+    const pack = codes.enabled ? packOnSale() : null;
+    if (!pack) return { support, pay: null };
+    const ip = clientIp(
+      { headers: request.headers, address: request.socket.remoteAddress },
+      TRUSTED_PROXY_HOPS,
+    );
+    return { support, pay: { pack, rail: countryOf?.(ip) === 'AU' ? 'payid' : 'sponsors' } };
+  };
   fastify.get(`${base}config`, config);
   fastify.get(`${base}api/config`, config);
 
@@ -319,18 +353,9 @@ export async function buildServer({
   // A code arrives with room:create (the website remembers it, or its link
   // carries it) or with any player's room:unlock. A good one opens the room's
   // pack from its next game; each opening and each paid game is a receipt
-  // record. Wrong codes are limited per address (rateLimit.ts): only a wrong
-  // one takes a token, so a family's good code never waits.
-  const receipts = openReceiptLog({
-    file: receiptsFile,
-    onError: (err) => fastify.log.error(err, 'receipt log'),
-  });
-  const codes = createPackCodes({ secret: packCodeSecret, log: receipts });
-  if (!codes.enabled) {
-    fastify.log.warn(
-      'PACK_CODE_SECRET is unset or under 16 characters: every paid code is refused',
-    );
-  }
+  // record (`receipts` and `codes`, made above for /config). Wrong codes are
+  // limited per address (rateLimit.ts): only a wrong one takes a token, so a
+  // family's good code never waits.
   const wrongCodeLimiter = createRateLimiter({
     capacity: WRONG_CODES_PER_HOUR,
     intervalMs: WRONG_CODE_WINDOW_MS,

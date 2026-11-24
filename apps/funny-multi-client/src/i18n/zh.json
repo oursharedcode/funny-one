@@ -107,6 +107,28 @@
     "copy": "复制",
     "copied": "已复制！"
   },
+  "pay": {
+    "card": "你刚看了两个圣诞故事。解锁全部：{{price}}，每局都能玩，直到 {{date}}为止。",
+    "cardButton": "解锁",
+    "pitch": "全部圣诞故事，每局都能玩，直到 {{date}}为止。一次付款，无需订阅。",
+    "oncePayId": "通过 PayID 支付，任何澳大利亚银行都可以。",
+    "onceSponsors": "在 GitHub Sponsors 上刷卡支付，由你的银行换算币种。",
+    "guideTitle": "3 步，大约 3 分钟：",
+    "guide1": "登录 GitHub，或注册一个免费账号。",
+    "guide2": "选择“{{tier}}”：{{price}}，一次性付款。",
+    "guide3": "付款后回到这里，你的解锁码就会出现。",
+    "switchToSponsors": "不在澳大利亚？",
+    "switchToPayId": "在澳大利亚？",
+    "otherLanguages": "你的语言暂时没有圣诞故事。圣诞故事包可以在使用以下语言的房间里玩：",
+    "refunds": "因改变主意而申请退款，恕不退还。故事包无法使用时，我们会修复或退款。",
+    "payPayId": "用 PayID 支付 {{price}}",
+    "paySponsors": "在 GitHub 支付 {{price}}",
+    "failed": "暂时无法发起付款，请稍后再试。",
+    "playFree": "免费玩",
+    "haveTitle": "你已经有这个故事包了。",
+    "ended": "2026 圣诞特别版已停止销售。",
+    "closed": "暂时无法购买故事包，请稍后再来。"
+  },
   "gallery": {
     "share": "分享房间的图片",
     "shareButton": "分享",

@@ -906,6 +906,66 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     and the stories with two different words for Christmas; Tamil's footer line wraps on a
     phone. **Next:** Step 123 — the pay card after a free game and `/x26` as the pay page, with
     #11's Sponsors guide.
+  - *Decisions 2026-11-24 (owner, on Step 123's plan — the pay card and the pay page):*
+    - **D1 A — the pay page is a screen of Funny Multi's website**, where the code is kept and
+      the rooms are made; the landing site's `/x26` forwards to it. Not a page of the landing
+      site.
+    - **D2 A — the server picks the way to pay by the buyer's country**: Australia PayID,
+      everyone else GitHub Sponsors, with a small "In Australia?" / "Not in Australia?"
+      switch on the page for a wrong guess.
+    - **D3 A — outside Australia the price reads "US$2" exactly**, with "your bank converts
+      it"; A$2.60 in Australia; no conversion anywhere.
+    - **D4 A — ar, he and fa players read the card and the page in their own language**, with
+      one more line: the pack plays in rooms in its own languages, not theirs.
+    - **D5 A — the Sponsors guide is three numbered steps of text** in the buyer's language,
+      no screenshots.
+  - **The pay card and the pay page done 2026-11-24 (Step 123)** — nothing can be paid yet
+    (design §4.4). `/config` says what is on sale and the rail this visitor is offered first
+    (`pay`; null without `PACK_CODE_SECRET`, under `PACK_ROOMS=off` and after the free part).
+    The end screen shows the pay card after a free Christmas game, on the website only. The
+    pay page — opened by the card or by `?pay=x26`, where the landing site's `/x26/` now
+    forwards — has the price, the last day, the Sponsors guide, the note for ar, he and fa,
+    the refund policy's line with its version, the switch between the two ways to pay, "Play
+    free" for a QR's visitor, "You already have this pack" for a phone with a code, and "no
+    longer on sale" once the free part is over. Its pay button counts the press and says the
+    payment cannot be started: Steps 124 and 125 fill the `startPayment` seam. Three new
+    counts (`xm_card`, `xm_page`, `xm_pay`) and a second Christmas table on `/stats/`, "Paying
+    for it"; the privacy policy names the counts in all 23 languages. 20 new texts in all 23
+    catalogues: en and ru the agent's, 21 machine drafts on B-3's pile. Settled in the step:
+    the card's price is the buyer's own — US$2 outside Australia, where the 2026-11-21
+    wording had A$2.60 for everyone; D4's line lists the pack's languages by name (19 names,
+    the two Spanishes as one) rather than counting them; the tier's name stays English in
+    every language, as GitHub shows it, and is kept whole in a right-to-left line; ru and uk
+    end a dated sentence «включительно» / «включно», since their dates end in a full stop of
+    their own (ru's Step 122 hint too); the landing page keeps reading `?from=xmas` for the
+    counts already made, though nothing arrives with it any more. Verified in phone-sized
+    Chromium against the built server (a throwaway secret in the process environment only)
+    and the built landing site, 426 checks, none failing: a 3-player English game at 360 px —
+    the card on all three phones, US$2 on two and A$2.60 on the one given an Australian
+    `/config`, Unlock, a press of pay, both ways to pay, Close back to the card; no card in a
+    paid room, with the host's switch off, in an ar room or in the Android shell; a 320 px
+    room with ar, he, fa, ta and de guests — the card and the page in each language, right to
+    left in three, the note in three, nothing cut; the link kept through a reload and taken
+    off on close; `/x26/` sending a German browser to `…/?pay=x26&lang=de`; a phone with a
+    code; a server selling nothing; and the counts on `/stats/` equal to what the phones did
+    (8 cards, 7 pages from the card, 10 from the link, 3 presses). The country lookup itself
+    is covered by the server's tests, not by the browser. **Decided 2026-11-25 (owner, on
+    the step's report): no price on a golden story's download.** The 2026-11-21 wording put
+    the unlock line with A$2.60 on both golden stories' downloads once the paid half is
+    live; they stay at "Christmas 2026 edition" over the QR, which now leads to the pay
+    page — that shows the price for the viewer's country, which a download cannot know.
+    The drafters' notes for B-3's reviewer: none in de, es-419,
+    es-es, pt-br, uk, zh and ja; fr writes "jusqu'au 1 août" where French says "1er août"
+    (Step 122's hint too); "By card on GitHub Sponsors. Your bank converts it." is loose or
+    stiff in it, id, sw, fa, hi and bn; the refund line is loose in sw, fa, te and yue, and
+    all formal passives in ar; the note on languages is casual or clunky in it, id, ko, ta and
+    te; ko mixes its two polite endings and its button says "잠금 해제"; yo is the least
+    certain — diacritics, the money words, "no monthly payment" for "no subscription"; he's
+    card says "פותחים את כולם" and its refund line "שינוי דעה"; ar keeps to infinitives to
+    avoid gender and its button "فتح" is terse; ta, hi and bn differ in register (polite
+    imperatives, formal "आप", informal "তুমি"); the policy's new clause brings "offer",
+    "payment page" and "pay button" (de "Bezahlknopf"; ar adds "للشراء"). **Next:** Step
+    124 — PayID and the admin page.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

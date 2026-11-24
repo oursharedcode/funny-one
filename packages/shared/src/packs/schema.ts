@@ -26,6 +26,14 @@ export type PackId = 'chr26';
 
 export const PACK_IDS: readonly PackId[] = ['chr26'];
 
+/**
+ * How a pack is paid for (B-29, owner decisions 2026-11-22): PayID inside
+ * Australia, a one-time GitHub Sponsors tier everywhere else.
+ */
+export type PayRail = 'payid' | 'sponsors';
+
+export const PAY_RAILS: readonly PayRail[] = ['payid', 'sponsors'];
+
 export interface PackOption extends AnswerOption {
   /**
    * Slot 6 only: the ending as an English aftermath fragment — the objects left
@@ -55,6 +63,13 @@ export interface PackConfig {
   readonly freeUntil: string;
   /** The last day a paid code works, `YYYY-MM-DD`, honoured the same way. */
   readonly paidUntil: string;
+  /**
+   * The price on each rail, written the same in every language (Step 123,
+   * owner decision D3 A): what the buyer is charged and never a conversion —
+   * Australian dollars by PayID, and the US dollars GitHub charges for the
+   * Sponsors tier, which the buyer's bank converts.
+   */
+  readonly prices: Readonly<Record<PayRail, string>>;
 }
 
 /**

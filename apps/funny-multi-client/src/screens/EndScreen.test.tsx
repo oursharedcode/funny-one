@@ -9,12 +9,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { POOLS, SLOT_COUNT, optionsFor } from '@funny/shared';
-import { createSocketMock } from '../testutils/socketMock';
+import { createSocketMock, setUrl } from '../testutils/socketMock';
 import i18n from '../i18n';
 import { __resetPackCodeForTest, forgetPackCode, rememberPackCode } from '../packCode';
 import { renderStory } from '../storyLanguage';
 import type {
   GalleryReadyPayload,
+  PackId,
+  PayConfig,
   Player,
   SlotIndex,
   StoryContent,
@@ -39,6 +41,13 @@ vi.mock('../socket', () => ({ socket: socketMock }));
 // a paid story's download is reported.
 const downloadStoryImage = vi.fn(async () => {});
 vi.mock('../downloadStory', () => ({ buildStoryImageFile: vi.fn(), downloadStoryImage }));
+
+// The funnel itself is funnel.test.ts's; here, only that the pay card is counted.
+const { trackPayCard } = vi.hoisted(() => ({ trackPayCard: vi.fn() }));
+vi.mock('../funnel', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../funnel')>()),
+  trackPayCard,
+}));
 
 const { default: EndScreen } = await import('./EndScreen');
 
@@ -111,6 +120,8 @@ function renderEnd(props: {
   gallery?: GalleryReadyPayload | null;
   support?: SupportConfig | null;
   onOpenSupport?: () => void;
+  pay?: PayConfig | null;
+  onOpenPay?: (pack: PackId) => void;
 }) {
   return render(
     <EndScreen
@@ -120,6 +131,8 @@ function renderEnd(props: {
       gallery={props.gallery ?? null}
       support={props.support}
       onOpenSupport={props.onOpenSupport}
+      pay={props.pay}
+      onOpenPay={props.onOpenPay}
     />,
   );
 }
@@ -408,5 +421,115 @@ describe('the paid code (Step 122)', () => {
     fireEvent.click(screen.getByText('Download story'));
     await waitFor(() => expect(downloadStoryImage).toHaveBeenCalledTimes(2));
     expect(socketMock.emitsOf('story:exported')).toHaveLength(1);
+  });
+});
+
+// Step 123 (B-29): the pay card — every player's, after a free Christmas game,
+// on the website only.
+describe('the pay card (Step 123)', () => {
+  const CODE = 'XMAS26-K7QM-3FPA';
+  const ON = { id: 'chr26', on: true, paid: false } as const;
+  const SPONSORS: PayConfig = { pack: 'chr26', rail: 'sponsors' };
+  const PAYID: PayConfig = { pack: 'chr26', rail: 'payid' };
+  const CARD = /^You just saw two Christmas stories\. Unlock all of them: /;
+
+  function resetCode(): void {
+    forgetPackCode();
+    __resetPackCodeForTest();
+  }
+
+  beforeEach(() => {
+    resetCode();
+    sessionStorage.clear();
+    setUrl('');
+    trackPayCard.mockClear();
+    vi.useFakeTimers({ now: Date.parse('2026-12-20T09:00:00Z'), toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    resetCode();
+    sessionStorage.clear();
+    setUrl('');
+  });
+
+  it("shows every player the price their rail charges and the pack's last day", () => {
+    // The host, outside Australia.
+    const { unmount } = renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS });
+    expect(
+      screen.getByText(
+        'You just saw two Christmas stories. Unlock all of them: US$2, every game, until 1 August 2027.',
+      ),
+    ).toBeTruthy();
+    unmount();
+
+    // A guest, in Australia.
+    renderEnd({ lobby: lobby({ socketId: 's2', pack: ON }), pay: PAYID });
+    expect(
+      screen.getByText(
+        'You just saw two Christmas stories. Unlock all of them: A$2.60, every game, until 1 August 2027.',
+      ),
+    ).toBeTruthy();
+  });
+
+  // A Russian date ends in "г.", so it does not close the sentence.
+  it("writes the date in the reader's language", async () => {
+    await i18n.changeLanguage('ru');
+    renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS });
+    expect(
+      screen.getByText(/US\$2, в каждой игре, до 1 августа 2027 г\. включительно\.$/),
+    ).toBeTruthy();
+  });
+
+  it('has one button, which opens the pay page for the pack', () => {
+    const onOpenPay = vi.fn();
+    const { container } = renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS, onOpenPay });
+    const card = container.querySelector('[data-pay-card="chr26"]')!;
+    expect(card.querySelectorAll('button')).toHaveLength(1);
+    fireEvent.click(screen.getByText('Unlock'));
+    expect(onOpenPay).toHaveBeenCalledTimes(1);
+    expect(onOpenPay).toHaveBeenCalledWith('chr26');
+  });
+
+  it('is counted when shown, and stays once the game is over', () => {
+    renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS, gameOver: true });
+    expect(screen.getByText(CARD)).toBeTruthy();
+    expect(trackPayCard).toHaveBeenCalled();
+  });
+
+  it('is not shown, or counted, where nothing is on sale', () => {
+    renderEnd({ lobby: lobby({ pack: ON }), pay: null });
+    expect(screen.queryByText(CARD)).toBeNull();
+    expect(trackPayCard).not.toHaveBeenCalled();
+  });
+
+  it('is not shown in a paid room', () => {
+    renderEnd({ lobby: lobby({ pack: { ...ON, paid: true } }), pay: SPONSORS });
+    expect(screen.queryByText(CARD)).toBeNull();
+  });
+
+  it("is not shown when the host's switch was off: no Christmas story was seen", () => {
+    renderEnd({ lobby: lobby({ pack: { ...ON, on: false } }), pay: SPONSORS });
+    expect(screen.queryByText(CARD)).toBeNull();
+  });
+
+  it('is not shown in a room whose language has no pack', async () => {
+    await i18n.changeLanguage('ar');
+    renderEnd({ lobby: lobby({ language: 'ar', myLanguage: 'ar', pack: null }), pay: SPONSORS });
+    expect(document.querySelector('[data-pay-card]')).toBeNull();
+    expect(trackPayCard).not.toHaveBeenCalled();
+  });
+
+  it('is never shown in the Android app', () => {
+    setUrl('?shell=android');
+    renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS });
+    expect(screen.queryByText(CARD)).toBeNull();
+    expect(trackPayCard).not.toHaveBeenCalled();
+  });
+
+  it('is not shown on a phone that keeps a code: it has the pack to use', () => {
+    rememberPackCode(CODE);
+    renderEnd({ lobby: lobby({ socketId: 's1', pack: ON }), pay: SPONSORS });
+    expect(screen.queryByText(CARD)).toBeNull();
+    expect(screen.getByText('🔔 Use my Christmas pack here')).toBeTruthy();
   });
 });

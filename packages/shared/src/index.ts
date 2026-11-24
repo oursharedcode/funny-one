@@ -59,13 +59,22 @@ export {
   GOLDEN_STORIES,
   PACK_IDS,
   PACK_OPTIONS_PER_SLOT,
+  PAY_RAILS,
 } from './packs/schema.js';
-export type { PackConfig, PackId, PackOption, PackPools, StoryContent } from './packs/schema.js';
+export type {
+  PackConfig,
+  PackId,
+  PackOption,
+  PackPools,
+  PayRail,
+  StoryContent,
+} from './packs/schema.js';
 export {
   BASE_CONTENT,
   CHR26_LANGUAGES,
   PACKS,
   PACK_TEXTS,
+  REFUND_POLICY_VERSION,
   cutoffOf,
   drawsEnding,
   freeGameContents,
@@ -118,6 +127,7 @@ export {
 // T-1.6 — socket contract (design §5). Types only: the protocol carries no
 // runtime values, so this whole module erases at build time.
 export type {
+  ClientConfig,
   ClientToServerEvents,
   ErrorCode,
   ErrorPayload,
@@ -127,6 +137,7 @@ export type {
   GameRestartReadyPayload,
   LobbyUpdatePayload,
   PaidGameCounts,
+  PayConfig,
   PictureRef,
   Player,
   PlayerLostPayload,

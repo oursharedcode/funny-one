@@ -104,6 +104,35 @@ describe('statKey', () => {
     expect(statKey({ e: 'xm_gold', s: 'app', l: 'en' })).toBeNull();
   });
 
+  it('keys the paying half: the pay card, the pay page by its door, a pay press by rail (Step 123)', () => {
+    expect(statKey({ e: 'xm_card', s: 'direct', l: 'ru' })).toBe('xm_card||ru|direct|||');
+    expect(statKey({ e: 'xm_card', s: 'hub', v: 'a', l: 'en' })).toBe('xm_card|a|en|hub|||');
+    expect(statKey({ e: 'xm_page', s: 'direct', l: 'de', t: 'card' })).toBe(
+      'xm_page||de|direct|card||',
+    );
+    // An Arabic, Hebrew or Persian reader reaches the page too (D4 A).
+    expect(statKey({ e: 'xm_page', s: 'direct', l: 'ar', t: 'link' })).toBe(
+      'xm_page||ar|direct|link||',
+    );
+    expect(statKey({ e: 'xm_pay', s: 'direct', l: 'en', t: 'payid' })).toBe(
+      'xm_pay||en|direct|payid||',
+    );
+    expect(statKey({ e: 'xm_pay', s: 'hub', v: 'b', l: 'ja', t: 'sponsors' })).toBe(
+      'xm_pay|b|ja|hub|sponsors||',
+    );
+    // The card carries no label of its own; the page and the press each need theirs.
+    expect(statKey({ e: 'xm_card', s: 'direct', l: 'en', t: 'card' })).toBeNull();
+    expect(statKey({ e: 'xm_page', s: 'direct', l: 'en' })).toBeNull();
+    expect(statKey({ e: 'xm_page', s: 'direct', l: 'en', t: 'payid' })).toBeNull();
+    expect(statKey({ e: 'xm_pay', s: 'direct', l: 'en', t: 'lightning' })).toBeNull();
+    // Website only: the app shows no price, so it has nothing to count.
+    for (const e of ['xm_card', 'xm_page', 'xm_pay']) {
+      expect(statKey({ e, s: 'app', l: 'en', t: 'card' }), e).toBeNull();
+      expect(statKey({ e, s: 'app', l: 'en', t: 'payid' }), e).toBeNull();
+      expect(statKey({ e, s: 'app', l: 'en' }), e).toBeNull();
+    }
+  });
+
   it("keys a hub visit sent by /x26/ and the hub's two Christmas buttons (Step 119)", () => {
     expect(statKey({ e: 'hub_view', v: 'a', l: 'de', r: 'xmas', d: 'm' })).toBe(
       'hub_view|a|de|||xmas|m',

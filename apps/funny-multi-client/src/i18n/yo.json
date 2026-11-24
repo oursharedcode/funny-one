@@ -107,6 +107,28 @@
     "copy": "Ṣàdàkọ",
     "copied": "A ti ṣàdàkọ rẹ̀!"
   },
+  "pay": {
+    "card": "O ti rí ìtàn Kérésìmesì méjì. Ṣí gbogbo wọn: {{price}}, nínú gbogbo eré, títí di {{date}}.",
+    "cardButton": "Ṣí wọn",
+    "pitch": "Gbogbo ìtàn Kérésìmesì, nínú gbogbo eré, títí di {{date}}. Ìsanwó kan ṣoṣo, kò sí ìsanwó oṣooṣù.",
+    "oncePayId": "Nípasẹ̀ PayID, láti ilé ìfowópamọ́ èyíkéyìí ní Ọsirélíà.",
+    "onceSponsors": "Pẹ̀lú káàdì lórí GitHub Sponsors. Ilé ìfowópamọ́ rẹ ni yóò yí owó náà padà.",
+    "guideTitle": "Ìgbésẹ̀ 3, nǹkan bí ìṣẹ́jú 3:",
+    "guide1": "Wọlé sí GitHub, tàbí ṣẹ̀dá àkọọ́lẹ̀ ọ̀fẹ́.",
+    "guide2": "Yan “{{tier}}”: {{price}}, ìgbà kan.",
+    "guide3": "Sanwó kí o padà wá síbí: kóòdù rẹ yóò hàn.",
+    "switchToSponsors": "Ṣé o kò sí ní Ọsirélíà?",
+    "switchToPayId": "Ṣé o wà ní Ọsirélíà?",
+    "otherLanguages": "A kò kọ àwọn ìtàn Kérésìmesì ní èdè rẹ. Àpò náà ń ṣiṣẹ́ nínú àwọn yàrá ní àwọn èdè wọ̀nyí:",
+    "refunds": "A kì í dá owó padà fún ẹni tó yí ọkàn padà. Àpò tí kò bá ṣiṣẹ́ ni a óò tún ṣe tàbí dá owó rẹ̀ padà.",
+    "payPayId": "San {{price}} nípasẹ̀ PayID",
+    "paySponsors": "San {{price}} lórí GitHub",
+    "failed": "A kò lè bẹ̀rẹ̀ ìsanwó báyìí. Jọ̀ọ́ gbìyànjú lẹ́ẹ̀kan sí i láìpẹ́.",
+    "playFree": "Ṣeré lọ́fẹ̀ẹ́",
+    "haveTitle": "O ti ní àpò yìí tẹ́lẹ̀.",
+    "ended": "Ẹ̀dà Kérésìmesì 2026 kò sí fún tà mọ́.",
+    "closed": "A kò lè ra àpò náà lọ́wọ́lọ́wọ́ yìí. Jọ̀ọ́ padà wá nígbà míì."
+  },
   "gallery": {
     "share": "Pín àwọn àwòrán yàrá yìí",
     "shareButton": "Pín",

@@ -107,6 +107,28 @@
     "copy": "Kopieren",
     "copied": "Kopiert!"
   },
+  "pay": {
+    "card": "Das waren zwei Weihnachtsgeschichten. Schalte alle frei: {{price}}, in jedem Spiel, bis {{date}}.",
+    "cardButton": "Freischalten",
+    "pitch": "Alle Weihnachtsgeschichten, in jedem Spiel, bis {{date}}. Einmal bezahlen, kein Abo.",
+    "oncePayId": "Per PayID, von jeder australischen Bank.",
+    "onceSponsors": "Per Karte über GitHub Sponsors. Deine Bank rechnet den Betrag um.",
+    "guideTitle": "3 Schritte, etwa 3 Minuten:",
+    "guide1": "Melde dich bei GitHub an oder erstelle ein kostenloses Konto.",
+    "guide2": "Wähle „{{tier}}“: {{price}}, einmalig.",
+    "guide3": "Bezahle und komm hierher zurück: Dein Code erscheint.",
+    "switchToSponsors": "Nicht in Australien?",
+    "switchToPayId": "In Australien?",
+    "otherLanguages": "Die Weihnachtsgeschichten gibt es nicht in deiner Sprache. Das Paket läuft in Räumen in diesen Sprachen:",
+    "refunds": "Keine Erstattung, wenn du es dir nur anders überlegst. Ein Paket, das nicht funktioniert, wird repariert oder erstattet.",
+    "payPayId": "{{price}} per PayID bezahlen",
+    "paySponsors": "{{price}} auf GitHub bezahlen",
+    "failed": "Die Zahlung lässt sich gerade nicht starten. Bitte versuche es etwas später noch einmal.",
+    "playFree": "Kostenlos spielen",
+    "haveTitle": "Dieses Paket hast du schon.",
+    "ended": "Die Weihnachtsausgabe 2026 wird nicht mehr verkauft.",
+    "closed": "Das Paket kann gerade nicht gekauft werden. Bitte komm später wieder."
+  },
   "gallery": {
     "share": "Die Bilder des Raums teilen",
     "shareButton": "Teilen",

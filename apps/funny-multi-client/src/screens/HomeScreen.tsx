@@ -52,26 +52,15 @@ import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
 import LanguageList from '../components/LanguageList';
+import PackCodeLine from '../components/PackCodeLine';
 import SupportHeart from '../components/SupportHeart';
 import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
 import { forgetPackCode, linkCodeRefused, readPackCode } from '../packCode';
-import {
-  LANGUAGES,
-  NICKNAME_MAX,
-  NICKNAME_MIN,
-  PACKS,
-  isLanguage,
-  isPackPaid,
-} from '@funny/shared';
+import { lastPaidDay } from '../packDay';
+import { LANGUAGES, NICKNAME_MAX, NICKNAME_MIN, isLanguage, isPackPaid } from '@funny/shared';
 import type { LobbyState } from '../App';
-import type {
-  AuthoredLanguage,
-  Language,
-  PackId,
-  StatsPayload,
-  SupportConfig,
-} from '@funny/shared';
+import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
 
 interface Props {
   onJoined: (state: LobbyState) => void;
@@ -79,48 +68,6 @@ interface Props {
   // tests that don't care about the support screen need not pass it.
   support?: SupportConfig | null;
   onOpenSupport?: () => void;
-}
-
-/**
- * Where a browser has no dates of a language's own — Chrome, and so the
- * Android app, lacks Cantonese and Yoruba — the nearest it has, before
- * British English: without a list, Chrome writes "2027 M08 1".
- */
-const DATE_FALLBACKS: Partial<Record<string, string>> = { yue: 'zh-HK' };
-
-/**
- * A pack's last paid day, as the interface language writes a date: British
- * English, as the game's English is, and the Gregorian calendar in every
- * language (Persian would otherwise default to its own), as the pay page's.
- */
-function lastPaidDay(pack: PackId, language: string): string {
-  const own = language === 'en' ? 'en-GB' : language;
-  const locales = [own, DATE_FALLBACKS[language], 'en-GB'].filter((l): l is string => !!l);
-  return new Intl.DateTimeFormat(
-    locales.map((l) => `${l}-u-ca-gregory`),
-    { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' },
-  ).format(new Date(`${PACKS[pack].paidUntil}T00:00:00Z`));
-}
-
-// Stands in for the code while the pack line is split around it.
-const CODE_MARK = '\u0000';
-
-/**
- * The pack line with its code on one line: a code broken at a hyphen
- * ("XMAS26-" / "K7QM-3FPA") reads as two. The translated line is split at its
- * placeholder, so each language keeps its own word order, and a copied code
- * keeps its plain hyphens.
- */
-function PackCodeLine({ code }: { code: string }) {
-  const { t } = useTranslation();
-  const [before = '', after = ''] = t('home.packCode', { code: CODE_MARK }).split(CODE_MARK);
-  return (
-    <p className="font-semibold text-pink-600">
-      {before}
-      <span className="whitespace-nowrap">{code}</span>
-      {after}
-    </p>
-  );
 }
 
 export default function HomeScreen({ onJoined, support = null, onOpenSupport = () => {} }: Props) {

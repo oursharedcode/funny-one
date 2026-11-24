@@ -17,7 +17,7 @@
 import { describe, expect, it, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import { POOLS, POOL_TEXTS, QUESTIONS, SLOT_COUNT } from '@funny/shared';
-import type { RevealStartPayload, SlotIndex } from '@funny/shared';
+import type { PayConfig, RevealStartPayload, SlotIndex } from '@funny/shared';
 import { createSocketMock, setUrl } from './testutils/socketMock';
 import { screenSlide } from './styles/motion';
 import { renderStory } from './storyLanguage';
@@ -478,6 +478,154 @@ describe('support (T-9.4)', () => {
     expect(screen.getByRole('link', { name: 'Privacy policy' }).getAttribute('href')).toBe(
       '/privacy#privacy-en',
     );
+  });
+});
+
+// Step 123 (B-29): the pay page — open from the first render for a pay link
+// (where the landing site's /x26 forwards), later from the end screen's pay
+// card; what it sells comes from the same /config fetch as the support rails.
+describe('the pay page (Step 123)', () => {
+  const SPONSORS: PayConfig = { pack: 'chr26', rail: 'sponsors' };
+  const PAYID: PayConfig = { pack: 'chr26', rail: 'payid' };
+  const CLOSED = "The pack can't be bought right now. Please come back later.";
+
+  function resolvePay(pay: PayConfig | null): void {
+    fetchMock.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          support: {
+            payId: null,
+            payIdName: null,
+            sponsorsUrl: null,
+            lightningAddress: null,
+            kofiUrl: null,
+            bmcUrl: null,
+            donateUrl: null,
+          },
+          pay,
+        }),
+    });
+  }
+
+  function payPage(): Element | null {
+    return document.querySelector('[data-pay-page="chr26"]');
+  }
+
+  /** A free Christmas game, played to its end screen. */
+  function finishChristmasGame(): void {
+    socketMock.fire('lobby:update', {
+      players: [
+        { id: 's1', nickname: 'hostie', isBot: false },
+        { id: 's2', nickname: 'guest', isBot: false },
+        { id: 's3', nickname: 'third', isBot: false },
+      ],
+      hostId: 's1',
+      pack: { id: 'chr26', on: true, paid: false },
+    });
+    socketMock.fire('game:over', undefined);
+  }
+
+  // The pack is on sale only while its free part runs, so the day is pinned.
+  beforeEach(() => {
+    vi.setSystemTime(Date.parse('2026-12-20T09:00:00Z'));
+    setReloadSafe.mockClear();
+  });
+  afterEach(() => {
+    vi.setSystemTime(vi.getRealSystemTime());
+  });
+
+  it('opens from a pay link with the first render, and fills in once the server answers', async () => {
+    setUrl('?pay=x26');
+    resolvePay(SPONSORS);
+    render(<App />);
+    expect(payPage()).not.toBeNull();
+    expect(screen.queryByText('US$2')).toBeNull();
+    await act(async () => {});
+    expect(screen.getByText('US$2')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Pay US$2 on GitHub' })).toBeTruthy();
+  });
+
+  it('sells by the rail the server chose for this visitor', async () => {
+    setUrl('?pay=x26');
+    resolvePay(PAYID);
+    render(<App />);
+    await act(async () => {});
+    expect(screen.getByRole('button', { name: 'Pay A$2.60 by PayID' })).toBeTruthy();
+  });
+
+  it("shuts to the game underneath, and takes the link's name off the address", async () => {
+    setUrl('?pay=x26');
+    resolvePay(SPONSORS);
+    render(<App />);
+    await act(async () => {});
+    fireEvent.click(screen.getByText('Play free'));
+    expect(payPage()).toBeNull();
+    expect(window.location.search).toBe('');
+    expect(screen.getByText('Create room')).toBeTruthy();
+  });
+
+  it('says to come back later when the server cannot be reached, or sells nothing', async () => {
+    setUrl('?pay=x26');
+    const { unmount } = render(<App />);
+    await act(async () => {});
+    expect(screen.getByText(CLOSED)).toBeTruthy();
+    unmount();
+
+    setUrl('?pay=x26');
+    resolvePay(null);
+    render(<App />);
+    await act(async () => {});
+    expect(screen.getByText(CLOSED)).toBeTruthy();
+  });
+
+  // B-26: a reload on update would take the page from under someone paying.
+  it('holds a reload on update while it is open', async () => {
+    setUrl('?pay=x26');
+    resolvePay(SPONSORS);
+    render(<App />);
+    await act(async () => {});
+    expect(setReloadSafe).toHaveBeenLastCalledWith(false);
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(setReloadSafe).toHaveBeenLastCalledWith(true);
+  });
+
+  it("opens from the end screen's pay card and shuts back to the room", async () => {
+    resolvePay(SPONSORS);
+    renderInLobby();
+    await act(async () => {});
+    finishChristmasGame();
+    expect(document.querySelector('[data-pay-card="chr26"]')).not.toBeNull();
+    expect(payPage()).toBeNull();
+
+    fireEvent.click(screen.getByText('Unlock'));
+    expect(payPage()).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Pay US$2 on GitHub' })).toBeTruthy();
+    expect(screen.queryByText('Play free')).toBeNull();
+
+    fireEvent.click(screen.getByText('Close'));
+    expect(payPage()).toBeNull();
+    expect(screen.getByText('Unlock')).toBeTruthy();
+  });
+
+  it('shows no pay card when the server sells nothing', async () => {
+    resolvePay(null);
+    renderInLobby();
+    await act(async () => {});
+    finishChristmasGame();
+    expect(document.querySelector('[data-pay-card]')).toBeNull();
+  });
+
+  // FM-APP-3: no price and no way to pay inside the Android store app.
+  it('has no way in inside the Android store app: no link, no card', async () => {
+    setUrl('?pay=x26&shell=android');
+    resolvePay(SPONSORS);
+    renderInLobby();
+    await act(async () => {});
+    expect(payPage()).toBeNull();
+    finishChristmasGame();
+    expect(document.querySelector('[data-pay-card]')).toBeNull();
+    expect(screen.queryByText('Unlock')).toBeNull();
+    expect(screen.queryByText(/US\$2|A\$2\.60/)).toBeNull();
   });
 });
 

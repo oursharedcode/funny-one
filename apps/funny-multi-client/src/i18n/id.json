@@ -107,6 +107,28 @@
     "copy": "Salin",
     "copied": "Disalin!"
   },
+  "pay": {
+    "card": "Kamu baru saja melihat dua cerita Natal. Buka semuanya: {{price}}, di setiap permainan, sampai {{date}}.",
+    "cardButton": "Buka",
+    "pitch": "Semua cerita Natal, di setiap permainan, sampai {{date}}. Sekali bayar, tanpa langganan.",
+    "oncePayId": "Lewat PayID, dari bank Australia mana pun.",
+    "onceSponsors": "Pakai kartu di GitHub Sponsors. Banknya yang mengonversi jumlahnya.",
+    "guideTitle": "3 langkah, sekitar 3 menit:",
+    "guide1": "Masuk ke GitHub, atau buat akun gratis.",
+    "guide2": "Pilih “{{tier}}”: {{price}}, sekali bayar.",
+    "guide3": "Bayar lalu kembali ke sini: kodemu akan muncul.",
+    "switchToSponsors": "Tidak di Australia?",
+    "switchToPayId": "Di Australia?",
+    "otherLanguages": "Cerita Natal belum ada dalam bahasamu. Paket ini bisa dimainkan di ruangan dengan bahasa berikut:",
+    "refunds": "Tidak ada pengembalian dana jika hanya berubah pikiran. Paket yang tidak berfungsi akan diperbaiki atau uangnya dikembalikan.",
+    "payPayId": "Bayar {{price}} lewat PayID",
+    "paySponsors": "Bayar {{price}} di GitHub",
+    "failed": "Pembayaran belum bisa dimulai sekarang. Coba lagi sebentar lagi.",
+    "playFree": "Main gratis",
+    "haveTitle": "Paket ini sudah kamu miliki.",
+    "ended": "Edisi Natal 2026 sudah tidak dijual lagi.",
+    "closed": "Paket ini sedang tidak bisa dibeli. Silakan kembali nanti."
+  },
   "gallery": {
     "share": "Bagikan gambar-gambar ruangan",
     "shareButton": "Bagikan",

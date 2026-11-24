@@ -7892,6 +7892,9 @@ August 2027) and its webhook, at Step 125; the live-badge look; Funny Multi's tr
 before 1 February 2027; B-3's native reviewers now also have the 13 lines and the policy's
 section in 21 languages. The Lightning service is no longer owed (D4 A).
 
+~~RESUME HERE (2026-11-22, after Step 122; not yet pushed)~~ — pushed as `e152432`, CI green (run
+45012694062); carried into Step 123's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-22, after Step 122; not yet pushed).** Step 121 is pushed and green
 (`4b99d64`, CI run 44904743259) and its phone check passed. **The paid code works end to end,
 with no payment:** a signed `XMAS26-XXXX-XXXX` opens a room from `room:create` or any player's
@@ -7907,3 +7910,155 @@ players are shown rather than sell them a code. Then 124 PayID and the admin pag
 December–1 January or 6–7 January (#16). **Owed, the owner's:** `PACK_CODE_SECRET` in the VM's
 `.env` before the deploy; the Sponsors tier and its webhook; the live-badge look; Funny Multi's
 trader confirmation before 1 Feb 2027.
+
+## Step 123 (task B-29) — the pay card after a free game and the pay page (2026-11-24)
+
+**Owner decisions, 2026-11-24 (`/morning`, on Step 123's plan)** — B-29's block in tasks.md holds
+the binding text: **D1 A** the pay page is a screen of Funny Multi's website, and the landing
+site's `/x26` forwards to it; **D2 A** the server picks the way to pay by the buyer's country —
+Australia PayID, everyone else GitHub Sponsors — with a small switch on the page for a wrong
+guess; **D3 A** outside Australia the price reads "US$2" exactly, with "your bank converts it",
+A$2.60 in Australia, no conversion anywhere; **D4 A** ar, he and fa players read the card and the
+page in their own language, with one more line saying the pack plays in rooms in its own
+languages, not theirs; **D5 A** the Sponsors guide is three numbered steps of text in the buyer's
+language, no screenshots. **Nothing can be paid yet:** the pay button counts its press and says
+the payment cannot be started — Steps 124 (PayID) and 125 (Sponsors) fill that seam, and Steps
+122–126 deploy together.
+
+**Shipped:**
+
+- **Shared** (`packages/shared`): `PayRail` (`payid`, `sponsors`) and `PAY_RAILS`;
+  `PackConfig.prices` — chr26's are A$2.60 by PayID and US$2 through Sponsors, written the same
+  in every language; `REFUND_POLICY_VERSION` (`2026-11-24`), which a code's issue record will
+  keep with the sale; `PayConfig` and `ClientConfig`, the shape of `/config`'s answer.
+- **Server** (`apps/funny-multi-server`): `packOnSale` (`rooms.ts`) — the first pack whose free
+  part is on, none under `PACK_ROOMS=off`. `GET /config` answers `{ support, pay }`: `pay` is `{
+  pack, rail }` — `payid` where `geo.ts` places the request's address in Australia, `sponsors`
+  anywhere else and wherever it cannot tell — or null without a usable `PACK_CODE_SECRET`, with
+  the packs off, or after the free part. The answer differs per visitor, so it is sent
+  `no-store`. `analytics.ts` takes the three new counts and their `t` values.
+- **Client** (`apps/funny-multi-client`): `pay.ts` (new) — the link `?pay=x26` (`payLinkPack`,
+  `clearPayLink`), the tier's name as GitHub shows it (`SPONSORS_TIERS`) and `startPayment`, the
+  seam the rails fill, which answers not-ok for now. `PayScreen.tsx` (new) is the pay page, laid
+  over whatever is open: the edition's name, the pitch with the last paid day, the price and how
+  it is paid, the Sponsors guide outside Australia, the note for an ar, he or fa reader with the
+  pack's languages under their own names, the refund line, the pay button, the switch to the
+  other rail, and Close — "Play free" for a visitor the link brought. A phone that keeps a code
+  reads "You already have this pack." with the code and its last day; from the day after the free
+  part's last the page says the edition is no longer on sale; where `pay` is null, that the pack
+  cannot be bought right now. `EndScreen` shows the pay card after a free Christmas game — "You
+  just saw two Christmas stories. Unlock all of them: {price}, every game, until {date}." over
+  "Unlock" — to every player whose phone keeps no code; never in the Android app, in a paid room,
+  with the host's switch off, or in an ar, he or fa room. `App.tsx` reads `/config`'s `pay`,
+  opens the page from the card or the link, keeps the link on the address while the page is open
+  and takes it off on close, and does not reload itself for an update under an open page; the
+  Android shell ignores `?pay=`. `packDay.ts` and `PackCodeLine.tsx` (both new) are Step 122's
+  date and unbroken code, moved out of Home for the page to share. `funnel.ts`: `xm_card`,
+  `xm_page` (`card` or `link`) and `xm_pay` (`payid` or `sponsors`), each once per page load,
+  website only.
+- **Landing site** (`apps/funny-family-site`): `/x26/` now sends the visitor, in the language `/`
+  would choose, to `<Funny Multi>/?pay=x26&lang=<code>`, so the QR on every shared golden story
+  leads to the pay page. `/stats/` gains a second Christmas table, "Paying for it": cards shown,
+  pages opened from the card and from the link, presses for PayID and for Sponsors, per language.
+  `deploy/ship-funny-family.sh` checks `/x26/` for the new forward and says to ship the game
+  first.
+- **Texts:** a 20-key `pay` section in all 23 catalogues — en and ru the agent's, the other 21
+  machine drafts (sub-agents) on B-3's pile, the drafters' notes for the reviewer in tasks.md's
+  Step 123 line. The privacy policy (`privacy.html`) names the three counts in all 23 sections,
+  and `originRoot.test.ts` holds it to that.
+- **Docs:** design §4.4 (what is on sale, the pay card, the pay page, the paying half's counts,
+  where `/x26/` leads), §10.2 and §11; tasks.md — the 2026-11-24 decisions and the Step 123 line;
+  `.env.example`.
+
+**Settled in the step:**
+
+- The card's price is the buyer's own: US$2 outside Australia, where the 2026-11-21 wording had
+  A$2.60 for everyone — D2 A and D3 A read together.
+- Sales stop with the free part (FM-PACK-6), so every buyer gets the paid part's extra month at
+  least, and the pay card only ever follows a free Christmas game.
+- D4's line lists the pack's languages by name — 19 names, the two Spanishes as one — rather than
+  counting them.
+- The tier's name stays English in every language, as GitHub shows it, and sits between U+2068
+  and U+2069. Without them an ar or he line joined the name, the closing quotation mark and
+  "US$2" into one left-to-right run, and the mark and the colon landed on the wrong side of the
+  name — seen on the 320 px screenshots, fixed, shot again.
+- ru and uk end a dated sentence «включительно» / «включно», since their dates end in a full stop
+  of their own; ru's Step 122 hint on Home was reworded with them.
+- The landing page keeps reading `?from=xmas` for the counts already made, though nothing arrives
+  with it any more.
+
+**Verified in phone-sized Chromium** (`.screens/step123-check.mjs`, gitignored): the built server
+on 3000 under a random throwaway `PACK_CODE_SECRET` set in the process environment only (not in
+the repo or in .env), the picture Worker's local stand-in on 5185 and the built landing site on
+5187. 426 checks, none failing, no server warning, the three ports free afterwards. A 3-player
+English game at 360 px: the card on all three phones, US$2 on two and A$2.60 on the one given an
+Australian `/config`; Unlock opens the page; a press of pay says the payment cannot be started;
+both ways to pay through the switch; Close goes back to the card. No card in a paid room (a code
+minted for the run), with the host's switch off, in an ar room, or in the Android shell
+(`?shell=android`). A 320 px room with ar, he, fa, ta and de guests: the card and the page in
+each language, right to left in three, the note on languages in those three only, nothing cut or
+overflowing. The link: kept through a reload and taken off on close; "Play free"; the landing
+site's `/x26/` sending a German browser to `…/?pay=x26&lang=de`; a phone with a code; the Android
+shell showing no page; a server selling nothing. Then the counts — `/api/stats/summary` and the
+`/stats/` table equal to what the phones did: 8 cards, 7 pages from the card, 10 from the link, 3
+presses (1 PayID, 2 Sponsors). Not in the browser: the country lookup — locally there is no
+country file, so Australia was a rewritten `/config` answer; the server's tests cover the lookup.
+One thing left as it is: the German heading's bell wraps onto a line of its own at 320 px.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test`, outside the sandbox, 2245 across
+6 workspaces (536 funny-family-site — 3 more, 570 funny-multi-client — 47 more, 426
+funny-multi-server — 8 more, 178 funny-one-client, 447 shared, 88 cloudflare); no dependency
+changed; CI pending the push. `npm audit` is below.
+
+**`npm audit` — a new advisory, not this step's doing, accepted by ID.** GHSA-6jcc-5g8w-32mx
+(CVE-2026-63402, moderate, published 2026-11-23): `i18next` before 26.3.4 — `deepExtend` recurses
+into inherited built-ins, so data merged with `addResourceBundle(…, deep: true, overwrite: true)`
+can corrupt shared built-in objects (a denial of service). Both web clients have 23.16.8
+(`^23.16.8`). The only fix is a major bump (npm offers 27.2.7 with `--force`; `npm audit fix`
+without it changes nothing — dry run, lockfile untouched). What the agent found: neither client
+calls `addResourceBundle`, `addResources` or `addResource` anywhere, and `react-i18next` 14.1.3
+does not either; both pass catalogues bundled at build time to `init` once. In i18next 23.16.8
+`deepExtend` has that one caller. No player's input reaches the function, and it is browser code
+— the worst case is a visitor breaking their own tab. **The owner accepted it by ID on
+2026-11-25** (D1 A on this step's report), as glob and minimatch in Step 99, over a major bump as
+its own step before this one's commit. **The gate from now on:** `npm audit --omit=dev` reports 1
+moderate, this id alone — the first accepted id in production — and the full audit 10 moderate
+under exactly three accepted ids: GHSA-6jcc-5g8w-32mx i18next, GHSA-3g3m-2fjr-6pw4 glob,
+GHSA-g3hv-75wg-m249 minimatch. Re-checked each session; the exception goes with an upgrade to
+i18next 26.3.4 or later, and it no longer holds if either client ever merges catalogues it did
+not ship (a call to `addResourceBundle`).
+
+**Owed, the agent's:** Steps 124–126, then the one deploy (D1) — the server's log checked first
+for a game in progress (B-27), **`deploy/ship.sh` before `deploy/ship-funny-family.sh`**: `/x26/`
+forwards to a page only the new game has. An earlier deploy of the game alone is harmless — with
+no `PACK_CODE_SECRET`, `/config` answers `pay: null`, so there is no card and the page has
+nothing to buy. The policy's new clause goes live with the next `ship.sh`. B-29 stays open.
+
+**Decided on this step's report, 2026-11-25 (owner):** D1 A, the advisory above; **D2 A — no
+price on a golden story's download.** The 2026-11-21 wording put the unlock line with A$2.60 on
+both golden stories' downloads once the paid half is live; they stay at "Christmas 2026 edition"
+over the QR, which now leads to the pay page — that shows the price for the viewer's country,
+which a download cannot know.
+
+**Owed, the owner's:** nothing new. To know: on an Android phone with the app installed, a `/x26`
+QR may open the app (it handles every address of the game's site), where no pay page is shown —
+Play's rule. Still owed from Step 122: `PACK_CODE_SECRET` in the VM's `.env` before the deploy;
+the Sponsors tier (US$2 one-time, "Christmas 2026 edition", its text naming 1 August 2027) and
+its webhook, at Step 125; the live-badge look; Funny Multi's trader confirmation before 1
+February 2027. B-3's native reviewers now also have the `pay` section and the policy's clause in
+21 languages.
+
+**RESUME HERE (2026-11-24, after Step 123; not yet pushed).** Step 122 is pushed and green
+(`e152432`, CI run 45012694062). **The pay card and the pay page are built; nothing can be paid
+yet, and nothing of the paid half is live** — Steps 122–126 deploy together (D1). After a free
+Christmas game every player on the website reads the pay card; it and `?pay=x26` — where the
+landing site's `/x26/` now forwards — open the pay page, whose button only counts its press.
+**`npm audit` now has three accepted ids, one of them in production** (GHSA-6jcc-5g8w-32mx
+i18next, accepted 2026-11-25; the step's audit paragraph). **Next, Step 124 (the agent's) — PayID
+and the admin page:** the pay button's `startPayment` seam for Australia, the owner's private
+phone page behind a secret link (D2 A of 2026-11-22), the issue record with the refund policy's
+version. Then 125 Sponsors, 126 sleigh bells, the landing line "Christmas pack — try it free",
+#2's Christmas invitation, #15's uptime alarm and the one deploy by about 10 December, the game
+before the landing site — no deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** `PACK_CODE_SECRET` in the VM's `.env` before the deploy; the Sponsors tier
+and its webhook; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.

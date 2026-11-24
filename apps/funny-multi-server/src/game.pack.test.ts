@@ -44,7 +44,7 @@ vi.mock('./image.js', () => {
   };
 });
 
-import { __resetRoomsForTest, createRoom, joinRoom, packOffer } from './rooms.js';
+import { __resetRoomsForTest, createRoom, joinRoom, packOffer, packOnSale } from './rooms.js';
 import {
   ROUNDS,
   buildGallery,
@@ -140,6 +140,14 @@ describe('the offer (owner decisions 3A, 4A)', () => {
   it('offers nothing from the free cut-off on', () => {
     expect(packOffer('en', FREE_CUTOFF - 1)).toEqual({ id: 'chr26', on: true, paid: false });
     expect(packOffer('en', FREE_CUTOFF)).toBeNull();
+  });
+
+  it('sells the pack while its free part is on, and never with the rooms off (Step 123)', () => {
+    expect(packOnSale(FREE_CUTOFF - 1)).toBe('chr26');
+    // Sales stop with the free part, a month before the paid codes do.
+    expect(packOnSale(FREE_CUTOFF)).toBeNull();
+    vi.stubEnv('PACK_ROOMS', 'off');
+    expect(packOnSale(FREE_CUTOFF - 1)).toBeNull();
   });
 });
 

@@ -2,7 +2,7 @@
 // @vitest-environment node
 
 import { describe, expect, it, vi } from 'vitest';
-import { FROM_XMAS, headScript, XMAS_CUTOFF, xmasForwardScript } from './headScript.ts';
+import { FROM_XMAS, headScript, PAY_XMAS, XMAS_CUTOFF, xmasForwardScript } from './headScript.ts';
 import { LANG_KEY, REFERRER_KEY, VARIANT_KEY } from '../keys.ts';
 
 const HOST = 'www.funny-family.oursharedcode.com';
@@ -272,7 +272,7 @@ describe('the head script: the end of the Christmas edition’s free part (Step 
     expect(run(false, { now: XMAS_CUTOFF + 400 * 86_400_000 }).xmas).toBe('over');
   });
 
-  it('tells a visitor sent by /x26 that the edition has ended', () => {
+  it('tells a visitor who arrives marked as sent by /x26 that the edition has ended', () => {
     const now = XMAS_CUTOFF;
     expect(run(false, { now, search: `?${FROM_XMAS}` }).xmas).toBe('ended');
     expect(run(false, { now, search: `?v=b&${FROM_XMAS}` }).xmas).toBe('ended');
@@ -296,44 +296,52 @@ describe('the head script: the end of the Christmas edition’s free part (Step 
   });
 });
 
-describe('/x26/: on to the visitor’s own page (Step 119)', () => {
+// Step 123 (D1 A): the pay page is a screen of Funny Multi, so /x26/ leaves
+// this site for it, in the language `/` would have chosen.
+describe('/x26/: on to the pay page in the visitor’s language (Steps 119, 123)', () => {
   const forward = (env: Env = {}) => run(false, env, xmasForwardScript()).replaced;
+  const pay = (code: string) => `https://www.funny37.oursharedcode.com/?${PAY_XMAS}&lang=${code}`;
 
-  it('sends a browser that prefers a language of the games to its page, marked', () => {
-    expect(forward({ languages: ['de-DE', 'en'] })).toEqual([`/de/?${FROM_XMAS}`]);
-    expect(forward({ languages: ['zh-HK'] })).toEqual([`/yue/?${FROM_XMAS}`]);
-    expect(forward({ languages: [], language: 'ko-KR' })).toEqual([`/ko/?${FROM_XMAS}`]);
+  it('names the pack as Funny Multi’s pay link does', () => {
+    expect(PAY_XMAS).toBe('pay=x26');
   });
 
-  it('sends English and every language the games lack to /', () => {
-    expect(forward({ languages: ['en-AU'] })).toEqual([`/?${FROM_XMAS}`]);
-    expect(forward({ languages: ['xx-YY'] })).toEqual([`/?${FROM_XMAS}`]);
-    expect(forward({ languages: [], language: '' })).toEqual([`/?${FROM_XMAS}`]);
+  it('sends a browser that prefers a language of the games to the pay page in it', () => {
+    expect(forward({ languages: ['de-DE', 'en'] })).toEqual([pay('de')]);
+    expect(forward({ languages: ['zh-HK'] })).toEqual([pay('yue')]);
+    expect(forward({ languages: ['es-MX'] })).toEqual([pay('es-419')]);
+    expect(forward({ languages: [], language: 'ko-KR' })).toEqual([pay('ko')]);
   });
 
-  it('sends ar, he and fa to their own pages, which have no Christmas buttons', () => {
-    expect(forward({ languages: ['he-IL'] })).toEqual([`/he/?${FROM_XMAS}`]);
+  it('sends English and every language the games lack to the English one', () => {
+    expect(forward({ languages: ['en-AU'] })).toEqual([pay('en')]);
+    expect(forward({ languages: ['xx-YY'] })).toEqual([pay('en')]);
+    expect(forward({ languages: [], language: '' })).toEqual([pay('en')]);
+  });
+
+  it('sends ar, he and fa in their own language: the pay page says where the pack plays', () => {
+    expect(forward({ languages: ['he-IL'] })).toEqual([pay('he')]);
+    expect(forward({ languages: ['ar-EG'] })).toEqual([pay('ar')]);
   });
 
   it('puts the language picked here before over the browser’s', () => {
-    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'ru' } })).toEqual([
-      `/ru/?${FROM_XMAS}`,
-    ]);
-    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'en' } })).toEqual([`/?${FROM_XMAS}`]);
-    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'xx' } })).toEqual([
-      `/de/?${FROM_XMAS}`,
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'ru' } })).toEqual([pay('ru')]);
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'en' } })).toEqual([pay('en')]);
+    expect(forward({ languages: ['de'], local: { [LANG_KEY]: 'xx' } })).toEqual([pay('de')]);
+  });
+
+  it('goes on from a page of this site too, and copes with blocked storage', () => {
+    expect(forward({ languages: ['fr'], referrer: `https://${HOST}/de/` })).toEqual([pay('fr')]);
+    expect(forward({ languages: ['ja'], blocked: true })).toEqual([pay('ja')]);
+  });
+
+  it('carries nothing of its own address on: the pay page is reached by its code alone', () => {
+    expect(forward({ languages: ['it'], search: '?v=b&lang=<x>', hash: '#games' })).toEqual([
+      pay('it'),
     ]);
   });
 
-  it('goes on from a page of this site too, keeps the hash, and copes with blocked storage', () => {
-    expect(forward({ languages: ['fr'], referrer: `https://${HOST}/de/` })).toEqual([
-      `/fr/?${FROM_XMAS}`,
-    ]);
-    expect(forward({ languages: ['ja'], hash: '#games' })).toEqual([`/ja/?${FROM_XMAS}#games`]);
-    expect(forward({ languages: ['ja'], blocked: true })).toEqual([`/ja/?${FROM_XMAS}`]);
-  });
-
-  it('drops the rest of its own query: the page is reached by its code alone', () => {
-    expect(forward({ languages: ['it'], search: '?v=b' })).toEqual([`/it/?${FROM_XMAS}`]);
+  it('no longer marks a visit to this site', () => {
+    expect(xmasForwardScript()).not.toContain(FROM_XMAS);
   });
 });

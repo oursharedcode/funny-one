@@ -133,8 +133,9 @@ export default defineConfig({
         // shell (spec §13). Socket.IO traffic is never cached; neither are
         // the Worker's `/i/<hash>.png` cartoons, which carry their own
         // immutable cache headers (design §7.2). `woff2` is the self-hosted
-        // Fredoka (styles/index.css).
-        globPatterns: ['**/*.{js,css,png,svg,woff2,webmanifest}'],
+        // Fredoka (styles/index.css); `mp3` the video's sleigh bells (Step
+        // 126, 41 KB), so a clip made offline still rings.
+        globPatterns: ['**/*.{js,css,png,svg,woff2,webmanifest,mp3}'],
         // Disable the default precached-index.html fallback for SPA
         // navigations — the NetworkFirst rule below handles them.
         navigateFallback: null,

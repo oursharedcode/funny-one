@@ -16,7 +16,7 @@
 // are about their shape.
 
 import { describe, expect, it } from 'vitest';
-import { LANGUAGES, type ErrorCode } from '@funny/shared';
+import { LANGUAGES, PACK_INVITES, type ErrorCode, type Language } from '@funny/shared';
 import en from './en.json';
 import ru from './ru.json';
 import de from './de.json';
@@ -189,6 +189,18 @@ describe('catalogue coverage', () => {
       const round = catalog.round as Record<string, string>;
       expect(round.placeholder, `${code}.json still has round.placeholder`).toBeUndefined();
       expect(round.pick, `${code}.json is missing the combobox prompt`).toBeTruthy();
+    }
+  });
+
+  it('names the game in the Christmas invitation as Home does, and the button no price (Step 126)', () => {
+    // The invitation's text lives in @funny/shared (PACK_INVITES), where the
+    // server's preview reads it too; its title must name the game as this
+    // catalogue does. The button's label is here, and carries no money (5A).
+    for (const [code, catalog] of Object.entries(CATALOGS)) {
+      const title = (catalog.home as Record<string, string>).title!;
+      expect(PACK_INVITES[code as Language].title, `${code} invitation`).toContain(title);
+      const invite = (catalog.lobby as Record<string, string>).invite!;
+      expect(invite, `${code}.json lobby.invite`).not.toMatch(/[\p{Nd}\p{Sc}]/u);
     }
   });
 });

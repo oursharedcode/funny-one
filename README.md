@@ -48,7 +48,11 @@ This repo is licensed [AGPL-3.0-only](LICENSE).
 The flag pictures in each app's `public/flags/` are [Twemoji](https://github.com/twitter/twemoji)
 © Twitter, Inc. and other contributors, licensed under
 [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The Fredoka font is under the SIL Open
-Font License (`public/fonts/OFL.txt`). The repo _is_ the product: there are no
+Font License (`public/fonts/OFL.txt`). Funny Multi's sleigh bells
+(`public/sounds/sleigh-bells.mp3`) are cut from
+[Sleigh bells.wav](https://commons.wikimedia.org/wiki/File:Sleigh_bells.wav) by The Midnite Wolf,
+dedicated to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The repo _is_ the product: there are no
 secrets baked into any deployment, no server-side-only feature, nothing withheld from a
 self-hoster. If you deploy your own copy — modified or not — the AGPL requires you to make
 your source available to your users, same as everyone else deploying this game.

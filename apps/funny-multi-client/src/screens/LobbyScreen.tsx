@@ -17,6 +17,13 @@
 // any player whose phone keeps a paid code can open the room with it
 // (PackUnlock) — which also shows why the code Home sent did not.
 //
+// Step 126 (B-29 #2, the Christmas invitation): a Christmas room's box has an
+// Invite button for every player, handing the share sheet the invitation in
+// the player's own language (@funny/shared's PACK_INVITES, the table the
+// server's join-link preview reads too) and the join link; where the browser
+// has no share sheet, the two are copied instead. No price and no unlock code:
+// the link is the room's ordinary one.
+//
 // The cap banner is carried as-is. At T-3.2 it was inert — no server
 // `stats:get` handler, so the ack never fired and `isCapReached(null)` was
 // false. T-5.3 wired the handler; this file did not need to change.
@@ -25,12 +32,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import { homeUrl } from '../basePath';
+import { copyText } from '../copyText';
 import PlayerList from '../components/PlayerList';
 import QRCode from '../components/QRCode';
 import PackUnlock from '../components/PackUnlock';
 import { hoursUntilUtcMidnight, isCapReached } from '../capReset';
 import type { LobbyState } from '../App';
-import type { StatsPayload } from '@funny/shared';
+import { inviteText, isLanguage, type StatsPayload } from '@funny/shared';
 
 interface Props {
   lobby: LobbyState;
@@ -38,8 +46,9 @@ interface Props {
 }
 
 export default function LobbyScreen({ lobby, onLeave }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [copied, setCopied] = useState(false);
+  const [inviteCopied, setInviteCopied] = useState(false);
   const [stats, setStats] = useState<StatsPayload | null>(null);
 
   // Subscribe to the live stats broadcast (spec §26) so the lobby reflects
@@ -88,6 +97,22 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
       document.body.removeChild(ta);
       flash();
     }
+  }
+
+  async function invite(): Promise<void> {
+    const text = inviteText(isLanguage(i18n.language) ? i18n.language : 'en');
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title: t('home.title'), text, url: joinUrl });
+        return;
+      } catch (err) {
+        // Dismissed: done. Refused (an insecure page, a busy sheet): copy.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+    await copyText(`${text} ${joinUrl}`);
+    setInviteCopied(true);
+    window.setTimeout(() => setInviteCopied(false), 1500);
   }
 
   function leave(): void {
@@ -144,6 +169,14 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
               />
               <span>{t('lobby.christmasSwitch')}</span>
             </label>
+          )}
+          {lobby.pack.on && (
+            <button
+              className="rounded bg-pink-500 py-2 font-semibold text-white"
+              onClick={() => void invite()}
+            >
+              {inviteCopied ? t('lobby.copied') : t('lobby.invite')}
+            </button>
           )}
         </div>
       )}

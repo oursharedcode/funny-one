@@ -46,7 +46,8 @@
     "christmasOn": "🔔 本局有一个圣诞故事",
     "christmasSwitch": "使用 2026 圣诞故事",
     "christmasPaid": "🔔 本局的每个故事都是圣诞故事",
-    "usePack": "🔔 在这里使用我的圣诞故事包"
+    "usePack": "🔔 在这里使用我的圣诞故事包",
+    "invite": "🔔 邀请朋友来玩圣诞游戏"
   },
   "round": {
     "progress": "第 {{current}} 轮 / 共 {{total}} 轮",

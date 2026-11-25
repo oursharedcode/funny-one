@@ -871,7 +871,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       festive line, and a join link's preview — a title and one of the 650 pictures) and #15 an
       uptime alarm (a scheduled GitHub check every 30 minutes of the server's health page,
       `/x26` and one Christmas picture, an email to the owner on a failure) in Step 126. After
-      the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 127; it
+      the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 128 since 2026-11-25, the deploy being 127; it
       changes the 3-player rule), #10 gift a pack (Australia's gift-card law checked first — a
       3-year expiry against 1 August 2027), #9 a festive room look (snow, off under reduced
       motion; a festive ending card; a bell when a golden story is revealed), #7 the whole-game
@@ -1059,6 +1059,40 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     GitHub's own localised pages; "sponsorship" is coined in sw ("udhamini") and yo ("ìgbọ̀wọ́"), a
     loanword in hi, ta, te and bn; he keeps the plural address, ar the masculine singular of
     the rest of its policy. **Next:** Step 126 — sleigh bells.
+  - *Decisions 2026-11-25, third set (owner, on the Step 126 plan):*
+    - **D1 A — the bells are a CC0 recording**, 5 s of "Sleigh bells.wav" by The Midnite Wolf
+      on Wikimedia Commons, credited in the README.
+    - **D2 A — bells only in a golden story's and a paid game's videos**; an ordinary story's
+      clip stays silent.
+    - **D3 A — the join link's preview has one fixed picture**: the agent proposes 3 of the 650
+      that avoid the known flaws, the owner picks one, and it ships as a 1200 × 630 JPEG from
+      the game's own address. The uptime alarm checks the same picture.
+    - Following from these, the deploy is Step 127 and #1 (play alone with two bots) moves to
+      Step 128.
+  - **Bells, the landing line, the invitation and the alarm done 2026-11-25 (Step 126)** — not
+    live until Step 127's deploy. `sleighBells.ts` and `public/sounds/sleigh-bells.mp3` (the
+    clip's audio track, best-effort); `xmasStrings.ts`'s 20 `play` lines; `PACK_INVITES` and
+    `inviteText` in shared (23 languages) and the lobby's `lobby.invite` button (share sheet,
+    copy fallback); `invitePreview.ts` (the dressed join page) and `public/og-christmas.jpg`
+    (provisional: S006, until the owner picks); `.github/workflows/uptime.yml`, which reads a
+    Worker picture's address from the repository variable `CHRISTMAS_PICTURE_URL`, the
+    owner's to set. Seen working 2026-11-25 in phone-sized Chromium: 45 checks — golden and
+    paid clips carry an opus track peaking at −2.7 dB and an ordinary one none; de, ta and en
+    landing buttons fit 320 px; the share sheet gets the line and the ordinary link, the copy
+    fallback says "Скопировано!" in ru at 320 px, no button in an ordinary (ar) room; a
+    Christmas room's link carries the tags and a 1200 × 630 JPEG, an ordinary room's and the
+    plain home none, and the dressed link opens the join screen. The drafters' notes for B-3's
+    reviewer — **the invitation and the landing line** (en and ru the agent's; the other 21
+    invitations and 18 landing lines machine drafts): each invitation names the game with
+    its catalogue's `home.title`, quoted as that script quotes ("…", «…», „…“, 「…」), and
+    keeps the catalogue's address (fr «Rejoins», de «Spiel mit», uk «Заходь», bn «এসো»; te,
+    hi and he the plural or polite form, as their lobbies do); "cartoon" is «dessin animé»,
+    «cartone animato», «caricatura» (es-419), «漫画» (ja, zh, yue — a comic as much as a
+    cartoon, the least certain of the CJK), «만화», «kartun»/«katuni»; ar «بنسخة عيد الميلاد»
+    turns "Christmas game" into "the Christmas edition of"; yo «Darapọ̀ mọ́» and «àwòrán
+    eré» (cartoon) are coined; the landing line's "pack" reuses each catalogue's
+    `home.packCode` word, and yo «gbìyànjú rẹ̀» (try it) is the least certain of the 18.
+    **Next:** Step 127 — the deploy.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

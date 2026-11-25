@@ -2,6 +2,7 @@
 
 // MUST be first — loads .env into process.env before any other module reads it.
 import './env.js';
+import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import fastifyCors from '@fastify/cors';
@@ -61,6 +62,7 @@ import { createGeo, type Geo } from './geo.js';
 import { registerPayRoutes } from './payid.js';
 import { registerSponsorsRoutes, sponsorsRail, type SponsorsSettings } from './sponsors.js';
 import { registerAdminRoutes } from './admin.js';
+import { registerInvitePreview } from './invitePreview.js';
 
 // ---------------------------------------------------------------------------
 // T-2.1 — bootstrap only (design §3). This is SRC/server/src/index.ts reduced
@@ -368,8 +370,13 @@ export async function buildServer({
   // The bundle is mounted under the base path because the client was built
   // with the same value as Vite's `base`, so every asset URL in it already
   // carries the prefix.
+  //
+  // Step 126: the bundle's home itself has a route of its own, so a Christmas
+  // room's join link can carry a preview (invitePreview.ts); every other
+  // request for it gets the same index.html as before.
   if (NODE_ENV === 'production') {
     await fastify.register(fastifyStatic, { root: CLIENT_DIST, prefix: base });
+    registerInvitePreview(fastify, { base, indexFile: join(CLIENT_DIST, 'index.html') });
     fastify.setNotFoundHandler((_request, reply) => reply.sendFile('index.html'));
   }
 

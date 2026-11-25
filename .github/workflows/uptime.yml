@@ -1,0 +1,69 @@
+name: Uptime
+
+# Step 126 (B-29 improvement #15): a check every 30 minutes, through the
+# Christmas season, of the four things a Christmas player meets first:
+#
+#   1. Funny Multi's server — its /health, on the game's own host;
+#   2. the landing page's /x26 — where a golden story's QR code and the pay
+#      card lead;
+#   3. the join link's preview picture, og-christmas.jpg on the game's host
+#      (invitePreview.ts) — the file a messenger fetches for the card;
+#   4. one Christmas picture, from the Worker that serves all 650 — the scene
+#      the preview is cropped from (S006), so the bucket, the Worker and the
+#      picture path are all proven. The Worker's address is the repository
+#      variable CHRISTMAS_PICTURE_URL (Settings → Secrets and variables →
+#      Actions → Variables), not written here, as DEPLOYMENT.md keeps it; an
+#      unset variable fails the run rather than skipping the check.
+#
+# Each check tries 3 times about a minute apart, so one slow answer is not an
+# alarm. A failed run is the alarm: GitHub emails the person who last changed
+# this schedule (the owner, on their notification settings' "Actions" email).
+# GitHub may delay a scheduled run, and pauses the schedule after 60 days with
+# no commit to the repository; "Run workflow" on the Actions tab runs it by
+# hand.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Funny Multi's server
+        run: >-
+          curl -fsS --max-time 20 --retry 2 --retry-delay 60 --retry-all-errors
+          -o /dev/null https://www.funny37.oursharedcode.com/health
+
+      - name: The landing page's /x26
+        run: >-
+          curl -fsS --max-time 20 --retry 2 --retry-delay 60 --retry-all-errors
+          -o /dev/null https://www.funny-family.oursharedcode.com/x26
+
+      - name: The join link's preview picture
+        run: |
+          type=$(curl -fsS --max-time 20 --retry 2 --retry-delay 60 --retry-all-errors \
+            -o /dev/null -w '%{content_type}' https://www.funny37.oursharedcode.com/og-christmas.jpg)
+          case "$type" in
+            image/jpeg*) echo "OK: $type" ;;
+            *) echo "::error::The preview came back as '$type', not a JPEG."; exit 1 ;;
+          esac
+
+      - name: One Christmas picture from the Worker
+        env:
+          PICTURE_URL: ${{ vars.CHRISTMAS_PICTURE_URL }}
+        run: |
+          if [ -z "$PICTURE_URL" ]; then
+            echo "::error::The repository variable CHRISTMAS_PICTURE_URL is not set."
+            exit 1
+          fi
+          type=$(curl -fsS --max-time 20 --retry 2 --retry-delay 60 --retry-all-errors \
+            -o /dev/null -w '%{content_type}' "$PICTURE_URL")
+          case "$type" in
+            image/*) echo "OK: $type" ;;
+            *) echo "::error::The picture came back as '$type', not an image."; exit 1 ;;
+          esac

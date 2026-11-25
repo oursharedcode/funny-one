@@ -90,6 +90,8 @@ export {
   paidGameContents,
 } from './packs/index.js';
 export type { PackTexts } from './packs/index.js';
+export { PACK_INVITES, inviteText } from './packs/invite.js';
+export type { PackInvite } from './packs/invite.js';
 // Step 122 — the paid code's shape and its forgiving reading, shared so the
 // client and the server read a typed or linked code the same way.
 export {

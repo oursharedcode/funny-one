@@ -33,8 +33,12 @@
 // A golden story's footer is the edition's (landingUrl.ts `footerTarget`).
 // Step 122: a paid story's footer is the buyer's thank-you, measured with the
 // same label it is drawn with, since that one can wrap.
+// Step 126 (owner decisions 2026-11-25 D1 A, D2 A): a golden story's and a
+// paid story's clip rings with sleigh bells (sleighBells.ts), to the speaker
+// and into the recording; every other clip stays silent.
 
 import { footerTarget } from './landingUrl';
+import { openSleighBells, type SleighBells } from './sleighBells';
 import { withBase } from './basePath';
 import { downloadFile } from './share';
 import {
@@ -86,8 +90,16 @@ function wobbleAt(ms: number): WobbleFrame {
   };
 }
 
-function pickMime(): { mime: string; ext: string } | null {
+// With a sound track, a container that names its audio codec first; the plain
+// types after them take whatever audio the browser records by default.
+function pickMime(withAudio = false): { mime: string; ext: string } | null {
   const candidates: Array<[string, string]> = [
+    ...(withAudio
+      ? ([
+          ['video/webm;codecs=vp9,opus', 'webm'],
+          ['video/webm;codecs=vp8,opus', 'webm'],
+        ] as Array<[string, string]>)
+      : []),
     ['video/webm;codecs=vp9', 'webm'],
     ['video/webm;codecs=vp8', 'webm'],
     ['video/webm', 'webm'],
@@ -155,11 +167,21 @@ export interface WobbleVideoOptions {
 }
 
 export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<File> {
+  if (!pickMime()) throw new Error('MediaRecorder not supported in this browser');
+  // Opened before the first await, while the tap that asked for the clip still
+  // counts as the user's gesture (Safari's rule, sleighBells.ts).
+  const bells = opts.golden === true || opts.paid === true ? openSleighBells() : null;
+  try {
+    return await recordClip(opts, bells);
+  } finally {
+    bells?.close();
+  }
+}
+
+async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
   const ending = opts.ending ?? null;
   const target = footerTarget(opts.golden === true, opts.paid === true);
-  const mime = pickMime();
-  if (!mime) throw new Error('MediaRecorder not supported in this browser');
 
   const picture = await loadImage(pictureUrl);
   // Deployer logo: best-effort — if it fails to load (404 / CORS), the video
@@ -222,7 +244,21 @@ export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<Fi
   const maxStoryHeight = H - BOTTOM_MARGIN - attributionHeight - STORY_GAP - storyTop;
 
   const stream = canvas.captureStream(FPS);
-  const recorder = new MediaRecorder(stream, { mimeType: mime.mime });
+  // The bells' track, when they loaded; the clip is silent otherwise.
+  const bellsTrack = bells ? await bells.ready : null;
+  let mime = pickMime(bellsTrack !== null)!;
+  let recorder: MediaRecorder;
+  try {
+    if (bellsTrack) stream.addTrack(bellsTrack);
+    recorder = new MediaRecorder(stream, { mimeType: mime.mime });
+  } catch (err) {
+    if (!bellsTrack) throw err;
+    // A browser that will not record this sound records the picture alone.
+    stream.removeTrack(bellsTrack);
+    bells?.close();
+    mime = pickMime()!;
+    recorder = new MediaRecorder(stream, { mimeType: mime.mime });
+  }
   const chunks: BlobPart[] = [];
   recorder.ondataavailable = (e): void => {
     if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -330,6 +366,7 @@ export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<Fi
   }
 
   recorder.start();
+  bells?.play();
   raf = requestAnimationFrame(drawFrame);
   try {
     return await done;

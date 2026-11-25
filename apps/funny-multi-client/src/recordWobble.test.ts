@@ -398,3 +398,131 @@ describe('a Christmas story in the clip (Step 117)', () => {
     }
   });
 });
+
+// Step 126 (owner decisions 2026-11-25 D1 A, D2 A): a golden story's and a paid
+// story's clip ring with sleigh bells, to the speaker and into the recording.
+describe('the sleigh bells (Step 126)', () => {
+  const TRACK = { kind: 'audio', id: 'bells' } as unknown as MediaStreamTrack;
+  let contexts: FakeAudioContext[];
+  let stream: { addTrack: ReturnType<typeof vi.fn>; removeTrack: ReturnType<typeof vi.fn> };
+  let fetchMock: ReturnType<typeof vi.fn>;
+  let recorderMimes: string[];
+
+  class FakeAudioContext {
+    destination = { node: 'speaker' };
+    resume = vi.fn(() => Promise.resolve());
+    close = vi.fn(() => Promise.resolve());
+    decodeAudioData = vi.fn(() => Promise.resolve({ duration: 5 }));
+    streamDestination = { stream: { getAudioTracks: () => [TRACK] } };
+    createMediaStreamDestination = vi.fn(() => this.streamDestination);
+    source = {
+      buffer: null as unknown,
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+    };
+    createBufferSource = vi.fn(() => this.source);
+    constructor() {
+      contexts.push(this);
+    }
+  }
+
+  class OpusRecorder extends FakeMediaRecorder {
+    static override isTypeSupported(mime: string): boolean {
+      return mime === 'video/webm;codecs=vp9' || mime === 'video/webm;codecs=vp9,opus';
+    }
+    constructor(s: unknown, opts: { mimeType: string }) {
+      super(s, opts);
+      recorderMimes.push(opts.mimeType);
+    }
+  }
+
+  beforeEach(() => {
+    installCanvasStub();
+    installRecorderEnv();
+    contexts = [];
+    recorderMimes = [];
+    stream = { addTrack: vi.fn(), removeTrack: vi.fn() };
+    (HTMLCanvasElement.prototype as unknown as { captureStream: () => unknown }).captureStream =
+      vi.fn(() => stream);
+    vi.stubGlobal('MediaRecorder', OpusRecorder);
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    fetchMock = vi.fn(() =>
+      Promise.resolve({ ok: true, arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it.each([
+    ['a golden story', { golden: true }],
+    ['a paid story', { paid: true }],
+  ])('rings in %s, to the speaker and into the recording', async (_name, flags) => {
+    const file = await buildWobbleVideoFile({ ...story, ...flags, ending: null });
+    expect(contexts).toHaveLength(1);
+    const ctx = contexts[0]!;
+    expect(ctx.resume).toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith('/sounds/sleigh-bells.mp3');
+    expect(stream.addTrack).toHaveBeenCalledWith(TRACK);
+    expect(recorderMimes).toEqual(['video/webm;codecs=vp9,opus']);
+    expect(file.type).toBe('video/webm;codecs=vp9,opus');
+    expect(file.name).toBe('funny-stories-Mika.webm');
+    expect(ctx.source.connect).toHaveBeenCalledWith(ctx.destination);
+    expect(ctx.source.connect).toHaveBeenCalledWith(ctx.streamDestination);
+    expect(ctx.source.start).toHaveBeenCalledTimes(1);
+    expect(ctx.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the sound before anything is awaited, inside the tap', async () => {
+    const recording = buildWobbleVideoFile({ ...story, golden: true, ending: null });
+    // Synchronously, before the first image has even started to load.
+    expect(contexts).toHaveLength(1);
+    await recording;
+  });
+
+  it.each([
+    ['an ordinary story', {}],
+    ['a slice story', { ending: { pictureUrl: null, text: 'Carols.' } }],
+  ])('leaves %s silent', async (_name, extra) => {
+    const file = await buildWobbleVideoFile({ ...story, ...extra });
+    expect(contexts).toHaveLength(0);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(stream.addTrack).not.toHaveBeenCalled();
+    expect(file.type).toBe('video/webm;codecs=vp9');
+  });
+
+  it('records a silent clip when the sound cannot be fetched', async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 404 });
+    const file = await buildWobbleVideoFile({ ...story, golden: true, ending: null });
+    expect(stream.addTrack).not.toHaveBeenCalled();
+    expect(file.type).toBe('video/webm;codecs=vp9');
+    expect(contexts[0]!.source.start).not.toHaveBeenCalled();
+    expect(contexts[0]!.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('records a silent clip in a browser without Web Audio', async () => {
+    vi.stubGlobal('AudioContext', undefined);
+    const file = await buildWobbleVideoFile({ ...story, paid: true, ending: null });
+    expect(stream.addTrack).not.toHaveBeenCalled();
+    expect(file.type).toBe('video/webm;codecs=vp9');
+  });
+
+  it('records the picture alone when the browser refuses to record the sound', async () => {
+    vi.stubGlobal(
+      'MediaRecorder',
+      class extends OpusRecorder {
+        constructor(s: unknown, opts: { mimeType: string }) {
+          if (opts.mimeType.includes('opus')) throw new Error('NotSupportedError');
+          super(s, opts);
+        }
+      },
+    );
+    const file = await buildWobbleVideoFile({ ...story, golden: true, ending: null });
+    expect(stream.removeTrack).toHaveBeenCalledWith(TRACK);
+    expect(file.type).toBe('video/webm;codecs=vp9');
+    expect(contexts[0]!.source.start).not.toHaveBeenCalled();
+  });
+});

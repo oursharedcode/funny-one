@@ -5,7 +5,7 @@
 // this server's handler takes no payload at all.
 
 import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import type { Player } from '@funny/shared';
 import { createSocketMock, setUrl } from '../testutils/socketMock';
 import type { LobbyState } from '../App';
@@ -268,6 +268,125 @@ describe('Christmas stories (Step 117)', () => {
     renderLobby({ pack: ON, language: 'ru', myLanguage: 'ru' });
     expect(screen.getByText('🔔 В этой игре одна новогодняя история')).toBeTruthy();
     expect(screen.getByLabelText('Играть с историями «Новый год 2027»')).toBeTruthy();
+  });
+});
+
+// Step 126 (B-29 #2): a Christmas room's box invites friends through the share
+// sheet, or copies the line and the link where there is none.
+describe('the Christmas invitation (Step 126)', () => {
+  const ON = { id: 'chr26', on: true, paid: false } as const;
+  const PAID = { id: 'chr26', on: true, paid: true } as const;
+  const OFF = { id: 'chr26', on: false, paid: false } as const;
+  const INVITE = '🔔 Invite friends to this Christmas game';
+  const TEXT =
+    'Join my Christmas game of Funny Multi! We make up silly Christmas stories together, and each one becomes a cartoon 🎄';
+
+  function stubShare(impl: () => Promise<void> = () => Promise.resolve()) {
+    const share = vi.fn((_data: ShareData) => impl());
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    return share;
+  }
+  function stubClipboard() {
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    return writeText;
+  }
+
+  afterEach(async () => {
+    Reflect.deleteProperty(navigator, 'share');
+    await i18n.changeLanguage('en');
+  });
+
+  it.each([
+    ['the host', 's0'],
+    ['a guest', 's1'],
+  ])('is offered to %s in a Christmas room, free or paid', (_who, socketId) => {
+    renderLobby({ pack: ON, socketId, hostId: 's0' });
+    expect(screen.getByText(INVITE)).toBeTruthy();
+  });
+
+  it('is offered in a paid room too', () => {
+    renderLobby({ pack: PAID });
+    expect(screen.getByText(INVITE)).toBeTruthy();
+  });
+
+  it.each([
+    ['switched off', OFF],
+    ['offered no pack', null],
+  ])('is not offered in a room %s', (_why, pack) => {
+    renderLobby({ pack });
+    expect(screen.queryByText(INVITE)).toBeNull();
+  });
+
+  it("hands the share sheet the line and the room's ordinary join link", async () => {
+    const share = stubShare();
+    const writeText = stubClipboard();
+    renderLobby({ pack: ON, roomCode: 'WXYZ', language: 'en' });
+    fireEvent.click(screen.getByText(INVITE));
+
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    const data = share.mock.calls[0]![0];
+    expect(data.title).toBe('Funny Multi');
+    expect(data.text).toBe(TEXT);
+    const url = new URL(data.url!);
+    expect(url.searchParams.get('room')).toBe('WXYZ');
+    expect(url.searchParams.get('lang')).toBe('en');
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it('does nothing more when the player dismisses the sheet', async () => {
+    const share = stubShare(() => Promise.reject(new DOMException('no', 'AbortError')));
+    const writeText = stubClipboard();
+    renderLobby({ pack: ON });
+    fireEvent.click(screen.getByText(INVITE));
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    await Promise.resolve();
+    expect(writeText).not.toHaveBeenCalled();
+    expect(screen.getByText(INVITE)).toBeTruthy();
+  });
+
+  it('copies the line and the link when the sheet refuses', async () => {
+    stubShare(() => Promise.reject(new DOMException('no', 'NotAllowedError')));
+    const writeText = stubClipboard();
+    renderLobby({ pack: ON, roomCode: 'WXYZ' });
+    fireEvent.click(screen.getByText(INVITE));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    expect(writeText.mock.calls[0]![0]).toMatch(new RegExp(`^${TEXT} http.*\\?room=WXYZ&lang=en$`));
+  });
+
+  it('copies the line and the link where there is no share sheet, and says so', async () => {
+    const writeText = stubClipboard();
+    renderLobby({ pack: ON, roomCode: 'WXYZ' });
+    fireEvent.click(screen.getByText(INVITE));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const copied = writeText.mock.calls[0]![0];
+    expect(copied.startsWith(`${TEXT} `)).toBe(true);
+    expect(new URL(copied.slice(TEXT.length + 1)).searchParams.get('room')).toBe('WXYZ');
+    expect(await screen.findByText('Copied!')).toBeTruthy();
+  });
+
+  it('carries no unlock code, even from a phone that keeps one', async () => {
+    rememberPackCode('XMAS26-K7QM-3FPA');
+    try {
+      const share = stubShare();
+      renderLobby({ pack: PAID });
+      fireEvent.click(screen.getByText(INVITE));
+      await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+      expect(JSON.stringify(share.mock.calls[0]![0])).not.toMatch(/XMAS26/);
+    } finally {
+      forgetPackCode();
+      __resetPackCodeForTest();
+      sessionStorage.clear();
+    }
+  });
+
+  it('invites in Russian with the game’s Russian name', async () => {
+    await i18n.changeLanguage('ru');
+    const share = stubShare();
+    renderLobby({ pack: ON, language: 'ru', myLanguage: 'ru' });
+    fireEvent.click(screen.getByText('🔔 Позвать друзей в новогоднюю игру'));
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    expect(share.mock.calls[0]![0].text).toMatch(/«Чепуха 37»/);
   });
 });
 

@@ -45,7 +45,8 @@
     "christmasOn": "🔔 This game has one Christmas story",
     "christmasSwitch": "Play with the Christmas 2026 stories",
     "christmasPaid": "🔔 Every story in this game is a Christmas story",
-    "usePack": "🔔 Use my Christmas pack here"
+    "usePack": "🔔 Use my Christmas pack here",
+    "invite": "🔔 Invite friends to this Christmas game"
   },
   "round": {
     "progress": "Round {{current}} of {{total}}",

@@ -46,7 +46,8 @@
     "christmasOn": "🔔 Questa partita ha una storia di Natale",
     "christmasSwitch": "Gioca con le storie di Natale 2026",
     "christmasPaid": "🔔 Questa partita ha solo storie di Natale",
-    "usePack": "🔔 Usa qui il mio pacchetto di Natale"
+    "usePack": "🔔 Usa qui il mio pacchetto di Natale",
+    "invite": "🔔 Invita gli amici a questa partita di Natale"
   },
   "round": {
     "progress": "Round {{current}} di {{total}}",

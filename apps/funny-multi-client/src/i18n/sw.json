@@ -46,7 +46,8 @@
     "christmasOn": "🔔 Mchezo huu una hadithi moja ya Krismasi",
     "christmasSwitch": "Cheza na hadithi za Krismasi 2026",
     "christmasPaid": "🔔 Kila hadithi katika mchezo huu ni hadithi ya Krismasi",
-    "usePack": "🔔 Tumia kifurushi changu cha Krismasi hapa"
+    "usePack": "🔔 Tumia kifurushi changu cha Krismasi hapa",
+    "invite": "🔔 Waalike marafiki kwenye mchezo huu wa Krismasi"
   },
   "round": {
     "progress": "Raundi {{current}} kati ya {{total}}",

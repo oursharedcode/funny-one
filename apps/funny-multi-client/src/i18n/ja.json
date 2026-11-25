@@ -46,7 +46,8 @@
     "christmasOn": "🔔 このゲームにはクリスマスの物語が1つあります",
     "christmasSwitch": "2026年クリスマスの物語で遊ぶ",
     "christmasPaid": "🔔 このゲームの物語はすべてクリスマスの物語です",
-    "usePack": "🔔 自分のクリスマスパックをここで使う"
+    "usePack": "🔔 自分のクリスマスパックをここで使う",
+    "invite": "🔔 友だちをクリスマスゲームに招待"
   },
   "round": {
     "progress": "ラウンド {{current}} / {{total}}",

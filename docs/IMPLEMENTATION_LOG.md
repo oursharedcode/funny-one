@@ -8279,14 +8279,110 @@ Still owed: `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and it
 live-badge look; Funny Multi's trader confirmation before 1 February 2027. B-3's native reviewers
 also have this step's Sponsors texts and the policy's clause in 21 languages.
 
-**RESUME HERE (2026-11-25, after Step 125; not yet pushed).** Step 124 is pushed and green
-(`6de99fa`, CI run 45535520445). **Paying by PayID and through GitHub Sponsors both work locally;
-nothing of the paid half is live** — Steps 122–126 deploy together (D1). A Sponsors buyer types
-their GitHub name; GitHub's webhook, or the owner's Received, switches the code on. **Next, Step
-126 (the agent's) — sleigh bells**, then the landing line "Christmas pack — try it free", #2's
-Christmas invitation, #15's uptime alarm and the one deploy by about 10 December, the game before
-the landing site — no deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
-**Owed, the owner's:** the Sponsors tier, its webhook, and `SPONSORS_TIER_ID`,
+## Step 126 (task B-29) — sleigh bells, the landing line, the invitation, the uptime alarm (2026-11-25)
+
+**Correction to the last RESUME note:** it said Step 125 was not yet pushed. It was pushed the
+same day and CI is green (`50a4ece`, run 45574321845).
+
+**Owner decisions, 2026-11-25, third set (`/morning`, on Step 126's plan)** — B-29's block in
+tasks.md holds the binding text: **D1 A** the bells are a CC0 recording; **D2 A** bells only in a
+golden story's and a paid game's videos; **D3 A** the join link's preview has one fixed picture
+the owner picks from three, shipped as a 1200 × 630 JPEG from the game's own address, and the
+uptime alarm checks it. The deploy is Step 127, so #1 (play alone with two bots) moves to 128.
+
+**Shipped:**
+
+- **Client** (`apps/funny-multi-client`): `sleighBells.ts` (new) — the bells through Web Audio,
+  to the speaker and into a MediaStream track, the context opened in the tap (Safari);
+  `public/sounds/sleigh-bells.mp3` (new; 5 s of "Sleigh bells.wav" by The Midnite Wolf, CC0,
+  Wikimedia Commons, high-passed, normalised, faded; README credits it), precached
+  (`vite.config.ts`). `recordWobble.ts` — a golden or paid clip adds the bells' track and picks a
+  mime with audio (`pickMime(true)`: webm vp9 or vp8 with opus first, then the plain types — Safari's mp4 takes
+  its default audio); any failure records the
+  clip silent. `LobbyScreen.tsx` — in a room whose Christmas switch is on, every player sees
+  "🔔 Invite friends to this Christmas game" (`lobby.invite`, 23 catalogues): the share sheet
+  gets `home.title`, `inviteText(<the player's language>)` and the room's ordinary join link; no
+  sheet → the text and the link copied, "Copied!". `public/og-christmas.jpg` (new) — the
+  preview's picture, provisionally S006 (a reindeer and a grumpy cat decorating a tree by the
+  fireplace), cropped to 1200 × 630, 180,590 bytes, not precached.
+- **Server** (`apps/funny-multi-server`): `invitePreview.ts` (new) — production's `GET {base}`
+  ahead of the static wildcard: `?room=CODE` of a live room whose switch is on gets index.html
+  with Open Graph and Twitter tags in the room's language (title and line from `PACK_INVITES`,
+  the picture's absolute URL, 1200 × 630), `no-cache`; anything else the file untouched.
+- **Shared** (`packages/shared`): `packs/invite.ts` (new) — `PACK_INVITES` (23 languages: a title
+  naming the game as `home.title` does, then a line) and `inviteText`, one table for the lobby
+  and the preview so message and card agree.
+- **Landing site** (`apps/funny-family-site`): `xmasStrings.ts` — the 20 Christmas buttons say
+  "Christmas pack — try it free".
+- **CI** (`.github/workflows/uptime.yml`, new): every 30 minutes and by hand, `curl` with 3 tries
+  a minute apart of the game's `/health`, `/x26`, `og-christmas.jpg` (must be a JPEG) and one
+  Worker picture from the repository variable `CHRISTMAS_PICTURE_URL` (must be an image; unset
+  fails the run). The Worker's address stays out of the public repo. A failed run is the alarm.
+- **Docs:** design §4.4 (the bells, the landing line, the invitation and the preview, the alarm;
+  the golden video's "no sound" corrected); tasks.md — the decisions and the Step 126 line with
+  the drafters' notes; the README's credit.
+
+**Settled in the step:**
+
+- The invitation's text moved from the client's catalogues to shared (`PACK_INVITES`) once the
+  server's preview needed it per room language; the catalogues keep only the button's label. A
+  catalogue test holds each title to its `home.title`, a shared test holds the table to rule 5A
+  (no digit but «Чепуха 37», no currency sign, no code or address).
+- ja, zh and yue join title and line with no space after a full-width "！".
+- The preview never names the room code, though the link does: a messenger shows the card under
+  the link, and the code belongs to the link alone.
+- `npm run build` does not rebuild the landing site; the check rebuilt it with `npm run build
+  -w apps/funny-family-site`. The deploy script builds it itself.
+
+**Verified in phone-sized Chromium** (`.screens/step126-check.mjs`, gitignored): the client's dev
+server on 5183 for the clips, the built landing site on 5187, the built server on 3000. 45
+checks, none failing. `buildWobbleVideoFile` in the page: golden and paid clips are
+`video/webm;codecs=vp9,opus` with an opus track peaking at −2.7 dB (ffmpeg volumedetect), an
+ordinary one vp9 alone. The landing's Christmas buttons in de, ta and en fit 320 px. The lobby:
+the Invite button in a Christmas room; the share sheet gets the title, the en line and the
+ordinary link with the room code, no price or code; with no sheet, ru at 320 px copies the line
+and the link and says "Скопировано!"; de at 320 px fits; an ar room (no pack) has no button. The
+preview: a Christmas room's link carries the en tags, the picture served is a 1200 × 630
+`image/jpeg`, the code is not in the page; an ordinary room's link and the plain home are the
+same untouched shell; the dressed link opens the join screen. No page errors.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test`, outside the sandbox, 2357 across
+6 workspaces (536 funny-family-site, 617 funny-multi-client — 20 more, 485 funny-multi-server —
+12 more, 178 funny-one-client, 453 shared — 4 more, 88 cloudflare); no dependency changed; `npm
+audit` exactly the three accepted ids (GHSA-6jcc-5g8w-32mx i18next, GHSA-3g3m-2fjr-6pw4 glob,
+GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed, the agent's:** Step 127, the one deploy (D1 of 2026-11-22) — `deploy/ship.sh` before
+`deploy/ship-funny-family.sh`, by about 10 December. B-29 stays open.
+
+**Owed, the owner's** (new):
+
+1. **The preview picture (D3):** S006 is in place; S265 or S093 instead if preferred.
+2. **The repository variable `CHRISTMAS_PICTURE_URL`** (Settings → Secrets and variables →
+   Actions → Variables): one chr26 picture's full address on the Worker. Until it is set, and
+   until Step 127 puts `og-christmas.jpg` on the game's host, each scheduled run fails.
+3. **After the push:** GitHub's email for failed Actions runs is on (Settings → Notifications →
+   System → Actions); one "Run workflow" by hand — it fails, since the picture is not live yet,
+   which is the forced-failure test — and confirm the email arrived. Then the agent disables the
+   workflow (`gh workflow disable uptime.yml`) so it does not email every 30 minutes, and
+   enables it again in Step 127 after the deploy, with one green run by hand.
+
+Still owed: the Sponsors tier, its webhook, `SPONSORS_TIER_ID`, `SPONSORS_WEBHOOK_SECRET`,
+`PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its backups before the deploy
+(Step 125's entry); D4's real US$2 sponsorship after it; the live-badge look; Funny Multi's
+trader confirmation before 1 February 2027. B-3's native reviewers also have this step's
+invitations, Invite buttons and landing lines in 21 languages.
+
+**RESUME HERE (2026-11-25, after Step 126; not yet pushed).** Step 125 is pushed and green
+(`50a4ece`, CI run 45574321845). **Steps 122–126 work locally; nothing of the paid half is
+live.** Step 126 added the sleigh bells to golden and paid videos, the landing line "Christmas
+pack — try it free", the lobby's Invite button with the join link's preview, and the uptime
+alarm. **Next, Step 127 (the agent's) — the one deploy** by about 10 December, the game
+(`deploy/ship.sh`) before the landing site (`deploy/ship-funny-family.sh`). No deploys 24–26
+December, 31 December–1 January or 6–7 January (#16). After the deploy, `gh workflow enable
+uptime.yml` and one green run by hand. Then Step 128, #1 play alone with two bots.
+**Owed, the owner's:** the preview picture (S006 in place); `CHRISTMAS_PICTURE_URL`; the
+failure-email test after the push; the Sponsors tier, its webhook, and `SPONSORS_TIER_ID`,
 `SPONSORS_WEBHOOK_SECRET`, `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
-backups before the deploy (Step 125's entry lists the steps); D4's real US$2 sponsorship after
-it; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.
+backups before the deploy; D4's real US$2 sponsorship after it; the live-badge look; Funny Multi's
+trader confirmation before 1 Feb 2027.

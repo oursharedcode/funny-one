@@ -46,7 +46,8 @@
     "christmasOn": "🔔 이번 게임에는 크리스마스 이야기가 한 개 있어요",
     "christmasSwitch": "2026 크리스마스 이야기로 플레이",
     "christmasPaid": "🔔 이번 게임은 모든 이야기가 크리스마스 이야기예요",
-    "usePack": "🔔 여기서 내 크리스마스 팩 사용하기"
+    "usePack": "🔔 여기서 내 크리스마스 팩 사용하기",
+    "invite": "🔔 친구를 크리스마스 게임에 초대하기"
   },
   "round": {
     "progress": "{{total}} 중 {{current}} 라운드",

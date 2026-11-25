@@ -46,7 +46,8 @@
     "christmasOn": "🔔 Permainan ini punya satu cerita Natal",
     "christmasSwitch": "Main dengan cerita Natal 2026",
     "christmasPaid": "🔔 Semua cerita dalam permainan ini adalah cerita Natal",
-    "usePack": "🔔 Pakai paket Natalku di sini"
+    "usePack": "🔔 Pakai paket Natalku di sini",
+    "invite": "🔔 Undang teman ke permainan Natal ini"
   },
   "round": {
     "progress": "Ronde {{current}} dari {{total}}",

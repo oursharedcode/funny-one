@@ -302,8 +302,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   from `optionsFor(slot, content)`; the ending under the scene in the reveal and the gallery —
   a picture for a golden story, a card otherwise (`StoryEnding`); "🔔 A Christmas story" over a
   golden one. A golden story's still stacks the ending under the scene, best-effort; its 5 s
-  video switches to the ending at 2.5 s, a card when there is no picture, with no sound (sleigh
-  bells come with the paid half). Their footer names the edition and leads to `/x26` on the
+  video switches to the ending at 2.5 s, a card when there is no picture, with sleigh bells
+  since Step 126 (below). Their footer names the edition and leads to `/x26` on the
   website, to the landing page inside the Android app (`footerTarget`). **No price in a free
   game — its lobby, rounds, stories and downloads (5A) — and no download ever carries a room
   or unlock code** — both tested. The first price a player sees is the pay card's, after the
@@ -482,6 +482,35 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   `payid` or `sponsors`), each once per page load, website only, with nothing about the buyer
   or the payment. `/stats/` shows them per language in a second table of its Christmas
   section, "Paying for it". A press is not a payment: payments are in the receipt log.
+- **Sleigh bells, the landing line, the invitation and the alarm** (Step 126, owner decisions
+  of 2026-11-25, third set). **The 5 s video of a golden story or of a paid game's story**
+  (D2 A; an ordinary story's stays silent) rings with sleigh bells (`sleighBells.ts`):
+  `public/sounds/sleigh-bells.mp3`, 5 s of a CC0 recording from Wikimedia Commons (D1 A;
+  README credits it), played through Web Audio to the speaker and into a MediaStream track
+  that `recordWobble.ts` adds to the canvas's stream (`pickMime(true)`: webm with opus
+  first, then the plain types, whose default audio Safari's mp4 takes). The audio context is opened in the tap, before any await (Safari);
+  any failure — no Web Audio, the file, the decode, a recorder that refuses the sound —
+  records the clip silent, as before. The mp3 is precached. **The landing page's Christmas
+  buttons** say the paid half's "Christmas pack — try it free" (`xmasStrings.ts`, 20
+  languages). **The Christmas invitation** (#2): in a room whose Christmas switch is on, free
+  or paid, every player's lobby has "🔔 Invite friends to this Christmas game"
+  (`lobby.invite`), which hands the share sheet `{ title: home.title, text, url }` — `text`
+  the player's language's `inviteText` from `PACK_INVITES` (shared, all 23 languages; a title
+  naming the game as `home.title` does, then a line) and `url` the room's ordinary join link —
+  and, with no sheet, copies the text and the link and says "Copied!". **The join link's
+  preview** (D3 A; `invitePreview.ts`): production registers `GET {base}` ahead of the static
+  wildcard; for `?room=CODE` naming a live room whose switch is on, the SPA's own index.html
+  gets Open Graph and Twitter tags in the room's language — the same `PACK_INVITES` title and
+  line, and `og-christmas.jpg`, one fixed 1200 × 630 JPEG cropped from a chr26 scene, shipped
+  in the client's `public/` (not precached) — with `cache-control: no-cache`; every other
+  request (no code, an unknown or over-long one, an ordinary room, a Host that is not a plain
+  host name) gets the file untouched. Neither the message nor the card carries a room code,
+  a price or an unlock code (5A). **The uptime alarm** (#15; `.github/workflows/uptime.yml`):
+  every 30 minutes and by hand, `curl` with 3 tries a minute apart of the game's `/health`,
+  the landing page's `/x26`, `og-christmas.jpg` (must be `image/jpeg`) and one Worker
+  picture, its address the repository variable `CHRISTMAS_PICTURE_URL` (must be `image/*`;
+  unset fails the run). A failed run is the alarm: GitHub's own email about failed Actions
+  runs to the owner.
 
 ## 5. Protocol deltas — `packages/shared/src/events.ts`
 

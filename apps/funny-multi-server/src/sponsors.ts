@@ -145,7 +145,9 @@ export function waitingSponsorsCodes(
       waiting.delete(record.code);
     }
   }
-  return [...waiting.values()].sort((a, b) => b.at - a.at);
+  // Reversed first, so codes issued in the same millisecond keep the log's
+  // order newest first through the (stable) sort.
+  return [...waiting.values()].reverse().sort((a, b) => b.at - a.at);
 }
 
 /** What the webhook reads of GitHub's `sponsorship` event; null when it is not one to act on. */

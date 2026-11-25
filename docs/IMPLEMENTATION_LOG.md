@@ -8458,8 +8458,19 @@ likely.
 **Gates:** no code changed (the change is tasks.md and this log). typecheck 0, lint 0,
 format:check clean; `npm test`, outside the sandbox: the first full run had 1 of 485
 funny-multi-server tests fail (its name lost to the output filter), then four server-only runs
-and a second full run passed — 2357 across 6 workspaces — so a flake, probably a socket race
-under load like Step 124's; `npm audit` exactly the three accepted ids; CI pending the push.
+and a second full run passed — 2357 across 6 workspaces; `npm audit` exactly the three accepted
+ids. Pushed as `d137e39`; CI failed (run 45623975062) on the same test, now named — below.
+
+**Fixed — the Sponsors hook's same-millisecond tie** (`sponsors.ts`, `waitingSponsorsCodes`).
+The test "switches on the newest code waiting for the sponsor's name, once" failed at random:
+the hook takes the newest waiting code for a GitHub name by its issue time in milliseconds, and
+two codes issued in the same millisecond tied, the stable sort keeping the log's order — older
+first, so the older code was switched on. The list is now reversed before the sort, so a tie
+goes to the later entry in the log. A new test pins it (four codes, two pairs of equal times);
+it fails without the fix. Live, two codes for one name within a millisecond is near impossible;
+the fix rides with the second deploy. **Gates for the fix:** typecheck 0, lint 0, format:check
+clean, `npm test` 2358 across 6 workspaces (486 funny-multi-server — 1 more), `sponsors.test.ts`
+three more runs green, `npm audit` the three accepted ids; CI pending the push.
 
 **Owed, the owner's:** D4 of Step 125, the real US$2 sponsorship from a family member's GitHub
 account (the checkout link is its first test), then keep or refund; the admin link bookmarked on

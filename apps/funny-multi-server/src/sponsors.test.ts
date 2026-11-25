@@ -446,4 +446,28 @@ describe('the waiting codes', () => {
       ]).map((w) => w.code),
     ).toEqual(['A']);
   });
+
+  it('are newest first, the later in the log first when issued in the same millisecond', () => {
+    const issue = (code: string, at: string) => ({
+      type: 'issue' as const,
+      at,
+      code,
+      pack: 'chr26' as const,
+      rail: 'sponsors' as const,
+      ref: '',
+      amount: 'US$2',
+      delivered: SPONSORS_DELIVERED,
+      policy: REFUND_POLICY_VERSION,
+      state: 'pending' as const,
+      login: 'mona',
+    });
+    expect(
+      waitingSponsorsCodes([
+        issue('A', '2026-12-01T00:00:00.000Z'),
+        issue('B', '2026-12-01T00:00:00.000Z'),
+        issue('C', '2026-12-01T00:00:00.001Z'),
+        issue('D', '2026-12-01T00:00:00.001Z'),
+      ]).map((w) => w.code),
+    ).toEqual(['D', 'C', 'B', 'A']);
+  });
 });

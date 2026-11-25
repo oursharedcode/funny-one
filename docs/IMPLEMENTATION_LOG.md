@@ -8355,17 +8355,17 @@ GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
 **Owed, the agent's:** Step 127, the one deploy (D1 of 2026-11-22) — `deploy/ship.sh` before
 `deploy/ship-funny-family.sh`, by about 10 December. B-29 stays open.
 
-**Owed, the owner's** (new):
+**Closed after the push (2026-11-25, GitHub state only, nothing in the repo):** the owner chose
+S006 for the preview; pushed as `d084989`, CI green (run 45591305394). Actions failure email was
+already on (Email, failed workflows only). The by-hand run (45595282591) failed at "The join
+link's preview picture" as expected, the server and `/x26` steps passing, and the owner
+confirmed the failure email arrived. The agent then disabled the workflow
+(`gh workflow disable uptime.yml`, state `disabled_manually`) and set the repository variable
+`CHRISTMAS_PICTURE_URL` to S006's picture on the Worker (200, `image/webp`; a first set carried a
+BOM from piping, reset with `--body` and verified clean).
 
-1. **The preview picture (D3):** S006 is in place; S265 or S093 instead if preferred.
-2. **The repository variable `CHRISTMAS_PICTURE_URL`** (Settings → Secrets and variables →
-   Actions → Variables): one chr26 picture's full address on the Worker. Until it is set, and
-   until Step 127 puts `og-christmas.jpg` on the game's host, each scheduled run fails.
-3. **After the push:** GitHub's email for failed Actions runs is on (Settings → Notifications →
-   System → Actions); one "Run workflow" by hand — it fails, since the picture is not live yet,
-   which is the forced-failure test — and confirm the email arrived. Then the agent disables the
-   workflow (`gh workflow disable uptime.yml`) so it does not email every 30 minutes, and
-   enables it again in Step 127 after the deploy, with one green run by hand.
+**Owed, the agent's, in Step 127 after the deploy:** `gh workflow enable uptime.yml`, one green
+run by hand.
 
 Still owed: the Sponsors tier, its webhook, `SPONSORS_TIER_ID`, `SPONSORS_WEBHOOK_SECRET`,
 `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its backups before the deploy
@@ -8373,16 +8373,15 @@ Still owed: the Sponsors tier, its webhook, `SPONSORS_TIER_ID`, `SPONSORS_WEBHOO
 trader confirmation before 1 February 2027. B-3's native reviewers also have this step's
 invitations, Invite buttons and landing lines in 21 languages.
 
-**RESUME HERE (2026-11-25, after Step 126; not yet pushed).** Step 125 is pushed and green
-(`50a4ece`, CI run 45574321845). **Steps 122–126 work locally; nothing of the paid half is
-live.** Step 126 added the sleigh bells to golden and paid videos, the landing line "Christmas
+**RESUME HERE (2026-11-25, after Step 126; pushed).** Step 126 is pushed and green (`d084989`,
+CI run 45591305394). **Steps 122–126 work locally; nothing of the paid half is live.** Step 126 added the sleigh bells to golden and paid videos, the landing line "Christmas
 pack — try it free", the lobby's Invite button with the join link's preview, and the uptime
 alarm. **Next, Step 127 (the agent's) — the one deploy** by about 10 December, the game
 (`deploy/ship.sh`) before the landing site (`deploy/ship-funny-family.sh`). No deploys 24–26
 December, 31 December–1 January or 6–7 January (#16). After the deploy, `gh workflow enable
-uptime.yml` and one green run by hand. Then Step 128, #1 play alone with two bots.
-**Owed, the owner's:** the preview picture (S006 in place); `CHRISTMAS_PICTURE_URL`; the
-failure-email test after the push; the Sponsors tier, its webhook, and `SPONSORS_TIER_ID`,
+uptime.yml` (disabled since the failure-email test, which passed; `CHRISTMAS_PICTURE_URL` is
+set) and one green run by hand. Then Step 128, #1 play alone with two bots.
+**Owed, the owner's:** the Sponsors tier, its webhook, and `SPONSORS_TIER_ID`,
 `SPONSORS_WEBHOOK_SECRET`, `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
 backups before the deploy; D4's real US$2 sponsorship after it; the live-badge look; Funny Multi's
 trader confirmation before 1 Feb 2027.

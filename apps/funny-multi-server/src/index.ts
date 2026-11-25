@@ -58,6 +58,8 @@ import { maybeSyncImageCounter, syncImageCounterFromWorker } from './image.js';
 import { buildStats, broadcastStats } from './stats.js';
 import { createStatsStore, isBotAgent, summaryDays } from './analytics.js';
 import { createGeo, type Geo } from './geo.js';
+import { registerPayRoutes } from './payid.js';
+import { registerAdminRoutes } from './admin.js';
 
 // ---------------------------------------------------------------------------
 // T-2.1 — bootstrap only (design §3). This is SRC/server/src/index.ts reduced
@@ -124,6 +126,12 @@ const RECEIPTS_FILE = process.env.RECEIPTS_FILE || null;
 // VM's .env only, never in the repository: a new secret voids every code.
 const PACK_CODE_SECRET = process.env.PACK_CODE_SECRET || null;
 
+// Step 124 (owner decision D1 A, 2026-11-25): the admin page's own secret, the
+// last part of its address (admin.ts). Its own so a leaked link is changed
+// without voiding a code sold. Unset, or shorter than 16 characters, there is
+// no admin page. In the VM's .env only, never in the repository.
+const PACK_ADMIN_SECRET = process.env.PACK_ADMIN_SECRET || null;
+
 // The English wire text of a refused code; the client shows its own words.
 const CODE_MESSAGES: Record<CodeError | 'PACK_UNAVAILABLE', string> = {
   CODE_INVALID: 'That code is not right.',
@@ -183,6 +191,8 @@ export interface BuildServerOptions {
   receiptsFile?: string | null;
   /** Step 122: overrides the PACK_CODE_SECRET env var; null turns paid codes off. */
   packCodeSecret?: string | null;
+  /** Step 124: overrides the PACK_ADMIN_SECRET env var; null, no admin page. */
+  packAdminSecret?: string | null;
 }
 
 export async function buildServer({
@@ -193,6 +203,7 @@ export async function buildServer({
   countryOf,
   receiptsFile = RECEIPTS_FILE,
   packCodeSecret = PACK_CODE_SECRET,
+  packAdminSecret = PACK_ADMIN_SECRET,
 }: BuildServerOptions = {}): Promise<BuiltServer> {
   const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
@@ -253,6 +264,23 @@ export async function buildServer({
   };
   fastify.get(`${base}config`, config);
   fastify.get(`${base}api/config`, config);
+
+  // Step 124 (B-29): paying by PayID (payid.ts) and the owner's admin page
+  // (admin.ts), where a PayID payment is matched to its code.
+  const ipOf = (request: FastifyRequest): string =>
+    clientIp(
+      { headers: request.headers, address: request.socket.remoteAddress },
+      TRUSTED_PROXY_HOPS,
+    );
+  registerPayRoutes(fastify, { base, codes, support, ipOf });
+  const admin = registerAdminRoutes(fastify, {
+    base,
+    secret: packAdminSecret,
+    codes,
+    receipts,
+    ipOf,
+  });
+  if (!admin) fastify.log.warn('PACK_ADMIN_SECRET is unset or under 16 characters: no admin page');
 
   // Step 72: visit and funnel counts (analytics.ts). The landing page posts
   // here through its own host's proxy (deploy/caddy/Caddyfile) and so does

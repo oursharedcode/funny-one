@@ -43,7 +43,7 @@
     "host": "Hôte",
     "capReached": "La génération d'images est indisponible pour les ~{{hours}} prochaines heures. Vous pouvez encore jouer — le texte de l'histoire s'affichera à la place des dessins.",
     "capReachedHost": "Appuie sur Lancer la partie quand tu es prêt, ou attends que le quota quotidien d'images se réinitialise.",
-    "christmasOn": "🔔 Cette partie a deux histoires de Noël",
+    "christmasOn": "🔔 Cette partie a une histoire de Noël",
     "christmasSwitch": "Jouer avec les histoires de Noël 2026",
     "christmasPaid": "🔔 Cette partie n'a que des histoires de Noël",
     "usePack": "🔔 Utiliser mon pack de Noël ici"
@@ -108,7 +108,7 @@
     "copied": "Copié !"
   },
   "pay": {
-    "card": "Tu viens de voir deux histoires de Noël. Débloque-les toutes : {{price}}, dans chaque partie, jusqu'au {{date}}.",
+    "card": "Tu viens de voir une histoire de Noël. Débloque toutes les histoires de Noël : {{price}}, dans chaque partie, jusqu'au {{date}}.",
     "cardButton": "Débloquer",
     "pitch": "Toutes les histoires de Noël, dans chaque partie, jusqu'au {{date}}. Un seul paiement, sans abonnement.",
     "oncePayId": "Par PayID, depuis n'importe quelle banque australienne.",
@@ -127,7 +127,20 @@
     "playFree": "Jouer gratuitement",
     "haveTitle": "Tu as déjà ce pack.",
     "ended": "L'édition Noël 2026 n'est plus en vente.",
-    "closed": "Le pack ne peut pas être acheté pour le moment. Reviens plus tard."
+    "closed": "Le pack ne peut pas être acheté pour le moment. Reviens plus tard.",
+    "transferTitle": "Paie depuis l'appli de ta banque, vers ce PayID :",
+    "transferName": "Nom du compte",
+    "transferAmount": "Montant",
+    "transferReference": "Référence",
+    "referenceHint": "Mets le code dans la référence (ou la description) du paiement, exactement comme ici : c'est ainsi que ton paiement est relié à ton code.",
+    "paidWarning": "Argent envoyé ? Appuie sur « Payé » avant de fermer cette page : ton code fonctionne alors tout de suite. Si tu la fermes avant, ton code attend que nous retrouvions ton paiement à la main.",
+    "paidButton": "Payé",
+    "claimFailed": "Ça n'a pas marché. Vérifie ta connexion et appuie de nouveau.",
+    "leaveTitle": "Déjà payé ?",
+    "leaveText": "Appuie d'abord sur « Payé » : ton code fonctionnera tout de suite. Pas encore payé ? Ton code reste sur ce téléphone : rouvre cette page quand ce sera fait.",
+    "leaveAnyway": "Pas encore — fermer",
+    "paidTitle": "Merci ! Ton code fonctionne maintenant.",
+    "paidCheck": "Nous vérifions à la main que ton paiement est bien arrivé. S'il n'arrive pas sous 2 jours, le code cesse de fonctionner."
   },
   "gallery": {
     "share": "Partager les images de la salle",

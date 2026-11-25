@@ -712,6 +712,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       Christmas stories"; end of a free game: "You just saw two Christmas stories. Unlock all of
       them: A$2.60, every game, until 1 August 2027"; both golden stories' downloads carry the
       unlock line. FM-PACK-4 and design §4.4 say two; `schema.ts`'s comments follow in the build.
+      *(Superseded 2026-11-25: one golden story — see* Decisions 2026-11-25 *below.)*
     - **The free Christmas part ends 1 July 2027** — the slice and the golden stories: from then
       a free room, and the Android app, plays the base pools only. On the agent's condition:
       `/x26` and the QR on every shared golden-story download keep leading to a working page,
@@ -966,6 +967,62 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     imperatives, formal "आप", informal "তুমি"); the policy's new clause brings "offer",
     "payment page" and "pay button" (de "Bezahlknopf"; ar adds "للشراء"). **Next:** Step
     124 — PayID and the admin page.
+  - *Decisions 2026-11-25 (owner, on the Step 124 plan):*
+    - **D1 A — the admin page's key is a secret of its own**, `PACK_ADMIN_SECRET` (16
+      characters at least; unset, no page), not one derived from `PACK_CODE_SECRET`: a new
+      admin key only moves the page and voids no code.
+    - **D2 A — no alert on a claim.** The bank's own PayID notice is the owner's cue to open
+      the page; nothing is sent by email, push or chat.
+    - **D3 A — payments that arrive without "I've paid"** are found on the admin page, which
+      lists unclaimed PayID codes of the last 7 days. **And a warning on the pay page** (the
+      owner's addition): above "I've paid" the panel tells the buyer to press it before
+      closing, and closing with a waiting code asks "Already paid?" first.
+    - **D4 A — one waiting code per phone** (kept on it until claimed or the offer ends) **and 3
+      PayID codes per address per hour.**
+    - **D5 A — the admin page is in English** only: the owner is its one reader.
+    - **One Christmas story per free room, whatever the number of players** (the owner's
+      request during the step). `GOLDEN_STORIES` goes from 2 to 1; the slice in the other
+      stories stays. Lobby: "🔔 This game has one Christmas story"; the pay card: "You just saw
+      one Christmas story. Unlock all of them: …". Supersedes 1C of 2026-11-21; FM-PACK-4 and
+      design §4.4 say one.
+  - **PayID and the admin page done 2026-11-25 (Step 124).** The server's `payid.ts`
+    (`POST /pay/payid` issues a pending code, `POST /pay/claim` claims it) and `admin.ts`
+    (`GET /admin/<key>`: claimed codes to match within 48 h, unclaimed PayID codes of the last
+    7 days, a lookup, Received, Block, New code), as design §4.4 sets out; the pay page's
+    transfer panel with Copy on each line, the D3 warning, "I've paid", the close guard and
+    the thank-you; the waiting code kept on the phone; the admin page left out of the service
+    worker's cache; one golden story; the privacy policy, in all 23 languages, names the
+    waiting PayID code on the device and the per-address count of PayID codes. The owner owes
+    `PACK_ADMIN_SECRET` in the VM's `.env` and its backups before the deploy. The drafters'
+    notes for B-3's reviewer — **the pay texts:** de "Bezahlt", "Verwendungszweck", "Handy";
+    fr "Payé", "appli"; it "Pagato", "Causale"; es-es "Pagado", "Concepto", «Pulsa»; es-419
+    "Referencia", "Monto", «Presiona»; pt-br "Pago" is terse and «Obrigado» masculine; uk
+    impersonal to avoid gendered verbs; ja "支払い済み" is a status, not a verb, and
+    "リファレンス" a loanword; ko "결제했어요", "참조 메시지" may not be the banks' label; zh
+    "付款参考" is coined ("转账备注" may be the banks' word); yue "㩒" and "閂" need a font that
+    has them; id "Referensi" where banks may say "Berita" or "Keterangan"; sw "Rejea" is
+    bookish; yo the least certain — tone marks, "Ìtọ́kasí", "Kò tíì — ti í", "ìṣàfilọ́lẹ̀
+    báńkì"; ar "تم الدفع", "المرجع" may read as jargon (its "2 يومين" made "يومين" on review);
+    he "שולם", "הפניה" rather than the banks' "אסמכתה"; fa "شرح پرداخت"; hi and bn
+    transliterate "reference"; ta "குறிப்பு" (note) may be vague; te's button is the longest
+    of all and "ఖాళీ" colloquial. **The one-story texts:** fr, it, es-es, es-419, pt-br, he,
+    fa, ta, te and sw now name the stories in "unlock all", since a bare "them" lost its
+    antecedent; bn keeps the counter "টি"; ja "1つ" where "ひとつ" is softer; ko "한 개"; yo
+    "Ìtàn Kérésìmesì kan wà…". **The policy's two clauses:** de "gehortet"; es-es "se
+    acaparen"; uk "назбирати" is colloquial; fa "احتکار" also means profiteering; ja's clause
+    order is awkward; ko's "…코드뿐이며" (only the pack code) now slightly contradicts the
+    added PayID code; yo again the least certain. Verified in phone-sized Chromium against the
+    built server (throwaway secrets in the process environment only), 158 checks, none
+    failing: a free room of three gets exactly one full story and two slices; the pay card's
+    words at US$2 and A$2.60; the PayID panel's rows, Copy, the warning above "I've paid", the
+    close guard, the same code on reopening and on reload with no second issue, the claim
+    reaching every player's lobby; the admin page at 390 px — its private headers, both lists,
+    Received, Block, the lookup, a new code for a buyer and its link; the service worker
+    caching nothing under /admin/; no pay page in the Android shell; ar, he, fa, ta and de at
+    320 px; the fourth PayID code from one address refused. A wrong admin key gets the game's
+    own page (the SPA fallback), as any unknown address does; design §4.4 says so. The socket
+    test's room helper now waits for the host's first lobby update, a race seen under load.
+    **Next:** Step 125 — paying by GitHub Sponsors.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

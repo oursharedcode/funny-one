@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from './QRCode';
 import { trackGift, type GiftRail } from '../funnel';
+import { copyText } from '../copyText';
 import type { SupportConfig } from '@funny/shared';
 
 interface Props {
@@ -110,22 +111,7 @@ export default function SupportScreen({ support, onClose }: Props) {
       setCopiedField(field);
       window.setTimeout(() => setCopiedField((f) => (f === field ? null : f)), 1500);
     };
-    function fallbackCopy(): void {
-      const ta = document.createElement('textarea');
-      ta.value = value;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      flash();
-    }
-    if (navigator.clipboard?.writeText) {
-      void navigator.clipboard.writeText(value).then(flash, fallbackCopy);
-    } else {
-      fallbackCopy();
-    }
+    void copyText(value).then(flash);
   }
 
   return (

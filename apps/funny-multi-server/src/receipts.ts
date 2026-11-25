@@ -39,7 +39,11 @@ export interface IssueRecord {
   code: string;
   pack: PackId;
   rail: ReceiptRail;
-  /** The rail's own reference: the PayID transfer's, the sponsorship's id. */
+  /**
+   * The rail's own reference: the sponsorship's id; for a code the owner
+   * gives by hand, the code it replaces, if any. Empty for PayID, whose
+   * transfer carries the code itself as its reference (D4 of 2026-11-05).
+   */
   ref: string;
   /** As the buyer saw it, `A$2.60`, `US$2`. */
   amount: string;

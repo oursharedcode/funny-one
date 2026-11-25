@@ -43,7 +43,7 @@
     "host": "Mwenyeji",
     "capReached": "Utengenezaji wa picha haupatikani kwa takriban saa {{hours}} zijazo. Bado mnaweza kucheza — wachezaji wataona maandishi ya hadithi badala ya katuni.",
     "capReachedHost": "Gusa Anzisha mchezo ukiwa tayari, au subiri hadi kikomo cha katuni cha kila siku kianze upya.",
-    "christmasOn": "🔔 Mchezo huu una hadithi mbili za Krismasi",
+    "christmasOn": "🔔 Mchezo huu una hadithi moja ya Krismasi",
     "christmasSwitch": "Cheza na hadithi za Krismasi 2026",
     "christmasPaid": "🔔 Kila hadithi katika mchezo huu ni hadithi ya Krismasi",
     "usePack": "🔔 Tumia kifurushi changu cha Krismasi hapa"
@@ -108,7 +108,7 @@
     "copied": "Imenakiliwa!"
   },
   "pay": {
-    "card": "Umeona hadithi mbili za Krismasi. Fungua zote: {{price}}, kwenye kila mchezo, hadi {{date}}.",
+    "card": "Umeona hadithi moja ya Krismasi. Fungua hadithi zote: {{price}}, kwenye kila mchezo, hadi {{date}}.",
     "cardButton": "Fungua",
     "pitch": "Hadithi zote za Krismasi, kwenye kila mchezo, hadi {{date}}. Malipo mara moja, bila usajili.",
     "oncePayId": "Kwa PayID, kutoka benki yoyote ya Australia.",
@@ -127,7 +127,20 @@
     "playFree": "Cheza bure",
     "haveTitle": "Tayari una kifurushi hiki.",
     "ended": "Toleo la Krismasi 2026 haliuzwi tena.",
-    "closed": "Kifurushi hakiwezi kununuliwa kwa sasa. Tafadhali rudi baadaye."
+    "closed": "Kifurushi hakiwezi kununuliwa kwa sasa. Tafadhali rudi baadaye.",
+    "transferTitle": "Lipa kupitia programu ya benki yako, kwenda PayID hii:",
+    "transferName": "Jina la akaunti",
+    "transferAmount": "Kiasi",
+    "transferReference": "Rejea",
+    "referenceHint": "Weka msimbo kwenye sehemu ya rejea (maelezo) ya malipo, kama ulivyo hapa: hivyo ndivyo malipo yako yanavyolinganishwa na msimbo wako.",
+    "paidWarning": "Umetuma pesa? Bonyeza “Nimelipa” kabla ya kufunga ukurasa huu: msimbo wako utaanza kufanya kazi mara moja. Ukifunga kwanza, msimbo wako utasubiri hadi tupate malipo yako kwa mkono.",
+    "paidButton": "Nimelipa",
+    "claimFailed": "Haikufanikiwa. Angalia muunganisho wako kisha bonyeza tena.",
+    "leaveTitle": "Umeshalipa?",
+    "leaveText": "Bonyeza “Nimelipa” kwanza ili msimbo wako ufanye kazi sasa hivi. Bado hujalipa? Msimbo wako utabaki kwenye simu hii: fungua ukurasa huu tena ukishalipa.",
+    "leaveAnyway": "Bado — funga",
+    "paidTitle": "Asante! Msimbo wako unafanya kazi sasa.",
+    "paidCheck": "Tunakagua kwa mkono kwamba malipo yako yamefika. Yasipofika ndani ya siku 2, msimbo utaacha kufanya kazi."
   },
   "gallery": {
     "share": "Shiriki picha za chumba",

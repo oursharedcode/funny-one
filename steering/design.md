@@ -234,8 +234,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 - **Content is decided per story, not per room** (`StoryContent`, `optionsFor`): `base` in a room
   without a pack; `slice` for a free room's ordinary stories — the pack's when, why and ending,
   the base pools' four picture slots, so the scene is one the library already holds and the
-  ending is a text card; `full` for a free game's two golden stories (one until the owner's
-  decision of 2026-11-21); `paid` for every story of a paid room (Step 122) — `full`'s options
+  ending is a text card; `full` for a free game's one golden story, at any room size (owner,
+  2026-11-25; two from 2026-11-21 to then); `paid` for every story of a paid room (Step 122) — `full`'s options
   and ending picture, but not golden, since every story is one: no "🔔 A Christmas story" over
   it and no golden-last order in the gallery. A test holds every pack's `sliceSlots` apart from
   `VISUAL_SLOTS`.
@@ -292,9 +292,9 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 - **In rooms** (Step 117, owner decisions 1C, 3A, 4A, 5A). `packOffer` (rooms.ts) offers a new
   room its language's pack while the free part lasts, switched on; the host's lobby switch
   (`room:setPack`, §5) turns it off and on until the game starts, and it carries over to "one
-  more game". At each start `freeGameContents` picks two golden stories at random and gives
+  more game". At each start `freeGameContents` picks one golden story at random and gives
   every other story the slice; the free cut-off is checked again there, for a lobby left open
-  across it. The gallery lists the golden stories last. A golden story's aftermath is asked for
+  across it. The gallery lists the golden story last. A golden story's aftermath is asked for
   after its scene (`endingFor`, an `/exists` hit) and sent with it; any failure leaves
   `ending: null`, and the client shows the ending as the text card a slice story gets.
   `PACK_ROOMS=off` (§11) makes every new room an ordinary one.
@@ -378,8 +378,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   same in every language and never converted (D3 A) — outside Australia the page says the
   buyer's bank converts it.
 - **The pay card** (Step 123, `EndScreen`). After a free Christmas game — the room's pack on
-  and not paid — every player whose phone keeps no code reads "You just saw two Christmas
-  stories. Unlock all of them: {price}, every game, until {date}." over one button, "Unlock",
+  and not paid — every player whose phone keeps no code reads "You just saw one Christmas
+  story. Unlock all of them: {price}, every game, until {date}." over one button, "Unlock",
   which opens the pay page. The price is their rail's; the date is the pack's last paid day as
   their language writes it (`packDay.ts`). On the website only, and only while `pay` names the
   room's pack: never in the Android app (FM-APP-3), in a paid room, with the host's switch
@@ -404,10 +404,43 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   "Play free" for a visitor the link brought. A phone that keeps a code reads "You already
   have this pack." with the code and its last day; from the day after the free part's last
   the page says the edition is no longer on sale; where `pay` is null, that the pack cannot be
-  bought right now. **The pay button starts nothing yet**: `startPayment` (`pay.ts`) is the
-  seam Steps 124 (PayID) and 125 (Sponsors) fill, and until then it answers not-ok and the
-  page says the payment cannot be started. Never in the Android app: `?pay=` is ignored there
-  and no price is shown (FM-APP-3).
+  bought right now. The pay button calls `startPayment` (`pay.ts`), the seam each rail fills:
+  PayID since Step 124, below; on Sponsors (Step 125's) it still answers not-ok and the page
+  says the payment cannot be started. Never in the Android app: `?pay=` is ignored there and
+  no price is shown (FM-APP-3).
+- **Paying by PayID** (Step 124, owner decisions of 2026-11-25; `payid.ts`, `PayScreen`).
+  `POST /pay/payid` `{ pack, policy }` issues a pending code — receipt `rail: payid`, `ref`
+  empty (the reference is the code itself), `delivered: pay page`, the policy the page showed —
+  and answers `{ code, payId, payIdName, amount }`: 409 `NOT_ON_SALE` wherever `/config` would
+  say `pay: null` or `DEPLOYER_PAYID`/`_NAME` is unset, 429 past **3 codes per address per
+  hour** (D4 A). The page turns its button into the transfer to make: the PayID, the account
+  name, the amount and the code as the reference, each with Copy, a line that the reference
+  is how the payment is matched, and "I've paid". The phone keeps the waiting code
+  (`funny37.pendingPayId`), so a reload or a later visit shows the same code and asks for no
+  other — **one waiting code per phone** (D4 A). `POST /pay/claim` `{ code }` claims it
+  (`codes.claim`: it works for 48 h unless the owner marks it received) and answers with the
+  code's verdict — ok also for one already received; `CODE_INVALID` costs a wrong-code token.
+  On ok the phone keeps the code as its pack code, forgets the waiting one, shows "Thank you!
+  Your code works now." and that the payment is checked by hand within 2 days, and App sends
+  `room:unlock` for a lobby the code could open. Both routes are `no-store`. **A buyer who
+  pays and closes first** (D3 A plus the owner's warning): the panel says, above "I've paid",
+  to press it before closing; × or Close with a waiting code asks "Already paid?" with "I've
+  paid" and "Not yet — close"; the code stays on the phone, and the admin page lists it among
+  the unclaimed.
+- **The owner's admin page** (Step 124, D1 A, D2 A, D5 A; `admin.ts`). `GET /admin/<key>`,
+  where the key is `PACK_ADMIN_SECRET` (§11; 16 characters at least, else no page): English,
+  phone-sized, built from the receipt log on each load, `no-store`, `noindex`, no referrer,
+  no frames. A wrong key is answered as any unknown address — the game's own page in
+  production (the SPA fallback), a 404 where there is none — so it tells nothing, and takes a
+  token of a wrong-key limiter (10 an hour per address, the right key refused too once spent). No alert is sent (D2 A): the bank's own
+  PayID notice is the cue. Lists: **claimed — match within 48 h**, least time left first,
+  lapsed ones still shown; **paid without "I've paid"?** — unclaimed PayID codes of the last
+  7 days (D3 A), newest first; a lookup by any part of a code, a room code or an issue day.
+  Each card has Received, Block (refund, payment taken back, leaked in public, the buyer
+  asked; confirmed first) and "New code for this buyer"; a New code form makes an owner's
+  code (`rail: owner`, `ref` the code it replaces, `delivered: by hand`) and shows it with
+  its `?code=` link to copy. Actions are form posts (the only urlencoded bodies the server
+  parses) answered with a 303 back to the page.
 - **The paying half's counts** (Step 123, DD-15): `xm_card` (the pay card shown), `xm_page`
   (the pay page opened; `t` is `card` or `link`) and `xm_pay` (the pay button pressed; `t` is
   `payid` or `sponsors`), each once per page load, website only, with nothing about the buyer
@@ -803,6 +836,7 @@ retired by D-6; nothing of it was built.*
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 | `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
 | `PACK_ROOMS` | server | `off` makes every new room an ordinary one (Step 117, §4.4) — the launch's lever; unset = packs offered |
+| `PACK_ADMIN_SECRET` | server | the owner's admin page's key (Step 124, §4.4): its address is `/admin/<key>`; unset or under 16 characters, there is no page. The VM's `.env` only, never the repository; a new one only moves the page |
 | `PACK_CODE_SECRET` | server | signs and checks the paid codes (Step 122, §4.4); under 16 characters, every code is refused and no pack is on sale (Step 123: `/config` answers `pay: null`). The VM's `.env` only, never the repository: a new one voids every code sold |
 | `RECEIPTS_FILE` | server | the paid codes' receipt log, JSONL (Step 122, §4.4); compose sets `/data/receipts.jsonl` in the stats volume; unset = memory only |
 

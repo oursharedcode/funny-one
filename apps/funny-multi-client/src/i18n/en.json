@@ -42,7 +42,7 @@
     "host": "Host",
     "capReached": "Picture generation is unavailable for the next ~{{hours}} hours. You can still play — players will see story text in place of cartoons.",
     "capReachedHost": "Tap Start Game when ready, or wait until the daily cartoon allowance resets.",
-    "christmasOn": "🔔 This game has two Christmas stories",
+    "christmasOn": "🔔 This game has one Christmas story",
     "christmasSwitch": "Play with the Christmas 2026 stories",
     "christmasPaid": "🔔 Every story in this game is a Christmas story",
     "usePack": "🔔 Use my Christmas pack here"
@@ -107,7 +107,7 @@
     "copied": "Copied!"
   },
   "pay": {
-    "card": "You just saw two Christmas stories. Unlock all of them: {{price}}, every game, until {{date}}.",
+    "card": "You just saw one Christmas story. Unlock all of them: {{price}}, every game, until {{date}}.",
     "cardButton": "Unlock",
     "pitch": "All the Christmas stories, in every game, until {{date}}. One payment, no subscription.",
     "oncePayId": "By PayID, from any Australian bank.",
@@ -126,7 +126,20 @@
     "playFree": "Play free",
     "haveTitle": "You already have this pack.",
     "ended": "The Christmas 2026 edition is no longer on sale.",
-    "closed": "The pack can't be bought right now. Please come back later."
+    "closed": "The pack can't be bought right now. Please come back later.",
+    "transferTitle": "Pay from your bank’s app, to this PayID:",
+    "transferName": "Account name",
+    "transferAmount": "Amount",
+    "transferReference": "Reference",
+    "referenceHint": "Put the code in the payment’s reference or description, exactly as it is here: that is how your payment is matched to your code.",
+    "paidWarning": "Sent the money? Press “I’ve paid” before you close this page: your code starts working then. If you close it first, your code waits until we find your payment by hand.",
+    "paidButton": "I’ve paid",
+    "claimFailed": "That didn’t go through. Check your connection and press again.",
+    "leaveTitle": "Already paid?",
+    "leaveText": "Press “I’ve paid” first, so your code works now. Not paid yet? Your code stays on this phone: open this page again when you have.",
+    "leaveAnyway": "Not yet — close",
+    "paidTitle": "Thank you! Your code works now.",
+    "paidCheck": "We check by hand that your payment has arrived. If it hasn’t within 2 days, the code stops working."
   },
   "gallery": {
     "share": "Share the room's pictures",

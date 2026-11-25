@@ -217,7 +217,7 @@ describe('cap banner', () => {
 describe('Christmas stories (Step 117)', () => {
   const ON = { id: 'chr26', on: true, paid: false } as const;
   const OFF = { id: 'chr26', on: false, paid: false } as const;
-  const LINE = '🔔 This game has two Christmas stories';
+  const LINE = '🔔 This game has one Christmas story';
   const SWITCH = 'Play with the Christmas 2026 stories';
 
   afterEach(async () => {
@@ -266,7 +266,7 @@ describe('Christmas stories (Step 117)', () => {
   it('names the edition «Новый год 2027» in Russian', async () => {
     await i18n.changeLanguage('ru');
     renderLobby({ pack: ON, language: 'ru', myLanguage: 'ru' });
-    expect(screen.getByText('🔔 В этой игре две новогодние истории')).toBeTruthy();
+    expect(screen.getByText('🔔 В этой игре одна новогодняя история')).toBeTruthy();
     expect(screen.getByLabelText('Играть с историями «Новый год 2027»')).toBeTruthy();
   });
 });
@@ -300,7 +300,7 @@ describe('the paid code (Step 122)', () => {
     rememberPackCode(CODE);
     renderLobby({ pack: PAID });
     expect(screen.getByText('🔔 Every story in this game is a Christmas story')).toBeTruthy();
-    expect(screen.queryByText('🔔 This game has two Christmas stories')).toBeNull();
+    expect(screen.queryByText('🔔 This game has one Christmas story')).toBeNull();
     expect(screen.queryByText(USE)).toBeNull();
   });
 

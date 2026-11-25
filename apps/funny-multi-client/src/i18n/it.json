@@ -43,7 +43,7 @@
     "host": "Host",
     "capReached": "La generazione di immagini non è disponibile per le prossime ~{{hours}} ore. Potete giocare lo stesso — al posto dei disegni vedrete il testo della storia.",
     "capReachedHost": "Premi Avvia la partita quando sei pronto, oppure aspetta che la quota giornaliera di immagini si resetti.",
-    "christmasOn": "🔔 Questa partita ha due storie di Natale",
+    "christmasOn": "🔔 Questa partita ha una storia di Natale",
     "christmasSwitch": "Gioca con le storie di Natale 2026",
     "christmasPaid": "🔔 Questa partita ha solo storie di Natale",
     "usePack": "🔔 Usa qui il mio pacchetto di Natale"
@@ -108,7 +108,7 @@
     "copied": "Copiato!"
   },
   "pay": {
-    "card": "Hai appena visto due storie di Natale. Sbloccale tutte: {{price}}, in ogni partita, fino al {{date}}.",
+    "card": "Hai appena visto una storia di Natale. Sblocca tutte le storie di Natale: {{price}}, in ogni partita, fino al {{date}}.",
     "cardButton": "Sblocca",
     "pitch": "Tutte le storie di Natale, in ogni partita, fino al {{date}}. Un solo pagamento, nessun abbonamento.",
     "oncePayId": "Con PayID, da qualsiasi banca australiana.",
@@ -127,7 +127,20 @@
     "playFree": "Gioca gratis",
     "haveTitle": "Questo pacchetto ce l'hai già.",
     "ended": "L'edizione Natale 2026 non è più in vendita.",
-    "closed": "Al momento il pacchetto non si può acquistare. Torna più tardi."
+    "closed": "Al momento il pacchetto non si può acquistare. Torna più tardi.",
+    "transferTitle": "Paga dall'app della tua banca, a questo PayID:",
+    "transferName": "Nome del conto",
+    "transferAmount": "Importo",
+    "transferReference": "Causale",
+    "referenceHint": "Scrivi il codice nella causale (descrizione) del pagamento, esattamente come qui: così il tuo pagamento viene collegato al tuo codice.",
+    "paidWarning": "Soldi inviati? Premi «Pagato» prima di chiudere questa pagina: il tuo codice funziona subito. Se la chiudi prima, il codice aspetta che troviamo il tuo pagamento a mano.",
+    "paidButton": "Pagato",
+    "claimFailed": "Non è andata a buon fine. Controlla la connessione e premi di nuovo.",
+    "leaveTitle": "Hai già pagato?",
+    "leaveText": "Premi prima «Pagato», così il tuo codice funziona subito. Non hai ancora pagato? Il codice resta su questo telefono: riapri questa pagina quando hai pagato.",
+    "leaveAnyway": "Non ancora — chiudi",
+    "paidTitle": "Grazie! Il tuo codice ora funziona.",
+    "paidCheck": "Controlliamo a mano che il pagamento sia arrivato. Se non arriva entro 2 giorni, il codice smette di funzionare."
   },
   "gallery": {
     "share": "Condividi le immagini della stanza",

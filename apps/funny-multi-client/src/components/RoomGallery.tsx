@@ -21,7 +21,7 @@
 // share and video buttons export the story in the language on screen.
 //
 // Step 117 (B-29): a Christmas story shows its ending under the scene
-// (StoryEnding.tsx), a golden one says so; the server lists the golden stories
+// (StoryEnding.tsx), a golden one says so; the server lists the golden story
 // last. A golden story's still carries its ending picture and the edition's
 // footer, and every Christmas story's video ends on its ending.
 //

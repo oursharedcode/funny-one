@@ -43,7 +43,7 @@
     "host": "房主",
     "capReached": "之後大約 {{hours}} 個鐘都冇得整圖。你照樣可以玩 — 玩家會見到故事文字，代替漫畫。",
     "capReachedHost": "準備好就撳「開始遊戲」，或者等每日漫畫額度重設。",
-    "christmasOn": "🔔 呢局有兩個聖誕故事",
+    "christmasOn": "🔔 呢局有一個聖誕故事",
     "christmasSwitch": "玩 2026 聖誕故事",
     "christmasPaid": "🔔 呢局每個故事都係聖誕故事",
     "usePack": "🔔 喺呢度用我嘅聖誕故事包"
@@ -108,7 +108,7 @@
     "copied": "複製咗！"
   },
   "pay": {
-    "card": "你啱啱睇咗兩個聖誕故事。解鎖全部：{{price}}，每局都玩到，直到 {{date}}為止。",
+    "card": "你啱啱睇咗一個聖誕故事。解鎖全部：{{price}}，每局都玩到，直到 {{date}}為止。",
     "cardButton": "解鎖",
     "pitch": "全部聖誕故事，每局都玩到，直到 {{date}}為止。一次過付款，唔使訂閱。",
     "oncePayId": "用 PayID 付款，任何澳洲銀行都得。",
@@ -127,7 +127,20 @@
     "playFree": "免費玩",
     "haveTitle": "你已經有呢個故事包喇。",
     "ended": "2026 聖誕特別版已經停售。",
-    "closed": "暫時買唔到故事包，請遲啲再嚟。"
+    "closed": "暫時買唔到故事包，請遲啲再嚟。",
+    "transferTitle": "請喺銀行 app 轉帳去呢個 PayID：",
+    "transferName": "收款戶口名稱",
+    "transferAmount": "金額",
+    "transferReference": "付款備註",
+    "referenceHint": "請將解鎖碼照足顯示嘅樣，填入付款嘅備註（說明）欄：我哋就係靠佢將你嘅付款同解鎖碼配對。",
+    "paidWarning": "轉咗帳未？閂呢頁之前請先㩒「已付款」，解鎖碼即時生效。如果先閂咗，解鎖碼要等我哋人手搵到你嘅付款先生效。",
+    "paidButton": "已付款",
+    "claimFailed": "唔成功。請檢查網絡，然後再㩒一次。",
+    "leaveTitle": "已經付咗款？",
+    "leaveText": "請先㩒「已付款」，解鎖碼即時生效。未付款？解鎖碼會留喺呢部手機：付款後請再打開呢頁。",
+    "leaveAnyway": "未呀 — 閂咗佢",
+    "paidTitle": "多謝！解鎖碼而家用得喇。",
+    "paidCheck": "我哋會人手核對你嘅付款有冇到帳。如果 2 日內都未到，解鎖碼就會失效。"
   },
   "gallery": {
     "share": "分享呢個房間啲圖",

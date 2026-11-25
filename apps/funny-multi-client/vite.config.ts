@@ -144,8 +144,13 @@ export default defineConfig({
             // Navigation requests (`/`, `/anything`) — NetworkFirst so a
             // deploy is visible on the next page open. Falls back to the
             // cache only when the network is slow or unreachable, which
-            // for a multiplayer game is already a degraded mode.
-            urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
+            // for a multiplayer game is already a degraded mode. Never the
+            // owner's admin page (Step 124): its address holds its key and
+            // its page the codes, so the worker leaves it to the network and
+            // keeps no copy. (The function is copied into sw.js as text, so
+            // it can name nothing from this file, BASE_PATH included.)
+            urlPattern: ({ request, url }: { request: Request; url: URL }) =>
+              request.mode === 'navigate' && !url.pathname.includes('/admin/'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'app-shell',

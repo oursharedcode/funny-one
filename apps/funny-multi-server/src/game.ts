@@ -41,14 +41,14 @@
 //     only two outcomes here are "generated" and "the Worker/cap failed".
 //
 //  6. **Packs in rooms** (Step 117, B-29, DD-16). A room offered a pack and
-//     left on by its host plays two golden stories — the pack in every slot,
+//     left on by its host plays one golden story — the pack in every slot,
 //     the ending drawn too — and the slice in every other (`freeGameContents`).
 //     Each story carries its `content`, so a pick is checked and a bot fills
 //     against `optionsFor(slot, content)`, `round:start` goes to each player
 //     with the content of the story it writes, and the texts resolve through
 //     `optionTexts`, which reads the pack's words in English where the room
 //     language has none. A golden story gets its aftermath right after its
-//     scene, and the gallery lists the golden stories last.
+//     scene, and the gallery lists the golden story last.
 //
 //  7. **A paid game** (Step 122, B-29). A room a code has opened plays the
 //     whole pack in every story (`paidGameContents`, content `paid`): every
@@ -126,11 +126,12 @@ function optionIdsFor(slot: SlotIndex, content: StoryContent): ReadonlySet<Optio
 }
 
 /**
- * Each story's content for a game starting now (Step 117): two golden stories
- * and the slice when the room's pack is on and its free part has not ended
- * (FM-PACK-6, checked here as well as at the room's creation, for a lobby left
- * open across the cut-off), the base pools otherwise. Drawn afresh at every
- * start, "one more game" included, so the golden stories move between games.
+ * Each story's content for a game starting now (Step 117): one golden story
+ * (two until 2026-11-25) and the slice when the room's pack is on and its free
+ * part has not ended (FM-PACK-6, checked here as well as at the room's
+ * creation, for a lobby left open across the cut-off), the base pools
+ * otherwise. Drawn afresh at every
+ * start, "one more game" included, so the golden story moves between games.
  *
  * Step 122: the whole pack in every story when a code has opened it and its
  * paid part has not ended — the code itself is checked again by the caller

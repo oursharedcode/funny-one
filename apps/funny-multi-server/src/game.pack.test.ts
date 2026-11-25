@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Step 117 (task B-29) — packs in rooms, in-process. Which room is offered the
-// Christmas pack, how a free game splits its stories into two golden ones and
+// Christmas pack, how a free game splits its stories into one golden story and
 // the slice (owner decision 1C), that every pick — a player's or a bot's — is
 // checked against the pool its own story offers, the golden ending drawn after
-// the scene, the gallery revealing the golden stories last, and the cut-off
+// the scene, the gallery revealing the golden story last, and the cut-off
 // (FM-PACK-6) at a room's creation and at a game's start.
 //
 // The workspace's vitest config sets PACK_ROOMS=off so the older suites keep
@@ -153,11 +153,11 @@ describe('the offer (owner decisions 3A, 4A)', () => {
 
 describe('a free game’s stories (owner decision 1C)', () => {
   for (const n of [3, 4, 5, 6, 7]) {
-    it(`gives ${n} players two golden stories and the slice`, () => {
+    it(`gives ${n} players one golden story and the slice (owner, 2026-11-25)`, () => {
       const room = makeRoom(n);
       startGame(room, makeIo().io);
-      expect(kinds(room).filter((k) => k === 'full')).toHaveLength(2);
-      expect(kinds(room).filter((k) => k === 'slice')).toHaveLength(n - 2);
+      expect(kinds(room).filter((k) => k === 'full')).toHaveLength(1);
+      expect(kinds(room).filter((k) => k === 'slice')).toHaveLength(n - 1);
       for (const story of room.stories) {
         expect(story.content).toMatchObject({ pack: 'chr26' });
         expect(story.ending).toBeNull();
@@ -182,7 +182,7 @@ describe('a free game’s stories (owner decision 1C)', () => {
     expect(kinds(room)).toEqual(['base', 'base', 'base']);
   });
 
-  it('keeps the switch on "one more game" and draws the golden stories afresh', () => {
+  it('keeps the switch on "one more game" and draws the golden story afresh', () => {
     const room = makeRoom(3);
     room.pack = { id: 'chr26', on: false, paid: false };
     const { io } = makeIo();
@@ -199,7 +199,7 @@ describe('a free game’s stories (owner decision 1C)', () => {
     playThrough(room, io);
     prepareRestart(room, 's0');
     startGame(room, io);
-    expect(kinds(room).filter((k) => k === 'full')).toHaveLength(2);
+    expect(kinds(room).filter((k) => k === 'full')).toHaveLength(1);
   });
 });
 
@@ -341,7 +341,7 @@ describe('the reveal', () => {
     ).not.toBeNull();
   });
 
-  it('reveals the golden stories last in the gallery, each with its content', () => {
+  it('reveals the golden story last in the gallery, each with its content', () => {
     const room = revealedRoom(6);
     const gallery = buildGallery(room);
     expect(gallery.entries.map((e) => e.content.kind)).toEqual([
@@ -349,7 +349,7 @@ describe('the reveal', () => {
       'slice',
       'slice',
       'slice',
-      'full',
+      'slice',
       'full',
     ]);
     // Each entry is still its owner's story, only moved.

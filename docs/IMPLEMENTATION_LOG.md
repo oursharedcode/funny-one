@@ -8048,6 +8048,9 @@ its webhook, at Step 125; the live-badge look; Funny Multi's trader confirmation
 February 2027. B-3's native reviewers now also have the `pay` section and the policy's clause in
 21 languages.
 
+~~RESUME HERE (2026-11-24, after Step 123; not yet pushed)~~ — pushed as `d07125e`, CI green (run
+45501028340); carried into Step 124's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-24, after Step 123; not yet pushed).** Step 122 is pushed and green
 (`e152432`, CI run 45012694062). **The pay card and the pay page are built; nothing can be paid
 yet, and nothing of the paid half is live** — Steps 122–126 deploy together (D1). After a free
@@ -8062,3 +8065,110 @@ version. Then 125 Sponsors, 126 sleigh bells, the landing line "Christmas pack �
 before the landing site — no deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
 **Owed, the owner's:** `PACK_CODE_SECRET` in the VM's `.env` before the deploy; the Sponsors tier
 and its webhook; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+## Step 124 (task B-29) — PayID and the admin page; one Christmas story per free room (2026-11-25)
+
+**Owner decisions, 2026-11-25 (`/morning`, on Step 124's plan)** — B-29's block in tasks.md holds
+the binding text: **D1 A** the admin page's key is a secret of its own, `PACK_ADMIN_SECRET`, not
+one derived from `PACK_CODE_SECRET`, so a new key only moves the page; **D2 A** no alert on a
+claim — the bank's own PayID notice is the owner's cue; **D3 A** payments that arrive without
+"I've paid" are found on the admin page, which lists unclaimed PayID codes of the last 7 days —
+**and, the owner's addition, a warning on the pay page** that a buyer must press "I've paid"
+before closing; **D4 A** one waiting code per phone and 3 PayID codes per address per hour; **D5
+A** the admin page is in English. **During the step the owner asked for one Christmas story per
+free room, whatever the number of players** — it was two; folded into this step, it supersedes
+1C of 2026-11-21.
+
+**Shipped:**
+
+- **Server** (`apps/funny-multi-server`): `payid.ts` (new) — `POST /pay/payid` issues a pending
+  code (its issue record keeps the rail, the amount and `REFUND_POLICY_VERSION`) and answers with
+  the transfer to make: the PayID, its account name, A$2.60 and the code as the reference;
+  `POST /pay/claim` is "I've paid" — the code works at once, for 48 hours, unless the owner
+  matches it first. Both `no-store`. Nothing is sold by PayID without a code secret, with the
+  packs off, after the free part, or without `DEPLOYER_PAYID` and `DEPLOYER_PAYID_NAME`. 3 codes
+  per address per hour (`PAYID_CODES_PER_HOUR`); a claim on what is not a code takes a token of
+  the wrong-code limit, as `room:unlock` does. `admin.ts` (new) — `GET`/`POST
+  /admin/<PACK_ADMIN_SECRET>` (16 characters at least; unset, no routes): plain server HTML, no
+  client bundle, `no-store`, `noindex`, `no-referrer`, `X-Frame-Options: DENY`.
+  Lists "Claimed — match within 48 h" with each code's time left (a lapsed one stays listed) and
+  "Paid without "I've paid"?" (unclaimed PayID codes of the last 7 days); Received; Block by
+  B-29's four reasons, behind a confirm; "New code for this buyer" and "Make a new code", logged
+  with the code they replace and shown with the link the buyer opens; a lookup by any part of a
+  code, a room code or an issue day. Everything is read from the receipt log and done through
+  `codes.ts`. A wrong key is answered as any unknown address (the SPA fallback in production)
+  and takes a token of a 10-an-hour wrong-key limiter, the right key refused too once spent.
+  `receipts.ts`: an owner's code keeps the code it replaces as its reference.
+- **Client** (`apps/funny-multi-client`): `pay.ts`'s `startPayment` fills the PayID seam — the
+  transfer, kept on the phone (`funny37.pendingPayId`) until claimed or the offer ends, so a
+  reload or a reopening shows the same code with no second issue; `claimPayId`. `PayScreen.tsx`:
+  the transfer panel with Copy on each line (`copyText.ts`, new, shared with the Support sheet),
+  the D3 warning above "I've paid", a close guard while a code waits ("Already paid?" — "I've
+  paid" or "Not yet — close"), the thank-you with when the code is checked, the code kept and the
+  room told at once. `vite.config.ts`: the service worker caches nothing under `/admin/`.
+- **Shared** (`packages/shared`): `PayIdAnswer`, `PayClaimAnswer`, `PayError`; **`GOLDEN_STORIES`
+  2 → 1**, the slice in the other stories kept.
+- **Texts:** the pay section's new keys and the one-story lines ("🔔 This game has one Christmas
+  story"; "You just saw one Christmas story. Unlock all of them: …") in all 23 catalogues — en
+  and ru the agent's, the other 21 machine drafts on B-3's pile, the drafters' notes in tasks.md's
+  Step 124 line. The privacy policy names the waiting PayID code on the device and the
+  per-address count of PayID codes, in all 23 sections.
+- **Docs:** FM-PACK-4 and design §4.4 (one golden story; PayID; the admin page and its wrong-key
+  answer); tasks.md — the 2026-11-25 decisions, the supersede note under 1C and the Step 124
+  line; `.env.example` (`PACK_ADMIN_SECRET`).
+
+**Settled in the step:**
+
+- The admin page is plain HTML from the server, not a screen of the game: none of it reaches a
+  player's bundle or the service worker's cache. Workbox serialises the `urlPattern` function
+  into sw.js, so it tests `includes('/admin/')` rather than a closure's base path.
+- A wrong admin key cannot answer 404 in production: the server's not-found handler serves the
+  game's page. So it gets the game's page with 200, as any unknown address does, which tells a
+  guesser nothing; design §4.4's wording was changed to say so, not the server.
+- The socket test's room helper (`paidRooms.socket.test.ts`) now waits for the host's first lobby
+  update: the server acks `room:create` before it sends the lobby, and under load a later `once`
+  took that update for the next event's.
+
+**Verified in phone-sized Chromium** (`.screens/step124-check.mjs`, gitignored): the built server
+on 3000 under random throwaway `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` set in the process
+environment only, an example PayID, and the picture Worker's local stand-in on 5185. 158 checks,
+none failing; the only console error is the expected 429 of the limit test. A free room of three
+gets exactly one full story and two slices, the lobby line on all three phones; the pay card's
+words at US$2 and A$2.60; the PayID panel's rows, Copy (the clipboard holds the code), the
+warning, the close guard both ways, the same code on reopening and on reload with no second
+issue, the claim reaching the other two players' lobbies; "Play free" with a waiting code. The
+admin page at 390 px: its headers, both lists, Received, Block with a reason, the lookup by a
+lower-case part of a code, a new code for a buyer whose link keeps it on a phone, a wrong key
+showing no code and a wrong-key POST changing nothing. The service worker caches the app shell and
+nothing under `/admin/`; no pay page in the Android shell; ar, he, fa, ta and de at 320 px; the
+fourth PayID code from one address refused. Looked at: the Arabic panel and the admin page — a
+long PayID or account name breaks mid-word, kept, since it still copies whole.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test`, outside the sandbox, 2282 across
+6 workspaces (536 funny-family-site, 585 funny-multi-client — 15 more, 448 funny-multi-server — 22
+more, 178 funny-one-client, 447 shared, 88 cloudflare); no dependency changed; `npm audit` exactly
+the three accepted ids (GHSA-6jcc-5g8w-32mx i18next, GHSA-3g3m-2fjr-6pw4 glob,
+GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed, the agent's:** Steps 125 (Sponsors) and 126, then the one deploy (D1) — `deploy/ship.sh`
+before `deploy/ship-funny-family.sh`. B-29 stays open.
+
+**Owed, the owner's:** **`PACK_ADMIN_SECRET` in the VM's `.env` and its backups before the
+deploy** (new); keep the admin link private — a bookmark on the phone, never a chat. Still owed:
+`PACK_CODE_SECRET` in the VM's `.env`; the Sponsors tier (US$2 one-time, "Christmas 2026
+edition", its text naming 1 August 2027) and its webhook, at Step 125; the live-badge look; Funny
+Multi's trader confirmation before 1 February 2027. B-3's native reviewers also have this step's
+pay texts, the one-story lines and the policy's two clauses in 21 languages.
+
+**RESUME HERE (2026-11-25, after Step 124; not yet pushed).** Step 123 is pushed and green
+(`d07125e`, CI run 45501028340). **Paying by PayID works locally, and the owner's admin page
+exists; nothing of the paid half is live** — Steps 122–126 deploy together (D1). A free
+Christmas room now plays one golden story, whatever the number of players. **Next, Step 125 (the
+agent's) — paying by GitHub Sponsors:** the pay button's seam outside Australia, the Sponsors
+webhook issuing the code (its signature checked), the code reaching the buyer, the admin page
+showing Sponsors codes. Then 126 sleigh bells, the landing line "Christmas pack — try it free",
+#2's Christmas invitation, #15's uptime alarm and the one deploy by about 10 December, the game
+before the landing site — no deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
+backups before the deploy; the Sponsors tier and its webhook; the live-badge look; Funny Multi's
+trader confirmation before 1 Feb 2027.

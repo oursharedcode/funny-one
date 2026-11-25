@@ -43,7 +43,7 @@
     "host": "房主",
     "capReached": "图片生成在接下来约 {{hours}} 小时内不可用。你仍然可以游玩 — 玩家将看到故事文字代替漫画。",
     "capReachedHost": "准备好后点击开始游戏，或等待每日漫画额度重置。",
-    "christmasOn": "🔔 本局有两个圣诞故事",
+    "christmasOn": "🔔 本局有一个圣诞故事",
     "christmasSwitch": "使用 2026 圣诞故事",
     "christmasPaid": "🔔 本局的每个故事都是圣诞故事",
     "usePack": "🔔 在这里使用我的圣诞故事包"
@@ -108,7 +108,7 @@
     "copied": "已复制！"
   },
   "pay": {
-    "card": "你刚看了两个圣诞故事。解锁全部：{{price}}，每局都能玩，直到 {{date}}为止。",
+    "card": "你刚看了一个圣诞故事。解锁全部：{{price}}，每局都能玩，直到 {{date}}为止。",
     "cardButton": "解锁",
     "pitch": "全部圣诞故事，每局都能玩，直到 {{date}}为止。一次付款，无需订阅。",
     "oncePayId": "通过 PayID 支付，任何澳大利亚银行都可以。",
@@ -127,7 +127,20 @@
     "playFree": "免费玩",
     "haveTitle": "你已经有这个故事包了。",
     "ended": "2026 圣诞特别版已停止销售。",
-    "closed": "暂时无法购买故事包，请稍后再来。"
+    "closed": "暂时无法购买故事包，请稍后再来。",
+    "transferTitle": "请在银行 App 中转账到这个 PayID：",
+    "transferName": "收款账户名",
+    "transferAmount": "金额",
+    "transferReference": "付款参考",
+    "referenceHint": "请把解锁码原样填入付款的参考（说明）栏：我们靠它把你的付款和解锁码对应起来。",
+    "paidWarning": "已经转账了？关闭本页前请先点“我已付款”，解锁码会马上生效。如果先关闭，解锁码要等我们手动找到你的付款后才会生效。",
+    "paidButton": "我已付款",
+    "claimFailed": "没有成功。请检查网络后再点一次。",
+    "leaveTitle": "已经付款了吗？",
+    "leaveText": "请先点“我已付款”，解锁码就会马上生效。还没付款？解锁码会保留在这部手机上：付款后请再打开本页。",
+    "leaveAnyway": "还没——关闭",
+    "paidTitle": "谢谢！解锁码已生效。",
+    "paidCheck": "我们会手动核对你的付款是否到账。如果 2 天内没有到账，解锁码将失效。"
   },
   "gallery": {
     "share": "分享房间的图片",

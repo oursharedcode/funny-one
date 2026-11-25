@@ -90,7 +90,7 @@ export interface Story {
  */
 export interface RoomStory extends Story {
   // Set at game start (DD-16, FM-PACK-4): base without a pack; with one, the
-  // slice, or the whole pack for each of the two golden stories.
+  // slice, or the whole pack for the golden story.
   content: StoryContent;
   // A golden story's aftermath (FM-PACK-3): the place and the ending, drawn
   // once the scene is. Null for every other story, whose ending is a text
@@ -329,6 +329,38 @@ export interface ClientConfig {
   pay: PayConfig | null;
 }
 
+/**
+ * Why a PayID request or claim was refused (Step 124): nothing on sale by
+ * PayID right now (no secret, the packs off, the free part over, no PayID
+ * configured), too many codes from one address, or the code's own verdict.
+ */
+export type PayError =
+  'NOT_ON_SALE' | 'RATE_LIMITED' | 'CODE_INVALID' | 'CODE_BLOCKED' | 'CODE_ENDED' | 'CODE_PENDING';
+
+/** POST /pay/payid (Step 124): the buyer pressed "Pay by PayID". */
+export interface PayIdRequest {
+  pack: PackId;
+  /** The refund policy the buyer read: REFUND_POLICY_VERSION. */
+  policy: string;
+}
+
+/**
+ * Its answer: the transfer to make. The code is issued pending and is the
+ * transfer's reference; it works once the buyer claims it ("I've paid") or
+ * the owner matches the payment.
+ */
+export type PayIdAnswer =
+  | { ok: true; code: string; payId: string; payIdName: string; amount: string }
+  | { ok: false; error: PayError };
+
+/** POST /pay/claim (Step 124): the buyer's "I've paid" on a PayID code. */
+export interface PayClaimRequest {
+  code: string;
+}
+
+/** Its answer: ok when the code works now, by this claim or by the owner's match. */
+export type PayClaimAnswer = { ok: true } | { ok: false; error: PayError };
+
 export interface RoundStartPayload {
   roundNumber: number;
   // Question text in the room's language.
@@ -452,8 +484,8 @@ export interface GalleryEntry {
 
 export interface GalleryReadyPayload {
   // One entry per player slot, in players[] order — except that the golden
-  // stories come last (owner decision 1C: "revealed last"), in players[] order
-  // among themselves.
+  // story comes last (owner decision 1C: "revealed last"; one golden story
+  // since 2026-11-25).
   entries: GalleryEntry[];
 }
 

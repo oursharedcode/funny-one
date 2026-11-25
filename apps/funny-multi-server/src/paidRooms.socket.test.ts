@@ -56,11 +56,16 @@ async function roomOf(
 }> {
   const sockets = [await h.connect(), await h.connect(), await h.connect()];
   const lobbies = sockets.map((s) => collect<LobbyUpdatePayload>(s, 'lobby:update'));
+  // The server answers room:create before it sends the lobby, so the host's
+  // first update can land after the ack: wait for it here, or a later `once`
+  // takes it for the next event's (a flake seen under load, Step 124).
+  const created = once<LobbyUpdatePayload>(sockets[0]!, 'lobby:update');
   const ack = await emitWithAck<RoomCreateAck>(sockets[0]!, 'room:create', {
     nickname: 'host',
     language,
     ...(code === undefined ? {} : { code }),
   });
+  await created;
   for (let i = 1; i < 3; i++) {
     const joined = sockets.slice(0, i + 1).map((s) => once<LobbyUpdatePayload>(s, 'lobby:update'));
     await emitWithAck(sockets[i]!, 'room:join', { roomCode: ack.roomCode, nickname: `guest${i}` });

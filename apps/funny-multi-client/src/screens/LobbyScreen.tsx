@@ -9,7 +9,7 @@
 //
 // Step 117 (owner decision 3A): a room in one of the Christmas edition's
 // languages is a Christmas room unless its host switches it off here. Every
-// player sees "🔔 This game has two Christmas stories" while it is on; only the
+// player sees "🔔 This game has one Christmas story" while it is on; only the
 // host sees the switch, and a guest sees nothing once it is off. The switch
 // shows the server's state, so every lobby agrees on it.
 //

@@ -7,7 +7,7 @@
 // drafted texts against the base templates' rules, and `optionsFor`.
 //
 // Then the rules that bring a pack into a room (Step 117): the dates
-// (FM-PACK-6), which room is offered it, the two golden stories, and the
+// (FM-PACK-6), which room is offered it, the golden story, and the
 // display texts with the English fallback (owner decision 4A).
 //
 // The prompts — 625 scenes, 25 aftermaths, the length cap, the refusals — are
@@ -429,7 +429,8 @@ describe('packForRoom (owner decisions 3A and 4A)', () => {
 });
 
 describe('freeGameContents (FM-PACK-4, owner decision 1C)', () => {
-  it.each([3, 4, 5, 6, 7])('makes two golden stories in a game of %i, the rest the slice', (n) => {
+  it.each([3, 4, 5, 6, 7])('makes one golden story in a game of %i, the rest the slice', (n) => {
+    expect(GOLDEN_STORIES).toBe(1);
     for (let run = 0; run < 50; run++) {
       const contents = freeGameContents('chr26', n);
       expect(contents).toHaveLength(n);
@@ -451,9 +452,9 @@ describe('freeGameContents (FM-PACK-4, owner decision 1C)', () => {
   });
 
   it('ends whatever the random source returns', () => {
-    expect(freeGameContents('chr26', 5, () => 0).filter(isGolden)).toHaveLength(2);
-    expect(freeGameContents('chr26', 5, () => 0.999999).filter(isGolden)).toHaveLength(2);
-    expect(freeGameContents('chr26', 5, () => 1).filter(isGolden)).toHaveLength(2);
+    expect(freeGameContents('chr26', 5, () => 0).filter(isGolden)).toHaveLength(1);
+    expect(freeGameContents('chr26', 5, () => 0.999999).filter(isGolden)).toHaveLength(1);
+    expect(freeGameContents('chr26', 5, () => 1).filter(isGolden)).toHaveLength(1);
   });
 
   it('marks only a full story golden', () => {

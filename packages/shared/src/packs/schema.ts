@@ -13,7 +13,7 @@
 //     equal a base id.
 //   - **A story's content**, decided per story rather than per room: a free
 //     room's ordinary stories take only the pack's prose slots (the *slice*),
-//     its two golden stories (owner decision 1C, 2026-11-21) and every story
+//     its one golden story (owner decision 1C, 2026-11-21; one since 2026-11-25) and every story
 //     of a paid game (Step 122) take the whole pack.
 //   - **An ending drawn as an aftermath** (slot 6's `aftermathEn`): the place
 //     and what is left there, no characters. The model draws every picture
@@ -77,11 +77,11 @@ export interface PackConfig {
  *
  *   base  — the base pools in every slot: a room without a pack;
  *   slice — the base pools on the picture slots and the pack's on when, why
- *           and the ending: every story of a free room except its two golden
- *           ones. Its picture is therefore one the library already holds, and
+ *           and the ending: every story of a free room except its golden
+ *           one. Its picture is therefore one the library already holds, and
  *           its ending is a text card;
- *   full  — the pack's options in every slot: a free game's two golden
- *           stories. Its ending is drawn too, as an aftermath;
+ *   full  — the pack's options in every slot: a free game's golden
+ *           story. Its ending is drawn too, as an aftermath;
  *   paid  — the same options and the same drawn ending, in every story of a
  *           game a code has paid for (Step 122). Not golden: a golden story is
  *           the free game's sample, and its downloads carry the edition's
@@ -103,9 +103,10 @@ export const PACK_OPTIONS_PER_SLOT = 5;
 
 /**
  * Golden stories in every free game, at every room size (owner decision 1C,
- * 2026-11-21): picked at random, revealed last, the pack's in every slot.
+ * 2026-11-21): picked at random, revealed last, the pack's in every slot. Two
+ * until the owner made it one, whatever the number of players (2026-11-25).
  */
-export const GOLDEN_STORIES = 2;
+export const GOLDEN_STORIES = 1;
 
 /** The slots an aftermath draws: the place (2) and the ending (6). */
 export const AFTERMATH_SLOTS: readonly SlotIndex[] = [2, 6];

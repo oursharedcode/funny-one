@@ -11,11 +11,26 @@
 // app never reads it: under Play's payments policy the app shows no price and
 // no way to pay, whichever link opened it.
 //
-// Paying itself is not wired here. `startPayment` is the seam: Step 124 gives
-// it PayID, Step 125 the Sponsors checkout, and until then every rail answers
-// "could not start" — which the page says in words that stay true afterwards.
+// `startPayment` is the seam each rail plugs into. Step 124 gives it PayID:
+// the server issues a code that waits for its payment (POST /pay/payid) and
+// answers with the transfer to make — the PayID, its account name, the amount
+// and the code as the reference. The phone keeps that one waiting code until
+// "I've paid" (POST /pay/claim, `claimPayId`) makes it work, so a reload, a
+// closed tab or a second press shows the same code again and never asks the
+// server for another (owner decision D4 A: three per address per hour). Step
+// 125 adds the Sponsors checkout; until then that rail answers "could not
+// start" — which the page says in words that stay true afterwards.
 
-import type { PackId, PayRail } from '@funny/shared';
+import {
+  isPackPaid,
+  parseCode,
+  type PackId,
+  type PayClaimAnswer,
+  type PayError,
+  type PayIdAnswer,
+  type PayRail,
+} from '@funny/shared';
+import { serverOrigin, withBase } from './basePath';
 import { isStoreShell } from './storeShell';
 
 const PARAM = 'pay';
@@ -57,22 +72,129 @@ export interface PaymentRequest {
   policy: string;
 }
 
+/** A PayID transfer to make: the server's answer, kept on the phone until claimed. */
+export interface PayIdTransfer {
+  pack: PackId;
+  /** The code, and the transfer's reference. */
+  code: string;
+  payId: string;
+  payIdName: string;
+  amount: string;
+}
+
 export interface PaymentStart {
   ok: boolean;
+  /** On PayID: the transfer the page shows. */
+  transfer?: PayIdTransfer;
 }
 
 type Starter = (request: PaymentRequest) => Promise<PaymentStart>;
 
-// The rails wired so far: none. Step 124 adds `payid`, Step 125 `sponsors`.
-const STARTERS: Partial<Record<PayRail, Starter>> = {};
+const PENDING_KEY = 'funny37.pendingPayId';
+// Where storage is blocked: this page load's waiting code.
+let pendingMemory: PayIdTransfer | null = null;
+
+function readTransfer(raw: unknown): PayIdTransfer | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const r = raw as Record<string, unknown>;
+  const code = parseCode(r.code);
+  if (!code || r.pack !== code.pack) return null;
+  if (typeof r.payId !== 'string' || typeof r.payIdName !== 'string') return null;
+  if (typeof r.amount !== 'string') return null;
+  return {
+    pack: code.pack,
+    code: code.code,
+    payId: r.payId,
+    payIdName: r.payIdName,
+    amount: r.amount,
+  };
+}
+
+/** The PayID code this phone is waiting to claim for `pack`, or null; always null in the Android app. */
+export function readPendingPayId(pack: PackId, now = Date.now()): PayIdTransfer | null {
+  if (isStoreShell() || !isPackPaid(pack, now)) return null;
+  let kept: PayIdTransfer | null = pendingMemory;
+  try {
+    const stored = localStorage.getItem(PENDING_KEY);
+    if (stored !== null) kept = readTransfer(JSON.parse(stored));
+  } catch {
+    // Storage blocked, or what it holds does not read: this page load's, if any.
+  }
+  return kept?.pack === pack ? kept : null;
+}
+
+function keepPendingPayId(transfer: PayIdTransfer): void {
+  pendingMemory = transfer;
+  try {
+    localStorage.setItem(PENDING_KEY, JSON.stringify(transfer));
+  } catch {
+    // Storage blocked — kept for this page load.
+  }
+}
+
+export function forgetPendingPayId(): void {
+  pendingMemory = null;
+  try {
+    localStorage.removeItem(PENDING_KEY);
+  } catch {
+    // Storage blocked — nothing was kept there.
+  }
+}
+
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(serverOrigin() + withBase(path), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return (await res.json()) as T;
+}
+
+async function startPayId(request: PaymentRequest): Promise<PaymentStart> {
+  const kept = readPendingPayId(request.pack);
+  if (kept) return { ok: true, transfer: kept };
+  const answer = await postJson<PayIdAnswer>('pay/payid', {
+    pack: request.pack,
+    policy: request.policy,
+  });
+  if (!answer.ok) return { ok: false };
+  const transfer = readTransfer({ ...answer, pack: request.pack });
+  // The amount is the server's, which logs it: the page shows what it says.
+  if (!transfer) return { ok: false };
+  keepPendingPayId(transfer);
+  return { ok: true, transfer };
+}
+
+// The rails wired so far. Step 125 adds `sponsors`.
+const STARTERS: Partial<Record<PayRail, Starter>> = { payid: startPayId };
 
 /** Starts a payment on a rail; not ok when it could not be started. Never throws. */
 export async function startPayment(request: PaymentRequest): Promise<PaymentStart> {
   const start = STARTERS[request.rail];
-  if (!start) return { ok: false };
+  if (!start || isStoreShell()) return { ok: false };
   try {
     return await start(request);
   } catch {
     return { ok: false };
   }
+}
+
+export type ClaimResult = { ok: true } | { ok: false; error: PayError | 'NETWORK' };
+
+/**
+ * The buyer's "I've paid": the server makes the waiting code work for 48
+ * hours, until the owner matches the transfer. Never throws: a lost
+ * connection is NETWORK, and the button can be pressed again.
+ */
+export async function claimPayId(code: string): Promise<ClaimResult> {
+  try {
+    const answer = await postJson<PayClaimAnswer>('pay/claim', { code });
+    return answer.ok ? { ok: true } : { ok: false, error: answer.error };
+  } catch {
+    return { ok: false, error: 'NETWORK' };
+  }
+}
+
+export function __resetPayForTest(): void {
+  pendingMemory = null;
 }

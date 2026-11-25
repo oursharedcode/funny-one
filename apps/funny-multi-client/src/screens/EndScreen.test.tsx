@@ -431,7 +431,7 @@ describe('the pay card (Step 123)', () => {
   const ON = { id: 'chr26', on: true, paid: false } as const;
   const SPONSORS: PayConfig = { pack: 'chr26', rail: 'sponsors' };
   const PAYID: PayConfig = { pack: 'chr26', rail: 'payid' };
-  const CARD = /^You just saw two Christmas stories\. Unlock all of them: /;
+  const CARD = /^You just saw one Christmas story\. Unlock all of them: /;
 
   function resetCode(): void {
     forgetPackCode();
@@ -457,7 +457,7 @@ describe('the pay card (Step 123)', () => {
     const { unmount } = renderEnd({ lobby: lobby({ pack: ON }), pay: SPONSORS });
     expect(
       screen.getByText(
-        'You just saw two Christmas stories. Unlock all of them: US$2, every game, until 1 August 2027.',
+        'You just saw one Christmas story. Unlock all of them: US$2, every game, until 1 August 2027.',
       ),
     ).toBeTruthy();
     unmount();
@@ -466,7 +466,7 @@ describe('the pay card (Step 123)', () => {
     renderEnd({ lobby: lobby({ socketId: 's2', pack: ON }), pay: PAYID });
     expect(
       screen.getByText(
-        'You just saw two Christmas stories. Unlock all of them: A$2.60, every game, until 1 August 2027.',
+        'You just saw one Christmas story. Unlock all of them: A$2.60, every game, until 1 August 2027.',
       ),
     ).toBeTruthy();
   });

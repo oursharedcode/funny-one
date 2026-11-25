@@ -43,7 +43,7 @@
     "host": "Tuan rumah",
     "capReached": "Pembuatan gambar tidak tersedia selama ~{{hours}} jam ke depan. Kalian masih bisa bermain — pemain akan melihat teks cerita tanpa gambar.",
     "capReachedHost": "Tekan Mulai permainan kalau siap, atau tunggu kuota gambar harian kembali.",
-    "christmasOn": "🔔 Permainan ini punya dua cerita Natal",
+    "christmasOn": "🔔 Permainan ini punya satu cerita Natal",
     "christmasSwitch": "Main dengan cerita Natal 2026",
     "christmasPaid": "🔔 Semua cerita dalam permainan ini adalah cerita Natal",
     "usePack": "🔔 Pakai paket Natalku di sini"
@@ -108,7 +108,7 @@
     "copied": "Disalin!"
   },
   "pay": {
-    "card": "Kamu baru saja melihat dua cerita Natal. Buka semuanya: {{price}}, di setiap permainan, sampai {{date}}.",
+    "card": "Kamu baru saja melihat satu cerita Natal. Buka semuanya: {{price}}, di setiap permainan, sampai {{date}}.",
     "cardButton": "Buka",
     "pitch": "Semua cerita Natal, di setiap permainan, sampai {{date}}. Sekali bayar, tanpa langganan.",
     "oncePayId": "Lewat PayID, dari bank Australia mana pun.",
@@ -127,7 +127,20 @@
     "playFree": "Main gratis",
     "haveTitle": "Paket ini sudah kamu miliki.",
     "ended": "Edisi Natal 2026 sudah tidak dijual lagi.",
-    "closed": "Paket ini sedang tidak bisa dibeli. Silakan kembali nanti."
+    "closed": "Paket ini sedang tidak bisa dibeli. Silakan kembali nanti.",
+    "transferTitle": "Bayar lewat aplikasi bank ke PayID ini:",
+    "transferName": "Nama akun",
+    "transferAmount": "Jumlah",
+    "transferReference": "Referensi",
+    "referenceHint": "Tulis kode di kolom referensi (deskripsi) pembayaran persis seperti di sini: begitulah pembayaranmu dicocokkan dengan kodemu.",
+    "paidWarning": "Sudah kirim uangnya? Tekan “Sudah bayar” sebelum menutup halaman ini: kodemu langsung berfungsi. Kalau ditutup dulu, kodemu menunggu sampai kami menemukan pembayaranmu secara manual.",
+    "paidButton": "Sudah bayar",
+    "claimFailed": "Belum berhasil. Periksa koneksimu, lalu tekan lagi.",
+    "leaveTitle": "Sudah bayar?",
+    "leaveText": "Tekan “Sudah bayar” dulu agar kodemu langsung berfungsi. Belum bayar? Kodemu tetap ada di ponsel ini: buka halaman ini lagi setelah kamu bayar.",
+    "leaveAnyway": "Belum — tutup",
+    "paidTitle": "Terima kasih! Kodemu sudah berfungsi.",
+    "paidCheck": "Kami memeriksa secara manual bahwa pembayaranmu sudah masuk. Jika dalam 2 hari belum masuk, kodemu berhenti berfungsi."
   },
   "gallery": {
     "share": "Bagikan gambar-gambar ruangan",

@@ -227,8 +227,8 @@ Packs — a second set of the seven pools a room can play with (B-29, DD-16, des
   tree in any place).
 - **FM-PACK-4 (MUST)** A story's content is `base`, `slice` or `full`: a free room's ordinary
   story takes the pack's when, why and ending only, its picture slots staying on the base pools
-  (the ending shown as a text card); a free game's **two golden stories** (one until the owner's
-  decision of 2026-11-21), picked at random and revealed last, and every story of a paid room
+  (the ending shown as a text card); a free game's **one golden story**, whatever the number of
+  players (owner, 2026-11-25; two from 2026-11-21 to then), picked at random and revealed last, and every story of a paid room
   take the pack in every slot. The slice never touches a picture slot.
 - **FM-PACK-5 (MUST)** A pack is offered only in the languages it names (chr26: 20, every
   authored language but ar, he and fa). Its display texts are **local glosses, not

@@ -25,6 +25,7 @@ import { hasAnyRail } from './support';
 import { trackChristmasGame, trackSupportOpen } from './funnel';
 import { clearPayLink, payLinkPack, type PayDoor } from './pay';
 import { isStoreShell } from './storeShell';
+import { canUnlockRoom } from './packCode';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { setReloadSafe } from './swReload';
@@ -123,6 +124,15 @@ export default function App() {
   function closePayPage(): void {
     setPayPage(null);
     clearPayLink();
+  }
+
+  // Step 124: a code just paid for opens the room this phone is in, as the
+  // lobby's "Use my Christmas pack here" would (PackUnlock) — from the next
+  // game on the end screen. A refusal leaves that button to say why.
+  function onPaid(code: string): void {
+    if (lobby && canUnlockRoom(lobby.pack, lobby.language)) {
+      socket.emit('room:unlock', { code }, () => {});
+    }
   }
 
   // Both entry points (Home's ♥, the end screen) open the sheet through here,
@@ -369,7 +379,13 @@ export default function App() {
         <SupportScreen support={support} onClose={() => setSupportOpen(false)} />
       )}
       {payPage && !isStoreShell() && (
-        <PayScreen pack={payPage.pack} pay={pay} door={payPage.door} onClose={closePayPage} />
+        <PayScreen
+          pack={payPage.pack}
+          pay={pay}
+          door={payPage.door}
+          onClose={closePayPage}
+          onPaid={onPaid}
+        />
       )}
     </MotionConfig>
   );

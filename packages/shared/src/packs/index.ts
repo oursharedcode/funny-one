@@ -98,8 +98,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
 export const BASE_CONTENT: StoryContent = { kind: 'base' };
 
 /**
- * A golden story (FM-PACK-4): one of a free game's two samples of the whole
- * pack, its ending drawn. A paid game's stories have the same options but are
+ * A golden story (FM-PACK-4): a free game's one sample of the whole pack, its
+ * ending drawn. A paid game's stories have the same options but are
  * not golden (Step 122): nothing in them asks to be unlocked.
  */
 export function isGolden(content: StoryContent): boolean {
@@ -177,9 +177,9 @@ export function packForRoom(language: AuthoredLanguage, now: number): PackId | n
 }
 
 /**
- * The stories of a free game with a pack (FM-PACK-4, owner decision 1C): two
- * golden stories at random, `full`, the rest the `slice`. At fewer than two
- * stories every one is golden, which no game reaches (three players at least).
+ * The stories of a free game with a pack (FM-PACK-4, owner decision 1C, one
+ * since 2026-11-25): `GOLDEN_STORIES` golden stories at random, `full`, the
+ * rest the `slice`.
  *
  * A partial Fisher–Yates over the story indices, so it ends whatever `random`
  * returns — a stubbed one included.

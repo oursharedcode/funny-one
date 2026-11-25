@@ -16,8 +16,17 @@
 // - for a reader whose language has no stories of the pack (ar, he, fa), the
 //   languages it does play in, before they pay (D4 A);
 // - the refund policy, whose version goes with the payment to the receipt log;
-// - the pay button. No rail is wired in this step (pay.ts `startPayment`), so
-//   it answers "can't be started right now".
+// - the pay button. Step 124 wires PayID (pay.ts): the button turns into the
+//   transfer to make — the PayID, its account name, the amount and the code as
+//   the reference, each with Copy — and "I've paid", which makes the code work
+//   at once (for 48 hours, until the owner matches the payment). Sponsors is
+//   Step 125's; until then it answers "can't be started right now".
+//
+// A buyer may pay in their bank's app and never come back to press "I've
+// paid" (owner decision D3 A, 2026-11-25): the panel says to press it before
+// closing, and Close or × with a code not yet claimed asks once more. The
+// waiting code stays on the phone, so this page shows it again when reopened,
+// and the owner's admin page lists codes nobody claimed.
 //
 // Instead of all that: a phone that keeps a code sees its own pack; once the
 // pack's free part has ended it is no longer on sale; and when the server
@@ -37,10 +46,20 @@ import {
   type PayRail,
 } from '@funny/shared';
 import PackCodeLine from './PackCodeLine';
+import { copyText } from '../copyText';
 import { trackPayPage, trackPayPress } from '../funnel';
-import { readPackCode } from '../packCode';
+import { readPackCode, rememberPackCode } from '../packCode';
 import { lastPaidDay } from '../packDay';
-import { SPONSORS_TIERS, startPayment, type PayDoor } from '../pay';
+import {
+  SPONSORS_TIERS,
+  claimPayId,
+  forgetPendingPayId,
+  readPendingPayId,
+  startPayment,
+  type ClaimResult,
+  type PayDoor,
+  type PayIdTransfer,
+} from '../pay';
 
 interface Props {
   /** The pack the card or the link named. */
@@ -49,6 +68,18 @@ interface Props {
   pay: PayConfig | null | undefined;
   door: PayDoor;
   onClose: () => void;
+  /** A code was just paid for and kept on this phone: App opens the room with it. */
+  onPaid?: (code: string) => void;
+}
+
+type CopyField = 'payId' | 'name' | 'amount' | 'reference';
+
+/** The refusal of a claim, in the reader's words: the code's own, or "try again". */
+function claimErrorKey(result: ClaimResult): string {
+  if (result.ok) return '';
+  return result.error.startsWith('CODE_') || result.error === 'RATE_LIMITED'
+    ? `errors.${result.error}`
+    : 'pay.claimFailed';
 }
 
 /**
@@ -75,11 +106,19 @@ function isolated(text: string): string {
   return `⁨${text}⁩`;
 }
 
-export default function PayScreen({ pack, pay, door, onClose }: Props) {
+export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
   const { t, i18n } = useTranslation();
-  const [chosenRail, setChosenRail] = useState<PayRail | null>(null);
+  // A PayID code this phone was given and has not claimed: shown again, on
+  // PayID, however the page was reopened.
+  const [transfer, setTransfer] = useState<PayIdTransfer | null>(() => readPendingPayId(pack));
+  const [chosenRail, setChosenRail] = useState<PayRail | null>(() => (transfer ? 'payid' : null));
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const [paid, setPaid] = useState(false);
+  // Close or × pressed with a code not yet claimed (D3).
+  const [leaving, setLeaving] = useState(false);
+  const [copied, setCopied] = useState<CopyField | null>(null);
 
   useEffect(() => {
     trackPayPage(door);
@@ -109,13 +148,83 @@ export default function PayScreen({ pack, pay, door, onClose }: Props) {
     const started = await startPayment({ pack, rail, policy: REFUND_POLICY_VERSION });
     setBusy(false);
     setFailed(!started.ok);
+    if (started.transfer) setTransfer(started.transfer);
   }
+
+  async function claim(): Promise<void> {
+    if (!transfer) return;
+    setBusy(true);
+    setClaimError(null);
+    const result = await claimPayId(transfer.code);
+    setBusy(false);
+    if (!result.ok) {
+      setClaimError(claimErrorKey(result));
+      // A code the server does not know (a new code secret): a new press asks for another.
+      if (result.error === 'CODE_INVALID') {
+        forgetPendingPayId();
+        setTransfer(null);
+      }
+      return;
+    }
+    rememberPackCode(transfer.code);
+    forgetPendingPayId();
+    setLeaving(false);
+    setPaid(true);
+    onPaid?.(transfer.code);
+  }
+
+  function copy(field: CopyField, value: string): void {
+    void copyText(value).then(() => {
+      setCopied(field);
+      window.setTimeout(() => setCopied((f) => (f === field ? null : f)), 1500);
+    });
+  }
+
+  // A code given and not claimed: closing asks first.
+  const unclaimed = transfer !== null && !paid && !owned;
+  function requestClose(): void {
+    if (unclaimed) setLeaving(true);
+    else onClose();
+  }
+
+  function copyRow(field: CopyField, label: string, value: string): JSX.Element {
+    return (
+      <div className="flex items-center gap-2" data-transfer={field}>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-gray-600">{label}</p>
+          <p className="break-all font-semibold text-gray-900" dir="ltr">
+            {value}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="flex-shrink-0 rounded border border-amber-300 px-3 py-1 text-sm font-semibold"
+          onClick={() => copy(field, value)}
+        >
+          {copied === field ? t('support.copied') : t('support.copy')}
+        </button>
+      </div>
+    );
+  }
+
+  const paidButton = (
+    <button
+      type="button"
+      className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:opacity-50"
+      disabled={busy}
+      onClick={() => void claim()}
+    >
+      {t('pay.paidButton')}
+    </button>
+  );
 
   let body: JSX.Element | null;
   if (owned) {
     body = (
       <>
-        <p className="font-semibold text-gray-800">{t('pay.haveTitle')}</p>
+        <p className="font-semibold text-gray-800" role={paid ? 'status' : undefined}>
+          {t(paid ? 'pay.paidTitle' : 'pay.haveTitle')}
+        </p>
         <div className="break-words rounded border border-amber-300 bg-white p-3">
           {isPackPaid(pack, now) ? (
             <>
@@ -126,6 +235,7 @@ export default function PayScreen({ pack, pay, door, onClose }: Props) {
             <p className="text-gray-700">{t('home.packEnded')}</p>
           )}
         </div>
+        {paid && <p className="text-sm text-gray-600">{t('pay.paidCheck')}</p>}
       </>
     );
   } else if (!selling) {
@@ -180,18 +290,47 @@ export default function PayScreen({ pack, pay, door, onClose }: Props) {
           {t('pay.refunds')}
         </p>
 
-        <button
-          type="button"
-          className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:opacity-50"
-          disabled={busy}
-          onClick={() => void press()}
-        >
-          {t(rail === 'payid' ? 'pay.payPayId' : 'pay.paySponsors', { price })}
-        </button>
-        {failed && (
-          <p className="text-center text-sm text-red-600" role="alert">
-            {t('pay.failed')}
-          </p>
+        {rail === 'payid' && transfer ? (
+          <div
+            className="flex flex-col gap-3 rounded border-2 border-pink-300 bg-white p-4"
+            data-transfer-panel={transfer.code}
+          >
+            <p className="font-semibold text-gray-800">{t('pay.transferTitle')}</p>
+            {copyRow('payId', t('support.payId'), transfer.payId)}
+            {copyRow('name', t('pay.transferName'), transfer.payIdName)}
+            {copyRow('amount', t('pay.transferAmount'), transfer.amount)}
+            {copyRow('reference', t('pay.transferReference'), transfer.code)}
+            <p className="text-sm text-gray-600">{t('pay.referenceHint')}</p>
+            <p
+              className="rounded bg-amber-50 p-3 text-sm text-gray-800"
+              role="note"
+              data-paid-warning
+            >
+              ⚠️ {t('pay.paidWarning')}
+            </p>
+            {paidButton}
+            {claimError && (
+              <p className="text-center text-sm text-red-600" role="alert">
+                {t(claimError)}
+              </p>
+            )}
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:opacity-50"
+              disabled={busy}
+              onClick={() => void press()}
+            >
+              {t(rail === 'payid' ? 'pay.payPayId' : 'pay.paySponsors', { price })}
+            </button>
+            {failed && (
+              <p className="text-center text-sm text-red-600" role="alert">
+                {t('pay.failed')}
+              </p>
+            )}
+          </>
         )}
 
         <button
@@ -216,7 +355,7 @@ export default function PayScreen({ pack, pay, door, onClose }: Props) {
             type="button"
             aria-label={t('support.close')}
             className="px-2 text-2xl leading-none text-gray-500"
-            onClick={onClose}
+            onClick={requestClose}
           >
             ×
           </button>
@@ -231,10 +370,39 @@ export default function PayScreen({ pack, pay, door, onClose }: Props) {
           <button
             type="button"
             className="w-full rounded border-2 border-pink-500 bg-white py-3 font-display text-xl font-semibold text-pink-500"
-            onClick={onClose}
+            onClick={requestClose}
           >
             {door === 'link' && !owned ? t('pay.playFree') : t('support.close')}
           </button>
+        )}
+
+        {leaving && unclaimed && (
+          <div
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pay-leave-title"
+          >
+            <div className="flex w-full max-w-md flex-col gap-3 rounded-lg bg-white p-5 shadow-lg">
+              <p id="pay-leave-title" className="font-display text-xl font-bold text-gray-900">
+                {t('pay.leaveTitle')}
+              </p>
+              <p className="text-gray-700">{t('pay.leaveText')}</p>
+              {paidButton}
+              {claimError && (
+                <p className="text-center text-sm text-red-600" role="alert">
+                  {t(claimError)}
+                </p>
+              )}
+              <button
+                type="button"
+                className="w-full rounded border-2 border-gray-300 bg-white py-3 font-semibold text-gray-700"
+                onClick={onClose}
+              >
+                {t('pay.leaveAnyway')}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

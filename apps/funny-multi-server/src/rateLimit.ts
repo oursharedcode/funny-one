@@ -132,6 +132,10 @@ export const RATE_WINDOW_MS = 60_000;
 // times in an hour waits six minutes for the next try.
 export const WRONG_CODES_PER_HOUR = 10;
 export const WRONG_CODE_WINDOW_MS = 60 * 60_000;
+// Step 124 (owner decision D4 A, 2026-11-25): PayID codes issued per IP per
+// hour. The phone keeps its one waiting code and shows it again, so an honest
+// buyer asks for one; three leave room for a second phone on the same Wi-Fi.
+export const PAYID_CODES_PER_HOUR = 3;
 
 /**
  * Client IP for bucketing, read from `x-forwarded-for` counting from the

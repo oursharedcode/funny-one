@@ -43,7 +43,7 @@
     "host": "Agbàlejò",
     "capReached": "A kò lè ṣe àwòrán fún bí wákàtí {{hours}} tó ń bọ̀. Ẹ ṣì lè ṣeré — àwọn òṣèré yóò rí ọ̀rọ̀ ìtàn dípò àwòrán efe.",
     "capReachedHost": "Tẹ “Bẹ̀rẹ̀ eré” nígbà tí o bá ṣetán, tàbí dúró títí ìpín àwòrán efe òòjọ́ yóò fi bẹ̀rẹ̀ padà.",
-    "christmasOn": "🔔 Ìtàn Kérésìmesì méjì wà nínú eré yìí",
+    "christmasOn": "🔔 Ìtàn Kérésìmesì kan wà nínú eré yìí",
     "christmasSwitch": "Ṣeré pẹ̀lú àwọn ìtàn Kérésìmesì 2026",
     "christmasPaid": "🔔 Ìtàn Kérésìmesì ni gbogbo ìtàn inú eré yìí",
     "usePack": "🔔 Lo àpò Kérésìmesì mi níbí"
@@ -108,7 +108,7 @@
     "copied": "A ti ṣàdàkọ rẹ̀!"
   },
   "pay": {
-    "card": "O ti rí ìtàn Kérésìmesì méjì. Ṣí gbogbo wọn: {{price}}, nínú gbogbo eré, títí di {{date}}.",
+    "card": "O ti rí ìtàn Kérésìmesì kan. Ṣí gbogbo wọn: {{price}}, nínú gbogbo eré, títí di {{date}}.",
     "cardButton": "Ṣí wọn",
     "pitch": "Gbogbo ìtàn Kérésìmesì, nínú gbogbo eré, títí di {{date}}. Ìsanwó kan ṣoṣo, kò sí ìsanwó oṣooṣù.",
     "oncePayId": "Nípasẹ̀ PayID, láti ilé ìfowópamọ́ èyíkéyìí ní Ọsirélíà.",
@@ -127,7 +127,20 @@
     "playFree": "Ṣeré lọ́fẹ̀ẹ́",
     "haveTitle": "O ti ní àpò yìí tẹ́lẹ̀.",
     "ended": "Ẹ̀dà Kérésìmesì 2026 kò sí fún tà mọ́.",
-    "closed": "A kò lè ra àpò náà lọ́wọ́lọ́wọ́ yìí. Jọ̀ọ́ padà wá nígbà míì."
+    "closed": "A kò lè ra àpò náà lọ́wọ́lọ́wọ́ yìí. Jọ̀ọ́ padà wá nígbà míì.",
+    "transferTitle": "Sanwó láti inú ìṣàfilọ́lẹ̀ báńkì rẹ sí PayID yìí:",
+    "transferName": "Orúkọ àkọọ́lẹ̀",
+    "transferAmount": "Iye owó",
+    "transferReference": "Ìtọ́kasí",
+    "referenceHint": "Fi kóòdù sí ibi ìtọ́kasí (àpèjúwe) ìsanwó, bí ó ṣe wà níbí gẹ́lẹ́: bí a ṣe ń so ìsanwó rẹ mọ́ kóòdù rẹ nìyẹn.",
+    "paidWarning": "Ṣé o ti fi owó ránṣẹ́? Tẹ “Mo ti sanwó” kí o tó ti ojú ìwé yìí: kóòdù rẹ yóò bẹ̀rẹ̀ sí í ṣiṣẹ́ nígbà náà. Tí o bá tì í ná, kóòdù rẹ yóò dúró títí a ó fi rí ìsanwó rẹ pẹ̀lú ọwọ́.",
+    "paidButton": "Mo ti sanwó",
+    "claimFailed": "Kò ṣeé ṣe. Ṣàyẹ̀wò ìsopọ̀ rẹ, kí o tún tẹ̀ ẹ́ lẹ́ẹ̀kan sí i.",
+    "leaveTitle": "Ṣé o ti sanwó?",
+    "leaveText": "Tẹ “Mo ti sanwó” kọ́kọ́, kí kóòdù rẹ lè ṣiṣẹ́ nísinsìnyí. O kò tíì sanwó? Kóòdù rẹ yóò wà lórí fóònù yìí: ṣí ojú ìwé yìí padà nígbà tí o bá ti sanwó.",
+    "leaveAnyway": "Kò tíì — ti í",
+    "paidTitle": "O ṣé! Kóòdù rẹ ti ń ṣiṣẹ́ báyìí.",
+    "paidCheck": "À ń ṣàyẹ̀wò pẹ̀lú ọwọ́ pé ìsanwó rẹ ti dé. Bí kò bá dé láàrin ọjọ́ 2, kóòdù náà yóò dáwọ́ iṣẹ́ dúró."
   },
   "gallery": {
     "share": "Pín àwọn àwòrán yàrá yìí",

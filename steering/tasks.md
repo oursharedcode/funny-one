@@ -1093,6 +1093,35 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     eré» (cartoon) are coined; the landing line's "pack" reuses each catalogue's
     `home.packCode` word, and yo «gbìyànjú rẹ̀» (try it) is the least certain of the 18.
     **Next:** Step 127 — the deploy.
+  - *Decisions 2026-11-25, fourth set (owner, on the Step 127 plan — the deploy):*
+    - **D1 A — the Sponsors setup before the deploy**: the tier, the webhook and all four
+      values in the VM's `.env`, then one deploy and one restart. Not PayID first.
+    - **D2 B — the agent makes the tier** with GitHub's GraphQL `createSponsorsTier`, after the
+      owner grants the `gh` login the `user` scope once (the same login retires it under D6 of
+      2026-11-22); the dashboard by hand if the API refuses. The webhook stays the owner's, on
+      the dashboard.
+    - **D3 A — the agent's script makes the secrets** on this PC (files in a location kept in
+      the agent's memory, never in the repo or the chat): the owner pastes the webhook secret
+      into GitHub and bookmarks the admin link; the script writes all four into the VM's `.env`
+      after a `.env.bak-step127`. One command per secret for the owner if auto mode refuses.
+    - **D4 A — the live PayID check moves no money**: a code issued on the pay page, "I've
+      paid", Received on the admin page, one paid room, then Block.
+  - **The paid half deployed 2026-11-25 (Step 127)** — image `funny-multi:395a65a` and the
+    landing site. Before it: the three secrets made by the agent's script and appended to the
+    VM's `.env` (backup `.env.bak-step127`), the US$2 one-time tier made through the API
+    (checkout number 687176, in the `.env` as `SPONSORS_TIER_ID`), the owner's webhook. After
+    it: no start-up warning about the four values, the webhook's ping redelivered with 204, the
+    uptime alarm enabled and green. On the owner's phone: PayID with no money (issue, "I've
+    paid", Received, a paid room, Block), the invitation's preview with the reindeer and the
+    cat, "one Christmas story" in a free lobby, bells in a golden video. **Owed:** D4 of
+    Step 125, the real US$2 sponsorship. **Next:** Step 128 — #1 play alone with two bots.
+  - *Agent finding 2026-11-25 (Step 127), for the owner to place:* **a lone host's room can
+    close while the invitation is sent.** The 65 s grace (`DISCONNECT_GRACE_MS`) counts from the
+    socket's close, and a phone hides the game while the share sheet and the messenger are open;
+    the owner's first try lost its room that way, so the messenger's preview was the plain one,
+    and guests opening the link would have found no room. Not new to Step 126, but the Invite
+    button makes it common. Options when taken up: a longer grace for a host alone in the lobby
+    (minutes, not seconds), or the room kept until its host's own tab is closed.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

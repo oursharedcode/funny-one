@@ -8373,7 +8373,10 @@ Still owed: the Sponsors tier, its webhook, `SPONSORS_TIER_ID`, `SPONSORS_WEBHOO
 trader confirmation before 1 February 2027. B-3's native reviewers also have this step's
 invitations, Invite buttons and landing lines in 21 languages.
 
-**RESUME HERE (2026-11-25, after Step 126; pushed).** Step 126 is pushed and green (`d084989`,
+~~RESUME HERE (2026-11-25, after Step 126; pushed)~~ — carried into Step 127's note. Its text, kept
+for the record:
+
+Step 126 is pushed and green (`d084989`,
 CI run 45591305394). **Steps 122–126 work locally; nothing of the paid half is live.** Step 126 added the sleigh bells to golden and paid videos, the landing line "Christmas
 pack — try it free", the lobby's Invite button with the join link's preview, and the uptime
 alarm. **Next, Step 127 (the agent's) — the one deploy** by about 10 December, the game
@@ -8385,3 +8388,90 @@ set) and one green run by hand. Then Step 128, #1 play alone with two bots.
 `SPONSORS_WEBHOOK_SECRET`, `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
 backups before the deploy; D4's real US$2 sponsorship after it; the live-badge look; Funny Multi's
 trader confirmation before 1 Feb 2027.
+
+## Step 127 (task B-29) — the paid half deployed (2026-11-25)
+
+**Owner decisions, 2026-11-25, fourth set (`/morning`, on Step 127's plan)** — B-29's block in
+tasks.md holds the binding text: **D1 A** the Sponsors setup before the deploy, one deploy;
+**D2 B** the agent makes the tier through GitHub's API; **D3 A** the agent's script makes the
+secrets; **D4 A** the live PayID check moves no money.
+
+**The setup (before the deploy):**
+
+- **The secrets.** The agent's script made `PACK_CODE_SECRET`, `PACK_ADMIN_SECRET` and
+  `SPONSORS_WEBHOOK_SECRET` (64 hex characters each) into files on this PC (location in the
+  agent's memory), with the admin page's link beside them, and appended the three to the VM's
+  `.env` after `.env.bak-step127`; no value passed through the chat or a log. Auto mode allowed
+  the append. SSH first timed out: the home IP had changed, and `deploy/oci/network.py`
+  re-pointed the port-22 rule.
+- **The tier.** The owner granted the `gh` login the `user` scope (`gh auth refresh -s user`);
+  the agent made the tier with `createSponsorsTier` — US$2, one-time, published, its description
+  headed "Christmas 2026 edition" and naming 1 August 2027. GitHub names it "$2 one time" (the
+  API takes no name). Its checkout number, 687176, is read from the tier's node id
+  (`ST_kwDOES9TPM4ACnxI`, a MessagePack `[0, owner, tier]`); the checkout page needs a login, so
+  D4's sponsorship is the first to open it. `SPONSORS_TIER_ID=687176` is in the VM's `.env`. The
+  server matches a sponsorship by its price and one-time flag, not the tier's number, so the
+  number only builds the checkout link.
+- **The webhook** (the owner's, on the Sponsors dashboard): payload URL
+  `…/pay/sponsors/hook`, `application/json`, the secret from the agent's file. GitHub's first
+  ping, sent before the deploy, showed green because the old server answered with its page.
+
+**Before the deploy (B-27):** no "socket connected" line in the server's log for the 3 hours
+before.
+
+**Deployed:**
+
+- **Server and Funny Multi client** (`deploy/ship.sh`): image `funny-multi:395a65a`; `/health`
+  `{"ok":true}`, `assetlinks.json` 200, `/privacy` the policy, the old address's 301. The server's
+  start-up log carries none of the three warnings (`PACK_CODE_SECRET`, Sponsors, admin page), so
+  all four values are read. `/config` answers `"pay":{"pack":"chr26","rail":"payid"}` from here.
+  An unsigned POST to the hook gets 401; `og-christmas.jpg` is a 200 `image/jpeg`.
+- **Landing page** (`deploy/ship-funny-family.sh`): every check passes; the en page says
+  "Christmas pack — try it free".
+- **The webhook, live:** the owner's redelivery of the ping got 204 — the signature checked with
+  the VM's secret.
+- **The uptime alarm:** `gh workflow enable uptime.yml`; the by-hand run 45610769723 passed all
+  four checks.
+
+**Checked live, on the owner's phone (D4 A and the step's list):**
+
+- **PayID, no money moved:** the pay page in Australia gave `XMAS26-6F6Z-NYEW` at A$2.60; "I've
+  paid", then Received on the admin page (opened from the agent's file); the receipt log reads
+  issue, claim, received. A room made with the code had no "one Christmas story" line. Then Block
+  (the log: `block`, reason refund) and Remove on Home.
+- **The invitation:** the agent's script (a socket client, not a browser) opened a Christmas room
+  on production and fetched its link as a messenger would: the en title and line, the
+  1200 × 630 JPEG, no room code in the page; the room closed after. On the owner's phone the
+  first try showed the game's ordinary picture: the phone's socket closed at 12:28:30 UTC when
+  the messenger came forward, the room went 65 s later (`DISCONNECT_GRACE_MS`, the host alone in
+  it), and the messenger first fetched the link at 12:30:05 — the plain page. A second room,
+  shared within 30 s and the game brought back, showed the reindeer and the cat.
+- **A free room's lobby** says "🔔 This game has one Christmas story".
+- **The sleigh bells:** a three-phone free game; the Christmas story's video has bells.
+
+**Found — a lone host's room can close while the invitation is being sent** (filed in tasks.md
+under B-29 for the owner): the 65 s grace counts from the socket's close, and a phone hides the
+game while the share sheet and messenger are open. Guests who open the link after that find no
+room, and the preview is the plain one. Not new to this deploy, but the Invite button makes it
+likely.
+
+**Gates:** no code changed (the change is tasks.md and this log). typecheck 0, lint 0,
+format:check clean; `npm test`, outside the sandbox: the first full run had 1 of 485
+funny-multi-server tests fail (its name lost to the output filter), then four server-only runs
+and a second full run passed — 2357 across 6 workspaces — so a flake, probably a socket race
+under load like Step 124's; `npm audit` exactly the three accepted ids; CI pending the push.
+
+**Owed, the owner's:** D4 of Step 125, the real US$2 sponsorship from a family member's GitHub
+account (the checkout link is its first test), then keep or refund; the admin link bookmarked on
+the phone; the live-badge look; Funny Multi's trader confirmation before 1 February 2027. B-3's
+native reviewers keep Steps 122–126's texts in 21 languages.
+
+**RESUME HERE (2026-11-25, after Step 127; not yet pushed).** The paid half is live (image
+`funny-multi:395a65a`, the landing site the same day): PayID, Sponsors (tier 687176, webhook
+checked with 204), the admin page, the invitation, the bells, the uptime alarm (enabled, green).
+**Next, Step 128 — #1 play alone with two bots** (it changes the 3-player rule), in the second
+deploy by 23 December with #10 gift a pack, #9 the festive room look and #7 the whole-game video;
+the owner may add the lone host's grace (B-29's finding of Step 127). No deploys 24–26 December,
+31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the real US$2 sponsorship (D4 of Step 125); the admin link on the phone;
+the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.

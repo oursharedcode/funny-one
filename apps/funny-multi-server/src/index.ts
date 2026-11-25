@@ -59,6 +59,7 @@ import { buildStats, broadcastStats } from './stats.js';
 import { createStatsStore, isBotAgent, summaryDays } from './analytics.js';
 import { createGeo, type Geo } from './geo.js';
 import { registerPayRoutes } from './payid.js';
+import { registerSponsorsRoutes, sponsorsRail, type SponsorsSettings } from './sponsors.js';
 import { registerAdminRoutes } from './admin.js';
 
 // ---------------------------------------------------------------------------
@@ -132,6 +133,13 @@ const PACK_CODE_SECRET = process.env.PACK_CODE_SECRET || null;
 // no admin page. In the VM's .env only, never in the repository.
 const PACK_ADMIN_SECRET = process.env.PACK_ADMIN_SECRET || null;
 
+// Step 125 (B-29): paying through GitHub Sponsors (sponsors.ts) — the pack's
+// one-time tier, the number in its checkout link, and the secret set on the
+// Sponsors webhook at GitHub. With DEPLOYER_SPONSORS_URL, both are needed
+// for anything to sell through Sponsors. The secret in the VM's .env only.
+const SPONSORS_TIER_ID = process.env.SPONSORS_TIER_ID || null;
+const SPONSORS_WEBHOOK_SECRET = process.env.SPONSORS_WEBHOOK_SECRET || null;
+
 // The English wire text of a refused code; the client shows its own words.
 const CODE_MESSAGES: Record<CodeError | 'PACK_UNAVAILABLE', string> = {
   CODE_INVALID: 'That code is not right.',
@@ -193,6 +201,8 @@ export interface BuildServerOptions {
   packCodeSecret?: string | null;
   /** Step 124: overrides the PACK_ADMIN_SECRET env var; null, no admin page. */
   packAdminSecret?: string | null;
+  /** Step 125: overrides the Sponsors rail's settings (DEPLOYER_SPONSORS_URL and SPONSORS_*). */
+  sponsors?: Partial<SponsorsSettings>;
 }
 
 export async function buildServer({
@@ -204,6 +214,7 @@ export async function buildServer({
   receiptsFile = RECEIPTS_FILE,
   packCodeSecret = PACK_CODE_SECRET,
   packAdminSecret = PACK_ADMIN_SECRET,
+  sponsors = {},
 }: BuildServerOptions = {}): Promise<BuiltServer> {
   const base = normalizeBasePath(basePath);
   const fastify = Fastify({ logger });
@@ -273,6 +284,26 @@ export async function buildServer({
       TRUSTED_PROXY_HOPS,
     );
   registerPayRoutes(fastify, { base, codes, support, ipOf });
+  // Step 125: and through GitHub Sponsors, whose webhook switches a code on.
+  const rail = sponsorsRail({
+    sponsorsUrl: support.sponsorsUrl,
+    tierId: SPONSORS_TIER_ID,
+    webhookSecret: SPONSORS_WEBHOOK_SECRET,
+    ...sponsors,
+  });
+  if (!rail) {
+    fastify.log.warn(
+      'DEPLOYER_SPONSORS_URL, SPONSORS_TIER_ID or SPONSORS_WEBHOOK_SECRET is unset: nothing sells through Sponsors',
+    );
+  }
+  registerSponsorsRoutes(fastify, {
+    base,
+    codes,
+    receipts,
+    rail,
+    ipOf,
+    onSponsorship: (outcome) => fastify.log.info({ outcome }, 'sponsorship'),
+  });
   const admin = registerAdminRoutes(fastify, {
     base,
     secret: packAdminSecret,

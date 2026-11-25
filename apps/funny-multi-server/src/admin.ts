@@ -13,6 +13,14 @@
 // - **Paid without "I've paid"?** (D3 A) — PayID codes of the last 7 days that
 //   nobody claimed: a buyer may pay and close the page first. Their code does
 //   not work until Received.
+// - **Sponsors — waiting for GitHub** (Step 125) — Sponsors codes of the last
+//   7 days whose sponsorship GitHub's webhook has not reported: the buyer may
+//   not have paid, or paid under another GitHub name. Received switches one on
+//   once the owner sees the sponsorship on GitHub.
+// - **Sponsorships without a code** (Step 125) — of the last 30 days, ones
+//   GitHub reported with no code waiting for the sponsor's name, or made once
+//   the pack was no longer on sale (D6 A of 2026-11-22: refund it on GitHub).
+//   "Make a code for this sponsorship" gives the buyer one by hand.
 // - **Block**, by B-29's four cases (refund, reversed, leaked, asked), and
 //   **New code** — the owner's gift or a replacement, logged with the code it
 //   replaces, shown with a link the buyer opens to keep it on their phone.
@@ -33,12 +41,20 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { PACK_IDS, REFUND_POLICY_VERSION, isPackPaid, parseCode, type PackId } from '@funny/shared';
 import { CLAIM_HOURS, type PackCodes } from './codes.js';
-import type { BlockReason, ReceiptLog, ReceiptRail, ReceiptRecord } from './receipts.js';
+import type {
+  BlockReason,
+  ReceiptLog,
+  ReceiptRail,
+  ReceiptRecord,
+  SponsorshipRecord,
+} from './receipts.js';
 import { WRONG_CODES_PER_HOUR, WRONG_CODE_WINDOW_MS, createRateLimiter } from './rateLimit.js';
 
 export const ADMIN_MIN_SECRET_LENGTH = 16;
-/** How far back the list of unclaimed PayID codes reaches (D3 A). */
+/** How far back the lists of unclaimed PayID codes and waiting Sponsors codes reach (D3 A). */
 export const UNCLAIMED_DAYS = 7;
+/** How far back the list of sponsorships without a code reaches. */
+export const SPONSORSHIP_DAYS = 30;
 /** At most this many codes answer a lookup. */
 export const LOOKUP_LIMIT = 50;
 /** Where the issue record says a code the owner gave was shown. */
@@ -61,9 +77,13 @@ export interface CodeRow {
   rail: ReceiptRail | null;
   amount: string;
   ref: string;
+  /** A Sponsors code's GitHub name, or the one a code by hand was made for; else empty. */
+  login: string;
   issuedAt: number | null;
-  /** Still a PayID code waiting for its payment to be matched. */
+  /** Still a PayID or Sponsors code waiting for its payment to be matched. */
   pending: boolean;
+  /** When GitHub's webhook reported its sponsorship paid. */
+  sponsoredAt: number | null;
   /** The first claim's time. */
   claimedAt: number | null;
   receivedAt: number | null;
@@ -76,11 +96,12 @@ export interface CodeRow {
   lastUsedAt: number | null;
 }
 
-export type CodeState = 'claimed' | 'lapsed' | 'unclaimed' | 'good' | 'blocked';
+export type CodeState = 'claimed' | 'lapsed' | 'unclaimed' | 'github' | 'good' | 'blocked';
 
 export function stateOf(row: CodeRow, now: number): CodeState {
   if (row.blockReason) return 'blocked';
   if (!row.pending) return 'good';
+  if (row.rail === 'sponsors') return 'github';
   if (row.claimedAt === null) return 'unclaimed';
   return now < row.claimedAt + CLAIM_MS ? 'claimed' : 'lapsed';
 }
@@ -96,8 +117,10 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
         rail: null,
         amount: '',
         ref: '',
+        login: '',
         issuedAt: null,
         pending: false,
+        sponsoredAt: null,
         claimedAt: null,
         receivedAt: null,
         blockedAt: null,
@@ -114,12 +137,15 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
   }
   for (const record of records) {
     const at = Date.parse(record.at);
+    // A sponsorship that switched no code on belongs to no code's history.
+    if (record.type === 'sponsorship' && record.code === '') continue;
     const row = rowOf(record.code);
     switch (record.type) {
       case 'issue':
         row.rail = record.rail;
         row.amount = record.amount;
         row.ref = record.ref;
+        row.login = record.login ?? '';
         row.issuedAt = at;
         row.pending = record.state === 'pending';
         break;
@@ -131,6 +157,9 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
           row.pending = false;
           row.receivedAt = at;
         }
+        break;
+      case 'sponsorship':
+        row.sponsoredAt = at;
         break;
       case 'block':
         if (!row.blockReason) {
@@ -153,11 +182,35 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
   return [...rows.values()];
 }
 
+/**
+ * Sponsorships GitHub reported that switched no code on, of the last
+ * SPONSORSHIP_DAYS days and not yet given a code by hand, newest first.
+ */
+export function sponsorshipsWithoutCode(
+  records: readonly ReceiptRecord[],
+  now: number,
+): SponsorshipRecord[] {
+  const given = new Set(
+    records.flatMap((r) => (r.type === 'issue' && r.rail === 'owner' && r.ref ? [r.ref] : [])),
+  );
+  return records
+    .filter(
+      (r): r is SponsorshipRecord =>
+        r.type === 'sponsorship' &&
+        r.code === '' &&
+        !given.has(r.ref) &&
+        Date.parse(r.at) >= now - SPONSORSHIP_DAYS * DAY_MS,
+    )
+    .reverse();
+}
+
 export interface AdminView {
   /** Claimed PayID codes still to match, least time left first; lapsed ones last. */
   claimed: CodeRow[];
   /** Unclaimed PayID codes of the last UNCLAIMED_DAYS days, newest first (D3 A). */
   unclaimed: CodeRow[];
+  /** Sponsors codes of the last UNCLAIMED_DAYS days GitHub has not reported paid, newest first. */
+  github: CodeRow[];
 }
 
 export function adminView(rows: readonly CodeRow[], now: number): AdminView {
@@ -175,14 +228,23 @@ export function adminView(rows: readonly CodeRow[], now: number): AdminView {
         r.issuedAt >= now - UNCLAIMED_DAYS * DAY_MS,
     )
     .sort((a, b) => b.issuedAt! - a.issuedAt!);
-  return { claimed, unclaimed };
+  const github = rows
+    .filter(
+      (r) =>
+        stateOf(r, now) === 'github' &&
+        r.issuedAt !== null &&
+        r.issuedAt >= now - UNCLAIMED_DAYS * DAY_MS,
+    )
+    .sort((a, b) => b.issuedAt! - a.issuedAt!);
+  return { claimed, unclaimed, github };
 }
 
 /**
  * The codes a lookup finds: a day (YYYY-MM-DD) finds those issued on it, by
  * UTC; anything else is read as letters and digits — part of a code, in any
- * case and with or without its hyphens (three characters at least), or a room
- * code a code opened. Newest first, at most LOOKUP_LIMIT.
+ * case and with or without its hyphens (three characters at least), a room
+ * code a code opened, or part of a Sponsors buyer's GitHub name. Newest
+ * first, at most LOOKUP_LIMIT.
  */
 export function lookup(rows: readonly CodeRow[], query: string): CodeRow[] {
   const q = query.trim();
@@ -195,7 +257,10 @@ export function lookup(rows: readonly CodeRow[], query: string): CodeRow[] {
     const bare = q.toUpperCase().replace(/[^0-9A-Z]/gu, '');
     if (bare.length < 3) return [];
     found = rows.filter(
-      (r) => r.code.replace(/-/gu, '').includes(bare) || r.roomCodes.includes(bare),
+      (r) =>
+        r.code.replace(/-/gu, '').includes(bare) ||
+        r.roomCodes.includes(bare) ||
+        r.login.toUpperCase().replace(/-/gu, '').includes(bare),
     );
   }
   const latest = (r: CodeRow): number => Math.max(r.issuedAt ?? 0, r.lastUsedAt ?? 0);
@@ -269,6 +334,10 @@ function card(row: CodeRow, path: string, now: number): string {
     case 'unclaimed':
       status = '<b class="warn">no “I’ve paid” — off until Received</b>';
       break;
+    case 'github':
+      status =
+        '<b class="warn">waiting for GitHub — off until its webhook reports the sponsorship, or Received</b>';
+      break;
     case 'blocked':
       status = `<b class="bad">blocked: ${esc(BLOCK_LABELS[row.blockReason!])}</b>`;
       break;
@@ -279,10 +348,17 @@ function card(row: CodeRow, path: string, now: number): string {
   const what = [row.rail ?? 'not issued here (a test code)', row.amount]
     .filter(Boolean)
     .join(' · ');
-  lines.push(`<p>${esc(what)}${row.ref ? ` · replaces ${esc(row.ref)}` : ''}</p>`);
+  const ref = !row.ref
+    ? ''
+    : parseCode(row.ref)
+      ? ` · replaces ${esc(row.ref)}`
+      : ` · for sponsorship ${esc(row.ref)}`;
+  const login = row.login ? ` · GitHub @${esc(row.login)}` : '';
+  lines.push(`<p>${esc(what)}${login}${ref}</p>`);
   const times = [`issued ${time(row.issuedAt)}`];
   if (row.claimedAt !== null) times.push(`“I’ve paid” ${time(row.claimedAt)}`);
-  if (row.receivedAt !== null) times.push(`received ${time(row.receivedAt)}`);
+  if (row.sponsoredAt !== null) times.push(`GitHub reported it paid ${time(row.sponsoredAt)}`);
+  else if (row.receivedAt !== null) times.push(`received ${time(row.receivedAt)}`);
   if (row.blockedAt !== null) times.push(`blocked ${time(row.blockedAt)}`);
   lines.push(`<p class="small">${times.join('<br>')}</p>`);
   if (row.rooms > 0 || row.games > 0) {
@@ -291,7 +367,7 @@ function card(row: CodeRow, path: string, now: number): string {
     );
   }
   const buttons: string[] = [];
-  if (state === 'claimed' || state === 'lapsed' || state === 'unclaimed') {
+  if (state === 'claimed' || state === 'lapsed' || state === 'unclaimed' || state === 'github') {
     buttons.push(action(path, 'received', 'Received', { code: row.code }));
   }
   if (state !== 'blocked') buttons.push(blockForm(path, row.code));
@@ -308,6 +384,8 @@ export interface AdminPage {
   /** The game's address a buyer opens to keep a code: `https://host/`. */
   gameUrl: string;
   rows: readonly CodeRow[];
+  /** Sponsorships GitHub reported that switched no code on (sponsorshipsWithoutCode). */
+  sponsorships?: readonly SponsorshipRecord[];
   now: number;
   query: string;
   done: AdminDone | null;
@@ -315,7 +393,7 @@ export interface AdminPage {
 }
 
 export function renderAdminPage(page: AdminPage): string {
-  const { path, gameUrl, rows, now, query, done, doneCode } = page;
+  const { path, gameUrl, rows, sponsorships = [], now, query, done, doneCode } = page;
   const view = adminView(rows, now);
   const parts: string[] = [];
 
@@ -351,9 +429,37 @@ export function renderAdminPage(page: AdminPage): string {
       : '<p class="small">None.</p>',
   );
 
+  parts.push(`<h2>Sponsors — waiting for GitHub (${view.github.length})</h2>`);
+  parts.push(
+    `<p class="small">Sponsors codes of the last ${UNCLAIMED_DAYS} days GitHub has not reported paid. A sponsorship you see on GitHub for one of these names: press Received.</p>`,
+  );
+  parts.push(
+    view.github.length
+      ? view.github.map((r) => card(r, path, now)).join('')
+      : '<p class="small">None.</p>',
+  );
+
+  parts.push(`<h2>Sponsorships without a code (${sponsorships.length})</h2>`);
+  parts.push(
+    `<p class="small">Of the last ${SPONSORSHIP_DAYS} days: no code was waiting for the sponsor’s GitHub name, or the pack was no longer on sale (then refund it on GitHub).</p>`,
+  );
+  parts.push(
+    sponsorships.length
+      ? sponsorships
+          .map((s) => {
+            const why =
+              s.outcome === 'not on sale'
+                ? 'after the sale ended'
+                : 'no code waiting for this name';
+            return `<section class="card"><p>GitHub @${esc(s.login)} · ${esc(s.amount)}</p><p><b class="warn">${esc(why)}</b></p><p class="small">${time(Date.parse(s.at))}<br>sponsorship ${esc(s.ref)}</p><div class="row">${action(path, 'new', 'Make a code for this sponsorship', { sponsorship: s.ref })}</div></section>`;
+          })
+          .join('')
+      : '<p class="small">None.</p>',
+  );
+
   parts.push('<h2>Look up</h2>');
   parts.push(
-    `<form method="get" action="${esc(path)}" class="row"><input name="q" value="${esc(query)}" placeholder="part of a code, a room code, or 2026-12-03" autocapitalize="characters"><button>Find</button></form>`,
+    `<form method="get" action="${esc(path)}" class="row"><input name="q" value="${esc(query)}" placeholder="part of a code, a room code, a GitHub name, or 2026-12-03" autocapitalize="characters"><button>Find</button></form>`,
   );
   if (query.trim() !== '') {
     const found = lookup(rows, query);
@@ -504,6 +610,7 @@ export function registerAdminRoutes(
       path: `${base}admin/${request.params.key}`,
       gameUrl: `${proto}://${host}${base}`,
       rows: codeRows(receipts.records()),
+      sponsorships: sponsorshipsWithoutCode(receipts.records(), now()),
       now: now(),
       query: typeof q === 'string' ? q : '',
       done: known.includes(done) ? (done as AdminDone) : null,
@@ -528,6 +635,13 @@ export function registerAdminRoutes(
     } else if (kind === 'new') {
       const replaced = parseCode(field(request.body, 'replaces'));
       const at = now();
+      // For a sponsorship GitHub reported with no code: its id and the sponsor's name.
+      const wanted = field(request.body, 'sponsorship');
+      const sponsorship = wanted
+        ? receipts
+            .records()
+            .find((r): r is SponsorshipRecord => r.type === 'sponsorship' && r.ref === wanted)
+        : undefined;
       const pack: PackId | undefined =
         replaced && isPackPaid(replaced.pack, at)
           ? replaced.pack
@@ -536,7 +650,8 @@ export function registerAdminRoutes(
         shown = codes.issue({
           pack,
           rail: 'owner',
-          ref: replaced?.code ?? '',
+          ref: sponsorship?.ref ?? replaced?.code ?? '',
+          ...(sponsorship ? { login: sponsorship.login } : {}),
           amount: '',
           delivered: OWNER_DELIVERED,
           policy: REFUND_POLICY_VERSION,

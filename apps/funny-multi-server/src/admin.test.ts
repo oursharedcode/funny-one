@@ -12,6 +12,7 @@ import {
   lookup,
   renderAdminPage,
   span,
+  sponsorshipsWithoutCode,
   stateOf,
 } from './admin.js';
 import { buildServer, type BuildServerOptions, type BuiltServer } from './index.js';
@@ -27,7 +28,8 @@ function issue(
   code: string,
   at: string,
   pending = true,
-  rail: 'payid' | 'owner' = 'payid',
+  rail: 'payid' | 'sponsors' | 'owner' = 'payid',
+  extra: { ref?: string; login?: string } = {},
 ): ReceiptRecord {
   return {
     type: 'issue',
@@ -40,6 +42,7 @@ function issue(
     delivered: 'pay page',
     policy: REFUND_POLICY_VERSION,
     state: pending ? 'pending' : 'received',
+    ...extra,
   };
 }
 
@@ -153,6 +156,76 @@ describe('the lists', () => {
     expect(html).toContain('&#60;b&#62;');
     expect(html).not.toContain('<b>"');
     expect(html).toContain('noindex');
+  });
+});
+
+describe('the Sponsors lists (Step 125)', () => {
+  const sponsored = (code: string, at: string, ref: string, login: string, outcome = 'no code') =>
+    ({
+      type: 'sponsorship',
+      at,
+      code,
+      ref,
+      login,
+      amount: 'US$2',
+      outcome,
+    }) as ReceiptRecord;
+  const SPONSORS_LOG: ReceiptRecord[] = [
+    // Waiting for GitHub, a day old; one 8 days old, past the list.
+    issue('XMAS26-JJJJ-1111', ago(24 * HOUR), true, 'sponsors', { login: 'mona-lisa' }),
+    issue('XMAS26-KKKK-2222', ago(8 * 24 * HOUR), true, 'sponsors', { login: 'jo' }),
+    // Switched on by GitHub's webhook.
+    issue('XMAS26-LLLL-3333', ago(5 * HOUR), true, 'sponsors', { login: 'octocat' }),
+    sponsored('XMAS26-LLLL-3333', ago(4 * HOUR), 'S_matched', 'octocat', 'matched'),
+    { type: 'received', at: ago(4 * HOUR), code: 'XMAS26-LLLL-3333' },
+    // Sponsorships with no code: one given a code by hand, one too old.
+    sponsored('', ago(3 * HOUR), 'S_lost', 'nobody'),
+    sponsored('', ago(2 * HOUR), 'S_given', 'someone'),
+    issue('XMAS26-MMMM-4444', ago(HOUR), false, 'owner', { ref: 'S_given', login: 'someone' }),
+    sponsored('', ago(31 * 24 * HOUR), 'S_old', 'ancient', 'not on sale'),
+  ];
+  const rows = codeRows(SPONSORS_LOG);
+
+  it('reads a waiting Sponsors code as waiting for GitHub, and one GitHub reported as good', () => {
+    expect(rows.map((r) => [r.code.slice(7, 11), stateOf(r, NOW)])).toEqual([
+      ['JJJJ', 'github'],
+      ['KKKK', 'github'],
+      ['LLLL', 'good'],
+      ['MMMM', 'good'],
+    ]);
+    expect(rows[2]!.sponsoredAt).toBe(Date.parse(ago(4 * HOUR)));
+    const view = adminView(rows, NOW);
+    expect(view.github.map((r) => r.code)).toEqual(['XMAS26-JJJJ-1111']);
+    expect(view.unclaimed).toEqual([]);
+    expect(view.claimed).toEqual([]);
+  });
+
+  it('lists the sponsorships of the last 30 days no code was given for', () => {
+    expect(sponsorshipsWithoutCode(SPONSORS_LOG, NOW).map((s) => s.ref)).toEqual(['S_lost']);
+  });
+
+  it("finds a code by its buyer's GitHub name", () => {
+    expect(lookup(rows, 'mona-li').map((r) => r.code)).toEqual(['XMAS26-JJJJ-1111']);
+    expect(lookup(rows, 'SOMEONE').map((r) => r.code)).toEqual(['XMAS26-MMMM-4444']);
+  });
+
+  it('renders both lists, a Received for the waiting code and a code for the sponsorship', () => {
+    const html = renderAdminPage({
+      path: '/admin/k',
+      gameUrl: 'https://game.example/',
+      rows,
+      sponsorships: sponsorshipsWithoutCode(SPONSORS_LOG, NOW),
+      now: NOW,
+      query: '',
+      done: null,
+      doneCode: null,
+    });
+    expect(html).toContain('Sponsors — waiting for GitHub (1)');
+    expect(html).toContain('GitHub @mona-lisa');
+    expect(html.match(/value="received"/gu)).toHaveLength(1);
+    expect(html).toContain('Sponsorships without a code (1)');
+    expect(html).toContain('name="sponsorship" value="S_lost"');
+    expect(html).toContain('GitHub @nobody');
   });
 });
 
@@ -301,6 +374,31 @@ describe('the admin routes', () => {
     });
     const shown = await page(ADMIN_SECRET, `?done=new&code=${made}`);
     expect(shown.body).toContain(`?code=${made}`);
+  });
+
+  it('makes a code for a sponsorship GitHub reported with none, and lists it no more', async () => {
+    const server = await boot();
+    server.receipts.append({
+      type: 'sponsorship',
+      code: '',
+      ref: 'S_kwDOlost',
+      login: 'mona',
+      amount: 'US$2',
+      outcome: 'no code',
+    });
+    expect((await page()).body).toContain('Sponsorships without a code (1)');
+    const res = await act({ action: 'new', sponsorship: 'S_kwDOlost' });
+    const made = new URL(res.headers.location as string, 'http://x').searchParams.get('code')!;
+    expect(server.codes.check(made).ok).toBe(true);
+    expect(server.receipts.records().at(-1)).toMatchObject({
+      type: 'issue',
+      code: made,
+      rail: 'owner',
+      ref: 'S_kwDOlost',
+      login: 'mona',
+      state: 'received',
+    });
+    expect((await page()).body).toContain('Sponsorships without a code (0)');
   });
 
   it('refuses an action with a wrong key and changes nothing', async () => {

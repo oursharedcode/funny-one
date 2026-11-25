@@ -1023,6 +1023,42 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     own page (the SPA fallback), as any unknown address does; design §4.4 says so. The socket
     test's room helper now waits for the host's first lobby update, a race seen under load.
     **Next:** Step 125 — paying by GitHub Sponsors.
+  - *Decisions 2026-11-25, second set (owner, on the Step 125 plan):*
+    - **D1 A — the pay page asks for the buyer's GitHub user name**, and the webhook matches the
+      sponsorship by it (a `metadata.code`, if GitHub ever sends one, first): GitHub's
+      documentation does not say the checkout link's metadata reaches the webhook.
+    - **D2 A — a Sponsors code works only once GitHub's webhook arrives or the owner presses
+      Received.** No 48 h claim on the buyer's word, no "I've paid".
+    - **D3 A — the GitHub name is kept in the receipt log for 18 months** with the rest, and the
+      privacy policy names it.
+    - **D4 A — the live check:** after the deploy a family member's GitHub account makes one
+      real US$2 sponsorship of the tier, and the owner refunds or keeps it.
+  - **Sponsors done 2026-11-25 (Step 125).** The server's `sponsors.ts` (`POST /pay/sponsors`
+    issues a code waiting for a GitHub name and answers with the tier's checkout link,
+    `POST /pay/sponsors/hook` checks GitHub's signature and switches the code on, `POST
+    /pay/status` tells the page), as design §4.4 sets out; a Sponsors code is never claimed;
+    the raw body kept for the hook's signature by the server's one JSON parser; the admin page's
+    two Sponsors lists and "Make a code for this sponsorship"; `parseGitHubLogin` in shared;
+    the pay page's GitHub-name field, the checkout panel, "Waiting for GitHub…", Change, and the
+    page asking every 5 s for 15 minutes and on return to the tab; the privacy policy, in all
+    23 languages, names the GitHub name on the device and in the receipt log, the sponsorship
+    GitHub reports, and the per-address count of Sponsors codes. Before the deploy the owner
+    owes the tier, the webhook and the two env values in the VM's `.env` and its backups (the
+    step's log entry lists them). Seen working 2026-11-25 in a headless phone-sized browser
+    against a local server with throwaway secrets and signed stand-in webhooks: 83 checks
+    (the whole flow, refusals and a duplicate delivery, the owner's Received, a sponsorship
+    with no code and "Make a code", Change, ar, he, fa, ta and de at 320 px, the fourth code
+    from one address refused, none in the Android shell); the real US$2 sponsorship is D4's,
+    after the deploy. The drafters' notes for B-3's reviewer — **the Sponsors
+    texts** (en and ru the agent's; the other 21 machine drafts): the game's texts keep each
+    catalogue's own address (fr «Ton», uk «Твоє», id "-mu", bn «তোমার»), the policy's clause
+    its page's (fr «vous», uk «ви», id "Anda", bn «আপনি»); "user name" differs between the two
+    in te ("యూజర్‌నేమ్" / "యూజర్ పేరు"), ta ("பயனர்பெயர்" / "பயனர் பெயர்") and yo ("oníṣe" /
+    "olùmúlò", the least certain); "Benutzername", "nom d'utilisateur", "nombre de
+    usuario", "nome de usuário", "ユーザー名", "사용자 이름", "用户名" are unchecked against
+    GitHub's own localised pages; "sponsorship" is coined in sw ("udhamini") and yo ("ìgbọ̀wọ́"), a
+    loanword in hi, ta, te and bn; he keeps the plural address, ar the masculine singular of
+    the rest of its policy. **Next:** Step 126 — sleigh bells.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

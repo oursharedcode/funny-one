@@ -1,17 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 // Step 123 (B-29): the pay link's parameter, and the payment seam. Step 124:
-// PayID — the waiting code the phone keeps, and "I've paid".
+// PayID — the waiting code the phone keeps, and "I've paid". Step 125:
+// Sponsors — the GitHub name, the checkout kept, and the question whether
+// its code works yet.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setUrl } from './testutils/socketMock';
 import {
   __resetPayForTest,
+  checkPayStatus,
   claimPayId,
   clearPayLink,
   forgetPendingPayId,
+  forgetPendingSponsors,
   payLinkPack,
   readPendingPayId,
+  readPendingSponsors,
   startPayment,
 } from './pay';
 
@@ -84,10 +89,6 @@ describe('the pay link', () => {
 describe('starting a payment', () => {
   const request = { pack: 'chr26', policy: '2026-11-24' } as const;
 
-  it('cannot be started on Sponsors yet: Step 125 wires it', async () => {
-    expect(await startPayment({ ...request, rail: 'sponsors' })).toEqual({ ok: false });
-  });
-
   it('asks the server for a PayID code, and keeps it on the phone', async () => {
     const fetch = stubFetch({ ok: true, ...TRANSFER });
     const started = await startPayment({ ...request, rail: 'payid' });
@@ -128,6 +129,96 @@ describe('starting a payment', () => {
     const fetch = stubFetch({ ok: true, ...TRANSFER });
     expect(await startPayment({ ...request, rail: 'payid' })).toEqual({ ok: false });
     expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+const CHECKOUT = {
+  code: 'XMAS26-K7QM-3FPA',
+  url: 'https://github.com/sponsors/example/sponsorships?tier_id=1&metadata_code=XMAS26-K7QM-3FPA',
+  amount: 'US$2',
+  login: 'mona-lisa',
+};
+
+describe('starting a Sponsors payment', () => {
+  const request = { pack: 'chr26', policy: '2026-11-24', rail: 'sponsors' } as const;
+
+  it('asks the server for a code waiting for the GitHub name, and keeps it', async () => {
+    const fetch = stubFetch({ ok: true, ...CHECKOUT });
+    const started = await startPayment({ ...request, login: ' @Mona-Lisa ' });
+    expect(started).toEqual({ ok: true, checkout: { pack: 'chr26', ...CHECKOUT } });
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/pay/sponsors',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ pack: 'chr26', policy: '2026-11-24', login: 'mona-lisa' }),
+      }),
+    );
+    expect(readPendingSponsors('chr26')).toEqual({ pack: 'chr26', ...CHECKOUT });
+  });
+
+  it('keeps the same code for the same name, and asks again for another', async () => {
+    stubFetch({ ok: true, ...CHECKOUT });
+    await startPayment({ ...request, login: 'mona-lisa' });
+    __resetPayForTest();
+    let fetch = stubFetch();
+    expect((await startPayment({ ...request, login: 'MONA-LISA' })).checkout?.code).toBe(
+      CHECKOUT.code,
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    fetch = stubFetch({ ok: true, ...CHECKOUT, code: 'XMAS26-AAAA-BBBB', login: 'jo' });
+    expect((await startPayment({ ...request, login: 'jo' })).checkout?.code).toBe(
+      'XMAS26-AAAA-BBBB',
+    );
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it('refuses a name GitHub could not have without asking the server', async () => {
+    const fetch = stubFetch();
+    for (const login of ['', 'mo_na', 'мона', undefined]) {
+      expect(await startPayment({ ...request, login })).toEqual({
+        ok: false,
+        error: 'LOGIN_INVALID',
+      });
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("passes on the server's refusal, and keeps nothing that is not a GitHub checkout", async () => {
+    stubFetch(
+      { ok: false, error: 'RATE_LIMITED' },
+      { ok: true, ...CHECKOUT, url: 'https://evil.example/' },
+    );
+    expect(await startPayment({ ...request, login: 'mona' })).toEqual({
+      ok: false,
+      error: 'RATE_LIMITED',
+    });
+    expect(await startPayment({ ...request, login: 'mona' })).toEqual({ ok: false });
+    expect(readPendingSponsors('chr26')).toBeNull();
+  });
+
+  it('forgets the waiting code on request', async () => {
+    stubFetch({ ok: true, ...CHECKOUT });
+    await startPayment({ ...request, login: 'mona-lisa' });
+    forgetPendingSponsors();
+    expect(readPendingSponsors('chr26')).toBeNull();
+    expect(localStorage.getItem('funny37.pendingSponsors')).toBeNull();
+  });
+});
+
+describe('whether a Sponsors code works yet', () => {
+  it("passes on the server's verdict, and a lost connection as NETWORK", async () => {
+    const fetch = stubFetch({ ok: false, error: 'CODE_PENDING' }, { ok: true });
+    expect(await checkPayStatus(CHECKOUT.code)).toEqual({ ok: false, error: 'CODE_PENDING' });
+    expect(await checkPayStatus(CHECKOUT.code)).toEqual({ ok: true });
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/pay/status',
+      expect.objectContaining({ body: JSON.stringify({ code: CHECKOUT.code }) }),
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Promise.reject(new Error('offline'))),
+    );
+    expect(await checkPayStatus(CHECKOUT.code)).toEqual({ ok: false, error: 'NETWORK' });
   });
 });
 

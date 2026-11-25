@@ -136,6 +136,10 @@ export const WRONG_CODE_WINDOW_MS = 60 * 60_000;
 // hour. The phone keeps its one waiting code and shows it again, so an honest
 // buyer asks for one; three leave room for a second phone on the same Wi-Fi.
 export const PAYID_CODES_PER_HOUR = 3;
+// Step 125: Sponsors codes per IP per hour, the same three and for the same
+// reason — the phone keeps its waiting code; a mistyped GitHub name, changed,
+// asks for one more.
+export const SPONSORS_CODES_PER_HOUR = 3;
 
 /**
  * Client IP for bucketing, read from `x-forwarded-for` counting from the

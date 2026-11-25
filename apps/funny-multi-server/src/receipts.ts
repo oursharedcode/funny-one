@@ -12,6 +12,11 @@
 //   claim     the buyer's "I've paid" on a pending code: its 48 hours start
 //   received  the owner matched the payment
 //   block     the owner's blocklist, by B-29's four cases
+//   sponsorship  GitHub's word that a one-time sponsorship of the pack's
+//             price was paid (Step 125): the sponsor's GitHub name, the
+//             sponsorship's id, the amount, and the code it switched on — or
+//             none, when no code was waiting for that name or the pack was
+//             no longer on sale (the admin page lists those)
 //   room      a room a code made paid — at its creation or by `room:unlock`:
 //             the room code, its language, the players then, the country of
 //             the address and the browser's family; never the address itself,
@@ -40,19 +45,30 @@ export interface IssueRecord {
   pack: PackId;
   rail: ReceiptRail;
   /**
-   * The rail's own reference: the sponsorship's id; for a code the owner
-   * gives by hand, the code it replaces, if any. Empty for PayID, whose
-   * transfer carries the code itself as its reference (D4 of 2026-11-05).
+   * For a code the owner gives by hand, the code it replaces, or the id of
+   * the sponsorship it is for (one GitHub reported with no code waiting),
+   * if any. Empty for PayID, whose transfer carries the code itself as its
+   * reference (D4 of 2026-11-05), and for Sponsors, whose sponsorship record
+   * names the code it switched on.
    */
   ref: string;
   /** As the buyer saw it, `A$2.60`, `US$2`. */
   amount: string;
-  /** Where the code was shown: the pay page, Sponsors' welcome, by hand. */
+  /** Where the code was shown: the pay page, by hand. */
   delivered: string;
   /** The refund policy's version shown before paying. */
   policy: string;
-  /** `pending` until a PayID payment is matched; every other rail `received`. */
+  /**
+   * `pending` until the payment is matched — by the owner for PayID, by
+   * GitHub's webhook for Sponsors; a code the owner gives is `received`.
+   */
   state: 'pending' | 'received';
+  /**
+   * Sponsors only (Step 125, owner decisions D1 A and D3 A of 2026-11-25): the
+   * GitHub user name the buyer said they would pay with, in lower case — how
+   * GitHub's webhook finds the code.
+   */
+  login?: string;
 }
 
 export interface ClaimRecord {
@@ -72,6 +88,23 @@ export interface BlockRecord {
   at: string;
   code: string;
   reason: BlockReason;
+}
+
+/** What GitHub's webhook of a sponsorship came to (Step 125). */
+export type SponsorshipOutcome = 'matched' | 'no code' | 'not on sale';
+
+export interface SponsorshipRecord {
+  type: 'sponsorship';
+  at: string;
+  /** The code it switched on; empty when it switched none on. */
+  code: string;
+  /** The sponsorship's id at GitHub (its node id). */
+  ref: string;
+  /** The sponsor's GitHub name, in lower case. */
+  login: string;
+  /** As GitHub reported it: `US$2`. */
+  amount: string;
+  outcome: SponsorshipOutcome;
 }
 
 export interface RoomRecord {
@@ -101,13 +134,27 @@ export interface GameRecord {
 }
 
 export type ReceiptRecord =
-  IssueRecord | ClaimRecord | ReceivedRecord | BlockRecord | RoomRecord | GameRecord;
+  | IssueRecord
+  | ClaimRecord
+  | ReceivedRecord
+  | BlockRecord
+  | SponsorshipRecord
+  | RoomRecord
+  | GameRecord;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 /** A record as written: the log stamps its time. */
 export type ReceiptInput = WithoutAt<ReceiptRecord>;
 
-const RECORD_TYPES: readonly string[] = ['issue', 'claim', 'received', 'block', 'room', 'game'];
+const RECORD_TYPES: readonly string[] = [
+  'issue',
+  'claim',
+  'received',
+  'block',
+  'sponsorship',
+  'room',
+  'game',
+];
 
 export const RETENTION_MONTHS = 18;
 

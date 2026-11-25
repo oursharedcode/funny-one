@@ -8160,6 +8160,9 @@ edition", its text naming 1 August 2027) and its webhook, at Step 125; the live-
 Multi's trader confirmation before 1 February 2027. B-3's native reviewers also have this step's
 pay texts, the one-story lines and the policy's two clauses in 21 languages.
 
+~~RESUME HERE (2026-11-25, after Step 124; not yet pushed)~~ — pushed as `6de99fa`, CI green (run
+45535520445); carried into Step 125's note. Its text, kept for the record:
+
 **RESUME HERE (2026-11-25, after Step 124; not yet pushed).** Step 123 is pushed and green
 (`d07125e`, CI run 45501028340). **Paying by PayID works locally, and the owner's admin page
 exists; nothing of the paid half is live** — Steps 122–126 deploy together (D1). A free
@@ -8172,3 +8175,118 @@ before the landing site — no deploys 24–26 December, 31 December–1 January
 **Owed, the owner's:** `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
 backups before the deploy; the Sponsors tier and its webhook; the live-badge look; Funny Multi's
 trader confirmation before 1 Feb 2027.
+
+## Step 125 (task B-29) — paying through GitHub Sponsors (2026-11-25)
+
+**Owner decisions, 2026-11-25, second set (`/morning`, on Step 125's plan)** — B-29's block in
+tasks.md holds the binding text: **D1 A** the pay page asks for the GitHub user name the buyer
+will pay with, and the webhook matches the sponsorship by it (GitHub's documentation does not say
+the checkout link's metadata reaches the webhook; a `metadata.code` is used first if it ever
+does); **D2 A** a Sponsors code works only once GitHub's webhook arrives or the owner presses
+Received — no 48 h claim, no "I've paid"; **D3 A** the GitHub name is kept in the receipt log for
+18 months and named in the privacy policy; **D4 A** after the deploy a family member's GitHub
+account makes one real US$2 sponsorship as the live check.
+
+**Shipped:**
+
+- **Server** (`apps/funny-multi-server`): `sponsors.ts` (new) — `POST /pay/sponsors` `{ pack,
+  policy, login }` issues a pending code (`rail: sponsors`, the login kept) and answers with the
+  tier's checkout link (`…/sponsorships?tier_id=<SPONSORS_TIER_ID>&metadata_code=<code>`); 3
+  codes per address per hour (`SPONSORS_CODES_PER_HOUR`), 400 `LOGIN_INVALID`, 409 `NOT_ON_SALE`
+  wherever PayID would say so or a Sponsors setting is unset. `POST /pay/sponsors/hook` checks
+  `X-Hub-Signature-256` over the raw body (the server's one JSON parser keeps it for this address
+  alone): a one-time `sponsorship` `created` of at least US$2 for the configured account switches
+  on the code its metadata names, else the newest one waiting for that login, and logs a
+  `sponsorship` record — `matched`, `no code`, or `not on sale` after the free part's last day; a
+  second delivery of the same `node_id` changes nothing; 401 on a bad signature. `POST
+  /pay/status` tells the page whether its code works yet — `CODE_PENDING` is a 200, the answer it
+  expects every 5 s. `codes.ts`: only a PayID code can be claimed. `receipts.ts`: the issue
+  record's `login`, the `sponsorship` record. `admin.ts`: **Sponsors — waiting for GitHub** (the
+  last 7 days, each with Received), **Sponsorships without a code** (the last 30 days, each with
+  "Make a code for this sponsorship"), "GitHub @name" on the cards, the lookup by GitHub name.
+  `index.ts` wires it from `DEPLOYER_SPONSORS_URL`, `SPONSORS_TIER_ID` and
+  `SPONSORS_WEBHOOK_SECRET`, with a warning at start when one is unset.
+- **Client** (`apps/funny-multi-client`): `pay.ts` — `startSponsors` (the same name reuses the
+  checkout kept on the phone, `funny37.pendingSponsors`; another asks for a new code),
+  `checkPayStatus`, `forgetPendingSponsors`. `PayScreen.tsx`: the GitHub-name field with its
+  label and hint, the button live only with a name typed; the checkout panel — "Paying as @name",
+  the link to GitHub in a new tab, "Waiting for GitHub to tell us you've paid…", a note for a slow
+  webhook, Change; the page asks at once, every 5 s for 15 minutes and on return to the tab, and
+  on ok keeps the code and opens the room as PayID does; no close guard, since nothing is lost by
+  closing.
+- **Shared** (`packages/shared`): `parseGitHubLogin` and `GITHUB_LOGIN_MAX` (new,
+  `githubLogin.ts`); `PaySponsorsRequest`/`Answer`, `PayStatusRequest`/`Answer`, `LOGIN_INVALID`.
+- **Texts:** the pay section's Sponsors keys in all 23 catalogues — en and ru the agent's, the
+  other 21 machine drafts on B-3's pile, the drafters' notes in tasks.md's Step 125 line. The
+  privacy policy, in all 23 sections, names the GitHub name on the device and in the receipt log
+  (18 months), the sponsorship GitHub reports, and the per-address count of Sponsors codes.
+- **Docs:** design §4.4 ("Paying through Sponsors", the admin page's two lists) and its env
+  table; tasks.md — the decisions and the Step 125 line; `.env.example` (`SPONSORS_TIER_ID`,
+  `SPONSORS_WEBHOOK_SECRET`).
+
+**Settled in the step:**
+
+- A waiting code's status is answered 200 `{ ok: false, error: 'CODE_PENDING' }`, not 409: the
+  page asks every 5 s, and a 409 put a red console line in the buyer's browser each time. Only
+  `CODE_INVALID` costs a wrong-code token.
+- A sponsorship GitHub reports with no code waiting for its name is logged and listed for the
+  owner, who makes a code for it by hand or refunds it on GitHub; a monthly or smaller one is a
+  gift and leaves no record.
+- `App.test.tsx`'s "opens from the end screen's pay card" test has 15 s: it timed out at 5 s once
+  in the full run, with all six workspaces at once on the laptop, and passed alone and in the
+  rerun.
+
+**Verified in phone-sized Chromium** (`.screens/step125-check.mjs`, gitignored): the built server
+on 3000 under random throwaway `PACK_CODE_SECRET`, `PACK_ADMIN_SECRET` and
+`SPONSORS_WEBHOOK_SECRET` set in the process environment only, an example Sponsors account and
+tier, and webhooks signed by the check itself in GitHub's form. 83 checks, none failing; the only
+console error is the expected 429 of the limit test. The whole flow — name, checkout link with
+the tier and the code (a new tab, `noopener noreferrer`), the panel, the same checkout after a
+reload, the webhook switching the code on, the thank-you; a bad signature 401 and an unreadable
+body 400; a monthly and a smaller sponsorship switching nothing on, a second delivery switching
+on no second code; the owner's Received from the waiting list; a sponsorship with no code
+listed, "Make a code for this sponsorship", the lookup by GitHub name; Change; ar, he, fa, ta and
+de at 320 px, the name field left to right; the fourth code from one address refused; no pay
+page in the Android shell.
+
+**Gates:** typecheck 0, lint 0, format:check clean; `npm test`, outside the sandbox, 2321 across
+6 workspaces (536 funny-family-site, 597 funny-multi-client — 12 more, 473 funny-multi-server — 25
+more, 178 funny-one-client, 449 shared — 2 more, 88 cloudflare); no dependency changed; `npm
+audit` exactly the three accepted ids (GHSA-6jcc-5g8w-32mx i18next, GHSA-3g3m-2fjr-6pw4 glob,
+GHSA-g3hv-75wg-m249 minimatch); CI pending the push.
+
+**Owed, the agent's:** Step 126 (sleigh bells), then the one deploy (D1) — `deploy/ship.sh`
+before `deploy/ship-funny-family.sh`. B-29 stays open.
+
+**Owed, the owner's — the Sponsors setup, before the deploy** (new):
+
+1. **The tier**, on the Sponsors dashboard's Tiers tab: one-time, US$2, named "Christmas 2026
+   edition", its text e.g. "A thank-you for the Christmas 2026 edition of «Чепуха 37»: every
+   Christmas story in your rooms until 1 August 2027. Start on the game's pay page, so your
+   GitHub name brings your code." Publish it; its number is the `tier_id=` in its link. A welcome
+   message is optional — the code is shown on the pay page, not in it.
+2. **The webhook**, on the dashboard's Webhooks tab: payload URL the game's address followed by
+   `/pay/sponsors/hook` (`https://<FM_HOST><BASE_PATH>/pay/sponsors/hook`), content type
+   `application/json`, a secret from `openssl rand -hex 32`.
+3. **`SPONSORS_TIER_ID` and `SPONSORS_WEBHOOK_SECRET` in the VM's `.env` and its backups**, with
+   `DEPLOYER_SPONSORS_URL` already there. Unset, nothing sells through Sponsors and the server
+   says so at start.
+4. **After the deploy, D4:** a family member's GitHub account opens the pay page outside
+   Australia, types its name and sponsors US$2; the code should work within a minute. Then keep
+   or refund it.
+
+Still owed: `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its backups; the
+live-badge look; Funny Multi's trader confirmation before 1 February 2027. B-3's native reviewers
+also have this step's Sponsors texts and the policy's clause in 21 languages.
+
+**RESUME HERE (2026-11-25, after Step 125; not yet pushed).** Step 124 is pushed and green
+(`6de99fa`, CI run 45535520445). **Paying by PayID and through GitHub Sponsors both work locally;
+nothing of the paid half is live** — Steps 122–126 deploy together (D1). A Sponsors buyer types
+their GitHub name; GitHub's webhook, or the owner's Received, switches the code on. **Next, Step
+126 (the agent's) — sleigh bells**, then the landing line "Christmas pack — try it free", #2's
+Christmas invitation, #15's uptime alarm and the one deploy by about 10 December, the game before
+the landing site — no deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the Sponsors tier, its webhook, and `SPONSORS_TIER_ID`,
+`SPONSORS_WEBHOOK_SECRET`, `PACK_CODE_SECRET` and `PACK_ADMIN_SECRET` in the VM's `.env` and its
+backups before the deploy (Step 125's entry lists the steps); D4's real US$2 sponsorship after
+it; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.

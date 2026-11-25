@@ -405,9 +405,8 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   have this pack." with the code and its last day; from the day after the free part's last
   the page says the edition is no longer on sale; where `pay` is null, that the pack cannot be
   bought right now. The pay button calls `startPayment` (`pay.ts`), the seam each rail fills:
-  PayID since Step 124, below; on Sponsors (Step 125's) it still answers not-ok and the page
-  says the payment cannot be started. Never in the Android app: `?pay=` is ignored there and
-  no price is shown (FM-APP-3).
+  PayID since Step 124 and Sponsors since Step 125, both below. Never in the Android app:
+  `?pay=` is ignored there and no price is shown (FM-APP-3).
 - **Paying by PayID** (Step 124, owner decisions of 2026-11-25; `payid.ts`, `PayScreen`).
   `POST /pay/payid` `{ pack, policy }` issues a pending code — receipt `rail: payid`, `ref`
   empty (the reference is the code itself), `delivered: pay page`, the policy the page showed —
@@ -427,6 +426,38 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   to press it before closing; × or Close with a waiting code asks "Already paid?" with "I've
   paid" and "Not yet — close"; the code stays on the phone, and the admin page lists it among
   the unclaimed.
+- **Paying through Sponsors** (Step 125, owner decisions of 2026-11-25, second set;
+  `sponsors.ts`, `PayScreen`). Abroad the pack is a thank-you for a one-time sponsorship of
+  its own tier ("Christmas 2026 edition", US$2), GitHub the merchant of record. The page asks
+  for **the GitHub user name the buyer will pay with** (D1 A; `parseGitHubLogin`: Latin
+  letters, digits and single hyphens, 39 at most, a leading `@` dropped, kept in lower case),
+  and the button is pressed only with one typed. `POST /pay/sponsors` `{ pack, policy, login }`
+  issues a pending code — receipt `rail: sponsors`, `ref` empty, `login`, `delivered: pay page`
+  — and answers `{ code, url, amount, login }`, the url GitHub's checkout of the tier
+  (`/sponsors/<account>/sponsorships?tier_id=<SPONSORS_TIER_ID>&metadata_code=<code>`):
+  409 `NOT_ON_SALE` wherever PayID would say so or `DEPLOYER_SPONSORS_URL`,
+  `SPONSORS_TIER_ID` or `SPONSORS_WEBHOOK_SECRET` is unset, 400 `LOGIN_INVALID`, 429 past **3
+  codes per address per hour**. The phone keeps the waiting checkout
+  (`funny37.pendingSponsors`; the same name again reuses it, Change lets it go), and the button
+  turns into "Paying as @name", a link that opens the checkout in a new tab, "Waiting for
+  GitHub to tell us you've paid…" and a note for a slow webhook. **A Sponsors code is never
+  claimed** (D2 A: no 48 h on the buyer's word, no "I've paid", nothing asks before closing):
+  it works once **GitHub's webhook** reports the sponsorship or **the owner presses
+  Received**. `POST /pay/sponsors/hook` checks `X-Hub-Signature-256` (HMAC-SHA256 of the body
+  as sent — the server keeps the raw body for this one address) and answers 401 on a bad
+  signature, 400 on a body that does not read, 204 otherwise. A `sponsorship` event with
+  `action: created`, for the configured account, one-time and at least the pack's price,
+  switches on the code its `metadata.code` names, if GitHub ever sends one, else **the newest
+  code waiting for the sponsor's login**, and writes a receipt `type: sponsorship` (`code`,
+  GitHub's `node_id` as `ref`, `login`, `amount`, `outcome`: `matched`, `no code`, or `not on
+  sale` after the free part's last day — the tier is retired then, D6 A of 2026-11-22). A
+  second delivery of the same `node_id` changes nothing; a monthly or smaller sponsorship is a
+  gift and leaves no record. `POST /pay/status` `{ code }` answers the code's verdict
+  (`CODE_PENDING` while it waits; only `CODE_INVALID` costs a wrong-code token): the page asks
+  at once, every 5 s for 15 minutes, and whenever the buyer comes back to the tab, and on ok
+  keeps the code, says "Thank you! Your code works now." and opens the room as PayID does; a
+  code the server refuses is dropped, with the reason. **The GitHub name is personal data**
+  (D3 A): kept in the receipt log for 18 months with the rest and named in the privacy policy.
 - **The owner's admin page** (Step 124, D1 A, D2 A, D5 A; `admin.ts`). `GET /admin/<key>`,
   where the key is `PACK_ADMIN_SECRET` (§11; 16 characters at least, else no page): English,
   phone-sized, built from the receipt log on each load, `no-store`, `noindex`, no referrer,
@@ -439,7 +470,12 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   Each card has Received, Block (refund, payment taken back, leaked in public, the buyer
   asked; confirmed first) and "New code for this buyer"; a New code form makes an owner's
   code (`rail: owner`, `ref` the code it replaces, `delivered: by hand`) and shows it with
-  its `?code=` link to copy. Actions are form posts (the only urlencoded bodies the server
+  its `?code=` link to copy. Step 125 adds **Sponsors — waiting for GitHub**, codes issued for
+  a GitHub name in the last 7 days that no webhook has switched on, each with Received; and
+  **Sponsorships without a code**, the webhook's `no code` and `not on sale` records of the
+  last 30 days, each with "Make a code for this sponsorship" (an owner's code whose `ref` is
+  the sponsorship's and whose `login` is its sponsor's) — or a refund on GitHub. Cards show
+  "GitHub @name"; the lookup also finds a GitHub name. Actions are form posts (the only urlencoded bodies the server
   parses) answered with a 303 back to the page.
 - **The paying half's counts** (Step 123, DD-15): `xm_card` (the pay card shown), `xm_page`
   (the pay page opened; `t` is `card` or `link`) and `xm_pay` (the pay button pressed; `t` is
@@ -832,7 +868,9 @@ retired by D-6; nothing of it was built.*
 | `MAX_IMAGES_PER_DAY` (25) / `MAX_ROOMS` (500) / `ROUND_DURATION_MS` (60000) | server | as SRC |
 | `DEPLOYER_DONATE_URL` | server | operator donate button, as SRC |
 | `DEPLOYER_PAYID` / `DEPLOYER_PAYID_NAME` | server | support rails (§10.2, D-6): PayID and the exact registered account name |
-| `DEPLOYER_SPONSORS_URL` | server | support rails (§10.2): GitHub Sponsors profile |
+| `DEPLOYER_SPONSORS_URL` | server | support rails (§10.2): GitHub Sponsors profile; its last part is the account the pack's Sponsors checkout and webhook use (Step 125, §4.4) |
+| `SPONSORS_TIER_ID` | server | the pack's one-time Sponsors tier, the number in its checkout link (Step 125, §4.4); unset, nothing sells through Sponsors |
+| `SPONSORS_WEBHOOK_SECRET` | server | the Sponsors webhook's secret (Step 125, §4.4): checks `X-Hub-Signature-256`; unset, nothing sells through Sponsors and there is no webhook. The VM's `.env` only, never the repository |
 | `DEPLOYER_LIGHTNING_ADDRESS` | server | support rails (§10.2): Lightning address (`user@wallet`) |
 | `DEPLOYER_KOFI_URL` / `DEPLOYER_BMC_URL` | server | support rails (§10.2, D-6(a) as amended 2026-10-17): Ko-fi and Buy Me a Coffee pages |
 | `PACK_ROOMS` | server | `off` makes every new room an ordinary one (Step 117, §4.4) — the launch's lever; unset = packs offered |

@@ -605,7 +605,9 @@ describe('the pay page (Step 123)', () => {
     fireEvent.click(screen.getByText('Close'));
     expect(payPage()).toBeNull();
     expect(screen.getByText('Unlock')).toBeTruthy();
-  });
+    // A lobby, an end screen and the pay page in one test: past 5 s when the
+    // whole repository's suites run at once on a busy machine (Step 125).
+  }, 15_000);
 
   it('shows no pay card when the server sells nothing', async () => {
     resolvePay(null);

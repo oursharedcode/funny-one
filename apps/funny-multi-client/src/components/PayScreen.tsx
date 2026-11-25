@@ -19,8 +19,15 @@
 // - the pay button. Step 124 wires PayID (pay.ts): the button turns into the
 //   transfer to make — the PayID, its account name, the amount and the code as
 //   the reference, each with Copy — and "I've paid", which makes the code work
-//   at once (for 48 hours, until the owner matches the payment). Sponsors is
-//   Step 125's; until then it answers "can't be started right now".
+//   at once (for 48 hours, until the owner matches the payment).
+// - On Sponsors (Step 125), the GitHub name the buyer will pay with (owner
+//   decision D1 A, 2026-11-25), above the pay button. The button gets a code
+//   that waits for that name's sponsorship, and turns into a link to GitHub's
+//   checkout of the pack's tier and "Waiting for GitHub…": the page asks the
+//   server every few seconds, and whenever the buyer comes back to the tab,
+//   whether the code works yet — once GitHub's webhook reports the
+//   sponsorship, or the owner presses Received; never on the buyer's word
+//   (D2 A), so there is no "I've paid" and nothing asks before closing.
 //
 // A buyer may pay in their bank's app and never come back to press "I've
 // paid" (owner decision D3 A, 2026-11-25): the panel says to press it before
@@ -33,7 +40,7 @@
 // sells nothing (no code secret, pack rooms off, or no answer) it says to come
 // back later. Until the server has answered, only the header shows.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   LANGUAGES,
@@ -52,14 +59,22 @@ import { readPackCode, rememberPackCode } from '../packCode';
 import { lastPaidDay } from '../packDay';
 import {
   SPONSORS_TIERS,
+  checkPayStatus,
   claimPayId,
   forgetPendingPayId,
+  forgetPendingSponsors,
   readPendingPayId,
+  readPendingSponsors,
   startPayment,
   type ClaimResult,
   type PayDoor,
   type PayIdTransfer,
+  type SponsorsCheckout,
 } from '../pay';
+
+/** How often the page asks whether a Sponsors code works yet, and for how long. */
+export const SPONSORS_POLL_MS = 5000;
+export const SPONSORS_POLL_FOR_MS = 15 * 60_000;
 
 interface Props {
   /** The pack the card or the link named. */
@@ -111,11 +126,21 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
   // A PayID code this phone was given and has not claimed: shown again, on
   // PayID, however the page was reopened.
   const [transfer, setTransfer] = useState<PayIdTransfer | null>(() => readPendingPayId(pack));
-  const [chosenRail, setChosenRail] = useState<PayRail | null>(() => (transfer ? 'payid' : null));
+  // A Sponsors code this phone waits on: its checkout shown again, likewise.
+  const [checkout, setCheckout] = useState<SponsorsCheckout | null>(() =>
+    readPendingSponsors(pack),
+  );
+  const [chosenRail, setChosenRail] = useState<PayRail | null>(() =>
+    transfer ? 'payid' : checkout ? 'sponsors' : null,
+  );
+  const [login, setLogin] = useState(() => checkout?.login ?? '');
+  const [loginInvalid, setLoginInvalid] = useState(false);
+  // A waiting Sponsors code the server refused: blocked, ended, or not known.
+  const [statusError, setStatusError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
-  const [paid, setPaid] = useState(false);
+  const [paid, setPaid] = useState<PayRail | null>(null);
   // Close or × pressed with a code not yet claimed (D3).
   const [leaving, setLeaving] = useState(false);
   const [copied, setCopied] = useState<CopyField | null>(null);
@@ -135,6 +160,51 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
   const price = PACKS[pack].prices[rail];
   const date = lastPaidDay(pack, i18n.language);
   const foreign = !(PACKS[pack].languages as readonly string[]).includes(i18n.language);
+  const onPaidRef = useRef(onPaid);
+  onPaidRef.current = onPaid;
+
+  // On Sponsors, with a code waiting: is it working yet?
+  const watching = rail === 'sponsors' && checkout !== null && !paid && !owned;
+  useEffect(() => {
+    if (!watching || !checkout) return;
+    let stopped = false;
+    let asking = false;
+    const until = Date.now() + SPONSORS_POLL_FOR_MS;
+    async function ask(): Promise<void> {
+      if (stopped || asking || !checkout) return;
+      asking = true;
+      const result = await checkPayStatus(checkout.code);
+      asking = false;
+      if (stopped) return;
+      if (result.ok) {
+        rememberPackCode(checkout.code);
+        forgetPendingSponsors();
+        setPaid('sponsors');
+        onPaidRef.current?.(checkout.code);
+      } else if (result.error.startsWith('CODE_') && result.error !== 'CODE_PENDING') {
+        forgetPendingSponsors();
+        setCheckout(null);
+        setStatusError(`errors.${result.error}`);
+      }
+    }
+    const timer = window.setInterval(() => {
+      if (Date.now() < until) void ask();
+      else window.clearInterval(timer);
+    }, SPONSORS_POLL_MS);
+    // Back from GitHub's tab: ask at once, also once the 15 minutes are over.
+    function onBack(): void {
+      if (document.visibilityState === 'visible') void ask();
+    }
+    document.addEventListener('visibilitychange', onBack);
+    window.addEventListener('focus', onBack);
+    void ask();
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onBack);
+      window.removeEventListener('focus', onBack);
+    };
+  }, [watching, checkout]);
 
   function switchRail(): void {
     setChosenRail(rail === 'payid' ? 'sponsors' : 'payid');
@@ -145,10 +215,25 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
     trackPayPress(rail);
     setBusy(true);
     setFailed(false);
-    const started = await startPayment({ pack, rail, policy: REFUND_POLICY_VERSION });
+    setLoginInvalid(false);
+    setStatusError(null);
+    const started = await startPayment({
+      pack,
+      rail,
+      policy: REFUND_POLICY_VERSION,
+      ...(rail === 'sponsors' ? { login } : {}),
+    });
     setBusy(false);
-    setFailed(!started.ok);
+    if (started.error === 'LOGIN_INVALID') setLoginInvalid(true);
+    else setFailed(!started.ok);
     if (started.transfer) setTransfer(started.transfer);
+    if (started.checkout) setCheckout(started.checkout);
+  }
+
+  /** Another GitHub name: the waiting code is let go, and the next press asks for one. */
+  function changeLogin(): void {
+    forgetPendingSponsors();
+    setCheckout(null);
   }
 
   async function claim(): Promise<void> {
@@ -169,7 +254,7 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
     rememberPackCode(transfer.code);
     forgetPendingPayId();
     setLeaving(false);
-    setPaid(true);
+    setPaid('payid');
     onPaid?.(transfer.code);
   }
 
@@ -235,7 +320,7 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
             <p className="text-gray-700">{t('home.packEnded')}</p>
           )}
         </div>
-        {paid && <p className="text-sm text-gray-600">{t('pay.paidCheck')}</p>}
+        {paid === 'payid' && <p className="text-sm text-gray-600">{t('pay.paidCheck')}</p>}
       </>
     );
   } else if (!selling) {
@@ -315,19 +400,90 @@ export default function PayScreen({ pack, pay, door, onClose, onPaid }: Props) {
               </p>
             )}
           </div>
+        ) : rail === 'sponsors' && checkout ? (
+          <div
+            className="flex flex-col gap-3 rounded border-2 border-pink-300 bg-white p-4"
+            data-checkout-panel={checkout.code}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="min-w-0 break-all font-semibold text-gray-800">
+                {t('pay.payingAs', { login: isolated(`@${checkout.login}`) })}
+              </p>
+              <button
+                type="button"
+                className="flex-shrink-0 text-sm text-gray-600 underline"
+                onClick={changeLogin}
+              >
+                {t('pay.changeLogin')}
+              </button>
+            </div>
+            <a
+              href={checkout.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded bg-pink-500 py-3 text-center font-display text-xl font-semibold text-white"
+              data-checkout-link
+            >
+              {t('pay.openGitHub')}
+            </a>
+            <p className="text-center text-gray-700" role="status" data-waiting-github>
+              ⏳ {t('pay.waitingGitHub')}
+            </p>
+            <p className="rounded bg-amber-50 p-3 text-sm text-gray-800" role="note">
+              {t('pay.slowGitHub')}
+            </p>
+          </div>
         ) : (
           <>
+            {rail === 'sponsors' && (
+              <div className="flex flex-col gap-1">
+                <label htmlFor="pay-github-login" className="font-semibold text-gray-800">
+                  {t('pay.loginLabel')}
+                </label>
+                <input
+                  id="pay-github-login"
+                  aria-describedby="pay-github-login-hint"
+                  className="rounded border border-amber-300 px-3 py-2 text-gray-900"
+                  dir="ltr"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="username"
+                  spellCheck={false}
+                  maxLength={60}
+                  value={login}
+                  aria-invalid={loginInvalid || undefined}
+                  onChange={(e) => {
+                    setLogin(e.target.value);
+                    setLoginInvalid(false);
+                  }}
+                  data-github-login
+                />
+                <p id="pay-github-login-hint" className="text-sm text-gray-600">
+                  {t('pay.loginHint')}
+                </p>
+              </div>
+            )}
             <button
               type="button"
               className="w-full rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:opacity-50"
-              disabled={busy}
+              disabled={busy || (rail === 'sponsors' && login.trim() === '')}
               onClick={() => void press()}
             >
               {t(rail === 'payid' ? 'pay.payPayId' : 'pay.paySponsors', { price })}
             </button>
+            {loginInvalid && (
+              <p className="text-center text-sm text-red-600" role="alert">
+                {t('pay.loginInvalid')}
+              </p>
+            )}
             {failed && (
               <p className="text-center text-sm text-red-600" role="alert">
                 {t('pay.failed')}
+              </p>
+            )}
+            {statusError && (
+              <p className="text-center text-sm text-red-600" role="alert">
+                {t(statusError)}
               </p>
             )}
           </>

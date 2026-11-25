@@ -144,6 +144,19 @@ describe('a PayID code (B-29 #5)', () => {
     expect(codes.receive(minted)).toBe(false);
   });
 
+  it('waits for GitHub as a Sponsors code: never claimed, switched on by its receipt (D2 A)', () => {
+    const first = setup();
+    const code = first.codes.issue({ ...PAYID, rail: 'sponsors', login: 'mona' });
+    expect(first.codes.claim(code)).toBe(false);
+    expect(first.codes.check(code)).toEqual({ ok: false, error: 'CODE_PENDING' });
+    // Not claimable after a restart either.
+    const again = createPackCodes({ secret: SECRET, log: first.receipts, now: () => START });
+    expect(again.claim(code)).toBe(false);
+    expect(again.receive(code)).toBe(true);
+    expect(again.check(code).ok).toBe(true);
+    expect(first.receipts.records().map((r) => r.type)).toEqual(['issue', 'received']);
+  });
+
   it('is blocked over its claim', () => {
     const { codes } = setup();
     const code = codes.issue(PAYID);

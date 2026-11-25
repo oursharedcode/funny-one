@@ -3,6 +3,7 @@
 // Step 123 (B-29): the pay page — what it shows while the pack is on sale, by
 // rail and by the reader's language, and what it shows instead. Step 124: the
 // PayID transfer, "I've paid", and the warning for a buyer who closes first (D3).
+// Step 125: Sponsors — the GitHub name, the checkout, and "Waiting for GitHub…".
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -14,7 +15,7 @@ import {
   readPackCode,
   rememberPackCode,
 } from '../packCode';
-import { __resetPayForTest, readPendingPayId, type PayDoor } from '../pay';
+import { __resetPayForTest, readPendingPayId, readPendingSponsors, type PayDoor } from '../pay';
 
 // The funnel itself is funnel.test.ts's; here, only what the page reports.
 const { trackPayPage, trackPayPress } = vi.hoisted(() => ({
@@ -62,6 +63,19 @@ function stubFetch(...answers: unknown[]): ReturnType<typeof vi.fn> {
   const fetch = vi.fn(async () => ({ json: async () => answers.shift() }));
   vi.stubGlobal('fetch', fetch);
   return fetch;
+}
+
+const CHECKOUT = {
+  code: CODE,
+  url: 'https://github.com/sponsors/example/sponsorships?tier_id=1&metadata_code=' + CODE,
+  amount: 'US$2',
+  login: 'mona-lisa',
+};
+
+/** Types a GitHub name and presses the Sponsors button. */
+function pressSponsors(login = 'mona-lisa'): void {
+  fireEvent.change(screen.getByLabelText('Your GitHub user name'), { target: { value: login } });
+  fireEvent.click(screen.getByRole('button', { name: 'Pay US$2 on GitHub' }));
 }
 
 /** Presses the PayID button and waits for the transfer to show. */
@@ -147,10 +161,10 @@ describe('on sale in Australia', () => {
 });
 
 describe('the pay button', () => {
-  it('counts the press by its rail and says the payment cannot be started yet', async () => {
+  it('counts the press by its rail and says when the payment cannot be started', async () => {
     renderPay({ pay: SPONSORS });
     expect(screen.queryByRole('alert')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Pay US$2 on GitHub' }));
+    pressSponsors();
     expect(trackPayPress).toHaveBeenCalledWith('sponsors');
     await waitFor(() =>
       expect(screen.getByRole('alert').textContent).toBe(
@@ -161,7 +175,7 @@ describe('the pay button', () => {
 
   it('counts the rail the visitor switched to, and drops the old failure with the switch', async () => {
     renderPay({ pay: SPONSORS });
-    fireEvent.click(screen.getByRole('button', { name: 'Pay US$2 on GitHub' }));
+    pressSponsors();
     await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy());
     fireEvent.click(screen.getByText('In Australia?'));
     expect(screen.queryByRole('alert')).toBeNull();
@@ -297,6 +311,121 @@ describe('paying by PayID', () => {
       expect(screen.getByRole('button', { name: 'Pay A$2.60 by PayID' })).toBeTruthy(),
     );
     expect(readPendingPayId('chr26')).toBeNull();
+  });
+});
+
+describe('paying through Sponsors', () => {
+  it('asks for the GitHub name first, and cannot be pressed without one', () => {
+    renderPay({ pay: SPONSORS });
+    const input = screen.getByLabelText('Your GitHub user name') as HTMLInputElement;
+    expect(input.dir).toBe('ltr');
+    expect(screen.getByText(i18n.t('pay.loginHint'))).toBeTruthy();
+    const button = screen.getByRole('button', { name: 'Pay US$2 on GitHub' }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    fireEvent.change(input, { target: { value: '  ' } });
+    expect(button.disabled).toBe(true);
+    fireEvent.change(input, { target: { value: 'mona' } });
+    expect(button.disabled).toBe(false);
+  });
+
+  it('says a name GitHub could not have is wrong, without asking the server', async () => {
+    const fetch = stubFetch();
+    renderPay({ pay: SPONSORS });
+    pressSponsors('mona_lisa');
+    await waitFor(() =>
+      expect(screen.getByRole('alert').textContent).toBe(i18n.t('pay.loginInvalid')),
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText('Your GitHub user name'), {
+      target: { value: 'mona-lisa' },
+    });
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it("turns the button into GitHub's checkout, and waits for GitHub with no leave question", async () => {
+    stubFetch({ ok: true, ...CHECKOUT }, { ok: false, error: 'CODE_PENDING' });
+    const onClose = vi.fn();
+    renderPay({ pay: SPONSORS, onClose });
+    pressSponsors('@Mona-Lisa');
+    await waitFor(() => expect(document.querySelector('[data-checkout-panel]')).toBeTruthy());
+    const panel = document.querySelector('[data-checkout-panel]')!;
+    expect(panel.getAttribute('data-checkout-panel')).toBe(CODE);
+    expect(panel.textContent).toContain('Paying as ⁨@mona-lisa⁩');
+    const link = screen.getByRole('link', { name: 'Open GitHub to pay' });
+    expect(link.getAttribute('href')).toBe(CHECKOUT.url);
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(screen.getByRole('status').textContent).toContain(i18n.t('pay.waitingGitHub'));
+    expect(screen.queryByRole('button', { name: PAID })).toBeNull();
+    expect(screen.queryByText(i18n.t('pay.paidWarning'))).toBeNull();
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(readPendingSponsors('chr26')?.code).toBe(CODE);
+  });
+
+  it('shows the code as soon as GitHub has reported the payment', async () => {
+    const fetch = stubFetch(
+      { ok: true, ...CHECKOUT },
+      { ok: false, error: 'CODE_PENDING' },
+      { ok: true },
+    );
+    const onPaid = vi.fn();
+    renderPay({ pay: SPONSORS, onPaid });
+    pressSponsors();
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(onPaid).not.toHaveBeenCalled();
+    // Back from GitHub's tab.
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    await waitFor(() => expect(onPaid).toHaveBeenCalledWith(CODE));
+    expect(fetch).toHaveBeenLastCalledWith(
+      'http://localhost:3000/pay/status',
+      expect.objectContaining({ body: JSON.stringify({ code: CODE }) }),
+    );
+    expect(screen.getByRole('status').textContent).toBe('Thank you! Your code works now.');
+    expect(screen.getByText(CODE)).toBeTruthy();
+    expect(screen.queryByText(i18n.t('pay.paidCheck'))).toBeNull();
+    expect(readPackCode()?.code).toBe(CODE);
+    expect(readPendingSponsors('chr26')).toBeNull();
+  });
+
+  it('shows the same checkout when reopened, whatever rail the server chose', async () => {
+    const fetch = stubFetch({ ok: true, ...CHECKOUT }, { ok: false, error: 'CODE_PENDING' });
+    const { unmount } = renderPay({ pay: SPONSORS });
+    pressSponsors();
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    unmount();
+    stubFetch({ ok: false, error: 'CODE_PENDING' });
+    renderPay({ pay: PAYID });
+    expect(
+      document.querySelector('[data-checkout-panel]')?.getAttribute('data-checkout-panel'),
+    ).toBe(CODE);
+  });
+
+  it('lets the buyer change the name, which lets the waiting code go', async () => {
+    stubFetch({ ok: true, ...CHECKOUT }, { ok: false, error: 'CODE_PENDING' });
+    renderPay({ pay: SPONSORS });
+    pressSponsors();
+    await waitFor(() => expect(document.querySelector('[data-checkout-panel]')).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: 'Change' }));
+    expect(document.querySelector('[data-checkout-panel]')).toBeNull();
+    expect((screen.getByLabelText('Your GitHub user name') as HTMLInputElement).value).toBe(
+      'mona-lisa',
+    );
+    expect(readPendingSponsors('chr26')).toBeNull();
+  });
+
+  it('says why a waiting code the server refused will not work, and drops it', async () => {
+    stubFetch({ ok: true, ...CHECKOUT }, { ok: false, error: 'CODE_BLOCKED' });
+    renderPay({ pay: SPONSORS });
+    pressSponsors();
+    await waitFor(() =>
+      expect(screen.getByRole('alert').textContent).toBe(i18n.t('errors.CODE_BLOCKED')),
+    );
+    expect(document.querySelector('[data-checkout-panel]')).toBeNull();
+    expect(readPendingSponsors('chr26')).toBeNull();
   });
 });
 

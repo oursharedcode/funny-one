@@ -330,12 +330,19 @@ export interface ClientConfig {
 }
 
 /**
- * Why a PayID request or claim was refused (Step 124): nothing on sale by
- * PayID right now (no secret, the packs off, the free part over, no PayID
- * configured), too many codes from one address, or the code's own verdict.
+ * Why a pay request or claim was refused (Steps 124 and 125): nothing on sale
+ * by that rail right now (no secret, the packs off, the free part over, the
+ * rail not configured), too many codes from one address, a GitHub user name
+ * that cannot be one (Sponsors), or the code's own verdict.
  */
 export type PayError =
-  'NOT_ON_SALE' | 'RATE_LIMITED' | 'CODE_INVALID' | 'CODE_BLOCKED' | 'CODE_ENDED' | 'CODE_PENDING';
+  | 'NOT_ON_SALE'
+  | 'RATE_LIMITED'
+  | 'LOGIN_INVALID'
+  | 'CODE_INVALID'
+  | 'CODE_BLOCKED'
+  | 'CODE_ENDED'
+  | 'CODE_PENDING';
 
 /** POST /pay/payid (Step 124): the buyer pressed "Pay by PayID". */
 export interface PayIdRequest {
@@ -360,6 +367,35 @@ export interface PayClaimRequest {
 
 /** Its answer: ok when the code works now, by this claim or by the owner's match. */
 export type PayClaimAnswer = { ok: true } | { ok: false; error: PayError };
+
+/**
+ * POST /pay/sponsors (Step 125): the buyer pressed "Pay on GitHub", having
+ * typed the GitHub user name they will pay with (owner decision D1 A,
+ * 2026-11-25) — how GitHub's webhook finds the code.
+ */
+export interface PaySponsorsRequest {
+  pack: PackId;
+  /** The refund policy the buyer read: REFUND_POLICY_VERSION. */
+  policy: string;
+  login: string;
+}
+
+/**
+ * Its answer: the code, issued pending, and the checkout to open — the pack's
+ * one-time tier, with the code in the link's metadata. The code works once
+ * GitHub reports the sponsorship paid (D2 A), or the owner presses Received.
+ */
+export type PaySponsorsAnswer =
+  | { ok: true; code: string; url: string; amount: string; login: string }
+  | { ok: false; error: PayError };
+
+/** POST /pay/status (Step 125): does a waiting code work yet? Changes nothing. */
+export interface PayStatusRequest {
+  code: string;
+}
+
+/** Its answer: ok once the code works; CODE_PENDING while it waits. */
+export type PayStatusAnswer = PayClaimAnswer;
 
 export interface RoundStartPayload {
   roundNumber: number;

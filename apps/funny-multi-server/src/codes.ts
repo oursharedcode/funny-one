@@ -13,14 +13,17 @@
 // will sell, and every new one is checked against the ids the log holds.
 //
 // The log adds what the secret cannot know: a code the owner has blocked,
-// and a PayID code still waiting for its payment. A code the log has never
+// and a PayID or Sponsors code still waiting for its payment. A code the log has never
 // seen is good — a code is issued by the server, which logs it (Steps 124 and
 // 125), or minted by hand for a test (scripts/mintCode.mjs), which does not.
 //
 // The verdict, in this order: not a code, or a tag that does not match —
 // CODE_INVALID; past its pack's paid part (FM-PACK-6) — CODE_ENDED; blocked —
 // CODE_BLOCKED; a PayID code not yet received, never claimed or claimed more
-// than 48 hours ago (B-29 #5) — CODE_PENDING; otherwise good.
+// than 48 hours ago (B-29 #5), or a Sponsors code GitHub has not yet reported
+// paid — CODE_PENDING; otherwise good. A Sponsors code cannot be claimed
+// (owner decision D2 A, 2026-11-25): it works when GitHub's webhook arrives,
+// or when the owner presses Received.
 //
 // A PACK_CODE_SECRET of fewer than 16 characters is no secret at all: every
 // code is then CODE_INVALID, nothing can be minted, and the boot log says so.
@@ -59,7 +62,7 @@ export type CodeVerdict =
 
 /** What an issue records beside the code itself (receipts.ts). */
 export type IssueDetails = Omit<IssueRecord, 'type' | 'at' | 'code' | 'state'> & {
-  /** A PayID code: it waits for its payment, or for a claim, to work. */
+  /** A PayID or Sponsors code: it waits for its payment (or a PayID claim) to work. */
   pending: boolean;
 };
 
@@ -72,9 +75,9 @@ export interface PackCodes {
   mint(pack: PackId): string;
   /** Mints a code and logs its issue; returns the code. */
   issue(details: IssueDetails): string;
-  /** The buyer's "I've paid" on a pending code. False for any other code, or a second claim. */
+  /** The buyer's "I've paid" on a pending PayID code. False for any other code, or a second claim. */
   claim(raw: unknown): boolean;
-  /** The owner's match of a pending code's payment. False for any other code. */
+  /** The payment of a pending code matched — by the owner, or GitHub's webhook. False for any other code. */
   receive(raw: unknown): boolean;
   /** The owner's block. False for what is not a good code, or one already blocked. */
   block(raw: unknown, reason: BlockReason): boolean;
@@ -89,8 +92,10 @@ export interface PackCodesOptions {
 }
 
 interface Standing {
-  /** Issued as a PayID code and not yet received. */
+  /** Issued as a PayID or Sponsors code and not yet received. */
   pending: boolean;
+  /** Only a PayID code can be claimed. */
+  claimable: boolean;
   /** The first claim's time; a later claim does not extend the 48 hours. */
   claimedAt: number | null;
   blocked: boolean;
@@ -146,7 +151,7 @@ export function createPackCodes(options: PackCodesOptions): PackCodes {
   function standingOf(code: string): Standing {
     let standing = standings.get(code);
     if (!standing) {
-      standing = { pending: false, claimedAt: null, blocked: false };
+      standing = { pending: false, claimable: false, claimedAt: null, blocked: false };
       standings.set(code, standing);
     }
     return standing;
@@ -159,9 +164,12 @@ export function createPackCodes(options: PackCodesOptions): PackCodes {
   for (const record of log.records()) {
     note(record.code);
     switch (record.type) {
-      case 'issue':
-        standingOf(record.code).pending = record.state === 'pending';
+      case 'issue': {
+        const standing = standingOf(record.code);
+        standing.pending = record.state === 'pending';
+        standing.claimable = record.rail === 'payid';
         break;
+      }
       case 'claim': {
         const standing = standings.get(record.code);
         if (standing && standing.claimedAt === null) standing.claimedAt = Date.parse(record.at);
@@ -208,14 +216,18 @@ export function createPackCodes(options: PackCodesOptions): PackCodes {
     const code = mint(details.pack);
     log.append({ type: 'issue', code, ...rest, state: pending ? 'pending' : 'received' });
     note(code);
-    standingOf(code).pending = pending;
+    const standing = standingOf(code);
+    standing.pending = pending;
+    standing.claimable = details.rail === 'payid';
     return code;
   }
 
   function claim(raw: unknown): boolean {
     const code = verify(raw)?.code;
     const standing = code ? standings.get(code) : undefined;
-    if (!code || !standing?.pending || standing.claimedAt !== null) return false;
+    if (!code || !standing?.pending || !standing.claimable || standing.claimedAt !== null) {
+      return false;
+    }
     standing.claimedAt = Date.parse(log.append({ type: 'claim', code }).at);
     return true;
   }

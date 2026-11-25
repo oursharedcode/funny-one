@@ -44,12 +44,20 @@ describe('the receipt log', () => {
     const written = log.append(ROOM);
     expect(written).toEqual({ ...ROOM, at: NOW.toISOString() });
     log.append({ type: 'block', code: ROOM.code, reason: 'leaked' });
-    expect(lines()).toHaveLength(3);
+    log.append({
+      type: 'sponsorship',
+      code: '',
+      ref: 'S_kwDO1',
+      login: 'mona',
+      amount: 'US$2',
+      outcome: 'no code',
+    });
+    expect(lines()).toHaveLength(4);
     expect(lines().at(-1)).toBe('');
 
     const again = openReceiptLog({ file, now: () => NOW });
     expect(again.records()).toEqual(log.records());
-    expect(again.records().map((r) => r.type)).toEqual(['room', 'block']);
+    expect(again.records().map((r) => r.type)).toEqual(['room', 'block', 'sponsorship']);
   });
 
   it('keeps its records in memory without a file', () => {

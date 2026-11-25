@@ -17,18 +17,27 @@
 // and the code as the reference. The phone keeps that one waiting code until
 // "I've paid" (POST /pay/claim, `claimPayId`) makes it work, so a reload, a
 // closed tab or a second press shows the same code again and never asks the
-// server for another (owner decision D4 A: three per address per hour). Step
-// 125 adds the Sponsors checkout; until then that rail answers "could not
-// start" — which the page says in words that stay true afterwards.
+// server for another (owner decision D4 A: three per address per hour).
+//
+// Step 125 gives it Sponsors (owner decisions 2026-11-25): the buyer types the
+// GitHub name they will pay with (D1 A), the server issues a code that waits
+// for that name's sponsorship (POST /pay/sponsors) and answers with GitHub's
+// checkout link for the pack's tier. The phone keeps that waiting code too, and
+// asks the server whether it works yet (POST /pay/status, `checkPayStatus`):
+// it works once GitHub's webhook reports the sponsorship, or once the owner
+// presses Received — never on the buyer's word alone (D2 A).
 
 import {
   isPackPaid,
   parseCode,
+  parseGitHubLogin,
   type PackId,
   type PayClaimAnswer,
   type PayError,
   type PayIdAnswer,
   type PayRail,
+  type PaySponsorsAnswer,
+  type PayStatusAnswer,
 } from '@funny/shared';
 import { serverOrigin, withBase } from './basePath';
 import { isStoreShell } from './storeShell';
@@ -70,6 +79,8 @@ export interface PaymentRequest {
   rail: PayRail;
   /** The refund policy the buyer read: REFUND_POLICY_VERSION, for the receipt log. */
   policy: string;
+  /** On Sponsors: the GitHub name the buyer will pay with, as typed. */
+  login?: string;
 }
 
 /** A PayID transfer to make: the server's answer, kept on the phone until claimed. */
@@ -82,10 +93,26 @@ export interface PayIdTransfer {
   amount: string;
 }
 
+/** A Sponsors checkout: the server's answer, kept on the phone until its code works. */
+export interface SponsorsCheckout {
+  pack: PackId;
+  /** The code, waiting for the sponsorship of `login`. */
+  code: string;
+  /** GitHub's checkout of the pack's tier. */
+  url: string;
+  amount: string;
+  /** The GitHub name, as the server read it: lower case. */
+  login: string;
+}
+
 export interface PaymentStart {
   ok: boolean;
   /** On PayID: the transfer the page shows. */
   transfer?: PayIdTransfer;
+  /** On Sponsors: the checkout to open, and the code that waits for it. */
+  checkout?: SponsorsCheckout;
+  /** Why it was not started, when the server said: LOGIN_INVALID is the buyer's to fix. */
+  error?: PayError;
 }
 
 type Starter = (request: PaymentRequest) => Promise<PaymentStart>;
@@ -141,6 +168,50 @@ export function forgetPendingPayId(): void {
   }
 }
 
+const SPONSORS_KEY = 'funny37.pendingSponsors';
+let sponsorsMemory: SponsorsCheckout | null = null;
+
+function readCheckout(raw: unknown): SponsorsCheckout | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const r = raw as Record<string, unknown>;
+  const code = parseCode(r.code);
+  if (!code || r.pack !== code.pack) return null;
+  if (typeof r.url !== 'string' || !r.url.startsWith('https://github.com/sponsors/')) return null;
+  if (typeof r.amount !== 'string' || typeof r.login !== 'string' || r.login === '') return null;
+  return { pack: code.pack, code: code.code, url: r.url, amount: r.amount, login: r.login };
+}
+
+/** The Sponsors code this phone is waiting on for `pack`, or null; always null in the Android app. */
+export function readPendingSponsors(pack: PackId, now = Date.now()): SponsorsCheckout | null {
+  if (isStoreShell() || !isPackPaid(pack, now)) return null;
+  let kept: SponsorsCheckout | null = sponsorsMemory;
+  try {
+    const stored = localStorage.getItem(SPONSORS_KEY);
+    if (stored !== null) kept = readCheckout(JSON.parse(stored));
+  } catch {
+    // Storage blocked, or what it holds does not read: this page load's, if any.
+  }
+  return kept?.pack === pack ? kept : null;
+}
+
+function keepPendingSponsors(checkout: SponsorsCheckout): void {
+  sponsorsMemory = checkout;
+  try {
+    localStorage.setItem(SPONSORS_KEY, JSON.stringify(checkout));
+  } catch {
+    // Storage blocked — kept for this page load.
+  }
+}
+
+export function forgetPendingSponsors(): void {
+  sponsorsMemory = null;
+  try {
+    localStorage.removeItem(SPONSORS_KEY);
+  } catch {
+    // Storage blocked — nothing was kept there.
+  }
+}
+
 async function postJson<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(serverOrigin() + withBase(path), {
     method: 'POST',
@@ -165,8 +236,28 @@ async function startPayId(request: PaymentRequest): Promise<PaymentStart> {
   return { ok: true, transfer };
 }
 
-// The rails wired so far. Step 125 adds `sponsors`.
-const STARTERS: Partial<Record<PayRail, Starter>> = { payid: startPayId };
+async function startSponsors(request: PaymentRequest): Promise<PaymentStart> {
+  const login = parseGitHubLogin(request.login);
+  if (!login) return { ok: false, error: 'LOGIN_INVALID' };
+  // The same name again: the same waiting code (three per address per hour).
+  const kept = readPendingSponsors(request.pack);
+  if (kept?.login === login) return { ok: true, checkout: kept };
+  const answer = await postJson<PaySponsorsAnswer>('pay/sponsors', {
+    pack: request.pack,
+    policy: request.policy,
+    login,
+  });
+  if (!answer.ok) return { ok: false, error: answer.error };
+  const checkout = readCheckout({ ...answer, pack: request.pack });
+  if (!checkout) return { ok: false };
+  keepPendingSponsors(checkout);
+  return { ok: true, checkout };
+}
+
+const STARTERS: Readonly<Record<PayRail, Starter>> = {
+  payid: startPayId,
+  sponsors: startSponsors,
+};
 
 /** Starts a payment on a rail; not ok when it could not be started. Never throws. */
 export async function startPayment(request: PaymentRequest): Promise<PaymentStart> {
@@ -195,6 +286,21 @@ export async function claimPayId(code: string): Promise<ClaimResult> {
   }
 }
 
+/**
+ * Does a waiting Sponsors code work yet? ok once GitHub's webhook has reported
+ * its sponsorship, or the owner has pressed Received; CODE_PENDING until then.
+ * Asks and changes nothing. Never throws: a lost connection is NETWORK.
+ */
+export async function checkPayStatus(code: string): Promise<ClaimResult> {
+  try {
+    const answer = await postJson<PayStatusAnswer>('pay/status', { code });
+    return answer.ok ? { ok: true } : { ok: false, error: answer.error };
+  } catch {
+    return { ok: false, error: 'NETWORK' };
+  }
+}
+
 export function __resetPayForTest(): void {
   pendingMemory = null;
+  sponsorsMemory = null;
 }

@@ -1198,7 +1198,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       handbell hanging from each hoof; the bells rock gently, and a tap swings them as the
       bells ring and the reindeer shakes. Still under reduced motion. The video's reindeer is
       unchanged. Seen in Chromium: phone en 360, ru, ta and de 320, desktop 1280 — clear of the
-      bubble and the line. Committed as Step 129; the deploy when the owner says.
+      bubble and the line. Committed as Step 129, pushed (CI run 45760488756 green) and deployed the same day
+      (image `funny-multi:01cd07a`); the owner's look on the phone is owed.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

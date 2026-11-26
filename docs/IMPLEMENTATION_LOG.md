@@ -8576,11 +8576,21 @@ sideways scroll.
 
 **Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
 (552 + 659 + 486 + 178 + 453 + 88 across 6 workspaces), `npm audit` exactly the three accepted
-ids (glob 1244013, minimatch 1244623, i18next 1250194); CI pending the push.
+ids (glob 1244013, minimatch 1244623, i18next 1250194); CI green (run 45760488756, `01cd07a`).
 
-**Owed:** the deploy of Step 129 (client), when the owner says.
+**Deployed the same day** (owner: "deploy"): the first check found one visitor still connected
+(a socket open 17 minutes), so the deploy waited for it to leave (polled every 2 minutes; gone at
+05:19Z), then `ship.sh` ran at 05:21Z — image `funny-multi:01cd07a`, `/health` ok, assetlinks,
+privacy and the old path's 301 as expected; the live bundle carries `xmas-bell` and
+`/reindeer/arm.png` answers 200. The landing site was not touched by this step, so
+`ship-funny-family.sh` was not run.
 
-**RESUME HERE (2026-11-26, after Step 129; not yet pushed).** Steps 122–128 are live; Step 129
+**Owed:** the owner's look at the bells on the phone.
+
+~~RESUME HERE (2026-11-26, after Step 129; not yet pushed)~~ — pushed as `01cd07a`, CI green,
+deployed; carried into the note below. Its text, kept for the record:
+
+Steps 122–128 are live; Step 129
 (the reindeer's two bells) is committed, not pushed or deployed. **Next, Step 130 — #1 play
 alone with two bots** (it changes the 3-player rule), in the second deploy by 23 December with
 #10 gift a pack, #9 the festive room look (the home screen has its snow since Step 128) and #7
@@ -8590,3 +8600,15 @@ owner decisions D1–D4 (from the Step 128 plan) are still open. No deploys 24�
 **Owed, the owner's:** the push and deploy of Step 129; the real US$2 sponsorship (D4 of
 Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027.
+
+**RESUME HERE (2026-11-26, after Step 129; pushed and deployed).** Steps 122–129 are live (the
+game at image `funny-multi:01cd07a`). **Next, Step 130 — #1 play alone with two bots** (it
+changes the 3-player rule), in the second deploy by 23 December with #10 gift a pack, #9 the
+festive room look (the home screen has its snow and bells since Steps 128–129) and #7 the
+whole-game video; the owner may add the lone host's grace (B-29's finding of Step 127). Its owner
+decisions D1–D4 (from the Step 128 plan; recommended A, A, A, B) are still open. A deploy waits
+until no visitor is connected (check the server log first). No deploys 24–26 December,
+31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the look at the reindeer's bells on the phone; the real US$2 sponsorship
+(D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader
+confirmation before 1 Feb 2027.

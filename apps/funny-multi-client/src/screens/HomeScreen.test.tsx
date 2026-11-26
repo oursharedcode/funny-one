@@ -729,6 +729,8 @@ describe('the Christmas dressing (B-29, 2026-11-26)', () => {
     renderHome();
     expect(screen.getByText(LINE)).toBeTruthy();
     expect(screen.getByRole('button', { name: PEEK })).toBeTruthy();
+    // The reindeer holds up a bell in each hoof.
+    expect(screen.getAllByTestId('peek-bell')).toHaveLength(2);
     expect(screen.getByTestId('christmas-lights')).toBeTruthy();
     expect(screen.getByTestId('snowfall')).toBeTruthy();
   });

@@ -334,9 +334,9 @@ body {
 }
 
 /* ── Home's Christmas dressing (B-29, ChristmasDressing.tsx) ─────────────
-   The bulbs glow and dim one colour after another; the reindeer bobs; the
-   snow crystals fall slowly, swaying and turning. Each flake's fall, sway
-   and spin times are set inline. */
+   The bulbs glow and dim one colour after another; the reindeer bobs and
+   rocks its bells; the snow crystals fall slowly, swaying and turning. Each
+   flake's fall, sway and spin times are set inline. */
 
 @keyframes xmas-twinkle {
   0%,
@@ -356,6 +356,14 @@ body {
   }
   50% {
     transform: translateY(-4px) rotate(-3deg);
+  }
+}
+@keyframes xmas-bell {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(9deg);
   }
 }
 @keyframes snow-fall {
@@ -385,6 +393,10 @@ body {
 .xmas-peek {
   animation: xmas-peek 2.6s ease-in-out infinite;
   transform-origin: bottom center;
+}
+.xmas-bell {
+  animation: xmas-bell 0.9s ease-in-out infinite alternate;
+  transform-origin: top center;
 }
 .snow-flake {
   position: absolute;
@@ -418,6 +430,7 @@ body {
   .gift-sheen::after,
   .xmas-bulb,
   .xmas-peek,
+  .xmas-bell,
   .snow-flake,
   .snow-sway,
   .snow-spin {

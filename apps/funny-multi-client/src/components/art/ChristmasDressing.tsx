@@ -9,9 +9,10 @@
 // - `ChristmasLights`: a string of red, green and gold bulbs along the top
 //   edge, twinkling one colour after another.
 // - `ChristmasPeek`: the gold-on-green line saying so, with the video's
-//   reindeer (public/reindeer/, videoCharacter.ts) peeking up from behind it
-//   and a speech bubble; a tap on either rings the clips' sleigh bells and
-//   shakes the reindeer.
+//   reindeer (public/reindeer/, videoCharacter.ts) peeking up from behind it,
+//   both hooves raised with a gold handbell in each (owner, 2026-11-26), and
+//   a speech bubble; a tap on either rings the clips' sleigh bells, shakes the
+//   reindeer and swings the bells.
 // - `Snowfall`: big six-armed snow crystals falling slowly behind the page.
 //
 // All three are pictures: the lights and the snow are aria-hidden, and the
@@ -93,10 +94,10 @@ export function ChristmasPeek() {
             className="absolute -right-[7px] top-3 h-3 w-3 rotate-45 border-r-2 border-t-2 border-red-500 bg-white"
           />
         </span>
-        <span aria-hidden="true" className="xmas-peek relative block h-24 w-[68px] flex-shrink-0">
+        <span aria-hidden="true" className="xmas-peek relative block h-24 w-[120px] flex-shrink-0">
           <motion.span
             key={taps}
-            className="absolute inset-0 block"
+            className="absolute inset-y-0 left-[26px] block w-[68px]"
             style={{ originY: 1 }}
             initial={false}
             animate={taps > 0 ? { rotate: [0, -14, 12, -8, 4, 0] } : { rotate: 0 }}
@@ -108,6 +109,8 @@ export function ChristmasPeek() {
               draggable={false}
               className="absolute left-[9px] top-[48px] w-[50px]"
             />
+            <BellArm side="left" rung={taps > 0} />
+            <BellArm side="right" rung={taps > 0} />
             <img
               src={withBase('reindeer/head.png')}
               alt=""
@@ -121,6 +124,101 @@ export function ChristmasPeek() {
         {t('home.christmasLine')}
       </p>
     </div>
+  );
+}
+
+// The raised arms, in the 68 px reindeer's own frame: each sleeve starts at
+// the sweater's shoulder and turns up and out past the ears.
+const ARM_W = 13;
+const ARM_H = 43;
+const ARM_TURN = 135;
+const SHOULDER_X = { left: 19, right: 49 } as const;
+const SHOULDER_Y = 56;
+
+function BellArm({ side, rung }: { side: 'left' | 'right'; rung: boolean }) {
+  const turn = side === 'left' ? ARM_TURN : -ARM_TURN;
+  return (
+    <span
+      className="absolute block"
+      style={{
+        left: SHOULDER_X[side] - ARM_W / 2,
+        top: SHOULDER_Y,
+        width: ARM_W,
+        height: ARM_H,
+        transformOrigin: '50% 0',
+        transform: `rotate(${turn}deg)`,
+      }}
+    >
+      <img
+        src={withBase('reindeer/arm.png')}
+        alt=""
+        draggable={false}
+        className="absolute inset-0 h-full w-full"
+      />
+      {/* The bell hangs from the hoof, upright whatever the arm's turn. */}
+      <span
+        data-testid="peek-bell"
+        className="absolute block"
+        style={{
+          left: ARM_W / 2 - 11,
+          top: ARM_H - 4,
+          width: 22,
+          height: 26,
+          transformOrigin: '50% 0',
+          transform: `rotate(${-turn}deg)`,
+        }}
+      >
+        <span
+          className="xmas-bell absolute inset-0 block"
+          style={{ animationDelay: side === 'left' ? '0s' : '-0.45s' }}
+        >
+          <motion.span
+            className="absolute inset-0 block"
+            style={{ originY: 0 }}
+            initial={false}
+            animate={
+              rung
+                ? { rotate: side === 'left' ? [0, 34, -28, 20, -10, 0] : [0, -34, 28, -20, 10, 0] }
+                : { rotate: 0 }
+            }
+            transition={{ duration: 0.9 }}
+          >
+            <HandBell />
+          </motion.span>
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function HandBell() {
+  return (
+    <svg className="block" width="22" height="26" viewBox="0 0 24 28" fill="none">
+      <rect
+        x="9.5"
+        y="0.8"
+        width="5"
+        height="7"
+        rx="2"
+        fill="#dc2626"
+        stroke="#2b1d14"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M12 6.5 C6.5 6.5 5.5 12 5.5 17 L3 21.5 H21 L18.5 17 C18.5 12 17.5 6.5 12 6.5 Z"
+        fill="#f59e0b"
+        stroke="#2b1d14"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.5 11 C8.2 13 8 15 8 17"
+        stroke="#fde68a"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="24" r="2.6" fill="#b45309" stroke="#2b1d14" strokeWidth="1.4" />
+    </svg>
   );
 }
 

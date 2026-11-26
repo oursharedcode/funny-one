@@ -8535,7 +8535,11 @@ ids (glob 1244013, minimatch 1244623, i18next 1250194); CI pending the push.
 **Owed:** the deploy of Step 128 (client and landing site), when the owner says; B-3's native
 reviewers keep the new texts in 18 and 21 languages.
 
-**RESUME HERE (2026-11-26, after Step 128; not yet pushed).** Steps 122–127 are live; Step 128
+~~RESUME HERE (2026-11-26, after Step 128; not yet pushed)~~ — pushed as `772446e`, CI green
+(run 45758195541), deployed the same day; carried into Step 129's note. Its text, kept for the
+record:
+
+Steps 122–127 are live; Step 128
 (the video's reindeer and Santa, the landing bells, the home's Christmas dressing) is committed,
 not pushed or deployed. **Next, Step 129 — #1 play alone with two bots** (it changes the
 3-player rule), in the second deploy by 23 December with #10 gift a pack, #9 the festive room
@@ -8545,3 +8549,44 @@ January or 6–7 January (#16).
 **Owed, the owner's:** the push of Step 128; the real US$2 sponsorship (D4 of Step 125); the
 admin link on the phone; the live-badge look; Funny Multi's trader confirmation before 1 Feb
 2027.
+
+## Step 129 (task B-29) — the reindeer holds two bells (2026-11-26)
+
+**Step 128 went live the same day:** pushed as `772446e`, CI green (run 45758195541); deployed
+with no game running (every socket of the last 6 hours had disconnected) — `ship.sh` (image
+`funny-multi:772446e`, `/health` ok, assetlinks, privacy and the old path's 301 as expected) and
+`ship-funny-family.sh` (every check as expected). The bells, both voices, the reindeer and Santa
+sprites and the landing tooltip are served from the live addresses; the client bundle carries
+the dressing.
+
+Owner request, 2026-11-26: "make the reindeer with two pows, holding a bell in each of two
+pows". #1 (play alone with two bots) moves to Step 130.
+
+**Shipped:** `components/art/ChristmasDressing.tsx` — the create screen's peeking reindeer raises
+both arms (`BellArm`: the video's `reindeer/arm.png` sleeve, 13 × 43, turned 135° up and out
+from the sweater's shoulders past the ears), a gold handbell (`HandBell`, an SVG, 22 × 26)
+hanging upright from each hoof. The bells rock gently (`.xmas-bell`, index.css; off under
+reduced motion); a tap swings them, mirror-wise, as the sleigh bells ring and the reindeer
+shakes. The box is 120 px wide instead of 68. The video's reindeer is unchanged.
+`HomeScreen.test.tsx` checks the two bells.
+
+**Seen:** the home check (`.screens/xmas-home-check.mjs`, 42 checks) — desktop 1280, phone en 360
+and ru, ta, de 320, before and after a tap: the bells clear of the bubble and the line, no
+sideways scroll.
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 659 + 486 + 178 + 453 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob 1244013, minimatch 1244623, i18next 1250194); CI pending the push.
+
+**Owed:** the deploy of Step 129 (client), when the owner says.
+
+**RESUME HERE (2026-11-26, after Step 129; not yet pushed).** Steps 122–128 are live; Step 129
+(the reindeer's two bells) is committed, not pushed or deployed. **Next, Step 130 — #1 play
+alone with two bots** (it changes the 3-player rule), in the second deploy by 23 December with
+#10 gift a pack, #9 the festive room look (the home screen has its snow since Step 128) and #7
+the whole-game video; the owner may add the lone host's grace (B-29's finding of Step 127). Its
+owner decisions D1–D4 (from the Step 128 plan) are still open. No deploys 24–26 December,
+31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the push and deploy of Step 129; the real US$2 sponsorship (D4 of
+Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027.

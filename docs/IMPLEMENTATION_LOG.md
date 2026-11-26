@@ -8601,7 +8601,10 @@ owner decisions D1–D4 (from the Step 128 plan) are still open. No deploys 24�
 Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027.
 
-**RESUME HERE (2026-11-26, after Step 129; pushed and deployed).** Steps 122–129 are live (the
+~~RESUME HERE (2026-11-26, after Step 129; pushed and deployed)~~ — carried into Step 130's
+note. Its text, kept for the record:
+
+Steps 122–129 are live (the
 game at image `funny-multi:01cd07a`). **Next, Step 130 — #1 play alone with two bots** (it
 changes the 3-player rule), in the second deploy by 23 December with #10 gift a pack, #9 the
 festive room look (the home screen has its snow and bells since Steps 128–129) and #7 the
@@ -8612,3 +8615,79 @@ until no visitor is connected (check the server log first). No deploys 24–26 D
 **Owed, the owner's:** the look at the reindeer's bells on the phone; the real US$2 sponsorship
 (D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader
 confirmation before 1 Feb 2027.
+
+## Step 130 (task B-29) — play alone with bots (2026-11-26)
+
+Owner decisions 2026-11-26 ("A, A, A, B — go ahead"): **D1 A** — any room with fewer than 3
+humans is filled to 3 seats with bots, Christmas or not; **D2 A** — the bots are "Bot 1" and
+"Bot 2", translated; **D3 A** — #1 deploys on its own after this step; **D4 B** — the lone
+host's grace (Step 127's finding) is its own step right after.
+
+**Shipped:**
+- `packages/shared/src/seatBots.ts` (new, with its test) — the seat count (3), the bots a room
+  of N humans needs, and the `bot:<n>` ids. `GalleryEntry` gains `seat?` (events.ts).
+- Server `game.ts` — `fillEmptySeats(room)` at `game:start` and `game:restart`: bots `bot:1`,
+  `bot:2` (nicknames "Bot n") take the empty seats, and a `lobby:update` goes out before round
+  0. They answer as the room's bots always have and get pictures; a bot's gallery entry carries
+  its `seat`. `prepareRestart` no longer asks for 3 humans: a restart refills the bots. The
+  only human leaving deletes the room (a room of bots alone is never kept). The golden story
+  and the pay card are unchanged. `index.ts` — Start and Restart accept 1–7 humans.
+- Server `analytics.ts`, client `funnel.ts`, `App.tsx` — `xm_bots`, sent once per page load
+  beside `xm_game` when a Christmas game began with seat bots; the landing site's `/stats/`
+  shows it as "Of all those games, with bots" (`stats/view.ts`).
+- Client `LobbyScreen.tsx` — the host's button reads "Start with 1 bot" / "Start with 2 bots"
+  under 3 humans, and "Start Game" from 3; a note under it says each friend who joins takes a
+  bot's place. `EndScreen.tsx` — "Play again" no longer needs 3 people, only the others ready (the old "needs 3
+  players" line is gone). `RoomGallery.tsx` — a seat bot's story is "Bot 2's story" in the
+  player's language, and its still and video name it in the story's language.
+- Texts in 23 catalogues: `lobby.startWithOneBot`, `lobby.startWithTwoBots`, `lobby.botsNote`,
+  `gallery.botName`; `lobby.startDisabled` and `end.needPlayers` removed. en and ru are the
+  agent's; the other 21 are machine drafts, on B-3's review pile.
+- `deploy/origin-root/funny37/privacy.html` — every section's visit counts add "whether bots
+  took empty seats" (en and ru the agent's, 21 machine drafts on B-3's pile); updated
+  2026-11-26. `originRoot.test.ts` checks en and ru and spot-checks five sections.
+- Steering: FM-ID-1 is now 1–7 humans with at least 3 seats; FM-BOT-3 (new) states the seat
+  bots; design §6 notes `fillEmptySeats`.
+- Tests: `seatBots.test.ts`; game, socket, gallery, analytics, lobby, end, app, funnel and
+  stats-view tests for the above. One pre-existing race hardened: `index.test.ts` "broadcasts
+  lobby:update to players already in the room" waited for the first `lobby:update`, which can
+  be the create's own; it now waits for the roster with the joiner.
+
+**Seen** (`.screens/step130-check.mjs`, 52 checks, 0 problems; server, the Worker stand-in on
+5185 and the site preview on 5187):
+- A — an en host alone at 360 px: "Start with 2 bots", a full game with Bot 1 and Bot 2, a
+  picture on every story, one golden story and the pay card; Restart's roster
+  [Ada, Bot 1, Bot 2]; the host leaving mid-game, and 70 s later the room is gone
+  (`ROOM_NOT_FOUND`).
+- B — two humans get 1 bot; both phones' galleries read "Ben's story | Cy's story | Bot 1's
+  story".
+- C — the lobby's label goes 2, 1, 0 bots as friends join.
+- D — the Android shell: a game with two bots, no pay card.
+- E — ar, he, ta and de at 320 px: the label and the note fit, right-to-left correct; an ar game
+  names the bots "روبوت 1", "روبوت 2".
+- F — `xm_bots` counted 3 as expected; `/stats/` shows 3 in the new column.
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 662 + 493 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob, minimatch, i18next); CI owed after the push. Under a loaded machine the client's
+"starts on Home" tests (HomeScreen, App) timed out once and passed on the next runs — a
+pre-existing flake, not touched.
+
+**Not changed, for the owner:** the Play listing still says "3–7 players" (the owner's op in
+the Play Console, if wanted); `lobby.capReachedHost` still says "Tap Start Game when ready",
+which stays true at 7 humans.
+
+**Owed:** the push, CI, and the deploy of #1 on its own (D3 A).
+
+**RESUME HERE (2026-11-26, after Step 130; not yet pushed).** Steps 122–129 are live (the game
+at image `funny-multi:01cd07a`); Step 130 (#1 play alone with bots) is committed, not pushed or
+deployed. **Next:** the owner's push, CI, then the deploy of #1 on its own (D3 A) — a deploy
+waits until no visitor is connected (check the server log first); `ship.sh` only, plus
+`ship-funny-family.sh` for the `/stats/` column. **Then Step 131 — the lone host's grace**
+(D4 B; B-29's finding of Step 127: a longer grace for a host alone in the lobby, or the room
+kept until the host's own tab closes — the owner picks when it is planned). After it, the second
+deploy by 23 December: #10 gift a pack, #9 the festive room look, #7 the whole-game video. No
+deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the push and deploy of Step 130; the look at the reindeer's bells on the
+phone; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027.

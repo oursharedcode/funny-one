@@ -236,15 +236,47 @@ describe('Gate 2 — round flow over real sockets', () => {
     expect(otherSawWaiting, 'a player who has not submitted should see nothing').toBe(false);
   });
 
-  it('refuses to start with fewer than 3 players', async () => {
+  // Step 130 (B-29 #1, FM-BOT-3): fewer than three people start a game, and
+  // bots take the empty seats when it starts.
+  for (const humans of [1, 2]) {
+    it(`seats ${3 - humans} bot(s) for ${humans} player(s) and plays to the reveal`, async () => {
+      const { roomCode, reveals, picks } = await playFullGame(humans);
+      const room = getRoom(roomCode)!;
+      expect(room.players.map((p) => [p.id.startsWith('bot:') ? p.id : 'human', p.isBot])).toEqual([
+        ...Array.from({ length: humans }, () => ['human', false]),
+        ...Array.from({ length: 3 - humans }, (_, i) => [`bot:${i + 1}`, true]),
+      ]);
+      expect(room.players.filter((p) => p.isBot).map((p) => p.nickname)).toEqual(
+        Array.from({ length: 3 - humans }, (_, i) => `Bot ${i + 1}`),
+      );
+      // Three full stories, each person's own answers where rotation puts them.
+      expect(room.stories).toHaveLength(3);
+      expect(room.stories.every((s) => s.answers.every((a) => a !== null))).toBe(true);
+      for (let round = 0; round < ROUNDS; round++) {
+        for (let player = 0; player < humans; player++) {
+          const story = room.stories[storyIndex(player, round, 3)]!;
+          expect(story.answers[round]).toBe(picks[round]![player]);
+        }
+      }
+      expect(reveals).toHaveLength(humans);
+    });
+  }
+
+  it('tells every player the roster with its seat bots before round 0', async () => {
     const h = await startTestServer();
     harness = h;
     const host = await h.connect();
     await emitWithAck(host, 'room:create', { nickname: 'player0', language: 'en' });
 
-    const err = once<{ code: string }>(host, 'error');
+    // The last roster a phone holds when round 0 begins, whatever came before.
+    let roster: boolean[] = [];
+    host.on('lobby:update', (u: { players: { isBot: boolean }[] }) => {
+      roster = u.players.map((p) => p.isBot);
+    });
+    const started = once(host, 'round:start');
     host.emit('game:start');
-    expect((await err).code).toBe('NOT_ENOUGH_PLAYERS');
+    await started;
+    expect(roster).toEqual([false, true, true]);
   });
 
   it('refuses a start from a non-host', async () => {
@@ -314,5 +346,38 @@ describe('Gate 2 — restart into a second game', () => {
     }
     expect(getRoom(roomCode)!.phase).toBe('reveal');
     expect(getRoom(roomCode)!.stories.every((s) => s.answers.every((a) => a !== null))).toBe(true);
+  });
+  it('seats the bots again for a host alone at "one more game"', async () => {
+    const { roomCode, sockets, stopAutoPlay } = await playFullGame(1);
+    stopAutoPlay();
+
+    const restarted = once<{ roundNumber: number }>(sockets[0]!, 'round:start');
+    sockets[0]!.emit('game:restart');
+    expect((await restarted).roundNumber).toBe(0);
+    const room = getRoom(roomCode)!;
+    expect(room.players.map((p) => (p.id.startsWith('bot:') ? p.id : 'human'))).toEqual([
+      'human',
+      'bot:1',
+      'bot:2',
+    ]);
+    expect(room.stories).toHaveLength(3);
+  });
+
+  it('gives a room that lost a player to a bot a seat bot in its place after the restart', async () => {
+    const { roomCode, sockets, stopAutoPlay } = await playFullGame(3);
+    stopAutoPlay();
+    sockets[2]!.emit('room:leave');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(getRoom(roomCode)!.players[2]!.isBot).toBe(true);
+
+    const restarted = once<{ roundNumber: number }>(sockets[0]!, 'round:start');
+    sockets[0]!.emit('game:restart');
+    await restarted;
+    const room = getRoom(roomCode)!;
+    expect(room.players.map((p) => (p.id.startsWith('bot:') ? p.id : 'human'))).toEqual([
+      'human',
+      'human',
+      'bot:1',
+    ]);
   });
 });

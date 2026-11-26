@@ -113,6 +113,17 @@ describe('the Christmas 2026 edition', () => {
     expect(sent().slice(1)).toEqual([{ e: 'xm_game', s: 'direct', l: 'en', t: 'off' }]);
   });
 
+  it('counts a Christmas game with seat bots once more, as xm_bots (Step 130)', () => {
+    setUrl('');
+    initFunnel();
+    trackChristmasGame(true, true);
+    trackChristmasGame(true, true);
+    expect(sent().slice(1)).toEqual([
+      { e: 'xm_game', s: 'direct', l: 'en', t: 'on' },
+      { e: 'xm_bots', s: 'direct', l: 'en' },
+    ]);
+  });
+
   it('counts the first golden cartoon of a page load, in the interface language', async () => {
     setUrl('');
     initFunnel();

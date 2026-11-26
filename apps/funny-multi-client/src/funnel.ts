@@ -26,6 +26,10 @@
 // card shown after a free Christmas game (`xm_card`), the pay page opened,
 // from that card or from a link (`xm_page`), and its pay button pressed, by
 // rail (`xm_pay`). Nothing about the buyer or the payment goes with them.
+//
+// Step 130 (B-29 #1): a Christmas game that bots helped fill — fewer than
+// three people, bots in the empty seats — counts once more as `xm_bots`, with
+// its `xm_game`, so /stats/ can tell whether playing alone brings players.
 
 import { isLanguage, type Language, type PayRail } from '@funny/shared';
 import i18n from './i18n';
@@ -109,11 +113,15 @@ export function trackGift(rail: GiftRail): void {
   send({ e: 'fm_gift', t: rail });
 }
 
-/** A game started in a room offered the Christmas stories (Step 117). */
-export function trackChristmasGame(on: boolean): void {
+/**
+ * A game started in a room offered the Christmas stories (Step 117), and
+ * whether bots took empty seats in it (Step 130).
+ */
+export function trackChristmasGame(on: boolean, withBots = false): void {
   if (christmasGameSent) return;
   christmasGameSent = true;
   send({ e: 'xm_game', t: on ? 'on' : 'off' });
+  if (withBots) send({ e: 'xm_bots' });
 }
 
 /** A golden story's cartoon on screen, in the reveal or the gallery. */

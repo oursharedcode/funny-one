@@ -22,6 +22,8 @@ export { normalizeBasePath } from './basePath.js';
 
 // Step 120 (B-29, D3 A) — the nickname bounds, one place for server and client.
 export { NICKNAME_MAX, NICKNAME_MIN } from './nickname.js';
+// Step 130 (B-29 #1) — seat bots: fewer than 3 humans still start a game.
+export { MIN_SEATS, seatBotId, seatBotNumber, seatBotsNeeded } from './seatBots.js';
 // Step 125 (B-29, D1 A) — the GitHub user name a Sponsors buyer pays with.
 export { GITHUB_LOGIN_MAX, parseGitHubLogin } from './githubLogin.js';
 

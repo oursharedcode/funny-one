@@ -82,6 +82,9 @@ import {
   polishProse,
   renderProse,
   requireAuthoredLanguage,
+  seatBotId,
+  seatBotNumber,
+  seatBotsNeeded,
   storyIndex,
   type OptionId,
   type SlotIndex,
@@ -162,6 +165,22 @@ function slotOf(round: number): SlotIndex {
 // Game lifecycle
 // ============================================================================
 
+/**
+ * Step 130 (B-29 #1, FM-BOT-3): seats the bots a game with fewer than three
+ * humans needs, just before it starts — from the lobby or at "one more game",
+ * whose `prepareRestart` has dropped the last game's bots. Returns how many
+ * were seated; the caller broadcasts the roster when that is not 0. A seat bot
+ * is named "Bot <n>" in English here and in each player's own language on the
+ * clients (seatBots.ts).
+ */
+export function fillEmptySeats(room: Room): number {
+  const needed = seatBotsNeeded(room.players.filter((p) => !p.isBot).length);
+  for (let n = 1; n <= needed; n++) {
+    room.players.push({ id: seatBotId(n), nickname: `Bot ${n}`, isBot: true });
+  }
+  return needed;
+}
+
 export function startGame(room: Room, io: IO): void {
   room.phase = 'playing';
   room.currentRound = 0;
@@ -177,7 +196,14 @@ export function startGame(room: Room, io: IO): void {
   // taken the last game's record already.
   const paid = room.packCode !== null && contents.some((c) => c.kind === 'paid');
   room.paidGame = paid
-    ? { startedAt: Date.now(), players: room.players.length, picks: 0, downloads: 0, shares: 0 }
+    ? {
+        startedAt: Date.now(),
+        // The people, as the room's own record counts them; not seat bots.
+        players: room.players.filter((p) => !p.isBot).length,
+        picks: 0,
+        downloads: 0,
+        shares: 0,
+      }
     : null;
   startRound(room, io);
 }
@@ -571,9 +597,11 @@ export function buildGallery(room: Room): GalleryReadyPayload {
       const player = room.players[i]!;
       const story = room.stories[i];
       const answers = resolveAnswers(room, story);
+      const seat = seatBotNumber(player.id);
       return {
         nickname: player.nickname,
         isBot: player.isBot,
+        ...(seat === null ? {} : { seat }),
         answers,
         // Same offline-polished prose the reveal screen shows, so the
         // downloadable image and video (T-5.2) embed the story with the same
@@ -668,8 +696,11 @@ export function takePaidGameRecord(room: Room): ReceiptInput | null {
 
 // Validates a host's restart request and, on success, resets the room to a
 // fresh pre-game state per spec §4 "One more game" reset: drops bots, rebuilds
-// the host if needed, clears the ready set. The caller then broadcasts the new
-// roster and calls startGame to rebuild stories and begin round 0.
+// the host if needed, clears the ready set. The caller then seats new bots
+// where fewer than three people are left (`fillEmptySeats`, Step 130),
+// broadcasts the new roster and calls startGame to rebuild stories and begin
+// round 0. Since Step 130 any number of people can play again: the host alone
+// included.
 export function prepareRestart(
   room: Room,
   socketId: string,
@@ -681,10 +712,12 @@ export function prepareRestart(
     return { ok: false, error: { code: 'NOT_HOST', message: 'Only the host can restart.' } };
   }
   const nonBots = room.players.filter((p) => !p.isBot);
-  if (nonBots.length < 3) {
+  if (nonBots.length === 0) {
+    // Unreachable while the host is a person (the check above), kept so the
+    // roster below is never empty.
     return {
       ok: false,
-      error: { code: 'NOT_ENOUGH_PLAYERS', message: 'Need at least 3 players.' },
+      error: { code: 'NOT_ENOUGH_PLAYERS', message: 'No players left.' },
     };
   }
 

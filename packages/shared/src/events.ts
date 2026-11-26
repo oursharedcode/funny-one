@@ -48,7 +48,8 @@ export interface Player {
   // socket.id — rotates on each connection; no stable identity across reconnects.
   id: string;
   nickname: string;
-  // True when this slot's real player disconnected mid-game.
+  // True when this slot's real player disconnected mid-game, and for a seat
+  // bot (Step 130, seatBots.ts), whose id is `bot:<n>`.
   isBot: boolean;
 }
 
@@ -501,6 +502,9 @@ export interface StatsPayload {
 export interface GalleryEntry {
   nickname: string;
   isBot: boolean;
+  // Step 130: a seat bot's number, which each client names in its own
+  // language ("Bot 2"); absent for a person and a person's bot.
+  seat?: number;
   // This story's 7 answers as resolved display texts, for inline phrase
   // highlighting — same contract as RevealStartPayload.answers above.
   answers: string[];

@@ -33,6 +33,7 @@ import {
   type RemoveResult,
 } from './rooms.js';
 import {
+  fillEmptySeats,
   generateBotStoryPictures,
   handleMidGameBotification,
   handlePictureRequest,
@@ -739,18 +740,15 @@ export async function buildServer({
         socket.emit('error', { code: 'ROOM_LOCKED', message: 'Game already started.' });
         return;
       }
-      if (room.players.length < 3) {
-        socket.emit('error', {
-          code: 'NOT_ENOUGH_PLAYERS',
-          message: 'Need at least 3 players.',
-        });
-        return;
-      }
+      // Step 130 (B-29 #1): no minimum any more — the host alone starts, and
+      // bots take the seats up to three (FM-BOT-3).
       // SRC hard-locked room.wobbleEngine here and re-broadcast the lobby so
       // every joiner recorded with the same engine. Both are gone with the
-      // field (DD-9). Step 122 broadcasts again, only when a paid room's code
-      // no longer works, so every client knows this game is not paid.
-      if (recheckCode(room)) broadcastLobby(room);
+      // field (DD-9). Step 122 broadcasts again when a paid room's code no
+      // longer works, so every client knows this game is not paid; Step 130
+      // when bots were seated, so every client has the game's roster.
+      const changed = recheckCode(room);
+      if (fillEmptySeats(room) > 0 || changed) broadcastLobby(room);
       startGame(room, io);
     });
 
@@ -804,6 +802,7 @@ export async function buildServer({
       }
       flushPaidGame(room);
       recheckCode(room);
+      fillEmptySeats(room);
       broadcastLobby(room);
       startGame(room, io);
     });

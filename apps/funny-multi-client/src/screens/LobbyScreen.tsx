@@ -24,6 +24,11 @@
 // has no share sheet, the two are copied instead. No price and no unlock code:
 // the link is the room's ordinary one.
 //
+// Step 130 (B-29 #1, owner decision D1 A): the host can always start. With
+// fewer than three players the button says how many bots will take the empty
+// seats ("Start with 2 bots"), and a line under it says each friend who joins
+// takes a bot's place; the bots themselves join only when the game starts.
+//
 // The cap banner is carried as-is. At T-3.2 it was inert — no server
 // `stats:get` handler, so the ack never fired and `isCapReached(null)` was
 // false. T-5.3 wired the handler; this file did not need to change.
@@ -38,7 +43,7 @@ import QRCode from '../components/QRCode';
 import PackUnlock from '../components/PackUnlock';
 import { hoursUntilUtcMidnight, isCapReached } from '../capReset';
 import type { LobbyState } from '../App';
-import { inviteText, isLanguage, type StatsPayload } from '@funny/shared';
+import { inviteText, isLanguage, seatBotsNeeded, type StatsPayload } from '@funny/shared';
 
 interface Props {
   lobby: LobbyState;
@@ -73,7 +78,8 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
     lobby.multiLanguage ? '&multi=1' : ''
   }`;
   const isHost = lobby.socketId === lobby.hostId;
-  const canStart = lobby.players.length >= 3;
+  // The lobby holds people only: seat bots join at the start (Step 130).
+  const bots = seatBotsNeeded(lobby.players.length);
   const capReached = isCapReached(stats);
 
   function copyLink(): void {
@@ -196,14 +202,23 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
       )}
 
       {isHost ? (
-        <button
-          className="rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white disabled:bg-gray-300 disabled:text-gray-500"
-          disabled={!canStart}
-          title={!canStart ? t('lobby.startDisabled') : ''}
-          onClick={startGame}
-        >
-          {t('lobby.startGame')}
-        </button>
+        <>
+          <button
+            className="rounded bg-pink-500 py-3 font-display text-xl font-semibold text-white"
+            onClick={startGame}
+          >
+            {bots === 0
+              ? t('lobby.startGame')
+              : bots === 1
+                ? t('lobby.startWithOneBot')
+                : t('lobby.startWithTwoBots')}
+          </button>
+          {bots > 0 && (
+            <p className="text-center text-sm text-gray-600" data-bots-note>
+              {t('lobby.botsNote')}
+            </p>
+          )}
+        </>
       ) : (
         <p className="text-center text-gray-600">{t('lobby.waitingForHost')}</p>
       )}

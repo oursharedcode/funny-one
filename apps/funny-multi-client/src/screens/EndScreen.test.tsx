@@ -237,13 +237,19 @@ describe('room gallery display (RoomGallery)', () => {
 });
 
 describe('host — one more game', () => {
-  it('disables restart and explains why below 3 non-bot players', () => {
+  // Step 130: fewer than three people play again, with bots in the seats.
+  it('lets a host whose guests left, or who played alone, play again', () => {
     renderEnd({
-      lobby: lobby({ socketId: 's0', hostId: 's0', players: players({ id: 's0' }, { id: 's1' }) }),
+      lobby: lobby({
+        socketId: 's0',
+        hostId: 's0',
+        players: players({ id: 's0' }, { id: 'bot:1', isBot: true }, { id: 'bot:2', isBot: true }),
+      }),
     });
     const button = screen.getByText('One more game') as HTMLButtonElement;
-    expect(button.disabled).toBe(true);
-    expect(screen.getByText('Need at least 3 players for another game')).toBeTruthy();
+    expect(button.disabled).toBe(false);
+    fireEvent.click(button);
+    expect(socketMock.onlyEmitOf('game:restart')).toBeTruthy();
   });
 
   it('disables restart and explains why while guests are not yet ready', () => {

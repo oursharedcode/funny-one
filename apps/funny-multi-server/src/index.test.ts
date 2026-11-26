@@ -524,9 +524,16 @@ describe('room:join', () => {
     });
 
     const joiner = await connect(h);
-    const hostSees = once<{ players: { nickname: string }[] }>(host, 'lobby:update');
+    // room:create's own lobby:update follows its ack and can land after this
+    // listener is on (Step 130 saw it), so wait for the roster that has Bob.
+    const hostSees = new Promise<string[]>((resolve) => {
+      host.on('lobby:update', (u: { players: { nickname: string }[] }) => {
+        const names = u.players.map((p) => p.nickname);
+        if (names.length > 1) resolve(names);
+      });
+    });
     void emitWithAck(joiner, 'room:join', { roomCode, nickname: 'Bob' });
-    expect((await hostSees).players.map((p) => p.nickname)).toEqual(['Ada', 'Bob']);
+    expect(await hostSees).toEqual(['Ada', 'Bob']);
   });
 
   it('returns errors through the ack, never the error event', async () => {

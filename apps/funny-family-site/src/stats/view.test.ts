@@ -196,17 +196,20 @@ describe('renderStats', () => {
           'xm_game||de|direct|on||': 5,
           'xm_gold||de|direct|||': 4,
           'xm_gold|b|en|hub|||': 1,
+          // Step 130: three of those games had bots in their empty seats.
+          'xm_bots||de|direct|||': 2,
+          'xm_bots|a|en|hub|||': 1,
         },
       },
     });
     expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
-      ['All', '0', '0', '7', '1', '5'],
-      ['Deutsch (Deutschland)', '0', '0', '5', '0', '4'],
-      ['English (United Kingdom)', '0', '0', '2', '1', '1'],
+      ['All', '0', '0', '7', '1', '3', '5'],
+      ['Deutsch (Deutschland)', '0', '0', '5', '0', '2', '4'],
+      ['English (United Kingdom)', '0', '0', '2', '1', '1', '1'],
     ]);
     // No game in a Christmas room yet: the row of totals alone, all nought.
     expect(tableOf(render(), 'The Christmas 2026 edition')).toEqual([
-      ['All', '0', '0', '0', '0', '0'],
+      ['All', '0', '0', '0', '0', '0', '0'],
     ]);
   });
 
@@ -225,9 +228,9 @@ describe('renderStats', () => {
       },
     });
     expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
-      ['All', '4', '3', '1', '0', '0'],
-      ['Deutsch (Deutschland)', '3', '2', '1', '0', '0'],
-      ['English (United Kingdom)', '1', '1', '0', '0', '0'],
+      ['All', '4', '3', '1', '0', '0', '0'],
+      ['Deutsch (Deutschland)', '3', '2', '1', '0', '0', '0'],
+      ['English (United Kingdom)', '1', '1', '0', '0', '0', '0'],
     ]);
     // Three Funny Multi clicks of its own, and three on the Christmas buttons.
     expect(root.querySelector('.tile:nth-child(2) .tile-value')?.textContent).toBe('6');
@@ -270,7 +273,9 @@ describe('renderStats', () => {
       ['ar', '0', '0', '4', '0', '0'],
     ]);
     // The paying half adds nothing to the playing half's table.
-    expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([['All', '0', '0', '0', '0', '0']]);
+    expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
+      ['All', '0', '0', '0', '0', '0', '0'],
+    ]);
     // Nothing paid for yet: the row of totals alone, all nought.
     expect(tableOf(render(), 'The Christmas 2026 edition', 1)).toEqual([
       ['All', '0', '0', '0', '0', '0'],

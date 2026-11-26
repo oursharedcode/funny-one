@@ -27,9 +27,10 @@ wherever they fit (see `design.md` for the reuse map).
 ## 1. Product identity
 
 - **FM-ID-1 (MUST)** The product is **MUL — Funny Multi**, RU name (exact, binding) **«Чепуха 37»**:
-  a browser-based party game for **3–7 humans, one phone each**, in a live room
-  (room code + QR), with a Socket.IO server. "37" encodes the player range 3–7; store/marketing
-  copy must explain this once.
+  a browser-based party game for **1–7 humans, one phone each**, in a live room
+  (room code + QR), with a Socket.IO server; a game has **at least 3 seats**, bots taking the
+  empty ones (FM-BOT-3; owner decision D1 A, 2026-11-26 — until then 3–7 humans). "37" encodes
+  the seat range 3–7; store/marketing copy must explain this once.
 - **FM-ID-2 (MUST)** Audience positioning **12+**, web-first. Never appears inside kids store
   listings (source: MUL-5). See OD-F4 for a possible post-v1 revisit now that all content is curated.
 - **FM-ID-3 (MUST)** Core loop: each player answers 7 silly questions about a story they cannot
@@ -150,6 +151,13 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-BOT-2 (MUST, changed)** Bot/timeout auto-fill = **uniform random pick from the slot's
   pool**, excluding options already used for the same slot by other stories in this room this
   round when pool size allows (mirrors ONE-4's exclusion rule).
+- **FM-BOT-3 (MUST, added 2026-11-26, B-29 #1)** A room with fewer than 3 humans still starts:
+  at the host's Start, **seat bots** ("Bot 1", "Bot 2", each phone naming them in its own
+  language) fill it to 3 seats and play as FM-BOT-1/2's bots do, their stories getting pictures.
+  They join at the start, never in the lobby, so a friend who joins first means one bot fewer;
+  the host's button says how many ("Start with 2 bots"). "One more game" drops every bot and
+  fills the seats again. The only human leaving still deletes the room (a room of bots alone is
+  never kept).
 
 ### Reveal, pictures, gallery, end
 - **FM-CORE-9 (MUST)** Reveal: each player receives their own assembled story as localized

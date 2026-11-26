@@ -84,9 +84,10 @@ export default function EndScreen({
   const isHost = lobby.socketId === lobby.hostId;
   const nonBots = lobby.players.filter((p) => !p.isBot);
   const nonHostNonBots = nonBots.filter((p) => p.id !== lobby.hostId);
-  const enoughPlayers = nonBots.length >= 3;
+  // Any number of people can play again since Step 130: bots take the seats
+  // up to three, as at the first start.
   const allReady = nonHostNonBots.every((p) => readyIds.includes(p.id));
-  const canRestart = enoughPlayers && allReady;
+  const canRestart = allReady;
   const iAmReady = readyIds.includes(lobby.socketId);
 
   // The pay card's offer, or null where the card does not belong (see the top).
@@ -184,9 +185,7 @@ export default function EndScreen({
             {t('end.oneMoreGame')}
           </button>
           {!canRestart && (
-            <p className="text-center text-sm text-gray-600">
-              {!enoughPlayers ? t('end.needPlayers') : t('end.waitingForReady')}
-            </p>
+            <p className="text-center text-sm text-gray-600">{t('end.waitingForReady')}</p>
           )}
           <button
             className="w-full rounded border-2 border-pink-500 bg-white py-3 font-display text-xl font-semibold text-pink-500"

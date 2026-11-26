@@ -12,7 +12,7 @@
 // identifier, nothing finer than the day. That is what lets the game stay
 // cookie-free and banner-free, and lets the summary route be public. A label
 // outside its allowlist rejects the whole event, so nobody can write free text
-// into the file and the key space is closed (109 combinations per language a
+// into the file and the key space is closed (112 combinations per language a
 // day at most).
 //
 // Step 79 (B-20): a visit — hub_view or fm_view, not a click or a gift — also
@@ -39,6 +39,7 @@ export const STAT_EVENTS = [
   'fm_support',
   'fm_gift',
   'xm_game',
+  'xm_bots',
   'xm_gold',
   'xm_card',
   'xm_page',
@@ -113,6 +114,8 @@ const SPEC: Record<StatEvent, Partial<Record<Field, readonly string[]>>> = {
   fm_support: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   fm_gift: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: GIFT_TARGETS },
   xm_game: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: PACK_SWITCH },
+  // Step 130 (B-29 #1): one of those games with bots in its empty seats.
+  xm_bots: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   xm_gold: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   xm_card: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   xm_page: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: PAY_PAGE_DOORS },

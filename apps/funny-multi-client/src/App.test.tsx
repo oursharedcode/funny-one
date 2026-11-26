@@ -273,7 +273,24 @@ describe('lobby:update', () => {
     });
     expect(trackChristmasGame).not.toHaveBeenCalled();
     socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
-    expect(trackChristmasGame).toHaveBeenCalledWith(false);
+    expect(trackChristmasGame).toHaveBeenCalledWith(false, false);
+  });
+
+  // Step 130: a game the seat bots fill counts once more, as one with bots.
+  it('counts a Christmas game with seat bots as one with bots', () => {
+    trackChristmasGame.mockReset();
+    renderInLobby();
+    socketMock.fire('lobby:update', {
+      players: [
+        { id: 's1', nickname: 'hostie', isBot: false },
+        { id: 'bot:1', nickname: 'Bot 1', isBot: true },
+        { id: 'bot:2', nickname: 'Bot 2', isBot: true },
+      ],
+      hostId: 's1',
+      pack: { id: 'chr26', on: true, paid: false },
+    });
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    expect(trackChristmasGame).toHaveBeenCalledWith(true, true);
   });
 
   it('counts nothing in a room offered no pack', () => {

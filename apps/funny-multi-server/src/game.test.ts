@@ -15,6 +15,7 @@ import {
   ROUNDS,
   ROUND_DURATION_MS,
   enterRevealPhase,
+  fillEmptySeats,
   handleReadyToggle,
   prepareRestart,
   resolveAnswers,
@@ -509,16 +510,29 @@ describe('end screen', () => {
     expect(eventsFor('game:restartReady')[1]!.payload).toEqual({ readyIds: [] });
   });
 
-  it('refuses a restart from a non-host, and with fewer than 3 non-bots', () => {
+  it('refuses a restart from a non-host only — the host alone plays again (Step 130)', () => {
     const room = makeRoom(3);
     room.phase = 'reveal';
 
-    expect(prepareRestart(room, 's1')).toMatchObject({ ok: false });
+    expect(prepareRestart(room, 's1')).toMatchObject({ ok: false, error: { code: 'NOT_HOST' } });
+    room.players[1] = { ...room.players[1]!, isBot: true };
     room.players[2] = { ...room.players[2]!, isBot: true };
-    expect(prepareRestart(room, 's0')).toMatchObject({
-      ok: false,
-      error: { code: 'NOT_ENOUGH_PLAYERS' },
-    });
+    expect(prepareRestart(room, 's0')).toEqual({ ok: true });
+    expect(room.players.map((p) => p.id)).toEqual(['s0']);
+    expect(fillEmptySeats(room)).toBe(2);
+    expect(room.players).toEqual([
+      expect.objectContaining({ id: 's0', isBot: false }),
+      { id: 'bot:1', nickname: 'Bot 1', isBot: true },
+      { id: 'bot:2', nickname: 'Bot 2', isBot: true },
+    ]);
+  });
+
+  it('seats no bot for three people or more (Step 130)', () => {
+    for (const count of [3, 7]) {
+      const room = makeRoom(count);
+      expect(fillEmptySeats(room)).toBe(0);
+      expect(room.players).toHaveLength(count);
+    }
   });
 
   it('drops bots and clears readiness on a valid restart', () => {

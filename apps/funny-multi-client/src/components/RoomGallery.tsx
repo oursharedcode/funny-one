@@ -29,6 +29,9 @@
 // thank-you footer, and each one saved or shared is reported (`onExported`)
 // for its game's receipt record — a count, nothing else. A share the person
 // dismisses is not one.
+//
+// Step 130 (B-29 #1): a seat bot's story is "Bot 2's story" in the player's
+// own language, and its still and video name it in the story's language.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +62,7 @@ interface Props {
 // The shared room gallery (spec §24): every story + its picture, browsed one
 // at a time. Bot slots and ungenerated stories show a no-picture placeholder.
 export default function RoomGallery({ entries, roomLanguage, defaultLanguage, onExported }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [index, setIndex] = useState(0);
   // Story index → the language the player switched that story to.
   const [languages, setLanguages] = useState<Record<number, AuthoredLanguage>>({});
@@ -89,9 +92,17 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
   const story = storyIn(entry, roomLanguage, language);
   const christmas = content.kind !== 'base';
   const ending = entry.ending ?? null;
+  // A seat bot's name in the interface's language, and in the story's on its
+  // exports (Step 130); a person's (or a person's bot's) nickname as it is.
+  const seat = entry.seat;
+  const nickname = seat === undefined ? entry.nickname : t('gallery.botName', { number: seat });
+  const exportName =
+    seat === undefined
+      ? entry.nickname
+      : i18n.getFixedT(language)('gallery.botName', { number: seat });
   // What every export of this story shares: its still and its video.
   const still = {
-    nickname: entry.nickname,
+    nickname: exportName,
     prose: story.prose,
     pictureUrl: entry.picture?.url ?? null,
     language,
@@ -109,7 +120,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
   function shareMeta(): { title: string; text: string } {
     return {
       title: t('home.title'),
-      text: t('gallery.storyBy', { nickname: entry.nickname }),
+      text: t('gallery.storyBy', { nickname }),
     };
   }
 
@@ -140,7 +151,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
     setRecording(true);
     try {
       const file = await buildWobbleVideoFile({
-        nickname: entry.nickname,
+        nickname: exportName,
         prose: story.prose,
         pictureUrl: entry.picture.url,
         language,
@@ -163,9 +174,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
 
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-600">
-            {t('gallery.storyBy', { nickname: entry.nickname })}
-          </p>
+          <p className="text-sm text-gray-600">{t('gallery.storyBy', { nickname })}</p>
           {golden && (
             <p className="text-sm font-semibold text-pink-600">{t('reveal.goldenStory')}</p>
           )}
@@ -187,7 +196,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
                   src={entry.picture.url}
                   width={entry.picture.width}
                   height={entry.picture.height}
-                  alt={t('gallery.pictureAlt', { nickname: entry.nickname })}
+                  alt={t('gallery.pictureAlt', { nickname })}
                   className="w-full rounded-lg shadow"
                 />
               </div>
@@ -206,7 +215,7 @@ export default function RoomGallery({ entries, roomLanguage, defaultLanguage, on
           ending={ending}
           text={endingText(story, language)}
           language={language}
-          alt={t('gallery.endingAlt', { nickname: entry.nickname })}
+          alt={t('gallery.endingAlt', { nickname })}
         />
       )}
 

@@ -1200,6 +1200,15 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       unchanged. Seen in Chromium: phone en 360, ru, ta and de 320, desktop 1280 — clear of the
       bubble and the line. Committed as Step 129, pushed (CI run 45760488756 green) and deployed the same day
       (image `funny-multi:01cd07a`); the owner's look on the phone is owed.
+  - **#1 play alone with bots — Step 130, 2026-11-26** (owner decisions "A, A, A, B"): D1 A, any
+    room under 3 humans is filled to 3 seats with bots at Start and at Restart (FM-ID-1 now 1–7
+    humans, FM-BOT-3 new; design §6); D2 A, "Bot 1" / "Bot 2" in each player's language; D3 A,
+    #1 deploys on its own; D4 B, the lone host's grace is its own step next (Step 131). The
+    label reads "Start with N bots", a joiner means one bot fewer, the only human leaving
+    deletes the room; `xm_bots` and a `/stats/` column count Christmas games with bots; the
+    privacy page says so. en and ru the agent's, 21 machine drafts on B-3's pile. Seen in
+    Chromium (52 checks: alone, two humans, joiners, the Android shell, ar/he/ta/de at 320 px,
+    the counts). Committed, not yet pushed or deployed.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

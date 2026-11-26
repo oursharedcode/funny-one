@@ -104,6 +104,13 @@ describe('statKey', () => {
     expect(statKey({ e: 'xm_gold', s: 'app', l: 'en' })).toBeNull();
   });
 
+  it('keys a Christmas game with seat bots, website only (Step 130)', () => {
+    expect(statKey({ e: 'xm_bots', s: 'direct', l: 'ru' })).toBe('xm_bots||ru|direct|||');
+    expect(statKey({ e: 'xm_bots', s: 'hub', v: 'a', l: 'en' })).toBe('xm_bots|a|en|hub|||');
+    expect(statKey({ e: 'xm_bots', s: 'direct', l: 'en', t: 'on' })).toBeNull();
+    expect(statKey({ e: 'xm_bots', s: 'app', l: 'en' })).toBeNull();
+  });
+
   it('keys the paying half: the pay card, the pay page by its door, a pay press by rail (Step 123)', () => {
     expect(statKey({ e: 'xm_card', s: 'direct', l: 'ru' })).toBe('xm_card||ru|direct|||');
     expect(statKey({ e: 'xm_card', s: 'hub', v: 'a', l: 'en' })).toBe('xm_card|a|en|hub|||');

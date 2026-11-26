@@ -48,6 +48,7 @@ import type {
   RoundWaitingPayload,
   SupportConfig,
 } from '@funny/shared';
+import { seatBotNumber } from '@funny/shared';
 
 export type GamePhase = 'home' | 'lobby' | 'writing' | 'waiting' | 'reveal' | 'end';
 
@@ -248,11 +249,14 @@ export default function App() {
   // Step 117 (D2 A): the Christmas funnel's first step — a game under way in a
   // room that was offered the Christmas stories, switched on or off. The
   // funnel counts it once per page load.
+  // Step 130: and whether bots took empty seats — the roster with them reaches
+  // every player before round 0 does.
   const pack = lobby?.pack ?? null;
   const roundNumber = round?.roundNumber ?? null;
+  const withBots = lobby?.players.some((p) => seatBotNumber(p.id) !== null) ?? false;
   useEffect(() => {
-    if (phase === 'writing' && roundNumber === 0 && pack) trackChristmasGame(pack.on);
-  }, [phase, roundNumber, pack]);
+    if (phase === 'writing' && roundNumber === 0 && pack) trackChristmasGame(pack.on, withBots);
+  }, [phase, roundNumber, pack, withBots]);
 
   // "Create a new room" on the host notice (spec §12): end the current game
   // for everyone (game:end → game:over → room deleted), then reload to a fresh

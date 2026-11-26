@@ -587,6 +587,11 @@ Five error codes: `CODE_INVALID`, `CODE_BLOCKED`, `CODE_ENDED`, `CODE_PENDING`,
 - `autoFillFor(room, socketId)` (bots + timer expiry, FM-BOT-2): uniform random option id from
   `pool[currentRound]`, excluding ids already used at this slot by other stories in this room
   this round when the pool is large enough; otherwise fall back to plain uniform.
+- `fillEmptySeats(room)` (Step 130, FM-BOT-3): called by `game:start` and `game:restart`
+  before `startGame`; pushes `seatBotsNeeded(humans)` bots with ids `bot:<n>` (no Socket.IO id
+  has a colon) and English nicknames, then `lobby:update` goes out so every phone has the
+  roster before round 0. Gallery entries carry `seat: n`, from which each client names the bot
+  in its own language (`gallery.botName`). `prepareRestart` no longer asks for 3 humans.
 - `enterRevealPhase`: unchanged flow (bot pictures kicked off first, then per-player
   `reveal:start`), but answers resolve ids → room-language display texts before prose
   rendering; RU prose still passes through `polishRussianProse` (grammar.ts).

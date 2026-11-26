@@ -61,21 +61,33 @@ describe('starting the game', () => {
     expect(emit.args).toEqual([]);
   });
 
+  // Step 130 (B-29 #1, D1 A): the host can always start; below three players
+  // the button names the bots that will take the empty seats.
   it.each([
-    [1, false],
-    [2, false],
-    [3, true],
-    [7, true],
-  ])('with %i players the start button enabled is %s', (count, enabled) => {
+    [1, 'Start with 2 bots', true],
+    [2, 'Start with 1 bot', true],
+    [3, 'Start Game', false],
+    [7, 'Start Game', false],
+  ])('with %i players the start button reads %s', (count, label, note) => {
     renderLobby({ players: players(count) });
-    expect((screen.getByText('Start Game') as HTMLButtonElement).disabled).toBe(!enabled);
+    const button = screen.getByText(label) as HTMLButtonElement;
+    expect(button.disabled).toBe(false);
+    expect(Boolean(document.querySelector('[data-bots-note]'))).toBe(note);
   });
 
-  it('explains why start is unavailable below the minimum', () => {
-    renderLobby({ players: players(2) });
-    expect(screen.getByText('Start Game').getAttribute('title')).toBe(
-      'Need at least 3 players to start',
-    );
+  it('starts a game for a host alone, with no payload', () => {
+    renderLobby({ players: players(1) });
+    expect(
+      screen.getByText("Bots take the empty seats. Each friend who joins takes a bot's place."),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByText('Start with 2 bots'));
+    expect(socketMock.onlyEmitOf('game:start').args).toEqual([]);
+  });
+
+  it('shows a guest neither the bots nor the note', () => {
+    renderLobby({ socketId: 's1', hostId: 's0', players: players(2) });
+    expect(screen.queryByText('Start with 1 bot')).toBeNull();
+    expect(document.querySelector('[data-bots-note]')).toBeNull();
   });
 
   it('shows non-hosts a wait notice instead of a start button', () => {

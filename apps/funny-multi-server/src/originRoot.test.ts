@@ -76,9 +76,18 @@ describe('privacy.html', () => {
   it('names the Christmas funnel among the website counts (Step 117)', () => {
     const flat = html.replace(/\s+/g, ' ');
     expect(flat).toContain(
-      "a game begun in a room offered the Christmas stories (and whether its host switched them off), a Christmas story's cartoon seen",
+      "a game begun in a room offered the Christmas stories (whether its host switched them off, and whether bots took empty seats), a Christmas story's cartoon seen",
     );
-    expect(flat).toContain('истории «Новый год 2027» (и выключил ли их ведущий)');
+    expect(flat).toContain(
+      'истории «Новый год 2027» (выключил ли их ведущий и заняли ли боты пустые места)',
+    );
+    // Step 130: the counts say whether bots took empty seats (first five sections spot-checked).
+    const sections = html.split(/(?=<section id="privacy-)/).slice(1);
+    expect(sections).toHaveLength(23);
+    const bots = [/bots took empty seats/, /des bots/, /Bots freie/, /боты пустые/, /bot mengisi/];
+    for (const [i, word] of bots.entries()) {
+      expect(sections[i]!.replace(/\s+/g, ' ')).toMatch(word);
+    }
   });
 
   it('names the paying counts too: the offer, the payment page, the pay button (Step 123)', () => {

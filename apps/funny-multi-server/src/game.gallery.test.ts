@@ -13,6 +13,7 @@ import { __resetRoomsForTest, createRoom, joinRoom } from './rooms.js';
 import {
   ROUNDS,
   buildGallery,
+  fillEmptySeats,
   resolveAnswers,
   revealProse,
   shareGallery,
@@ -87,6 +88,23 @@ describe('buildGallery', () => {
     playToReveal(room, io);
 
     expect(buildGallery(room).entries.map((e) => e.isBot)).toEqual([false, true, false]);
+  });
+
+  it("gives a seat bot's entry its number and a person's bot none (Step 130)", () => {
+    const room = makeRoom(2);
+    fillEmptySeats(room);
+    room.players[1] = { ...room.players[1]!, isBot: true };
+    const { io } = makeIo();
+    startGame(room, io);
+    for (let round = 0; round < ROUNDS; round++) submitAnswer(room, 's0', optionAt(round, 0), io);
+
+    const entries = buildGallery(room).entries;
+    expect(entries.map((e) => [e.nickname, e.isBot, e.seat])).toEqual([
+      ['p0', false, undefined],
+      ['p1', true, undefined],
+      ['Bot 1', true, 1],
+    ]);
+    expect(entries.some((e) => 'seat' in e && e.seat === undefined)).toBe(false);
   });
 
   it('carries a null picture for a story with no picture yet', () => {

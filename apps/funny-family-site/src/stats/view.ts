@@ -555,6 +555,7 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
     (match) => clicksOn(rows, XMAS_BUTTONS, match),
     (match) => total(rows, { ...match, e: 'xm_game', t: 'on' }),
     (match) => total(rows, { ...match, e: 'xm_game', t: 'off' }),
+    (match) => total(rows, { ...match, e: 'xm_bots' }),
     (match) => total(rows, { ...match, e: 'xm_gold' }),
   ];
   const paying: readonly Column[] = [
@@ -573,12 +574,13 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
         'Christmas buttons clicked',
         'Games with the Christmas stories',
         'Games with them switched off',
+        'Of all those games, with bots',
         'Christmas cartoon seen',
       ],
-      byLanguage(rows, names, playing, [2, 1, 4]),
+      byLanguage(rows, names, playing, [2, 1, 5]),
     ),
     note(
-      'Website only. Each player’s tab counts a game once, when its first round starts, with the host’s switch as it stood then; and a golden story’s cartoon once, in the reveal or the gallery. The language is the one each player’s screen is in.',
+      'Website only. Each player’s tab counts a game once, when its first round starts, with the host’s switch as it stood then; and a golden story’s cartoon once, in the reveal or the gallery. The language is the one each player’s screen is in. “With bots” counts those games, on or off, that had fewer than three players, bots taking the empty seats.',
     ),
     note(
       'The first two columns are the landing page’s: a visit sent there by the /x26 address (the QR code on a golden story’s download), and a click on one of the edition’s two buttons, in the page’s language. The buttons lead to Funny Multi, so their clicks count among its clicks above and below too. Once the pay page is live, /x26 leads to it and no longer to the landing page: its visits are then in the table below.',

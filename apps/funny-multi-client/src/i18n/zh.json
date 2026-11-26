@@ -29,7 +29,9 @@
     "packCode": "🔔 你的圣诞故事包：{{code}}",
     "packCodeHint": "你在这部手机上创建的每个房间都会使用全部圣诞故事，直到 {{date}}为止。",
     "packCodeRemove": "移除",
-    "packEnded": "你的 2026 圣诞特别版已结束。感谢游玩！"
+    "packEnded": "你的 2026 圣诞特别版已结束。感谢游玩！",
+    "christmasLine": "🔔 每个新房间都有一个圣诞故事",
+    "christmasPeek": "圣诞故事包 — 免费！"
   },
   "lobby": {
     "roomCodeLabel": "房间代码",

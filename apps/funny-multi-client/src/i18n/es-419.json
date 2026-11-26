@@ -29,7 +29,9 @@
     "packCode": "🔔 Tu paquete de Navidad: {{code}}",
     "packCodeHint": "Cada sala que crees en este celular tiene todas las historias de Navidad, hasta el {{date}}.",
     "packCodeRemove": "Quitar",
-    "packEnded": "Tu edición Navidad 2026 terminó. ¡Gracias por jugar!"
+    "packEnded": "Tu edición Navidad 2026 terminó. ¡Gracias por jugar!",
+    "christmasLine": "🔔 Una historia de Navidad en cada nueva sala",
+    "christmasPeek": "¡Paquete de Navidad gratis!"
   },
   "lobby": {
     "roomCodeLabel": "Código de la sala",

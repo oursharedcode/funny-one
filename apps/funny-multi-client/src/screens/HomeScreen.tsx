@@ -42,12 +42,18 @@
 // room created while the pack's paid part lasts. A refused code still creates
 // the room; the ack says why and the lobby shows it. Once the paid part has
 // ended the box says so instead, and nothing is sent.
+//
+// B-29 (owner's picks, 2026-11-26): while a room in the picked language would
+// get the free Christmas pack (`packForRoom`), the create screen wears its
+// Christmas dressing — lights along the top, the gold-on-green line with the
+// peeking reindeer under the subtitle, and falling snow (ChristmasDressing).
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import { homeUrl } from '../basePath';
 import Wordmark from '../components/art/Wordmark';
+import { ChristmasLights, ChristmasPeek, Snowfall } from '../components/art/ChristmasDressing';
 import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
@@ -58,7 +64,14 @@ import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
 import { forgetPackCode, linkCodeRefused, readPackCode } from '../packCode';
 import { lastPaidDay } from '../packDay';
-import { LANGUAGES, NICKNAME_MAX, NICKNAME_MIN, isLanguage, isPackPaid } from '@funny/shared';
+import {
+  LANGUAGES,
+  NICKNAME_MAX,
+  NICKNAME_MIN,
+  isLanguage,
+  isPackPaid,
+  packForRoom,
+} from '@funny/shared';
 import type { LobbyState } from '../App';
 import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
 
@@ -106,6 +119,8 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
   // Step 122: the paid code, and the same code while it still works.
   const [packCode, setPackCode] = useState(readPackCode);
   const liveCode = packCode && isPackPaid(packCode.pack, Date.now()) ? packCode : null;
+  // B-29: the Christmas dressing, while a new room here gets the free pack.
+  const christmas = mode === 'create' && packForRoom(language, Date.now()) !== null;
 
   // When the invite link carries the room language (`?room=CODE&lang=ru`),
   // render the join screen in that language immediately rather than waiting for
@@ -265,11 +280,14 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
 
   return (
     <div
-      className={`mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6 ${hasAnyRail(support) ? 'pt-14' : ''}`}
+      className={`isolate mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6 ${hasAnyRail(support) || christmas ? 'pt-14' : ''}`}
     >
+      {christmas && <Snowfall />}
+      {christmas && <ChristmasLights />}
       {hasAnyRail(support) && <SupportHeart onOpen={onOpenSupport} />}
       <Wordmark />
       <p className="text-center text-gray-700">{t('home.subtitle')}</p>
+      {christmas && <ChristmasPeek />}
 
       {mode === 'create' && (
         <>

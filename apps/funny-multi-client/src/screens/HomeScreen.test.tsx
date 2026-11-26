@@ -711,3 +711,77 @@ describe('the paid code (Step 122)', () => {
     expect(socketMock.onlyEmitOf('room:create').args[0]).not.toHaveProperty('code');
   });
 });
+
+describe('the Christmas dressing (B-29, 2026-11-26)', () => {
+  const LINE = '🔔 One Christmas story in every new room';
+  const PEEK = 'Christmas pack — free!';
+  const at = (iso: string): void => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(iso));
+  };
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('dresses the create screen while a new room gets the free pack', () => {
+    at('2026-12-01T10:00:00Z');
+    renderHome();
+    expect(screen.getByText(LINE)).toBeTruthy();
+    expect(screen.getByRole('button', { name: PEEK })).toBeTruthy();
+    expect(screen.getByTestId('christmas-lights')).toBeTruthy();
+    expect(screen.getByTestId('snowfall')).toBeTruthy();
+  });
+
+  it('follows the picked language: none for a language outside the pack', async () => {
+    at('2026-12-01T10:00:00Z');
+    renderHome();
+    await chooseContentLanguage('ru');
+    expect(screen.getByText('🔔 В каждой новой комнате — одна новогодняя история')).toBeTruthy();
+    await chooseContentLanguage('ar');
+    expect(screen.queryByTestId('snowfall')).toBeNull();
+    expect(screen.queryByTestId('christmas-lights')).toBeNull();
+    expect(screen.queryByText(/🔔/)).toBeNull();
+  });
+
+  it('is gone once the free part has ended', () => {
+    at('2027-07-03T00:00:00Z');
+    renderHome();
+    expect(screen.queryByText(LINE)).toBeNull();
+    expect(screen.queryByTestId('snowfall')).toBeNull();
+  });
+
+  it('stays off the join screen', () => {
+    at('2026-12-01T10:00:00Z');
+    setUrl('?room=abcd');
+    renderHome();
+    expect(screen.queryByText(LINE)).toBeNull();
+    expect(screen.queryByTestId('christmas-lights')).toBeNull();
+  });
+
+  it('rings the sleigh bells when the reindeer is tapped, and again from the start', () => {
+    at('2026-12-01T10:00:00Z');
+    const play = vi
+      .spyOn(HTMLMediaElement.prototype, 'play')
+      .mockImplementation(() => Promise.resolve());
+    renderHome();
+    const deer = screen.getByRole('button', { name: PEEK });
+    fireEvent.click(deer);
+    expect(play).toHaveBeenCalledTimes(1);
+    const bells = play.mock.contexts[0] as HTMLAudioElement;
+    expect(bells.src).toContain('sounds/sleigh-bells.mp3');
+    expect(bells.volume).toBe(0.5);
+    fireEvent.click(deer);
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(play.mock.contexts[1]).toBe(bells);
+  });
+
+  it('carries on quietly when the browser will not sound', () => {
+    at('2026-12-01T10:00:00Z');
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() =>
+      Promise.reject(new DOMException('no', 'NotAllowedError')),
+    );
+    renderHome();
+    expect(() => fireEvent.click(screen.getByRole('button', { name: PEEK }))).not.toThrow();
+  });
+});

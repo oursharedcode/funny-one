@@ -241,14 +241,17 @@ export function xmasLabel(code: XmasLanguage, label: string): string {
  * too), so the game counts the visit as one from here. Its name is exactly
  * the visible label (WCAG 2.5.3); the bell is decoration. The top band also
  * holds what replaces the button for a visitor sent by /x26 once the free
- * part is over.
+ * part is over. On hover and keyboard focus a tooltip says what the free
+ * part gives (owner request 2026-11-26); it is the link's description, and a
+ * mouse over the button rings sleigh bells (client/xmasButtons.ts).
  */
 function xmasBand(code: Language, place: 'top' | 'foot'): string {
   if (!hasXmas(code)) return '';
   const t = XMAS_STRINGS[code];
+  const tip = `xmas-tip-${place}`;
   const ended = place === 'top' ? `\n<p class="xmas-ended">${esc(t.ended)}</p>` : '';
   return `<div class="xmas xmas-${place}">
-<a class="btn btn-xmas" href="${esc(fmUrl(code, 'a'))}" data-track="xm-${place}" aria-label="${esc(t.play)}"><span class="xmas-bell" aria-hidden="true">🔔</span><span class="xmas-label" aria-hidden="true">${xmasLabel(code, t.play)}</span></a>${ended}
+<span class="xmas-wrap"><a class="btn btn-xmas" href="${esc(fmUrl(code, 'a'))}" data-track="xm-${place}" aria-label="${esc(t.play)}" aria-describedby="${tip}"><span class="xmas-bell" aria-hidden="true">🔔</span><span class="xmas-label" aria-hidden="true">${xmasLabel(code, t.play)}</span></a><span class="xmas-tip" id="${tip}" role="tooltip">${esc(t.hint)}</span></span>${ended}
 </div>`;
 }
 

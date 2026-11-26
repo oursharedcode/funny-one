@@ -128,7 +128,7 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/main.tsx` | adapt | SRC's `?test=` harness branch dropped with the Test* screens |
 | `client/index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js` | adapt | product identity + this project's precached assets; PWA/workbox strategy carried verbatim |
 | `client/public/flags/*.png` | copy | language picker |
-| `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists. *(2026-10-05, B-12: `monkey/` — the four sprites of the share video's monkey — is carried after all, to `public/monkey/`.)* |
+| `client/public/{icon-192,icon-512}.png`, `monkeys-on-bus.png`, `monkey/`, demo images | **drop** | SRC's branding. Replaced by a placeholder `public/icon.svg` until real artwork exists. *(2026-10-05, B-12: `monkey/` — the four sprites of the share video's monkey — is carried after all, to `public/monkey/`. 2026-11-26, B-29: beside it `public/reindeer/` and `public/santa/`, four sprites each, this project's own drawings.)* |
 | `client/src/screens/HomeScreen.tsx` | adapt | create-mode language picker gated to `AUTHORED_LANGUAGES` — it sets the room's *content* language, which the server narrowed at T-2.3; join-mode picker stays at all 15 (interface only). `wobbleEngine` dropped from `LobbyState`. Busy flag released on `error`, since a rejected `room:create` reports by event and never acks (T-3.2) |
 | `client/src/screens/LobbyScreen.tsx` | adapt | `game:start` emitted with no arguments — T-1.6 dropped the payload type with its only field |
 | `client/src/screens/WaitingScreen.tsx` | copy | T-3.4. Only change: SRC's local `WaitingData` interface dropped for the `RoundWaitingPayload` already on the contract |
@@ -141,8 +141,8 @@ Legend: **copy** = as-is (path/import fixes only) · **adapt** = meaningful edit
 | `client/src/styles/*` | adapt | tokens + the three motion presets copied. `motion.ts` gains `screenSlide` (T-3.4): the §17 phase transition, lifted out of App.tsx so the forward-only lock — direction never varies — is a named value a test can hold rather than four inline literals |
 | `client/src/App.test.tsx` | **new** | T-3.4. The phase machine had no coverage: screen suites render their screen directly, so nothing checked that an event reaches the right screen with the right state. Also holds the §17 transition assertions, which are behavioural — framer-motion writes real transforms under jsdom |
 | `client/src/prose.ts`, `downloadStory.ts`, `share.ts` | adapt | fetch image URL → blob (CORS) instead of base64 (§8.3) |
-| `client/src/recordWobble.ts` | copy → adapt | CSS engine only. Since B-12 (2026-10-05) it also draws the monkey (`videoMonkey.ts`) and carries the two Android fixes SRC made only in the Lottie sibling: the app's own images load without CORS mode, and the canvas is attached off-screen while recording |
-| `client/src/recordWobbleLottie.ts` | **drop**, monkey carried | ARC-3: no Lottie — the second recorder and the engine choice stay dropped (DD-9). Carried 2026-10-05 (B-12) as `videoMonkey.ts`: the monkey's rig and timeline only. Despite its name the SRC file uses no Lottie library — plain canvas calls and four PNG sprites — so ARC-3 holds |
+| `client/src/recordWobble.ts` | copy → adapt | CSS engine only. Since B-12 (2026-10-05) it also draws the monkey (`videoCharacter.ts`, until 2026-11-26 `videoMonkey.ts`) and carries the two Android fixes SRC made only in the Lottie sibling: the app's own images load without CORS mode, and the canvas is attached off-screen while recording |
+| `client/src/recordWobbleLottie.ts` | **drop**, monkey carried | ARC-3: no Lottie — the second recorder and the engine choice stay dropped (DD-9). Carried 2026-10-05 (B-12) as `videoMonkey.ts` — `videoCharacter.ts` since 2026-11-26, when the reindeer and Santa joined the monkey (§8.3): the monkey's rig and timeline only. Despite its name the SRC file uses no Lottie library — plain canvas calls and four PNG sprites — so ARC-3 holds |
 | `client/src/capReset.ts`, `videoFooter.ts` | copy | cap UX helpers, share footer |
 | `client/src/screens/Test*` | drop v1 | dev-only harnesses; re-add on demand |
 | `client/src/screens/PlaceholderScreen.tsx` | **new** | T-3.1 scaffold. A phase router needs six destinations; the screens land across five later tasks, so each file renders this until its task replaces it wholesale |
@@ -484,7 +484,9 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   section, "Paying for it". A press is not a payment: payments are in the receipt log.
 - **Sleigh bells, the landing line, the invitation and the alarm** (Step 126, owner decisions
   of 2026-11-25, third set). **The 5 s video of a golden story or of a paid game's story**
-  (D2 A; an ordinary story's stays silent) rings with sleigh bells (`sleighBells.ts`):
+  (D2 A; an ordinary story's stays silent) rings with sleigh bells (`clipSound.ts`, until
+  2026-11-26 `sleighBells.ts`; the same clips' Christmas characters and their "ho-ho-ho" are
+  §8.3's amendment of that day):
   `public/sounds/sleigh-bells.mp3`, 5 s of a CC0 recording from Wikimedia Commons (D1 A;
   README credits it), played through Web Audio to the speaker and into a MediaStream track
   that `recordWobble.ts` adds to the canvas's stream (`pickMime(true)`: webm with opus
@@ -782,6 +784,36 @@ the QR footer, so it walks on the cartoon's top edge (in the empty band above) a
 wobble. Plain canvas 2D and four PNG sprites (`public/monkey/`) — no animation library, still
 one engine, no selection UI. The sprites are best-effort: if they fail to load the clip records
 without the monkey.
+
+**Amended 2026-11-26 (B-29, owner request):** in the two clips that ring with sleigh bells — a
+golden story's and a paid game's story's — a reindeer or a Santa takes the monkey's place and
+says "ho-ho-ho". An ordinary story's clip, and a slice story's, keep the monkey, "ha-ha" and
+silence.
+
+- **One act, three rigs** (`videoCharacter.ts`, renamed from `videoMonkey.ts`). The timeline and
+  the movements are the monkey's; a `CharacterRig` holds what differs — the sprite folder, the
+  four parts' sizes, where the joints are, how far the body drops in the fall, where the balloon
+  hangs and what it says. `MONKEY` holds SRC's numbers unchanged. `REINDEER` and `SANTA` are
+  shorter in the leg and larger in the head, and stand on the same line; their balloons and the
+  reindeer's antlers stay on the canvas at the highest ground the cartoon gives (y ≈ 232).
+- **Half and half.** `nextCharacter(festive)` gives the two in turn, clip by clip on one device,
+  the first by chance; an ordinary clip takes no turn.
+- **The sprites** are this project's own drawings, made as vector parts and shipped as PNG at
+  twice the drawn size like the monkey's (`public/reindeer/`, `public/santa/`; precached with
+  the other PNGs). The reindeer is redrawn from the owner's picture — green knitted jumper, red
+  nose. The Santa is the owner's pick of five drawn for him: "D · the moustache" (2026-11-26).
+- **The voice** (`clipSound.ts`, renamed from `sleighBells.ts`). "ho-ho-ho" is in the balloon —
+  Latin letters in every language, as "ha-ha" is — and aloud, each character in a voice of its
+  own (`CharacterRig.voice`; the monkey has none): `public/sounds/ho-ho-ho-santa.mp3` is low,
+  `public/sounds/ho-ho-ho-reindeer.mp3` a high cartoon voice with a kid goat's wobble (owner
+  request 2026-11-26; each is his pick, of three and of five). The voice starts with the
+  balloon, 3 s in, to the speaker and into the recording, and the bells drop to 0.3 of their
+  strength under it (0.15 s down, 0.3 s back up). Both files are the owner's one recording of
+  his own voice, altered before they enter the repo so that neither is his voice as he speaks;
+  the altered files live in the repo under a README credit line (owner decision 2026-11-26, D2
+  A), the untouched recording and the settings of the alteration stay out of it. A voice is an
+  extra: missing, or not a sound — a host that answers a missing file with its start page — the
+  clip rings with the bells alone, and without the bells there is no sound at all, as before.
 
 ## 9. i18n (D-2, FM-POOL-2/3/5)
 

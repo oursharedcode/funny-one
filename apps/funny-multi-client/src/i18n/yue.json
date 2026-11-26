@@ -29,7 +29,9 @@
     "packCode": "🔔 你嘅聖誕故事包：{{code}}",
     "packCodeHint": "你喺呢部手機建立嘅每個房間，都會玩齊所有聖誕故事，直到 {{date}}為止。",
     "packCodeRemove": "移除",
-    "packEnded": "你嘅 2026 聖誕特別版已經完咗。多謝你嚟玩！"
+    "packEnded": "你嘅 2026 聖誕特別版已經完咗。多謝你嚟玩！",
+    "christmasLine": "🔔 每個新房間都有一個聖誕故事",
+    "christmasPeek": "聖誕故事包 — 免費！"
   },
   "lobby": {
     "roomCodeLabel": "房間代碼",

@@ -8477,7 +8477,10 @@ account (the checkout link is its first test), then keep or refund; the admin li
 the phone; the live-badge look; Funny Multi's trader confirmation before 1 February 2027. B-3's
 native reviewers keep Steps 122–126's texts in 21 languages.
 
-**RESUME HERE (2026-11-25, after Step 127; not yet pushed).** The paid half is live (image
+~~RESUME HERE (2026-11-25, after Step 127; not yet pushed)~~ — pushed as `4bdbea5`, CI green
+(run 45648566926); carried into Step 128's note. Its text, kept for the record:
+
+The paid half is live (image
 `funny-multi:395a65a`, the landing site the same day): PayID, Sponsors (tier 687176, webhook
 checked with 204), the admin page, the invitation, the bells, the uptime alarm (enabled, green).
 **Next, Step 128 — #1 play alone with two bots** (it changes the 3-player rule), in the second
@@ -8486,3 +8489,59 @@ the owner may add the lone host's grace (B-29's finding of Step 127). No deploys
 31 December–1 January or 6–7 January (#16).
 **Owed, the owner's:** the real US$2 sponsorship (D4 of Step 125); the admin link on the phone;
 the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+## Step 128 (task B-29) — Christmas characters in the video, the landing bells, the home dressing (2026-11-26)
+
+Owner requests of 2026-11-26, taken one after another; B-29's block in tasks.md holds each
+request, pick and what was seen. Step 128 was to be #1 (play alone with two bots); it moves to
+129.
+
+**Shipped:**
+
+- **The Christmas video's characters** (design §8.3, amended). In a golden story's and a paid
+  game's 5 s clip a reindeer or a Santa takes the monkey's place, in turn clip by clip, and says
+  "ho-ho-ho" — in the balloon and aloud. `videoMonkey.ts` → `videoCharacter.ts` (one act, three
+  `CharacterRig`s, `nextCharacter`); `sleighBells.ts` → `clipSound.ts` (the character's voice
+  at 3 s, the bells ducked to 0.3 under it; a voice is optional); sprites in `public/reindeer/`
+  and `public/santa/` (owner's pick D, the moustache); voices `public/sounds/ho-ho-ho-santa.mp3`
+  (A) and `ho-ho-ho-reindeer.mp3` (3, the bleat). Both are the owner's one recording, altered;
+  the recording and the alteration's settings stay outside the repo (D2 A: the altered files are
+  in the repo, README credits them).
+- **The landing page's two "Christmas pack — try it free" buttons** (`funny-family-site`):
+  `client/xmasButtons.ts` (new) rings the bells (`public/media/sleigh-bells.mp3`, a copy) on a
+  mouse hover and fades them on leave; a tooltip (`XmasStrings.hint`, 20 languages, en and ru
+  written, 18 drafts) on hover and focus, Escape hides it. On a touch screen (owner's pick
+  "1 + jingle") the line is a caption under each button and a tap rings the bells before the
+  game opens 0.4 s later.
+- **Funny Multi's create screen wears Christmas** (owner's picks 2 and 4 of four, and the snow):
+  `components/art/ChristmasDressing.tsx` (new) — twinkling lights along the top, the gold-on-green
+  line `home.christmasLine` with the reindeer peeking over it and a bubble `home.christmasPeek`
+  (a tap rings the bells), and 14 big snow crystals falling slowly behind the page. Shown while
+  `packForRoom` gives the picked language a pack: not on the join screen, not in ar, he or fa,
+  not after the free part. The two keys are in all 23 catalogues (en and ru written, 21 drafts).
+  Under reduced motion nothing moves. It takes a part of #9 (a festive room look: snow) on the
+  home screen; the room itself is untouched.
+
+**Seen:** real headless-Chromium recordings of the clips (reindeer, Santa, the monkey; the
+voices at 3.0 s, the bells lower under them); the landing page on a desktop and phones (42
+checks); the home screen on a desktop (1280) and phones (en 360; ru, ta, de 320) — no sideways
+scroll, the title clear of the lights, the tap's bells, ar bare, the snow lying still under
+reduced motion (42 checks). Scratch scripts in `.screens/` (gitignored).
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 659 + 486 + 178 + 453 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob 1244013, minimatch 1244623, i18next 1250194); CI pending the push.
+
+**Owed:** the deploy of Step 128 (client and landing site), when the owner says; B-3's native
+reviewers keep the new texts in 18 and 21 languages.
+
+**RESUME HERE (2026-11-26, after Step 128; not yet pushed).** Steps 122–127 are live; Step 128
+(the video's reindeer and Santa, the landing bells, the home's Christmas dressing) is committed,
+not pushed or deployed. **Next, Step 129 — #1 play alone with two bots** (it changes the
+3-player rule), in the second deploy by 23 December with #10 gift a pack, #9 the festive room
+look (the home screen has its snow since Step 128) and #7 the whole-game video; the owner may add
+the lone host's grace (B-29's finding of Step 127). No deploys 24–26 December, 31 December–1
+January or 6–7 January (#16).
+**Owed, the owner's:** the push of Step 128; the real US$2 sponsorship (D4 of Step 125); the
+admin link on the phone; the live-badge look; Funny Multi's trader confirmation before 1 Feb
+2027.

@@ -29,7 +29,9 @@
     "packCode": "🔔 Dein Weihnachtspaket: {{code}}",
     "packCodeHint": "Jeder Raum, den du auf diesem Handy erstellst, hat bis zum {{date}} alle Weihnachtsgeschichten.",
     "packCodeRemove": "Entfernen",
-    "packEnded": "Deine Weihnachtsausgabe 2026 ist zu Ende. Danke fürs Spielen!"
+    "packEnded": "Deine Weihnachtsausgabe 2026 ist zu Ende. Danke fürs Spielen!",
+    "christmasLine": "🔔 Eine Weihnachtsgeschichte in jedem neuen Raum",
+    "christmasPeek": "Weihnachtspaket — gratis!"
   },
   "lobby": {
     "roomCodeLabel": "Raumcode",

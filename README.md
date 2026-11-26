@@ -49,9 +49,14 @@ The flag pictures in each app's `public/flags/` are [Twemoji](https://github.com
 © Twitter, Inc. and other contributors, licensed under
 [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The Fredoka font is under the SIL Open
 Font License (`public/fonts/OFL.txt`). Funny Multi's sleigh bells
-(`public/sounds/sleigh-bells.mp3`) are cut from
+(`public/sounds/sleigh-bells.mp3`, and the landing site's copy,
+`apps/funny-family-site/public/media/sleigh-bells.mp3`) are cut from
 [Sleigh bells.wav](https://commons.wikimedia.org/wiki/File:Sleigh_bells.wav) by The Midnite Wolf,
 dedicated to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The reindeer and the Santa of its Christmas video (`public/reindeer/`, `public/santa/`) are this
+project's own drawings, under the repo's licence. The two "ho-ho-ho" of that video
+(`public/sounds/ho-ho-ho-santa.mp3`, `public/sounds/ho-ho-ho-reindeer.mp3`) are the developer's
+own voice, altered on purpose so that neither is his voice as he speaks.
 The repo _is_ the product: there are no
 secrets baked into any deployment, no server-side-only feature, nothing withheld from a
 self-hoster. If you deploy your own copy — modified or not — the AGPL requires you to make

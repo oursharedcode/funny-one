@@ -223,9 +223,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
 - **B-12** The laughing monkey back in the 5-second share video (owner request 2026-10-05): it
   walks in, points and laughs ("ha-ha"), then falls on its back — SRC's act, here on the
   cartoon's top edge (design §8.3, amended). Plain canvas drawing of SRC's four sprites
-  (`public/monkey/`, `videoMonkey.ts`) inside the one recorder, which also takes that SRC
-  recorder's two Android fixes. No Lottie, no engine choice (DD-9 stands). **Code done
-  2026-10-05**; checked on a real headless-Chromium recording, frames viewed.
+  (`public/monkey/`, `videoMonkey.ts` — `videoCharacter.ts` since 2026-11-26) inside the one
+  recorder, which also takes that SRC recorder's two Android fixes. No Lottie, no engine choice
+  (DD-9 stands). **Code done 2026-10-05**; checked on a real headless-Chromium recording, frames
+  viewed.
   **Deployed 2026-10-05** (the four sprites answer 200 on the live host). *Open:* one recording
   on the owner's Android phone.
 - **B-13** — **closed 2026-10-05 (Step 61)**, block in `steering/tasks-done.md`. Home leaves
@@ -871,7 +872,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       festive line, and a join link's preview — a title and one of the 650 pictures) and #15 an
       uptime alarm (a scheduled GitHub check every 30 minutes of the server's health page,
       `/x26` and one Christmas picture, an email to the owner on a failure) in Step 126. After
-      the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 128 since 2026-11-25, the deploy being 127; it
+      the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 129 since 2026-11-26, the deploy being 127; it
       changes the 3-player rule), #10 gift a pack (Australia's gift-card law checked first — a
       3-year expiry against 1 August 2027), #9 a festive room look (snow, off under reduced
       motion; a festive ending card; a bell when a golden story is revealed), #7 the whole-game
@@ -1068,10 +1069,10 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       that avoid the known flaws, the owner picks one, and it ships as a 1200 × 630 JPEG from
       the game's own address. The uptime alarm checks the same picture.
     - Following from these, the deploy is Step 127 and #1 (play alone with two bots) moves to
-      Step 128.
+      Step 128 (129 since 2026-11-26, when Step 128 took the Christmas characters and dressing).
   - **Bells, the landing line, the invitation and the alarm done 2026-11-25 (Step 126)** — not
-    live until Step 127's deploy. `sleighBells.ts` and `public/sounds/sleigh-bells.mp3` (the
-    clip's audio track, best-effort); `xmasStrings.ts`'s 20 `play` lines; `PACK_INVITES` and
+    live until Step 127's deploy. `sleighBells.ts` (`clipSound.ts` since 2026-11-26) and
+    `public/sounds/sleigh-bells.mp3` (the clip's audio track, best-effort); `xmasStrings.ts`'s 20 `play` lines; `PACK_INVITES` and
     `inviteText` in shared (23 languages) and the lobby's `lobby.invite` button (share sheet,
     copy fallback); `invitePreview.ts` (the dressed join page) and `public/og-christmas.jpg`
     (provisional: S006, until the owner picks); `.github/workflows/uptime.yml`, which reads a
@@ -1114,7 +1115,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     uptime alarm enabled and green. On the owner's phone: PayID with no money (issue, "I've
     paid", Received, a paid room, Block), the invitation's preview with the reindeer and the
     cat, "one Christmas story" in a free lobby, bells in a golden video. **Owed:** D4 of
-    Step 125, the real US$2 sponsorship. **Next:** Step 128 — #1 play alone with two bots.
+    Step 125, the real US$2 sponsorship. **Next:** Step 129 — #1 play alone with two bots.
   - *Agent finding 2026-11-25 (Step 127), for the owner to place:* **a lone host's room can
     close while the invitation is sent.** The 65 s grace (`DISCONNECT_GRACE_MS`) counts from the
     socket's close, and a phone hides the game while the share sheet and the messenger are open;
@@ -1122,6 +1123,74 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     and guests opening the link would have found no room. Not new to Step 126, but the Invite
     button makes it common. Options when taken up: a longer grace for a host alone in the lobby
     (minutes, not seconds), or the room kept until its host's own tab is closed.
+  - **A reindeer and a Santa in the Christmas video, saying "ho-ho-ho"** (owner request
+    2026-11-26; design §8.3, amended that day). In the 5 s clip of a golden story and of a paid
+    game's story the monkey gives way to a reindeer in half of the clips and a funny Santa in
+    the other half — body parts prepared as the monkey's are, the same movements — and the
+    silent "ha-ha" becomes "ho-ho-ho" in the owner's own voice, altered so it cannot be taken
+    for his. The agent's readings, the owner's to overturn: only the clips that already ring
+    (golden, paid) change; the two take turns clip by clip, the first by chance; the balloon
+    says "ho-ho-ho" in Latin letters in every language.
+    - **Code done 2026-11-26, committed in Step 128, not deployed.** `videoCharacter.ts` (was
+      `videoMonkey.ts`: one act, three rigs, `nextCharacter`), `clipSound.ts` (was
+      `sleighBells.ts`: the voice at 3 s, the bells turned down under it, the voice optional),
+      `recordWobble.ts`, sprites in `public/reindeer/` and `public/santa/`. Seen working in
+      real headless-Chromium recordings: reindeer, then Santa, then an ordinary clip's monkey;
+      with a stand-in voice file it starts at 3.0 s and the bells are 10.5 dB lower under it;
+      with no voice file the clip rings with the bells alone.
+    - **Owner decisions 2026-11-26.** D1 **D**: of the five Santas drawn (A jolly classic,
+      B cool shades, C googly goof, D the moustache, E winking grandpa) the moustache — its
+      sprites are the ones in `public/santa/`. D2 **A**: the altered voice lives in the public
+      repo under a credit line in the README, not on the deployment alone.
+    - **The voice added 2026-11-26.** From the owner's recording, which stays outside the repo
+      with the settings: 1.6 s, 13 KB, mono, no tags of the recording — lower and
+      larger-throated than the owner, with a second, differently moved copy under the first.
+      The README credits it. Seen in real recordings with the file as shipped: the three "ho"
+      at 3.0, 3.5 and 4.0 s (the third as the fall begins), the voice over by 4.6 s, the bells
+      down under it and back before the clip ends, no clipping (peak −2.7 dB).
+    - **A voice each, 2026-11-26 (owner: "A stays for the Santa, for the reindeer make 5
+      options of higher, a cartoon voice").** The low voice above is the Santa's for good:
+      `public/sounds/ho-ho-ho-santa.mp3`. The reindeer has its own file,
+      `public/sounds/ho-ho-ho-reindeer.mp3`; `CharacterRig.voice` names each, the monkey has
+      none, and `openClipSound` takes the path. Five higher alterations of the same recording
+      were made for the owner's ear, outside the repo: 1 the young reindeer, 2 the chipmunk,
+      3 the bleat, 4 the nose, 5 the two squeaks. He heard each on a clip of the reindeer
+      alone on white and chose **3, the bleat** (2026-11-26) — higher, with a kid goat's
+      wobble; 1.5 s, 13 KB. Nothing is owed on the voices.
+    - **The landing buttons ring and explain, 2026-11-26 (owner: "mouse hover, add 'bells'
+      sound, add tooltip … please improve the tooltip text").** Both "Christmas pack — try it
+      free" buttons (top and foot) sit in a `.xmas-wrap` with a `role="tooltip"` the button's
+      `aria-describedby` names; the text is the new `XmasStrings.hint`, in the game's own words,
+      not "golden": en "Create a new room: one of its stories will be a Christmas story. Free,
+      no sign-up.", ru "Создайте новую комнату — одна из её историй будет новогодней. Бесплатно
+      и без регистрации."; the other 18 are machine drafts. Shown on hover and keyboard focus,
+      below the top button and above the foot one; Escape hides it (WCAG 1.4.13).
+      `client/xmasButtons.ts` (new) rings the game's own CC0 bells, copied to
+      `public/media/sleigh-bells.mp3`, at half strength when a mouse comes over either button
+      and fades them out in 0.4 s when it leaves; fetched on the first mouse move. Browsers
+      keep a page silent until the visitor has clicked or typed on it, so a first hover before
+      that rings nothing. **A touch screen (owner's pick "1 + jingle", the same day, of two):**
+      no hover, so the same line is a caption under each button, always shown; a tap rings the
+      bells (a tap may sound) and the game opens 0.4 s later. A mouse click, a key or a
+      new-tab click goes at once. Seen in Chromium: desktop en hover, Escape and focus; phone
+      en 360, ru and de 320, caption under both buttons, no sideways scroll, the tap's bells
+      and the game after them.
+    - **Funny Multi's create screen wears Christmas, 2026-11-26 (owner: "make 2 and 4, and
+      page with slow falling big snow cristalls", of four suggested).** While a new room in
+      the picked language gets the free pack (`packForRoom`: its 20 languages, until the free
+      part ends), `components/art/ChristmasDressing.tsx` (new) adds: a string of red, green
+      and gold bulbs along the top edge, twinkling (2); under the subtitle a gold-on-green
+      line, new key `home.christmasLine` (en "🔔 One Christmas story in every new room"), with
+      the video's reindeer peeking up from behind it and a bubble, `home.christmasPeek` (en
+      "Christmas pack — free!"); a tap on either rings the clips' bells at half strength and
+      shakes the reindeer (4); and 14 big six-armed snow crystals falling slowly behind the
+      page, swaying and turning. Not on the join screen; ar, he and fa have the two keys
+      (every catalogue has every key) but never show them. en and ru are written; the other 21
+      are machine drafts. Under prefers-reduced-motion nothing moves and the snow lies
+      scattered. Seen in Chromium: desktop en 1280; phone en 360, ru, ta and de 320, no
+      sideways scroll, the title clear of the lights, the tap's bells; ar bare.
+    - **Committed 2026-11-26 as Step 128** (the characters, the voices, the landing bells and
+      the home dressing); the deploy when the owner says.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

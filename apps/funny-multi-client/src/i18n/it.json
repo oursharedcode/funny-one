@@ -29,7 +29,9 @@
     "packCode": "🔔 Il tuo pacchetto di Natale: {{code}}",
     "packCodeHint": "Ogni stanza che crei su questo telefono ha tutte le storie di Natale, fino al {{date}}.",
     "packCodeRemove": "Rimuovi",
-    "packEnded": "La tua edizione Natale 2026 è finita. Grazie per aver giocato!"
+    "packEnded": "La tua edizione Natale 2026 è finita. Grazie per aver giocato!",
+    "christmasLine": "🔔 Una storia di Natale in ogni nuova stanza",
+    "christmasPeek": "Pacchetto di Natale — gratis!"
   },
   "lobby": {
     "roomCodeLabel": "Codice stanza",

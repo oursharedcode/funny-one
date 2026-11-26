@@ -29,7 +29,9 @@
     "packCode": "🔔 Seu pacote de Natal: {{code}}",
     "packCodeHint": "Toda sala que você criar neste celular tem todas as histórias de Natal, até {{date}}.",
     "packCodeRemove": "Remover",
-    "packEnded": "Sua edição de Natal 2026 terminou. Obrigado por jogar!"
+    "packEnded": "Sua edição de Natal 2026 terminou. Obrigado por jogar!",
+    "christmasLine": "🔔 Uma história de Natal em cada nova sala",
+    "christmasPeek": "Pacote de Natal — grátis!"
   },
   "lobby": {
     "roomCodeLabel": "Código da sala",

@@ -29,7 +29,9 @@
     "packCode": "🔔 Ton pack de Noël : {{code}}",
     "packCodeHint": "Chaque salle que tu crées sur ce téléphone a toutes les histoires de Noël, jusqu'au {{date}}.",
     "packCodeRemove": "Supprimer",
-    "packEnded": "Ton édition Noël 2026 est terminée. Merci d'avoir joué !"
+    "packEnded": "Ton édition Noël 2026 est terminée. Merci d'avoir joué !",
+    "christmasLine": "🔔 Une histoire de Noël dans chaque nouvelle salle",
+    "christmasPeek": "Pack de Noël — gratuit !"
   },
   "lobby": {
     "roomCodeLabel": "Code de la salle",

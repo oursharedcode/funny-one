@@ -36,7 +36,7 @@ function makeContextStub(): Canvas2DStub {
     translate: record('translate'),
     rotate: record('rotate'),
     scale: record('scale'),
-    // Path calls — the share video's speech balloon (videoMonkey.ts).
+    // Path calls — the share video's speech balloon (videoCharacter.ts).
     beginPath: record('beginPath'),
     moveTo: record('moveTo'),
     lineTo: record('lineTo'),

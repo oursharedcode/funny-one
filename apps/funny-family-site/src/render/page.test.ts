@@ -406,7 +406,14 @@ describe('the Christmas 2026 edition’s buttons (Step 119)', () => {
       // The hopping letters put together read the line as it is written.
       expect(a.querySelector('.xmas-label')?.textContent).toBe(t.play.split(/\s+/).join(' '));
       expect(a.querySelector('.xmas-bell')?.getAttribute('aria-hidden')).toBe('true');
+      // Its tooltip (2026-11-26) follows it and describes it.
+      const tip = doc.getElementById(a.getAttribute('aria-describedby') ?? '');
+      expect(tip?.getAttribute('role')).toBe('tooltip');
+      expect(tip?.textContent).toBe(t.hint);
+      expect(a.nextElementSibling).toBe(tip);
+      expect(tip?.parentElement?.classList.contains('xmas-wrap')).toBe(true);
     }
+    expect(new Set(buttons.map((a) => a.getAttribute('aria-describedby'))).size).toBe(2);
     // One under the header, before the hero; one last, above the footer.
     const main = doc.querySelector('main');
     expect(main?.firstElementChild?.classList.contains('xmas-top')).toBe(true);

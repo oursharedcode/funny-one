@@ -29,7 +29,9 @@
     "packCode": "🔔 Àpò Kérésìmesì rẹ: {{code}}",
     "packCodeHint": "Gbogbo yàrá tí o bá ṣẹ̀dá lórí fóònù yìí yóò ní gbogbo àwọn ìtàn Kérésìmesì, títí di {{date}}.",
     "packCodeRemove": "Yọ kúrò",
-    "packEnded": "Ẹ̀dà Kérésìmesì 2026 rẹ ti parí. O ṣeun fún ṣíṣeré!"
+    "packEnded": "Ẹ̀dà Kérésìmesì 2026 rẹ ti parí. O ṣeun fún ṣíṣeré!",
+    "christmasLine": "🔔 Ìtàn Kérésìmesì kan nínú yàrá tuntun kọ̀ọ̀kan",
+    "christmasPeek": "Àpò Kérésìmesì — lọ́fẹ̀ẹ́!"
   },
   "lobby": {
     "roomCodeLabel": "Kóòdù yàrá",

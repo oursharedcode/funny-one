@@ -333,6 +333,74 @@ body {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
 }
 
+/* ── Home's Christmas dressing (B-29, ChristmasDressing.tsx) ─────────────
+   The bulbs glow and dim one colour after another; the reindeer bobs; the
+   snow crystals fall slowly, swaying and turning. Each flake's fall, sway
+   and spin times are set inline. */
+
+@keyframes xmas-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+  50% {
+    opacity: 0.45;
+    filter: none;
+  }
+}
+@keyframes xmas-peek {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-3deg);
+  }
+}
+@keyframes snow-fall {
+  from {
+    transform: translate3d(0, -15vh, 0);
+  }
+  to {
+    transform: translate3d(0, 110vh, 0);
+  }
+}
+@keyframes snow-sway {
+  from {
+    transform: translateX(-18px);
+  }
+  to {
+    transform: translateX(18px);
+  }
+}
+@keyframes snow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.xmas-bulb {
+  animation: xmas-twinkle 1.65s ease-in-out infinite;
+}
+.xmas-peek {
+  animation: xmas-peek 2.6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.snow-flake {
+  position: absolute;
+  top: 0;
+  opacity: 0.9;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.snow-sway {
+  animation: snow-sway var(--snow-sway) ease-in-out infinite alternate;
+}
+.snow-spin {
+  animation: snow-spin var(--snow-spin) linear infinite;
+}
+
 /* Reduced motion: idle loops stop; color cues stay (DESIGN_SYSTEM §4). */
 @media (prefers-reduced-motion: reduce) {
   .bot-blink,
@@ -347,8 +415,17 @@ body {
   .picture-wobble-pulse,
   .support-beat,
   .support-hop,
-  .gift-sheen::after {
+  .gift-sheen::after,
+  .xmas-bulb,
+  .xmas-peek,
+  .snow-flake,
+  .snow-sway,
+  .snow-spin {
     animation: none;
+  }
+  /* The snow rests where it lies instead of all along the top. */
+  .snow-flake {
+    top: var(--snow-rest);
   }
 }
 

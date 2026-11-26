@@ -1353,6 +1353,108 @@ html.sheet-open {
   }
 }
 
+/* The tooltip (owner request 2026-11-26): under the top button, over the
+   foot one, on hover and keyboard focus; the mouse can move onto it, and
+   Escape hides it (client/xmasButtons.ts). A touch screen shows it as a
+   caption instead (below). */
+.xmas-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.xmas-tip {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 50%;
+  width: max-content;
+  max-width: min(22rem, 90vw);
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: var(--edge);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 4px 0 var(--ink);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -4px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
+}
+
+/* The gap between button and tooltip, held by the tooltip so the mouse can
+   cross it without the tooltip going. */
+.xmas-tip::before {
+  content: '';
+  position: absolute;
+  inset: -18px 0 auto;
+  height: 18px;
+}
+
+.xmas-foot .xmas-tip {
+  top: auto;
+  bottom: 100%;
+  margin: 0 0 14px;
+  transform: translate(-50%, 4px);
+}
+
+.xmas-foot .xmas-tip::before {
+  inset: auto 0 -18px;
+}
+
+.xmas-wrap:hover .xmas-tip,
+.btn-xmas:focus-visible + .xmas-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.xmas-wrap[data-tip-hidden] .xmas-tip {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* A touch screen has no hover (owner's pick, 2026-11-26): the same line is a
+   caption under each button, always shown. */
+@media (hover: none) {
+  .xmas-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .xmas-tip,
+  .xmas-foot .xmas-tip,
+  .xmas-wrap[data-tip-hidden] .xmas-tip {
+    position: static;
+    width: auto;
+    max-width: min(22rem, 90vw);
+    margin: 10px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+  }
+
+  .xmas-tip::before {
+    content: none;
+  }
+}
+
 .xmas-ended {
   display: none;
   max-width: 36em;
@@ -1364,7 +1466,7 @@ html.sheet-open {
   font-weight: 700;
 }
 
-html[data-xmas] .btn-xmas,
+html[data-xmas] .xmas-wrap,
 html[data-xmas] .xmas-foot,
 html[data-xmas='over'] .xmas {
   display: none;
@@ -1387,7 +1489,8 @@ html[data-xmas='ended'] .xmas-ended {
 
   .play-badge svg,
   .lang .chevron,
-  .hero-video {
+  .hero-video,
+  .xmas-tip {
     transition: none;
   }
 

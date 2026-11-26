@@ -10,7 +10,7 @@
 // ARC-3/DD-9 (T-1.6) dropped SRC's wire-level `WobbleEngine` choice, so there
 // is one recorder. Since B-12 (2026-10-05) it also carries what SRC's second
 // recorder (`recordWobbleLottie.ts`) added on top of this one — the laughing
-// monkey, see videoMonkey.ts — and that file's two Android fixes, marked
+// monkey, see videoCharacter.ts — and that file's two Android fixes, marked
 // below.
 //
 // Sibling to downloadStory.ts: same idea (composite + download), but the
@@ -34,11 +34,14 @@
 // Step 122: a paid story's footer is the buyer's thank-you, measured with the
 // same label it is drawn with, since that one can wrap.
 // Step 126 (owner decisions 2026-11-25 D1 A, D2 A): a golden story's and a
-// paid story's clip rings with sleigh bells (sleighBells.ts), to the speaker
+// paid story's clip rings with sleigh bells (clipSound.ts), to the speaker
 // and into the recording; every other clip stays silent.
+// Owner request 2026-11-26: in those two clips a reindeer or a Santa, turn
+// about, takes the monkey's place and says "ho-ho-ho" — in the balloon and
+// aloud, as the balloon goes up.
 
 import { footerTarget } from './landingUrl';
-import { openSleighBells, type SleighBells } from './sleighBells';
+import { openClipSound, type ClipSound } from './clipSound';
 import { withBase } from './basePath';
 import { downloadFile } from './share';
 import {
@@ -48,7 +51,14 @@ import {
   measureAttributionHeight,
   renderQrCanvas,
 } from './videoFooter';
-import { drawMonkey, loadMonkeySprites, type MonkeySprites } from './videoMonkey';
+import {
+  drawCharacter,
+  loadCharacterSprites,
+  nextCharacter,
+  POINT_START_MS,
+  type CharacterRig,
+  type CharacterSprites,
+} from './videoCharacter';
 import type { AuthoredLanguage } from '@funny/shared';
 
 const W = 720;
@@ -168,17 +178,31 @@ export interface WobbleVideoOptions {
 
 export async function buildWobbleVideoFile(opts: WobbleVideoOptions): Promise<File> {
   if (!pickMime()) throw new Error('MediaRecorder not supported in this browser');
+  // The character first — the monkey, or a festive clip's reindeer or Santa —
+  // because the voice is its own.
+  const festive = isFestive(opts);
+  const rig = nextCharacter(festive);
   // Opened before the first await, while the tap that asked for the clip still
-  // counts as the user's gesture (Safari's rule, sleighBells.ts).
-  const bells = opts.golden === true || opts.paid === true ? openSleighBells() : null;
+  // counts as the user's gesture (Safari's rule, clipSound.ts). The voice
+  // comes as the balloon goes up.
+  const sound = festive ? openClipSound(rig.voice, POINT_START_MS) : null;
   try {
-    return await recordClip(opts, bells);
+    return await recordClip(opts, rig, sound);
   } finally {
-    bells?.close();
+    sound?.close();
   }
 }
 
-async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): Promise<File> {
+/** The clips with sound and a Christmas character: a golden story's and a paid story's. */
+function isFestive(opts: WobbleVideoOptions): boolean {
+  return opts.golden === true || opts.paid === true;
+}
+
+async function recordClip(
+  opts: WobbleVideoOptions,
+  rig: CharacterRig,
+  sound: ClipSound | null,
+): Promise<File> {
   const { nickname, prose, pictureUrl, language } = opts;
   const ending = opts.ending ?? null;
   const target = footerTarget(opts.golden === true, opts.paid === true);
@@ -192,13 +216,13 @@ async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): 
   } catch {
     logo = null;
   }
-  // The monkey is best-effort too: without its sprites the clip is the plain
-  // wobble it was before B-12.
-  let monkey: MonkeySprites | null = null;
+  // The character is best-effort too: without its sprites the clip is the
+  // plain wobble it was before B-12.
+  let character: CharacterSprites | null = null;
   try {
-    monkey = await loadMonkeySprites(loadImage);
+    character = await loadCharacterSprites(loadImage, rig);
   } catch {
-    monkey = null;
+    character = null;
   }
   // The ending's picture is best-effort as well: without it, the card.
   let endingPicture: HTMLImageElement | null = null;
@@ -217,7 +241,7 @@ async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): 
   canvas.height = H;
   // In the page but out of sight (SRC's second Android fix): Android Chrome
   // throttles the frame loop of a canvas that is never in the DOM, which left
-  // the monkey frozen or missing. Not `display:none` — that pauses it too.
+  // the character frozen or missing. Not `display:none` — that pauses it too.
   canvas.style.cssText = 'position:fixed;left:-99999px;top:0;pointer-events:none;opacity:0;';
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
@@ -244,18 +268,18 @@ async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): 
   const maxStoryHeight = H - BOTTOM_MARGIN - attributionHeight - STORY_GAP - storyTop;
 
   const stream = canvas.captureStream(FPS);
-  // The bells' track, when they loaded; the clip is silent otherwise.
-  const bellsTrack = bells ? await bells.ready : null;
-  let mime = pickMime(bellsTrack !== null)!;
+  // The sound's track, when it loaded; the clip is silent otherwise.
+  const soundTrack = sound ? await sound.ready : null;
+  let mime = pickMime(soundTrack !== null)!;
   let recorder: MediaRecorder;
   try {
-    if (bellsTrack) stream.addTrack(bellsTrack);
+    if (soundTrack) stream.addTrack(soundTrack);
     recorder = new MediaRecorder(stream, { mimeType: mime.mime });
   } catch (err) {
-    if (!bellsTrack) throw err;
+    if (!soundTrack) throw err;
     // A browser that will not record this sound records the picture alone.
-    stream.removeTrack(bellsTrack);
-    bells?.close();
+    stream.removeTrack(soundTrack);
+    sound?.close();
     mime = pickMime()!;
     recorder = new MediaRecorder(stream, { mimeType: mime.mime });
   }
@@ -315,14 +339,15 @@ async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): 
     }
     ctx!.restore();
 
-    // The monkey, on top of the cartoon. Its ground is the cartoon's top edge
-    // under the same four-axis transform, so it rides the wobble.
-    if (monkey) {
-      drawMonkey(ctx!, elapsed, monkey, {
+    // The character, on top of the cartoon. Its ground is the cartoon's top
+    // edge under the same four-axis transform, so it rides the wobble.
+    if (character) {
+      const stage = {
         width: W,
-        groundAt: (x) =>
+        groundAt: (x: number): number =>
           cy + w.dy + (x - cx - w.dx) * Math.sin(w.rot) - (picSize / 2) * w.scale * Math.cos(w.rot),
-      });
+      };
+      drawCharacter(ctx!, elapsed, character, stage, rig);
     }
 
     // Pulsing nickname badge — the "speech bubble pulse" element. URL was
@@ -366,7 +391,7 @@ async function recordClip(opts: WobbleVideoOptions, bells: SleighBells | null): 
   }
 
   recorder.start();
-  bells?.play();
+  sound?.play();
   raf = requestAnimationFrame(drawFrame);
   try {
     return await done;

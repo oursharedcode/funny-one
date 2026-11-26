@@ -173,7 +173,8 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-CORE-10 (MUST)** Room gallery per spec §24: host shares all stories + pictures to every
   player; self-heals as late pictures arrive; per-story download; share flow (Web Share API)
   with the **CSS** wobble recording engine only (FM-ANS consequences table). The 5-second clip
-  includes the laughing monkey (B-12, 2026-10-05).
+  includes the laughing monkey (B-12, 2026-10-05); in a golden story's clip and a paid game's
+  story's a reindeer or a Santa takes its place and says "ho-ho-ho" (B-29, 2026-11-26).
 - **FM-CORE-11 (MUST)** End screen per spec: host gets "One more game" (requires all non-bot
   players ready and ≥ 3 non-bots) and "Finish game" (pre-bundled finale image). Restart drops
   bots and reuses the room.

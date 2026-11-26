@@ -28,7 +28,9 @@
     "packCode": "🔔 Your Christmas pack: {{code}}",
     "packCodeHint": "Every room you create on this phone plays all the Christmas stories, until {{date}}.",
     "packCodeRemove": "Remove",
-    "packEnded": "Your Christmas 2026 edition has ended. Thank you for playing!"
+    "packEnded": "Your Christmas 2026 edition has ended. Thank you for playing!",
+    "christmasLine": "🔔 One Christmas story in every new room",
+    "christmasPeek": "Christmas pack — free!"
   },
   "lobby": {
     "roomCodeLabel": "Room code",

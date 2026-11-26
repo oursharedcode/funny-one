@@ -29,7 +29,9 @@
     "packCode": "🔔 Kifurushi chako cha Krismasi: {{code}}",
     "packCodeHint": "Kila chumba utakachounda kwenye simu hii kitakuwa na hadithi zote za Krismasi, hadi {{date}}.",
     "packCodeRemove": "Ondoa",
-    "packEnded": "Toleo lako la Krismasi 2026 limekwisha. Asante kwa kucheza!"
+    "packEnded": "Toleo lako la Krismasi 2026 limekwisha. Asante kwa kucheza!",
+    "christmasLine": "🔔 Hadithi moja ya Krismasi katika kila chumba kipya",
+    "christmasPeek": "Kifurushi cha Krismasi — bure!"
   },
   "lobby": {
     "roomCodeLabel": "Msimbo wa chumba",

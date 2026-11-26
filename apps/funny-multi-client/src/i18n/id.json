@@ -29,7 +29,9 @@
     "packCode": "🔔 Paket Natalmu: {{code}}",
     "packCodeHint": "Di setiap ruangan yang kamu buat di ponsel ini, semua cerita Natal bisa dimainkan sampai {{date}}.",
     "packCodeRemove": "Hapus",
-    "packEnded": "Edisi Natal 2026 milikmu sudah berakhir. Terima kasih sudah bermain!"
+    "packEnded": "Edisi Natal 2026 milikmu sudah berakhir. Terima kasih sudah bermain!",
+    "christmasLine": "🔔 Satu cerita Natal di setiap ruangan baru",
+    "christmasPeek": "Paket Natal — gratis!"
   },
   "lobby": {
     "roomCodeLabel": "Kode ruangan",

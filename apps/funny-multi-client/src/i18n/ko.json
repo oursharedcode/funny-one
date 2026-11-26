@@ -29,7 +29,9 @@
     "packCode": "🔔 내 크리스마스 팩: {{code}}",
     "packCodeHint": "이 휴대폰에서 만드는 모든 방에서 {{date}}까지 크리스마스 이야기가 전부 나옵니다.",
     "packCodeRemove": "삭제",
-    "packEnded": "이용하신 2026 크리스마스 에디션이 종료되었습니다. 플레이해 주셔서 감사합니다!"
+    "packEnded": "이용하신 2026 크리스마스 에디션이 종료되었습니다. 플레이해 주셔서 감사합니다!",
+    "christmasLine": "🔔 새 방마다 크리스마스 이야기가 한 개",
+    "christmasPeek": "크리스마스 팩 — 무료!"
   },
   "lobby": {
     "roomCodeLabel": "방 코드",

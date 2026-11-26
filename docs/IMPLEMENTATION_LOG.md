@@ -8702,7 +8702,7 @@ deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
 phone; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-26, after Step 130; pushed and deployed).** Steps 122–130 are live (the
+~~RESUME HERE (2026-11-26, after Step 130; pushed and deployed).~~ — carried into the note below (Step 131 renumbered the steps after it). Steps 122–130 are live (the
 game at image `funny-multi:f06fe59`; #1 play alone with bots is live). **Next, Step 131 — the
 lone host's grace** (D4 B; B-29's finding of Step 127: a longer grace for a host alone in the
 lobby, or the room kept until the host's own tab closes — the owner picks when it is planned).
@@ -8711,3 +8711,43 @@ whole-game video. No deploys 24–26 December, 31 December–1 January or 6–7 
 **Owed, the owner's:** the look at the reindeer's bells and a game with bots on the phone; the
 Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125); the admin
 link on the phone; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+## Step 131 (task B-29) — itch.io as a pack rail abroad, decided (2026-11-27)
+
+A decision step; no code.
+
+**Shipped:**
+- Research read from itch.io's own docs (Payouts mode, sub-products with a redeem URL, fees,
+  payout rules) and the counters route (2 of 96 game visits in 30 days from abroad); kept in the
+  memory note `itch-io-rail-facts`, with what is still unsettled.
+- **Owner decision 2026-11-27:** D-6 amended in `steering/requirements.md` — abroad the pack is
+  also sold on itch.io at **US$1.00**, Payouts mode only (itch.io the merchant of record, liable
+  for chargebacks, collecting VAT, so D-6(a) holds); paid out to the owner's **PayPal**, which
+  only receives; **the GitHub Sponsors tier stays abroad at US$2.00**; Australia keeps PayID.
+- B-29 in `steering/tasks.md` gained "Decisions 2026-11-27": the plan, the owner's setup ops, the
+  open questions. B-29 stays open.
+
+**Owed:**
+- The owner, one op at a time: the itch.io account in Payouts mode (tax interview, PayPal
+  address); a look that "Sub-products & DLC" shows (if not, the plan stops); the US$1.00
+  sub-product with the redeem URL the agent gives; the project's secret token as a file on this PC.
+- The build, **Step 133**: the `itch` rail (server check of itch.io's signed token, each
+  `purchase_id` once, receipt log, pay-page texts, privacy paragraph, funnel, tests), only after
+  the account and the sub-product exist.
+- Unsettled: whether US$1 is allowed for a sub-product, whether a buyer can claim again after
+  closing the tab, Australia's withholding rate, and whether the receive-only PayPal fits D-6(a)
+  as written (the owner has said yes).
+
+**Gates:** docs only — `format:check` run on the two steering files, clean; typecheck, lint,
+tests and audit not applicable (no code changed).
+
+**RESUME HERE (2026-11-27, after Step 131; not yet pushed).** Steps 122–130 are live (image
+`funny-multi:f06fe59`). **Next, Step 132 — the lone host's grace** (D4 B; B-29's finding of Step
+127: a longer grace for a host alone in the lobby, or the room kept until the host's own tab
+closes — the owner picks when it is planned). **Step 133 — itch.io** waits on the owner's four
+setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a pack, #9 the
+festive room look, #7 the whole-game video. No deploys 24–26 December, 31 December–1 January or
+6–7 January (#16). **Owed, the owner's:** the itch.io setup; the look at the reindeer's bells and
+a game with bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2
+sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's
+trader confirmation before 1 Feb 2027.

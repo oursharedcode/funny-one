@@ -1203,12 +1203,27 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
   - **#1 play alone with bots — Step 130, 2026-11-26** (owner decisions "A, A, A, B"): D1 A, any
     room under 3 humans is filled to 3 seats with bots at Start and at Restart (FM-ID-1 now 1–7
     humans, FM-BOT-3 new; design §6); D2 A, "Bot 1" / "Bot 2" in each player's language; D3 A,
-    #1 deploys on its own; D4 B, the lone host's grace is its own step next (Step 131). The
+    #1 deploys on its own; D4 B, the lone host's grace is its own step next (Step 132). The
     label reads "Start with N bots", a joiner means one bot fewer, the only human leaving
     deletes the room; `xm_bots` and a `/stats/` column count Christmas games with bots; the
     privacy page says so. en and ru the agent's, 21 machine drafts on B-3's pile. Seen in
     Chromium (52 checks: alone, two humans, joiners, the Android shell, ar/he/ta/de at 320 px,
     the counts). Pushed as `f06fe59`, CI green, deployed 2026-11-26.
+  - *Decisions 2026-11-27 (owner, on the agent's itch.io plan; D-6 amended the same day):* a
+    visitor outside Australia can also buy the pack on **itch.io at US$1.00**, Payouts mode only
+    (itch.io the merchant of record), its share set to 0% (about US$0.67 kept a sale; the first
+    payout after 8–13 sales: US$5 minimum, the US$3 tax interview once); itch.io pays out to the
+    owner's PayPal, which only receives. **The Sponsors tier stays abroad at US$2.00**, as it
+    is; Australia stays PayID. Delivery: an itch.io sub-product whose redeem URL lands on this
+    site with itch.io's signed token; the server checks it, takes each `purchase_id` once and
+    makes the code work. Its own step, Step 133, after the lone host's grace (Step 132); which rail the page opens on abroad, and
+    the texts, are settled on that step's plan. **Owed by the owner first, one op at a time:**
+    the itch.io account in Payouts mode with the tax interview and the PayPal address; a look
+    that "Sub-products & DLC" shows on it (if not, the step stops); the US$1.00 sub-product
+    with the redeem URL the agent gives; the project's secret token as a file on this PC.
+    Unsettled until then: whether US$1 is allowed for a sub-product, whether a buyer can claim
+    again after closing the tab, Australia's withholding rate. The counters showed 2 of 96 game
+    visits from abroad in the 30 days to 2026-11-26.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

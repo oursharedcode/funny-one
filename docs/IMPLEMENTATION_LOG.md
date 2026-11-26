@@ -8679,7 +8679,17 @@ which stays true at 7 humans.
 
 **Owed:** the push, CI, and the deploy of #1 on its own (D3 A).
 
-**RESUME HERE (2026-11-26, after Step 130; not yet pushed).** Steps 122–129 are live (the game
+**Deployed the same day** (owner: "push and deploy"): pushed as `f06fe59`, CI green (run
+45796160893). Before the deploy every socket of the last 6 hours had disconnected and none had
+connected in the last hour (09:55Z). `ship.sh` — image `funny-multi:f06fe59`, `/health` ok,
+assetlinks, privacy and the old path's 301 as expected; `ship-funny-family.sh` — every check as
+expected. The live bundle carries "Start with 2 bots" and `xm_bots`, the live privacy page "bots
+took empty seats", and `/stats/`'s script "with bots".
+
+~~RESUME HERE (2026-11-26, after Step 130; not yet pushed)~~ — pushed as `f06fe59`, CI green,
+deployed; carried into the note below. Its text, kept for the record:
+
+Steps 122–129 are live (the game
 at image `funny-multi:01cd07a`); Step 130 (#1 play alone with bots) is committed, not pushed or
 deployed. **Next:** the owner's push, CI, then the deploy of #1 on its own (D3 A) — a deploy
 waits until no visitor is connected (check the server log first); `ship.sh` only, plus
@@ -8691,3 +8701,13 @@ deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
 **Owed, the owner's:** the push and deploy of Step 130; the look at the reindeer's bells on the
 phone; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-26, after Step 130; pushed and deployed).** Steps 122–130 are live (the
+game at image `funny-multi:f06fe59`; #1 play alone with bots is live). **Next, Step 131 — the
+lone host's grace** (D4 B; B-29's finding of Step 127: a longer grace for a host alone in the
+lobby, or the room kept until the host's own tab closes — the owner picks when it is planned).
+After it, the second deploy by 23 December: #10 gift a pack, #9 the festive room look, #7 the
+whole-game video. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16).
+**Owed, the owner's:** the look at the reindeer's bells and a game with bots on the phone; the
+Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125); the admin
+link on the phone; the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.

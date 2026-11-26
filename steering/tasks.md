@@ -1208,7 +1208,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     deletes the room; `xm_bots` and a `/stats/` column count Christmas games with bots; the
     privacy page says so. en and ru the agent's, 21 machine drafts on B-3's pile. Seen in
     Chromium (52 checks: alone, two humans, joiners, the Android shell, ar/he/ta/de at 320 px,
-    the counts). Committed, not yet pushed or deployed.
+    the counts). Pushed as `f06fe59`, CI green, deployed 2026-11-26.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

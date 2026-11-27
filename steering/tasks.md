@@ -1244,7 +1244,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     it; one away at Start became a bot and, back, got Home with the line; a mid-game seat still
     went to a bot at 65 s; a reloaded, navigated or closed lobby page gave its seat up at once; a
     restart sent ar, he, ta and de pages Home with the line at 320 px. iOS's `pagehide` not seen.
-    Committed as Step 132, not yet pushed or deployed; the owner's look on the phone is owed.
+    Pushed as `1b853fa`, CI green, deployed 2026-11-27; the owner's look on the phone is owed.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

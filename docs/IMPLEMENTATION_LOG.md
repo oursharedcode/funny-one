@@ -8830,7 +8830,15 @@ shows the same line.
 **Owed:** the push and CI; the deploy on its own (D5 A), when no visitor is connected; the owner's
 look on the phone.
 
-**RESUME HERE (2026-11-27, after Step 132; not yet pushed).** Steps 122–130 are live (image
+**Deployed the same day** (owner: "push and deploy"): pushed as `1b853fa`, CI green (run
+45944673572). Before the deploy no socket was open: the last of the log's 9 connections had gone
+at 14:35Z the day before (checked 05:17Z). `ship.sh` only — image `funny-multi:1b853fa`, the
+running container's image; `/health` ok, assetlinks, privacy and the old path's 301 as expected.
+The live bundle carries "You were away too long"; the running server's code, `recovery:mark` and
+the lobby's 10 min; its log since the start has no error.
+
+~~RESUME HERE (2026-11-27, after Step 132; not yet pushed).~~ — pushed as `1b853fa`, CI green,
+deployed; carried into the note below. Its text, kept for the record: Steps 122–130 are live (image
 `funny-multi:f06fe59`); Step 131 (a decision, no code) is pushed. Step 132 (the lone host's
 grace) is committed, not pushed or deployed. **Next:** the owner's push, CI, then Step 132's
 deploy on its own (D5 A) — it waits until no visitor is connected (check the server log first);
@@ -8843,3 +8851,14 @@ and the look on the phone; the itch.io setup; the look at the reindeer's bells a
 bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of
 Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027.
+
+**RESUME HERE (2026-11-27, after Step 132; pushed and deployed).** Steps 122–132 are live (the
+game at image `funny-multi:1b853fa`; Step 131 was a decision, no code). **Next, Step 133 —
+itch.io**, which waits on the owner's four setup ops (see Step 131). After them, the second
+deploy by 23 December: #10 gift a pack, #9 the festive room look, #7 the whole-game video. No
+deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the owner's:** the
+look on the phone at the lone host's grace (make a room, stay in a messenger for over a minute,
+come back to the same room, a friend joining meanwhile); the itch.io setup; the look at the
+reindeer's bells and a game with bots on the phone; the Play listing's "3–7 players", if wanted;
+the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look;
+Funny Multi's trader confirmation before 1 Feb 2027.

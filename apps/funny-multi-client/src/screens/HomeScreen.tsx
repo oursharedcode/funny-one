@@ -47,6 +47,10 @@
 // get the free Christmas pack (`packForRoom`), the create screen wears its
 // Christmas dressing — lights along the top, the gold-on-green line with the
 // peeking reindeer under the subtitle, and falling snow (ChristmasDressing).
+//
+// Step 132 (B-29, D4 A): a page App.tsx sends back here because its seat was
+// given up shows a line under the subtitle saying the player was away too
+// long, until the next room is made or joined.
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,13 +81,23 @@ import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@f
 
 interface Props {
   onJoined: (state: LobbyState) => void;
+  /**
+   * Step 132: this page came back after its seat was given up (App.tsx), so
+   * Home says why it is here instead of the room.
+   */
+  awayTooLong?: boolean;
   // T-9.4 (FM-TIER-4): drives the ♥ affordance. Optional so screen-level
   // tests that don't care about the support screen need not pass it.
   support?: SupportConfig | null;
   onOpenSupport?: () => void;
 }
 
-export default function HomeScreen({ onJoined, support = null, onOpenSupport = () => {} }: Props) {
+export default function HomeScreen({
+  onJoined,
+  awayTooLong = false,
+  support = null,
+  onOpenSupport = () => {},
+}: Props) {
   const { t, i18n } = useTranslation();
 
   const params = new URLSearchParams(window.location.search);
@@ -288,6 +302,14 @@ export default function HomeScreen({ onJoined, support = null, onOpenSupport = (
       <Wordmark />
       <p className="text-center text-gray-700">{t('home.subtitle')}</p>
       {christmas && <ChristmasPeek />}
+      {awayTooLong && (
+        <p
+          className="w-full break-words rounded border-2 border-pink-300 bg-white p-3 text-center font-semibold text-gray-800"
+          role="status"
+        >
+          {t('home.awayTooLong')}
+        </p>
+      )}
 
       {mode === 'create' && (
         <>

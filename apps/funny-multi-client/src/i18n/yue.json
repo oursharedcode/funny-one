@@ -19,6 +19,7 @@
     "join": "加入房間",
     "joining": "加入緊房間",
     "roomGone": "呢個房間已經冇咗 — 可能已經玩完，或者條連結太舊。",
+    "awayTooLong": "你走開咗太耐 — 遊戲冇等你，已經繼續咗。",
     "createNew": "建立新房間",
     "openRooms": "可以加入嘅房間：{{count}}",
     "imagesToday": "每日最多 {{total}} 幅漫畫。每日 00:00 UTC 重設。",

@@ -41,6 +41,11 @@ export interface SocketMock {
   ackFor(event: string): (...args: unknown[]) => void;
   /** Invoke every server→client listener registered for an event (`act`-wrapped). */
   fire(event: string, payload: unknown): void;
+  /**
+   * Socket.IO's flag for a connection that recovered its old one (Step 132).
+   * Set it before `fire('connect', undefined)`; `reset` puts it back to false.
+   */
+  recovered: boolean;
   reset(): void;
 }
 
@@ -93,7 +98,9 @@ export function createSocketMock(): SocketMock {
         for (const handler of listeners.get(event) ?? []) handler(payload);
       });
     },
+    recovered: false,
     reset() {
+      this.recovered = false;
       emitted.length = 0;
       listeners.clear();
       emit.mockClear();

@@ -19,6 +19,7 @@
     "join": "加入房间",
     "joining": "正在加入房间",
     "roomGone": "该房间已不存在 — 可能已经结束，或链接已过期。",
+    "awayTooLong": "你离开太久了 — 游戏已在没有你的情况下继续。",
     "createNew": "创建新房间",
     "openRooms": "开放房间: {{count}}",
     "imagesToday": "每天最多 {{total}} 张漫画。每天 00:00 UTC 重置。",

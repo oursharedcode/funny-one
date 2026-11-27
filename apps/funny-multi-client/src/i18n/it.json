@@ -19,6 +19,7 @@
     "join": "Entra",
     "joining": "Stai entrando nella stanza",
     "roomGone": "Questa stanza non esiste più — forse è finita, o il link è vecchio.",
+    "awayTooLong": "La tua assenza è durata troppo — la partita è andata avanti senza di te.",
     "createNew": "Crea una nuova stanza",
     "openRooms": "Stanze aperte: {{count}}",
     "imagesToday": "Fino a {{total}} immagini al giorno. Si azzera ogni giorno alle 00:00 UTC.",

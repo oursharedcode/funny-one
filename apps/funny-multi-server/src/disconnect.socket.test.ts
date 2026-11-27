@@ -7,14 +7,21 @@
 // which exists when handlers are called directly. `disconnect.test.ts` covers
 // the timing rules exactly; this covers what actually happens to a room.
 //
-// Every server here is built with a short `disconnectGraceMs` so a window can
-// close inside a test. The window's *length* is not what these assert.
+// Every server here is built with short windows so one can close inside a
+// test; both phases get the same one unless a test names the lobby's. The
+// windows' *lengths* are not what these assert.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import type { Socket } from 'socket.io-client';
-import { POOLS, type SlotIndex } from '@funny/shared';
+import { POOLS, seatBotNumber, type SlotIndex } from '@funny/shared';
 import { __resetRoomsForTest, getRoom } from './rooms.js';
-import { emitWithAck, once, startTestServer, type TestServer } from './testutils/socket.js';
+import {
+  collect,
+  emitWithAck,
+  once,
+  startTestServer,
+  type TestServer,
+} from './testutils/socket.js';
 
 const GRACE_MS = 80;
 
@@ -36,12 +43,25 @@ function optionAt(slot: number, n: number): string {
   return pool[n % pool.length]!.id;
 }
 
+interface LobbyOptions {
+  /** Both windows, unless `lobbyGraceMs` names the lobby's. */
+  graceMs?: number;
+  lobbyGraceMs?: number;
+  recoveryMarkMs?: number;
+  reconnection?: boolean;
+}
+
 /** A lobby of `count` players; sockets[0] is the host. */
 async function lobby(
   count: number,
-  opts: { graceMs?: number; reconnection?: boolean } = {},
+  opts: LobbyOptions = {},
 ): Promise<{ roomCode: string; sockets: Socket[] }> {
-  const h = await startTestServer({ disconnectGraceMs: opts.graceMs ?? GRACE_MS });
+  const graceMs = opts.graceMs ?? GRACE_MS;
+  const h = await startTestServer({
+    disconnectGraceMs: graceMs,
+    lobbyGraceMs: opts.lobbyGraceMs ?? graceMs,
+    ...(opts.recoveryMarkMs === undefined ? {} : { recoveryMarkMs: opts.recoveryMarkMs }),
+  });
   harness = h;
 
   const sockets: Socket[] = [];
@@ -65,12 +85,44 @@ async function lobby(
 }
 
 /** A lobby with the game started and round 0 under way. */
-async function started(count: number): Promise<{ roomCode: string; sockets: Socket[] }> {
-  const { roomCode, sockets } = await lobby(count);
+async function started(
+  count: number,
+  opts: LobbyOptions = {},
+): Promise<{ roomCode: string; sockets: Socket[] }> {
+  const { roomCode, sockets } = await lobby(count, opts);
   const starts = sockets.map((s) => once<{ roundNumber: number }>(s, 'round:start'));
   sockets[0]!.emit('game:start');
   for (const s of starts) expect((await s).roundNumber).toBe(0);
   return { roomCode, sockets };
+}
+
+/** Polls until `check` holds: for what the server does after a client's own event. */
+async function until(check: () => boolean, what: string): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (!check()) {
+    if (Date.now() > deadline) throw new Error(`timed out waiting for ${what}`);
+    await settle(10);
+  }
+}
+
+/**
+ * A network drop the page does not retry: a phone whose owner is in a
+ * messenger. The sockets here have reconnection off, so the page stays away
+ * until `comeBack`. Resolves once the server has armed the window.
+ */
+async function goAway(socket: Socket): Promise<void> {
+  const before = harness!.server.disconnects.pending();
+  const gone = once(socket, 'disconnect');
+  socket.io.engine.close();
+  await gone;
+  await until(() => harness!.server.disconnects.pending() > before, 'the window to arm');
+}
+
+/** The page returns: reconnects, recovering its old connection if the server lets it. */
+async function comeBack(socket: Socket): Promise<void> {
+  const back = once(socket, 'connect');
+  socket.connect();
+  await back;
 }
 
 describe('grace window (spec §7)', () => {
@@ -251,5 +303,152 @@ describe('explicit leave', () => {
     // The window fires against a socket that is no longer in any room; it must
     // be a no-op rather than removing whoever now sits at that index.
     expect(getRoom(roomCode)!.players).toHaveLength(2);
+  });
+});
+
+// Step 132 (B-29): a phone drops the game's connection while its owner is in
+// a messenger sending the invite. A lobby therefore waits far longer than a
+// game, and a page that comes back after its window must not recover into the
+// seat it lost: it gets a fresh connection, which App.tsx sends Home.
+describe('the lobby waits longer (Step 132)', () => {
+  it('keeps a lone host’s room past the game’s window, and lets them back in', async () => {
+    // Step 127's finding: the room closed with its only player before anyone
+    // could open the invite.
+    const { roomCode, sockets } = await lobby(1, { lobbyGraceMs: 5000 });
+    const host = sockets[0]!;
+    const hostId = host.id;
+
+    await goAway(host);
+    await settle(); // three game windows
+    expect(getRoom(roomCode), 'the room waits for its host').toBeDefined();
+
+    // A friend opens the invite meanwhile.
+    const guest = await harness!.connect();
+    const ack = await emitWithAck<{ error?: unknown }>(guest, 'room:join', {
+      roomCode,
+      nickname: 'friend',
+    });
+    expect(ack.error).toBeUndefined();
+
+    const missed = once<{ players: { nickname: string }[] }>(host, 'lobby:update');
+    await comeBack(host);
+    expect(host.recovered, 'the host is back in their own seat').toBe(true);
+    expect(host.id).toBe(hostId);
+    expect(harness!.server.disconnects.pending()).toBe(0);
+    expect((await missed).players.map((p) => p.nickname)).toEqual(['player0', 'friend']);
+
+    const round = once<{ roundNumber: number }>(guest, 'round:start');
+    host.emit('game:start');
+    expect((await round).roundNumber).toBe(0);
+  });
+
+  it('keeps the game’s window short', async () => {
+    // ACCEPTANCE B14: mid-game the others are waiting for that seat.
+    const { roomCode, sockets } = await started(3, { lobbyGraceMs: 60_000 });
+    const lost = once<{ nickname: string }>(sockets[0]!, 'player:lost');
+    await goAway(sockets[1]!);
+    expect((await lost).nickname).toBe('player1');
+    expect(getRoom(roomCode)!.players[1]!.isBot).toBe(true);
+  });
+
+  it('gives a page back after the game’s window a fresh connection, not the bot’s seat', async () => {
+    const { roomCode, sockets } = await started(3, { lobbyGraceMs: 60_000 });
+    const away = sockets[1]!;
+    const awayId = away.id;
+    const notices = collect<{ nickname: string }>(sockets[0]!, 'player:lost');
+
+    await goAway(away);
+    await until(() => notices.length > 0, 'player:lost');
+    await comeBack(away);
+
+    expect(away.recovered, 'the seat is a bot’s now').toBe(false);
+    expect(away.id).not.toBe(awayId);
+    const room = getRoom(roomCode)!;
+    expect(room.players[1]!.id).toBe(awayId);
+    expect(room.players[1]!.isBot).toBe(true);
+    await settle(60);
+    expect(notices, 'the host hears of the loss once').toHaveLength(1);
+  });
+
+  it('gives a page back after the lobby’s window a fresh connection', async () => {
+    const { roomCode, sockets } = await lobby(2, { lobbyGraceMs: GRACE_MS });
+    const away = sockets[1]!;
+    const awayId = away.id;
+    const update = once<{ players: unknown[] }>(sockets[0]!, 'lobby:update');
+
+    await goAway(away);
+    expect((await update).players).toHaveLength(1);
+    await comeBack(away);
+
+    expect(away.recovered).toBe(false);
+    expect(away.id).not.toBe(awayId);
+    expect(getRoom(roomCode)!.players.map((p) => p.nickname)).toEqual(['player0']);
+  });
+
+  it('drops a player still away at Start, and a bot takes the seat', async () => {
+    const { roomCode, sockets } = await lobby(3, { lobbyGraceMs: 60_000 });
+    const [host, here, away] = sockets as [Socket, Socket, Socket];
+    const awayId = away.id;
+    await goAway(away);
+
+    const round = once<{ roundNumber: number }>(here, 'round:start');
+    host.emit('game:start');
+    expect((await round).roundNumber).toBe(0);
+
+    const room = getRoom(roomCode)!;
+    expect(room.players.map((p) => p.nickname)).toEqual(['player0', 'player1', 'Bot 1']);
+    expect(seatBotNumber(room.players[2]!.id)).toBe(1);
+    expect(room.players.some((p) => p.id === awayId)).toBe(false);
+    expect(harness!.server.disconnects.pending(), 'Start ended the window').toBe(0);
+
+    // Their page, back later, is not let into the game.
+    await comeBack(away);
+    expect(away.recovered).toBe(false);
+    expect(away.id).not.toBe(awayId);
+  });
+
+  it('sends every page the recovery mark', async () => {
+    const { sockets } = await lobby(1, { recoveryMarkMs: 40 });
+    await once(sockets[0]!, 'recovery:mark');
+  });
+
+  it('keeps a quiet page recoverable with the mark', async () => {
+    // Socket.IO recovers a page only while the last message it received is in
+    // the server's buffer, which keeps messages as long as it keeps a saved
+    // state. A lobby can be quiet for longer than that before someone leaves
+    // it. Emptying the buffer stands in for those minutes passing; a mark
+    // received after that is what still lets the page back in.
+    const { roomCode, sockets } = await lobby(2, { lobbyGraceMs: 5000, recoveryMarkMs: 40 });
+    const away = sockets[1]!;
+    const awayId = away.id;
+    const adapter = harness!.server.io.of('/').adapter as unknown as {
+      packets: { id: string }[];
+    };
+    adapter.packets.length = 0;
+    // A mark already on its way when the buffer was emptied is gone from it,
+    // and the page keeps that mark's offset as its last: wait for a mark the
+    // server still holds. (Waiting for the first one flaked under load.)
+    let offset = await once<string>(away, 'recovery:mark');
+    while (!adapter.packets.some((packet) => packet.id === offset)) {
+      offset = await once<string>(away, 'recovery:mark');
+    }
+
+    await goAway(away);
+    await comeBack(away);
+    expect(away.recovered).toBe(true);
+    expect(away.id).toBe(awayId);
+    expect(getRoom(roomCode)!.players).toHaveLength(2);
+  });
+
+  it('cannot recover a quiet page whose last message has gone (why the mark exists)', async () => {
+    // The control for the test above: the same page, with no mark since.
+    const { sockets } = await lobby(2, { lobbyGraceMs: 5000 });
+    const away = sockets[1]!;
+    const adapter = harness!.server.io.of('/').adapter as unknown as { packets: unknown[] };
+    adapter.packets.length = 0;
+
+    await goAway(away);
+    await comeBack(away);
+    expect(away.recovered).toBe(false);
   });
 });

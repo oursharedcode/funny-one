@@ -11,18 +11,26 @@
 //      the next test has already reset, and emits on a closed io. `clearAll()`
 //      is wired to Fastify's `onClose`.
 //
-//   2. **A testable seam.** The production window is 65 s. Driving that over
-//      real sockets is not an option, and faking timers inside a socket test
-//      also stalls Socket.IO's own heartbeats. The registry is exercised
-//      directly with fake timers, and the socket tests pass a short grace
-//      through `buildServer`.
+//   2. **A testable seam.** The production windows are 65 s in a game and
+//      10 min in the lobby (Step 132). Driving those over real sockets is not
+//      an option, and faking timers inside a socket test also stalls
+//      Socket.IO's own heartbeats. The registry is exercised directly with
+//      fake timers, and the socket tests pass short windows through
+//      `buildServer`.
+//
+// Step 132: the window is chosen per drop. A host who goes to a messenger to
+// send the invite closes the game socket on a phone, so a lobby seat waits
+// longer than a game seat; the caller passes the window that fits the phase.
 //
 // The timers are deliberately *not* `unref()`d: a player must be removed
 // because the window elapsed, never because the process happened to be busy.
 
 export interface DisconnectRegistry {
-  /** Starts (or restarts) the grace window for a dropped socket. */
-  schedule(socketId: string): void;
+  /**
+   * Starts (or restarts) the grace window for a dropped socket: `windowMs`
+   * when given, otherwise the registry's default.
+   */
+  schedule(socketId: string, windowMs?: number): void;
   /** Cancels a pending removal — the socket came back. True if one was armed. */
   cancel(socketId: string): boolean;
   /** Pending removals, for assertions. */
@@ -32,6 +40,7 @@ export interface DisconnectRegistry {
 }
 
 export interface DisconnectRegistryOptions {
+  /** The window when `schedule` names none. */
   graceMs: number;
   /** Runs when a window elapses with no return. */
   onExpire: (socketId: string) => void;
@@ -44,7 +53,7 @@ export function createDisconnectRegistry({
   const timers = new Map<string, NodeJS.Timeout>();
 
   return {
-    schedule(socketId) {
+    schedule(socketId, windowMs = graceMs) {
       const existing = timers.get(socketId);
       if (existing) clearTimeout(existing);
       timers.set(
@@ -55,7 +64,7 @@ export function createDisconnectRegistry({
           // has already happened.
           timers.delete(socketId);
           onExpire(socketId);
-        }, graceMs),
+        }, windowMs),
       );
     },
 

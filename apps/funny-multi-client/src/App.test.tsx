@@ -705,6 +705,121 @@ describe('reload on update', () => {
   });
 });
 
+// Step 132 (B-29, D4 A): a page whose seat the server gave up comes back to a
+// new connection, not its old one (the mock's `recovered` stays false). In the
+// lobby or a round it goes Home and says why; a story or the end screen stays,
+// since what is on them is this page's own.
+describe('a seat lost while away (Step 132)', () => {
+  const AWAY = 'You were away too long — the room went on without you.';
+
+  /** Answers the latest emit of one event, as the server would. */
+  function answerLast(event: string, payload: unknown): void {
+    const ack = socketMock.emitsOf(event).at(-1)!.args.at(-1) as (p: unknown) => void;
+    act(() => ack(payload));
+  }
+
+  const REACH: Record<'lobby' | 'writing' | 'waiting', () => void> = {
+    lobby: () => {},
+    writing: () => {
+      socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    },
+    waiting: () => {
+      socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+      socketMock.fire('round:waiting', { submitted: 2, total: 3 });
+    },
+  };
+
+  it.each(['lobby', 'writing', 'waiting'] as const)(
+    'goes Home from the %s screen, and says why',
+    async (phase) => {
+      const { container } = renderInLobby();
+      REACH[phase]();
+      await settle();
+      expect(phases(container)).toEqual([phase]);
+
+      socketMock.fire('connect', undefined);
+      await settle();
+      expect(phases(container)).toEqual(['home']);
+      expect(screen.getByText(AWAY)).toBeTruthy();
+      expect(screen.getByText('Create room')).toBeTruthy();
+    },
+  );
+
+  it('stays put when the old connection came back', async () => {
+    const { container } = renderInLobby();
+    await settle();
+    socketMock.recovered = true;
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(phases(container)).toEqual(['lobby']);
+    expect(screen.queryByText(AWAY)).toBeNull();
+  });
+
+  it('leaves the story and the end screen where they are', async () => {
+    const { container } = renderInLobby();
+    socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
+    socketMock.fire('reveal:start', REVEAL);
+    await settle();
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(phases(container)).toEqual(['reveal']);
+
+    fireEvent.click(screen.getByText('Continue'));
+    await settle();
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(phases(container)).toEqual(['end']);
+    expect(screen.getByText('Rounds are over')).toBeTruthy();
+  });
+
+  it('says nothing on Home, where every first connection arrives', async () => {
+    const { container } = render(<App />);
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(phases(container)).toEqual(['home']);
+    expect(screen.queryByText(AWAY)).toBeNull();
+  });
+
+  it('takes the invite off the address, so Home offers a new room, not the old one', async () => {
+    setUrl('?room=WXYZ&lang=en&multi=1');
+    const { container } = render(<App />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'guestie' } });
+    fireEvent.click(screen.getByText('Join room'));
+    answerLast('room:join', {
+      socketId: 's2',
+      hostId: 's1',
+      language: 'en',
+      multiLanguage: false,
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+    });
+    await settle();
+    expect(phases(container)).toEqual(['lobby']);
+
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(window.location.search).toBe('');
+    expect(screen.getByText('Create room')).toBeTruthy();
+    expect(screen.queryByText('Join room')).toBeNull();
+  });
+
+  it('keeps the line only until the next room', async () => {
+    const { container } = renderInLobby();
+    await settle();
+    socketMock.fire('connect', undefined);
+    await settle();
+    expect(screen.getByText(AWAY)).toBeTruthy();
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'hostie' } });
+    fireEvent.click(screen.getByText('Create room'));
+    answerLast('room:create', { roomCode: 'ABCD', socketId: 's3' });
+    await settle();
+    fireEvent.click(screen.getByText('Leave'));
+    await settle();
+    expect(phases(container)).toEqual(['home']);
+    expect(screen.queryByText(AWAY)).toBeNull();
+  });
+});
+
 describe('subscriptions', () => {
   it('detaches every socket listener on unmount', () => {
     const { unmount } = render(<App />);

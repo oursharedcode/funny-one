@@ -122,6 +122,14 @@ Everything in this section is inherited from the source spec v4 unless marked **
 - **FM-CORE-3 (MUST)** Disconnect handling per spec §7: a short connection-state-recovery grace
   window tolerates brief drops; beyond it, **disconnect = bot, no reconnect**. Host is notified
   (`player:lost`). Lobby-phase leavers are simply removed; host migration per spec.
+  *Amended 2026-11-27 (owner decisions, B-29; Step 132): the window depends on the phase. In a
+  game it stays 65 s (ACCEPTANCE B14); in the lobby it is 10 min, because a phone drops the
+  connection while its owner is in a messenger sending the invite, and a lone host's room used
+  to close before anyone could open it (Step 127's finding). Connection-state recovery outlasts
+  both windows, so a page back inside its window always gets its seat back. At Start, anyone
+  still away is removed as a lobby leaver is, and bots take the seats up to three. A page back
+  after its window gets a new connection, never its old seat: from the lobby or a round it goes
+  Home, which says the player was away too long; a reveal or end screen stays.*
 - **FM-CORE-4 (MUST)** Rate limits and capacity per spec §17: `room:create` 5/IP/min,
   `room:join` 30/IP/min, max rooms per process 500 (`MAX_ROOMS` override), nickname 2–20 chars.
   *Amended 2026-11-21 (owner decision, B-29 D3 A; Step 120): the nickname minimum is 2, not

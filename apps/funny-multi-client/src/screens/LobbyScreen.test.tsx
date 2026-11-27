@@ -182,6 +182,27 @@ describe('leaving', () => {
     expect(socketMock.emitsOf('room:leave')).toHaveLength(1);
     expect(onLeave).toHaveBeenCalledTimes(1);
   });
+
+  // Step 132: the server keeps an away player's lobby seat for 10 min, so a
+  // page that is really going must not leave its seat waiting that long.
+  it('gives the seat up when the page closes, reloads or navigates away', () => {
+    renderLobby();
+    window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false }));
+    expect(socketMock.emitsOf('room:leave')).toHaveLength(1);
+  });
+
+  it('keeps the seat when the browser keeps the page for Back', () => {
+    renderLobby();
+    window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    expect(socketMock.emitsOf('room:leave')).toHaveLength(0);
+  });
+
+  it('stops listening once the lobby screen has gone', () => {
+    const { unmount } = render(<LobbyScreen lobby={lobbyState()} onLeave={vi.fn()} />);
+    unmount();
+    window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false }));
+    expect(socketMock.emitsOf('room:leave')).toHaveLength(0);
+  });
 });
 
 describe('cap banner', () => {

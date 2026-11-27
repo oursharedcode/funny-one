@@ -19,6 +19,7 @@
     "join": "Jiunge na chumba",
     "joining": "Unajiunga na chumba",
     "roomGone": "Chumba hicho hakipo tena — huenda mchezo umekwisha, au kiungo ni cha zamani.",
+    "awayTooLong": "Ulikuwa mbali kwa muda mrefu mno — mchezo uliendelea bila wewe.",
     "createNew": "Unda chumba kipya",
     "openRooms": "Vyumba vilivyo wazi: {{count}}",
     "imagesToday": "Hadi katuni {{total}} kwa siku. Idadi huanza upya kila siku saa 00:00 UTC.",

@@ -19,6 +19,7 @@
     "join": "Gabung",
     "joining": "Bergabung ke ruangan",
     "roomGone": "Ruangan ini sudah tidak ada — mungkin sudah berakhir atau tautannya sudah kedaluwarsa.",
+    "awayTooLong": "Kamu pergi terlalu lama — permainan berlanjut tanpamu.",
     "createNew": "Buat ruangan baru",
     "openRooms": "Ruangan terbuka: {{count}}",
     "imagesToday": "Hingga {{total}} gambar per hari. Disetel ulang setiap hari pukul 00:00 UTC.",

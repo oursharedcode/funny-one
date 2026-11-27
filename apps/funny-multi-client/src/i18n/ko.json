@@ -19,6 +19,7 @@
     "join": "참가하기",
     "joining": "방에 참가 중",
     "roomGone": "이 방은 더 이상 존재하지 않습니다 — 끝났거나 링크가 오래됐을 수 있어요.",
+    "awayTooLong": "너무 오래 자리를 비우셔서 게임이 먼저 진행됐어요.",
     "createNew": "새 방 만들기",
     "openRooms": "열린 방: {{count}}",
     "imagesToday": "하루 최대 {{total}}개의 이미지. 매일 00:00 UTC에 초기화됩니다.",

@@ -157,12 +157,26 @@ const CODE_MESSAGES: Record<CodeError | 'PACK_UNAVAILABLE', string> = {
 // school behind one address stays far below it.
 const STATS_EVENTS_PER_MINUTE = 60;
 
-// Bounded disconnect grace window (spec §7). A client that returns within
-// RECOVERY_WINDOW_MS keeps its slot via Socket.IO connection-state recovery;
-// the removal timer is a touch longer so recovery always wins the race. Both
-// values are SRC's.
-export const RECOVERY_WINDOW_MS = 60_000;
-export const DISCONNECT_GRACE_MS = RECOVERY_WINDOW_MS + 5_000;
+// Bounded disconnect grace windows (spec §7, FM-CORE-3). A seat waits for a
+// dropped player for a window that depends on the phase. In a game it is
+// 65 s, SRC's value (ACCEPTANCE B14): the others are waiting for that seat.
+// In the lobby it is 10 min (Step 132): a phone closes the game socket while
+// its owner is in a messenger sending the invite, and a lone host who stayed
+// away 65 s used to lose the room before anyone could join it.
+//
+// A client that returns inside its window keeps its slot via Socket.IO
+// connection-state recovery, so recovery must outlast both windows; and a
+// removal throws the saved state away (forgetSession in buildServer), so a
+// return after its window never recovers. A saved state is usable only while
+// the last message the page received is still in Socket.IO's buffer, which
+// keeps messages for the same span as the state. Every page therefore gets a
+// mark each RECOVERY_MARK_MS: a page that leaves has had a message at most a
+// minute before, so at the end of the lobby's window its last message is at
+// most 11 min old, inside the 12 min kept.
+export const LOBBY_GRACE_MS = 10 * 60_000;
+export const DISCONNECT_GRACE_MS = 65_000;
+export const RECOVERY_MARK_MS = 60_000;
+export const RECOVERY_WINDOW_MS = LOBBY_GRACE_MS + 2 * RECOVERY_MARK_MS;
 
 export type GameIO = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 
@@ -183,11 +197,15 @@ export interface BuiltServer {
 export interface BuildServerOptions {
   logger?: boolean;
   /**
-   * Overrides the spec §7 removal window. Production never passes this — the
-   * default is the only value that satisfies "longer than recovery". Tests use
-   * a few milliseconds so a grace window can actually elapse inside a case.
+   * Overrides the spec §7 removal window in a game (DISCONNECT_GRACE_MS).
+   * Production never passes this. Tests use a few milliseconds so a grace
+   * window can actually elapse inside a case.
    */
   disconnectGraceMs?: number;
+  /** Step 132: overrides the lobby's removal window (LOBBY_GRACE_MS), for tests. */
+  lobbyGraceMs?: number;
+  /** Step 132: overrides the recovery mark's period (RECOVERY_MARK_MS), for tests. */
+  recoveryMarkMs?: number;
   /** Overrides the BASE_PATH env var; tests use it to mount under a sub-path. */
   basePath?: string;
   /** Overrides the STATS_FILE env var; null keeps the counts in memory. */
@@ -211,6 +229,8 @@ export interface BuildServerOptions {
 export async function buildServer({
   logger = true,
   disconnectGraceMs = DISCONNECT_GRACE_MS,
+  lobbyGraceMs = LOBBY_GRACE_MS,
+  recoveryMarkMs = RECOVERY_MARK_MS,
   basePath = BASE_PATH,
   statsFile = STATS_FILE,
   countryOf,
@@ -400,6 +420,36 @@ export async function buildServer({
     },
   );
 
+  // Step 132: the recovery mark (see RECOVERY_MARK_MS). No page listens for
+  // it; receiving it moves the page's last-message offset forward, so a quiet
+  // lobby stays recoverable however long it waits before someone leaves it.
+  const recoveryMark = setInterval(() => io.emit('recovery:mark'), recoveryMarkMs);
+  recoveryMark.unref();
+  fastify.addHook('onClose', async () => {
+    clearInterval(recoveryMark);
+  });
+
+  // Step 132: a removed player's saved connection state is thrown away, so a
+  // page that returns after its window gets a fresh connection (and goes
+  // Home, App.tsx) instead of recovering into a seat a bot now holds, or one
+  // that is gone. socket.io-adapter 2.5 keeps a state after it is used and has
+  // no call to drop one, so this reaches into its map, which is keyed by the
+  // private id and holds the public one as `sid`. disconnect.socket.test.ts
+  // pins the behaviour: an upgrade that changes the map fails there.
+  type SavedStates = Map<string, { sid?: unknown }>;
+  const savedStates = (): SavedStates | null => {
+    const sessions = (io.of('/').adapter as unknown as { sessions?: unknown }).sessions;
+    return sessions instanceof Map ? (sessions as SavedStates) : null;
+  };
+  if (!savedStates()) {
+    fastify.log.error('Socket.IO saved states not found: a removed player could recover');
+  }
+  function forgetSession(socketId: string): void {
+    const states = savedStates();
+    if (!states) return;
+    for (const [pid, state] of states) if (state.sid === socketId) states.delete(pid);
+  }
+
   // Per-IP token buckets (spec §17). Held per server instance rather than at
   // module scope so tests get a fresh limiter with each buildServer().
   const createLimiter = createRateLimiter({
@@ -506,7 +556,9 @@ export async function buildServer({
   //
   // A dropped socket is not removed at once. It is removed only if the grace
   // window elapses with no return — which is what makes a tunnel, a locked
-  // phone or a Wi-Fi handover survivable mid-game (FM-CORE-3).
+  // phone or a Wi-Fi handover survivable mid-game (FM-CORE-3). The window is
+  // the lobby's when the socket drops in a lobby, the game's otherwise; Start
+  // ends every lobby window still running (game:start below).
 
   /**
    * Runs the real removal — either because a grace window elapsed with no
@@ -514,6 +566,9 @@ export async function buildServer({
    * so an explicit leave can also drop the socket from its Socket.IO room.
    */
   function finalizePlayerRemoval(socketId: string): RemoveResult | null {
+    // First, and whether or not the socket had a seat: once its window is
+    // over, nothing may recover into this id (Step 132).
+    forgetSession(socketId);
     const result = removePlayer(socketId);
     if (!result) return null;
 
@@ -740,6 +795,15 @@ export async function buildServer({
         socket.emit('error', { code: 'ROOM_LOCKED', message: 'Game already started.' });
         return;
       }
+      // Step 132: Start ends every lobby window. A player still away is
+      // dropped as a lobby leaver is, and a page of theirs that comes back
+      // later goes Home; the bots below then take the seats up to three.
+      for (const player of [...room.players]) {
+        if (player.id !== socket.id && disconnects.cancel(player.id)) {
+          fastify.log.info({ socketId: player.id }, 'away player dropped at start');
+          finalizePlayerRemoval(player.id);
+        }
+      }
       // Step 130 (B-29 #1): no minimum any more — the host alone starts, and
       // bots take the seats up to three (FM-BOT-3).
       // SRC hard-locked room.wobbleEngine here and re-broadcast the lobby so
@@ -833,8 +897,9 @@ export async function buildServer({
     socket.on('disconnect', (reason) => {
       fastify.log.info({ socketId: socket.id, reason }, 'socket disconnected');
       // Defer the removal (spec §7). Only a window that elapses with no return
-      // botifies or removes the player.
-      disconnects.schedule(socket.id);
+      // botifies or removes the player; a lobby waits longer (Step 132).
+      const room = findRoomForSocket(socket.id);
+      disconnects.schedule(socket.id, room?.phase === 'lobby' ? lobbyGraceMs : disconnectGraceMs);
     });
   });
 

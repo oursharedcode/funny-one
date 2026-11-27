@@ -18,6 +18,7 @@
     "join": "Join room",
     "joining": "Joining room",
     "roomGone": "That room no longer exists — it may have ended, or the link is old.",
+    "awayTooLong": "You were away too long — the room went on without you.",
     "createNew": "Create a new room",
     "openRooms": "Open rooms: {{count}}",
     "imagesToday": "Up to {{total}} cartoons per day. Resets daily at 00:00 UTC.",

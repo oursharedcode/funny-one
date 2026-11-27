@@ -19,6 +19,7 @@
     "join": "Entrar",
     "joining": "Entrando na sala",
     "roomGone": "Esta sala não existe mais — talvez tenha terminado ou o link esteja velho.",
+    "awayTooLong": "Você ficou fora por muito tempo — a partida continuou sem você.",
     "createNew": "Criar uma nova sala",
     "openRooms": "Salas abertas: {{count}}",
     "imagesToday": "Até {{total}} imagens por dia. Reinicia todo dia às 00:00 UTC.",

@@ -40,7 +40,8 @@ into this repo and adapted here. SRC spec section references (`spec §N`) point 
 ```
 
 Unchanged from SRC: no database, in-memory `Map<roomCode, Room>`, bounded-reconnect
-grace window then disconnect = bot (spec §7), no client-side AI calls, one Render service.
+grace window then disconnect = bot (spec §7; since Step 132 the lobby's window is 10 min and a
+game's 65 s, §6), no client-side AI calls, one Render service.
 *(D-5, 2026-09-14: the one service is now the Docker image on an Oracle Always-Free VM behind
 Caddy, at `https://www.staging-oursharedcode.com/funny37-game` — served under a sub-path, so the
 client's Vite `base`, manifest `start_url`/`scope`, Socket.IO path and the server's static
@@ -575,6 +576,11 @@ ended), followed by `lobby:update` when it opened the pack. `story:exported { ki
 Five error codes: `CODE_INVALID`, `CODE_BLOCKED`, `CODE_ENDED`, `CODE_PENDING`,
 `PACK_UNAVAILABLE`; too many wrong codes answer `RATE_LIMITED`.
 
+**Amended 2026-11-27 (Step 132, B-29 — the lobby's long window, §6, DD-17):** one event, no
+fields. `recovery:mark`, no payload, goes to every connected page once a minute
+(`RECOVERY_MARK_MS`) and no client handles it: Socket.IO recovers a page only while the last
+message it got is still in the server's buffer, and a quiet lobby could otherwise outlast that.
+
 ## 6. Server design — `apps/funny-multi-server`
 
 `game.ts` deltas (everything else per SRC):
@@ -618,8 +624,23 @@ Disconnect handling (T-2.4) follows SRC, with two deltas:
   deliberate leave and an elapsed grace window reach the same end state, so they get the same
   handling; only the delay differs.
 - **`buildServer` accepts `disconnectGraceMs`.** Production never passes it — the default is
-  `RECOVERY_WINDOW_MS + 5 s`, and being longer than the recovery window is the whole point. Tests
-  pass a few milliseconds, because a 65 s window cannot otherwise close inside a test.
+  65 s (`DISCONNECT_GRACE_MS`). Tests pass a few milliseconds, because a 65 s window cannot
+  otherwise close inside a test. *(Until Step 132 the default was `RECOVERY_WINDOW_MS + 5 s`, so
+  that recovery ended before removal; recovery now outlasts the window and removal ends it —
+  next bullet.)*
+- **Step 132 (B-29, DD-17): the window depends on the phase.** A drop in the lobby waits
+  `LOBBY_GRACE_MS` (10 min; `lobbyGraceMs` in tests), any other `DISCONNECT_GRACE_MS`; the
+  registry's `schedule(socketId, windowMs?)` takes the one the phase needs. Socket.IO keeps a
+  saved connection `RECOVERY_WINDOW_MS` = 10 min + 2 × `RECOVERY_MARK_MS` (12 min), longer than
+  either window plus the minute a page's last message can be older than its drop (§5's
+  `recovery:mark`). Because recovery outlasts the window, `finalizePlayerRemoval` first calls
+  `forgetSession`, which deletes that socket's saved state from the adapter's `sessions` map
+  (adapter 2.5 keeps a used state and has no API to drop one; `disconnect.socket.test.ts` pins
+  the behaviour): a page back after its window gets a new connection, and the client sends it
+  Home (§8). `game:start` ends every lobby window still running — whoever is away is removed as
+  a lobby leaver is, then `fillEmptySeats` tops the seats up to three. The lobby's page also
+  sends `room:leave` on a `pagehide` that is not `persisted`, so a closed or reloaded tab does
+  not leave a seat waiting 10 min.
 
 Deferred into the tasks that own them: `finalizePlayerRemoval` also re-broadcasts stats (T-5.3)
 and, when the drop lands in the reveal phase, kicks off bot-story pictures (T-4.4).
@@ -819,6 +840,17 @@ silence.
   A), the untouched recording and the settings of the alteration stay out of it. A voice is an
   extra: missing, or not a sound — a host that answers a missing file with its start page — the
   clip rings with the bells alone, and without the bells there is no sound at all, as before.
+
+### 8.4 A seat lost while away (Step 132, B-29, DD-17)
+
+App.tsx listens for `connect`. A connection that is not `recovered`, while the page is in the
+lobby, a round or the waiting screen, means the server gave the seat up or restarted: a page
+back inside its window always recovers, and gets what it missed before `connect` fires (§6).
+The page then drops the room's state, takes `room`, `lang` and `multi` off the address so Home
+opens on the create screen, and goes Home, where a line says "You were away too long — the
+room went on without you." (`home.awayTooLong`) until the next room is created or joined. A
+reveal or end screen stays, since the story and the gallery on it are this page's own. The
+lobby sends `room:leave` on a `pagehide` that is not `persisted` (§6).
 
 ## 9. i18n (D-2, FM-POOL-2/3/5)
 
@@ -1032,3 +1064,4 @@ device, is under `tasks.md` B-14.
 | DD-14 | Funny Family landing page (`apps/funny-family-site`, Step 72): pre-rendered static pages, one per language at `/<code>/` (English at `/`, a browser in another of the 15 languages is sent on to its page), vanilla TypeScript built by Vite, served by the same Caddy at `HUB_HOST`; two designs — A, a trailer card that plays on click; B, a muted background loop — split 50/50 per tab, `?v=a`/`?v=b` forces one | One screen needs no framework or server: ~5 kB of script, every language indexable, nothing running on the 1 GB VM; the split lets the funnel (DD-15) choose the design by its clicks to Funny Multi, judged by a two-proportion z-test on `/stats/` once each design has 100 visits |
 | DD-15 | Visit and funnel counts kept first-party by Funny Multi's server (`analytics.ts`): events with allowlisted labels only (variant, language, source, target, referrer class, phone or not), summed per UTC day into one JSON file in a volume, kept 400 days; the landing page posts through its own host, the game from its client (`funnel.ts`); `/stats/` (public, `noindex`) reads `GET /api/stats/summary`. No IP address, cookie or identifier is stored; nothing is sent from the Android app or under Do Not Track / Global Privacy Control. Step 79 (B-20): a visit (a landing-page or game view, nothing else) also adds one to its country's daily total, a tally kept apart from the labels; the server finds the country from the address in DB-IP's free country file (CC BY 4.0), which it downloads itself once a month into the volume and searches in memory (`geo.ts`), and keeps no address; `/stats/` draws the totals on a world map of its own (Natural Earth shapes, public domain) | Answers "does the landing page lead to plays and gifts" without a third-party tracker, a database or a consent banner; FM-CPL-2 says exactly this. The country tally answers "where do visitors come from" without sending an address to a lookup service or loading a map from a third party; apart from the labels, a country cannot single out the one visitor who came from it |
 | DD-16 | Packs (Step 103, B-29, §4.4): a pack is a second set of the seven pools, 5 options per slot, its ids carrying the pack inside the slug (`who.chr26-reindeer`); a story's content is `base`, `slice` (the pack on when, why and the ending only) or `full` (the pack in every slot); a scene's four picture slots come from one source, the base pools or one pack; a pack ending also gets an **aftermath** picture — the place and the ending, no characters — from its own skeleton and a style suffix without the character anchors | An id inside the slug keeps the wire format and `OPTION_ID_PATTERN` unchanged and cannot collide with a base id; a slice that never touches a picture slot gives every free room the pack's words at no picture cost, its scene already in the library; an aftermath without characters cannot fail to match the scene, as a second picture of the same characters would, and costs 25 pictures per pack instead of 3,125 |
+| DD-17 | Seat windows by phase (Step 132, B-29, §6, §8.4): an away player keeps a lobby seat 10 min and a game seat 65 s; Socket.IO keeps a saved connection 12 min, longer than both plus the minute of the `recovery:mark` every page gets; removing a player deletes their saved state, so a page back late gets a new connection and goes Home; Start removes anyone still away and bots fill the seats | A phone closes the game's connection while its owner is in a messenger sending the invite, which closed a lone host's room before anyone could open it (Step 127's finding); mid-game the others are waiting for that seat, so B14's 65 s stays; a recovery that outlasts the window has to be ended by the removal, or a late page would recover into a seat that is no longer its own |

@@ -19,6 +19,7 @@
     "join": "Beitreten",
     "joining": "Tritt dem Raum bei",
     "roomGone": "Diesen Raum gibt es nicht mehr — das Spiel ist vielleicht zu Ende, oder der Link ist veraltet.",
+    "awayTooLong": "Du warst zu lange weg — das Spiel ging ohne dich weiter.",
     "createNew": "Einen neuen Raum erstellen",
     "openRooms": "Offene Räume: {{count}}",
     "imagesToday": "Bis zu {{total}} Bilder pro Tag. Zurücksetzung täglich um 00:00 UTC.",

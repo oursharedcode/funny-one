@@ -8741,13 +8741,105 @@ A decision step; no code.
 **Gates:** docs only — `format:check` run on the two steering files, clean; typecheck, lint,
 tests and audit not applicable (no code changed).
 
-**RESUME HERE (2026-11-27, after Step 131; not yet pushed).** Steps 122–130 are live (image
-`funny-multi:f06fe59`). **Next, Step 132 — the lone host's grace** (D4 B; B-29's finding of Step
-127: a longer grace for a host alone in the lobby, or the room kept until the host's own tab
-closes — the owner picks when it is planned). **Step 133 — itch.io** waits on the owner's four
-setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a pack, #9 the
-festive room look, #7 the whole-game video. No deploys 24–26 December, 31 December–1 January or
-6–7 January (#16). **Owed, the owner's:** the itch.io setup; the look at the reindeer's bells and
-a game with bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2
-sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's
-trader confirmation before 1 Feb 2027.
+~~RESUME HERE (2026-11-27, after Step 131; not yet pushed).~~ — pushed as `e2f7814`, CI green
+(run 45840332417); carried into the note below. Its text, kept for the record: Steps 122–130 are
+live (image `funny-multi:f06fe59`). **Next, Step 132 — the lone host's grace** (D4 B; B-29's
+finding of Step 127: a longer grace for a host alone in the lobby, or the room kept until the
+host's own tab closes — the owner picks when it is planned). **Step 133 — itch.io** waits on the
+owner's four setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a
+pack, #9 the festive room look, #7 the whole-game video. No deploys 24–26 December, 31
+December–1 January or 6–7 January (#16). **Owed, the owner's:** the itch.io setup; the look at
+the reindeer's bells and a game with bots on the phone; the Play listing's "3–7 players", if
+wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+## Step 132 (task B-29) — the lone host's grace (2026-11-27)
+
+Owner decisions 2026-11-27 ("A, A, B, A, A — go ahead") on B-29's finding of Step 127: a phone
+closes the game socket while its owner is in the share sheet or a messenger sending the invite,
+and after 65 s the host alone was removed and the room deleted, so the friends found no room.
+**D1 A** — Socket.IO's connection-state recovery lengthened; **D2 A** — the removal window is the
+phase's: the lobby's is long, a game's stays 65 s (ACCEPTANCE B14 stands), and at Start anyone
+still away is dropped, bots filling the seats up to three; **D3 B** — the lobby's window is
+10 min; **D4 A** — a page back after its seat went goes Home and says "You were away too long —
+the room went on without you."; **D5 A** — deployed on its own right after the step.
+
+**Shipped:**
+- Server `index.ts` — `LOBBY_GRACE_MS` (10 min) beside `DISCONNECT_GRACE_MS` (65 s); a socket that
+  drops in the lobby gets the lobby's window (`disconnect.ts`: `schedule` takes the window per
+  drop). Recovery is kept `RECOVERY_WINDOW_MS` = 12 min, and every page gets a `recovery:mark`
+  once a minute, handled by none, so a quiet lobby's last message stays inside Socket.IO's
+  buffer and the page can still recover. A removal throws the player's saved connection state
+  away (`forgetSession`; it reaches into socket.io-adapter 2.5's map, pinned by a test), so a
+  page back after its window gets a fresh connection, never the bot's seat. `game:start` drops
+  anyone still away (logged "away player dropped at start") before `fillEmptySeats`.
+- Client `App.tsx` — a connection that is not the old one recovered, while the page is in the
+  lobby, a round or waiting, means the seat is gone: the page goes Home with the line, and the
+  invite's `room`, `lang` and `multi` come off the address. A reveal or end screen stays.
+  `HomeScreen.tsx` shows the line (`home.awayTooLong`, a status) until the next room.
+  `LobbyScreen.tsx` — a page that is really going (`pagehide` not kept for Back: closed, reloaded,
+  navigated away) sends `room:leave`, so nobody waits 10 min on its seat.
+- Shared `events.ts` — `recovery:mark`.
+- Texts in 23 catalogues: `home.awayTooLong`. en and ru are the agent's; the other 21 are machine
+  drafts, on B-3's review pile.
+- Steering: FM-CORE-3 amended; design line 43, §5, §6, §8.4 and DD-17; ACCEPTANCE B14's wording;
+  the B-29 bullet in `steering/tasks.md`.
+- Tests: server `disconnect.socket.test.ts` (8, real sockets: the lone host kept past 65 s and
+  back in; a game's window still short; a page back after either window gets a fresh connection;
+  the drop at Start with the bot; the mark reaches every page; a quiet page recovers with it and
+  not without), `disconnect.test.ts` (3); client App (8), Home (2), Lobby (3).
+
+**Seen** (`.screens/step132-check.mjs`, 71 checks, 0 problems; the server on 3000 and the Worker
+stand-in on 5185, Chromium at phone size; a phone "away" is its socket cut with no answer, as with
+no network):
+- A — an en host alone at 360 px, away 147 s: the room was kept; a friend joined at 70 s and saw
+  [Ada, Cy]; the host came back on the same connection (recovered, two marks replayed), saw the
+  friend and "Start with 1 bot", no line; the game began with [Ada, Cy, Bot 1].
+- B — three in a lobby, one away at Start: the game began with [Di, Ed, Bot 1], and the one away,
+  back, went Home with the line and the create screen (no `room=` left). Mid-game a player away
+  became a bot after 65 s (B14), and back at 75 s went Home with the line; the host reached the
+  reveal. A new room made from that Home and left: Home with no line.
+- C — a lobby page reloaded or sent elsewhere gave its seat up at once (143 ms, 67 ms); a closed
+  tab too (the host's room gone at once). The reloaded guest got the invite's join screen and
+  joined again.
+- D — the server restarted under four hosts at 320 px (ar, he, ta, de): each page went Home with
+  the line in its language, right to left for ar and he, inside the width (ta in 6 lines).
+- Noted, not failed: with one of three away, the host's button still read "Start Game" (the
+  known gap below). The check's "fits" skips aria-hidden pictures, so the snow hanging past the
+  screen's edge at 320 px (clipped) no longer counts; and the Christmas bubble's button (Step 129)
+  scrolls 8–12 px wider than its box at 320–360 px with its text inside and nothing seen past
+  it — Step 129's look, unchanged.
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 675 + 504 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob, minimatch, i18next); CI owed after the push. The first full run failed one new test,
+"keeps a quiet page recoverable with the mark": a mark already on its way when the test emptied
+the buffer became the page's last offset. The test now waits for a mark the server still holds;
+the file then passed 10 runs in a row, and the full suite.
+
+**The agent's readings, the owner's to overturn:** recovery is kept 12 min (the window, plus room
+for the mark); a lobby page that is really going gives its seat up at once (iOS's `pagehide` not
+seen here); a reveal or end screen whose seat went stays where it is.
+
+**Known gaps, not fixed here** (in `steering/tasks.md`): the lobby's "Start with N bots" counts
+an away player, so more bots can sit down than it says; a reveal or end page whose seat went
+stays put, and its "ready" finds no room; a tab that Android discards and reloads has lost its
+connection's id, so its host cannot get back in; after a deploy or a restart every seated page
+shows the same line.
+
+**Owed:** the push and CI; the deploy on its own (D5 A), when no visitor is connected; the owner's
+look on the phone.
+
+**RESUME HERE (2026-11-27, after Step 132; not yet pushed).** Steps 122–130 are live (image
+`funny-multi:f06fe59`); Step 131 (a decision, no code) is pushed. Step 132 (the lone host's
+grace) is committed, not pushed or deployed. **Next:** the owner's push, CI, then Step 132's
+deploy on its own (D5 A) — it waits until no visitor is connected (check the server log first);
+`ship.sh` only. Then the owner's phone look: make a room, go to a messenger for over a minute,
+come back to the same room; a friend joining meanwhile. **Step 133 — itch.io** waits on the
+owner's four setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a
+pack, #9 the festive room look, #7 the whole-game video. No deploys 24–26 December, 31
+December–1 January or 6–7 January (#16). **Owed, the owner's:** the push and deploy of Step 132,
+and the look on the phone; the itch.io setup; the look at the reindeer's bells and a game with
+bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of
+Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027.

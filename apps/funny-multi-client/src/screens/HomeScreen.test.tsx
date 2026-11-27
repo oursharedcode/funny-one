@@ -112,6 +112,22 @@ describe('mode selection', () => {
   });
 });
 
+// Step 132 (B-29, D4 A): App sends a page whose seat is gone back here.
+describe('a page back too late', () => {
+  const AWAY = 'You were away too long — the room went on without you.';
+
+  it('says the player was away too long, over the create screen', () => {
+    render(<HomeScreen onJoined={vi.fn()} awayTooLong />);
+    expect(screen.getByText(AWAY).getAttribute('role')).toBe('status');
+    expect(screen.getByText('Create room')).toBeTruthy();
+  });
+
+  it('says nothing of the kind on an ordinary visit', () => {
+    renderHome();
+    expect(screen.queryByText(AWAY)).toBeNull();
+  });
+});
+
 describe('content-language gating (T-2.3 server constraint)', () => {
   it('offers only authored languages as the room content language', () => {
     renderHome();

@@ -1122,7 +1122,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     the owner's first try lost its room that way, so the messenger's preview was the plain one,
     and guests opening the link would have found no room. Not new to Step 126, but the Invite
     button makes it common. Options when taken up: a longer grace for a host alone in the lobby
-    (minutes, not seconds), or the room kept until its host's own tab is closed.
+    (minutes, not seconds), or the room kept until its host's own tab is closed. **Taken up as
+    Step 132, 2026-11-27** — the lobby's window is 10 min (below, after the itch.io decisions).
   - **A reindeer and a Santa in the Christmas video, saying "ho-ho-ho"** (owner request
     2026-11-26; design §8.3, amended that day). In the 5 s clip of a golden story and of a paid
     game's story the monkey gives way to a reindeer in half of the clips and a funny Santa in
@@ -1224,6 +1225,26 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     Unsettled until then: whether US$1 is allowed for a sub-product, whether a buyer can claim
     again after closing the tab, Australia's withholding rate. The counters showed 2 of 96 game
     visits from abroad in the 30 days to 2026-11-26.
+  - **The lone host's grace — Step 132, 2026-11-27** (owner decisions "A, A, B, A, A" on the
+    Step 127 finding above): D1 A, Socket.IO's recovery lengthened; D2 A, the window is the
+    phase's — 10 min in the lobby, 65 s in a game as before (B14 stands) — and at Start anyone
+    still away is dropped, bots filling the seats up to three; D3 B, 10 min; D4 A, a page back
+    too late goes Home and says "You were away too long — the room went on without you."; D5 A,
+    deployed on its own right after the step. FM-CORE-3 amended; design §5, §6, §8.4, DD-17.
+    The agent's readings, the owner's to overturn: recovery is kept 12 min (the window, plus room
+    for the once-a-minute `recovery:mark` that keeps a quiet page recoverable); a lobby page that
+    is really going (`pagehide` not kept for Back: closed, reloaded, navigated away) gives its
+    seat up at once; a reveal or end screen stays where it is. en and ru the agent's, 21 machine
+    drafts on B-3's pile. Known gaps, not fixed here: the lobby's "Start with N bots" counts an
+    away player, so more bots can sit down than it says; a reveal or end page whose seat went
+    stays put, and its "ready" finds no room; a tab that Android discards and reloads has lost
+    its connection's id, so its host cannot get back in (a follow-up could keep the id in the
+    page); after a deploy or a restart every seated page shows the same line. Seen in Chromium
+    (71 checks): a host alone away 147 s kept the room and came back to a friend in
+    it; one away at Start became a bot and, back, got Home with the line; a mid-game seat still
+    went to a bot at 65 s; a reloaded, navigated or closed lobby page gave its seat up at once; a
+    restart sent ar, he, ta and de pages Home with the line at 320 px. iOS's `pagehide` not seen.
+    Committed as Step 132, not yet pushed or deployed; the owner's look on the phone is owed.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

@@ -29,6 +29,12 @@
 // seats ("Start with 2 bots"), and a line under it says each friend who joins
 // takes a bot's place; the bots themselves join only when the game starts.
 //
+// Step 132 (B-29): the server keeps a lobby seat 10 min for a player who is
+// away, since a phone drops the connection while its owner is in a messenger.
+// A page that is really going (closed, reloaded, navigated away from) gives
+// its seat up at once instead, so nobody waits on a seat that will not return.
+// A page kept for Back (`persisted`) keeps it: Back may bring it straight in.
+//
 // The cap banner is carried as-is. At T-3.2 it was inert — no server
 // `stats:get` handler, so the ack never fired and `isCapReached(null)` was
 // false. T-5.3 wired the handler; this file did not need to change.
@@ -67,6 +73,17 @@ export default function LobbyScreen({ lobby, onLeave }: Props) {
     socket.on('stats:update', onStatsUpdate);
     return () => {
       socket.off('stats:update', onStatsUpdate);
+    };
+  }, []);
+
+  // Step 132: a page that is going gives its seat up (see the header).
+  useEffect(() => {
+    const onPageHide = (e: PageTransitionEvent): void => {
+      if (!e.persisted) socket.emit('room:leave');
+    };
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, []);
 

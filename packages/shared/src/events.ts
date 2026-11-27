@@ -576,5 +576,10 @@ export interface ServerToClientEvents {
   // BUGS_AND_IMPROVEMENTS_01.md). Broadcast to every connected socket;
   // non-Home-screen clients simply ignore it.
   'stats:update': (payload: StatsPayload) => void;
+  // Step 132: sent to every connected page once a minute, and handled by
+  // none. Receiving it keeps a quiet page's last message recent enough for
+  // Socket.IO to recover the page after a long lobby absence (the server's
+  // RECOVERY_MARK_MS).
+  'recovery:mark': () => void;
   error: (payload: ErrorPayload) => void;
 }

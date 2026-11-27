@@ -8,8 +8,15 @@
 // `lobby:update` handler. ARC-3/DD-9 ship a single CSS recorder, so the field
 // was removed from the socket contract in T-2.1 — carrying it here would mean
 // storing a value the server no longer sends.
+//
+// Step 132 (B-29, owner decision D4 A): a page that comes back to a new
+// connection, not its old one, has lost its seat: the server removed it when
+// the player's window ran out (or the server restarted). In the lobby or a
+// round that page used to sit on a screen that never moved again; it now goes
+// Home, which says the player was away too long. A reveal or end screen stays,
+// since the story and the gallery on it are this page's own.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import HomeScreen from './screens/HomeScreen';
@@ -51,6 +58,20 @@ import type {
 import { seatBotNumber } from '@funny/shared';
 
 export type GamePhase = 'home' | 'lobby' | 'writing' | 'waiting' | 'reveal' | 'end';
+
+/** The phases a lost seat strands a page in (Step 132). */
+const SEATED_PHASES: ReadonlySet<GamePhase> = new Set(['lobby', 'writing', 'waiting']);
+
+/**
+ * Drops an invite link's join parameters from the address, so the Home a
+ * player is sent back to is the create screen, not a join to a room that has
+ * gone on without them. Anything else the address carries stays.
+ */
+function leaveJoinLink(): void {
+  const url = new URL(window.location.href);
+  for (const name of ['room', 'lang', 'multi']) url.searchParams.delete(name);
+  window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+}
 
 export interface LobbyState {
   roomCode: string;
@@ -105,6 +126,13 @@ export default function App() {
   // Nickname of a player lost after the §7 grace window; drives the host's
   // notice banner (spec §12). Only the host's client ever receives the event.
   const [lostPlayer, setLostPlayer] = useState<string | null>(null);
+  // Step 132: Home's "you were away too long" line, until the next room.
+  const [awayTooLong, setAwayTooLong] = useState(false);
+  // The socket handlers below are registered once, so they read the phase here.
+  const phaseRef = useRef(phase);
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
   const [error, setError] = useState<string | null>(null);
   // T-9.4/T-9.4a (FM-TIER-3/4): the support rails, fetched once at start-up so
   // Home's ♥ can show before any room exists. null until the fetch resolves
@@ -216,6 +244,24 @@ export default function App() {
       setError(t(`errors.${data.code}`, { defaultValue: data.message }));
       window.setTimeout(() => setError(null), 3000);
     };
+    // Step 132: a connection that is not the old one recovered means the seat
+    // is gone (see the header). Inside its window the old one always recovers,
+    // with what it missed delivered before this runs.
+    const onConnect = (): void => {
+      if (socket.recovered || !SEATED_PHASES.has(phaseRef.current)) return;
+      leaveJoinLink();
+      setLobby(null);
+      setRound(null);
+      setWaiting(null);
+      setReveal(null);
+      setReadyIds([]);
+      setGameOver(false);
+      setGallery(null);
+      setLostPlayer(null);
+      setAwayTooLong(true);
+      setPhase('home');
+    };
+    socket.on('connect', onConnect);
     socket.on('round:start', onRoundStart);
     socket.on('round:waiting', onRoundWaiting);
     socket.on('reveal:start', onRevealStart);
@@ -226,6 +272,7 @@ export default function App() {
     socket.on('player:lost', onPlayerLost);
     socket.on('error', onError);
     return () => {
+      socket.off('connect', onConnect);
       socket.off('round:start', onRoundStart);
       socket.off('round:waiting', onRoundWaiting);
       socket.off('reveal:start', onRevealStart);
@@ -314,9 +361,11 @@ export default function App() {
     body = (
       <HomeScreen
         onJoined={(state) => {
+          setAwayTooLong(false);
           setLobby(state);
           setPhase('lobby');
         }}
+        awayTooLong={awayTooLong}
         support={support}
         onOpenSupport={openSupport}
       />

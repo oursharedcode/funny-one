@@ -8837,6 +8837,11 @@ running container's image; `/health` ok, assetlinks, privacy and the old path's 
 The live bundle carries "You were away too long"; the running server's code, `recovery:mark` and
 the lobby's 10 min; its log since the start has no error.
 
+**Seen on the phone 2026-11-27** (owner: "phone look done"). The server's log, socket events
+only, agrees: a page went away for 76 s — past the old 65 s — and came back as itself
+(recovered); a second page connected after it, and the two then went away together for 80–81 s
+and both came back recovered. Nobody was dropped at Start; no warning or error in the log.
+
 ~~RESUME HERE (2026-11-27, after Step 132; not yet pushed).~~ — pushed as `1b853fa`, CI green,
 deployed; carried into the note below. Its text, kept for the record: Steps 122–130 are live (image
 `funny-multi:f06fe59`); Step 131 (a decision, no code) is pushed. Step 132 (the lone host's
@@ -8853,12 +8858,11 @@ Step 125); the admin link on the phone; the live-badge look; Funny Multi's trade
 before 1 Feb 2027.
 
 **RESUME HERE (2026-11-27, after Step 132; pushed and deployed).** Steps 122–132 are live (the
-game at image `funny-multi:1b853fa`; Step 131 was a decision, no code). **Next, Step 133 —
-itch.io**, which waits on the owner's four setup ops (see Step 131). After them, the second
-deploy by 23 December: #10 gift a pack, #9 the festive room look, #7 the whole-game video. No
-deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the owner's:** the
-look on the phone at the lone host's grace (make a room, stay in a messenger for over a minute,
-come back to the same room, a friend joining meanwhile); the itch.io setup; the look at the
-reindeer's bells and a game with bots on the phone; the Play listing's "3–7 players", if wanted;
+game at image `funny-multi:1b853fa`; Step 131 was a decision, no code); the owner has seen the
+lone host's grace on the phone. **Next, Step 133 — itch.io**, which waits on the owner's four
+setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a pack, #9 the
+festive room look, #7 the whole-game video. No deploys 24–26 December, 31 December–1 January or
+6–7 January (#16). **Owed, the owner's:** the itch.io setup; the look at the reindeer's bells
+and a game with bots on the phone; the Play listing's "3–7 players", if wanted;
 the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look;
 Funny Multi's trader confirmation before 1 Feb 2027.

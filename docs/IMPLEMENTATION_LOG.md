@@ -8966,6 +8966,13 @@ old path's 301 as expected. The live bundle (`index-C8a1Y6nd.js`, precached by `
 the holly sprig's and the bell's paths, the green frame and the taps that ready the bell; the
 running server's create ack sends the room's pack; its log since the start has no error.
 
+**Seen on the phone 2026-11-28** (owner: "done, all four checks passed"): Home's snow went on
+into the lobby; the host's switch took it off and brought it back; the golden story's reveal
+rang once; a story without an ending picture ended on the green holly card, on the screen and in
+the video. The server's log, socket and page events only, agrees as far as it goes: a phone
+loaded the new bundle at 01:01Z, and its sockets ran until 01:14Z (one drop came back as itself
+4 s later) and all closed; the log records no rooms or games, and no warning or error.
+
 ~~RESUME HERE (2026-11-28, after Step 133; not yet pushed).~~ — pushed as `5438de9`, CI green,
 deployed; carried into the note below. Its text, kept for the record: Steps 122–132 are live (the game at
 image `funny-multi:1b853fa`). Step 133 (the festive room look) is committed, not pushed or
@@ -8984,15 +8991,12 @@ wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone;
 look; Funny Multi's trader confirmation before 1 Feb 2027.
 
 **RESUME HERE (2026-11-28, after Step 133; pushed and deployed).** Steps 122–133 are live (the
-game at image `funny-multi:5438de9`; Step 131 was a decision, no code). **Next, the owner's look
-on the phone** at the festive room look: Home's snow going on into the room, off and back with
-the host's switch; the bell on the reveal of the one golden story; the holly card under a slice
-story, on its reveal, in the gallery and at the end of its video. **Next build, Step 134 — #10
-gift a pack** (Australia's gift-card law checked first: a 3-year expiry against 1 August 2027);
-then #7 the whole-game video; both in the second deploy by 23 December. Should itch.io switch
-sub-products on by 14 December, the itch.io step takes the next free number first. No deploys
-24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the owner's:** the look on
-the phone at Step 133; itch.io support's reply; the look at the reindeer's bells and a game with
-bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of
-Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
-before 1 Feb 2027.
+game at image `funny-multi:5438de9`; Step 131 was a decision, no code); the owner has seen the
+festive room look on the phone. **Next build, Step 134 — #10 gift a pack** (Australia's
+gift-card law checked first: a 3-year expiry against 1 August 2027); then #7 the whole-game
+video; both in the second deploy by 23 December. Should itch.io switch sub-products on by 14
+December, the itch.io step takes the next free number first. No deploys 24–26 December, 31
+December–1 January or 6–7 January (#16). **Owed, the owner's:** itch.io support's reply; the
+look at the reindeer's bells and a game with bots on the phone; the Play listing's "3–7
+players", if wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone;
+the live-badge look; Funny Multi's trader confirmation before 1 Feb 2027.

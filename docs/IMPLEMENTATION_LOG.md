@@ -9025,7 +9025,7 @@ phone, placed abroad, went from Home's link to "In Australia?" and gave a gift.
 
 **Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
 (552 + 731 + 509 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
-ids (glob, minimatch, i18next); CI owed after the push. One server test,
+ids (glob, minimatch, i18next); CI green after the push (run 46103852276). One server test,
 `disconnect.socket.test.ts` "deletes the room once the last player's window closes", failed once
 in the full run and passed on the two runs after.
 
@@ -9034,9 +9034,13 @@ costs a pack's price; the buyer's phone lists its gifts; a gift link never repla
 working pack; the app shows none of it; Home's link shows wherever the pack is on sale, so a
 visitor really abroad who follows it finds only "In Australia?".
 
-**Owed:** the push and CI; the deploy on its own (D4 A), when no visitor is connected —
-`ship.sh`, and `ship-funny-family.sh` for `/stats/`; the owner's gift on one phone, its link
-opened on another.
+**Pushed and deployed the same day** (`ef1fa9a`). Before the deploy no visitor was connected: the
+server's log showed three connections in 24 hours, all since disconnected. `ship.sh`, ending
+03:43Z — image `funny-multi:ef1fa9a`, `/health` ok, assetlinks, the policy and the old address —
+then `ship-funny-family.sh`, ending 03:44Z, every check passing. Production after: the policy
+dated 2026-11-28.
+
+**Owed:** the owner's gift on one phone, its link opened on another.
 
 ~~RESUME HERE (2026-11-28, after Step 133; pushed and deployed).~~ — carried into the note
 below. Its text, kept for the record: Steps 122–133 are live (the
@@ -9050,15 +9054,12 @@ look at the reindeer's bells on the phone; the Play listing's "3–7 players", i
 US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny
 Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-28, after Step 134; not yet pushed).** Steps 122–133 are live (the game
-at image `funny-multi:5438de9`). Step 134 (give the pack as a gift) is built and gated, not pushed or
-deployed. **Next:** the owner's push, CI, then Step 134's deploy on its own (D4 A) once no
-visitor is connected (check the server log first): `deploy/ship.sh`, then
-`deploy/ship-funny-family.sh` for `/stats/`. Then the owner gives one gift and opens its link on
-a second phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
+**RESUME HERE (2026-11-28, after Step 134; pushed and deployed).** Steps 122–134 are live (the
+game at image `funny-multi:ef1fa9a`). **Next:** the owner gives one gift and opens its link on a
+second phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
 Should itch.io switch sub-products on by 14 December, the itch.io step takes the next free number
 first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the
-owner's:** the push of Step 134; itch.io support's reply; the look at the reindeer's bells on the
+owner's:** the gift on the phone; itch.io support's reply; the look at the reindeer's bells on the
 phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125);
 the admin link on the phone; the live-badge look; Funny Multi's trader confirmation before
 1 Feb 2027.

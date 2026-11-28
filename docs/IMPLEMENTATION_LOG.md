@@ -9040,7 +9040,11 @@ server's log showed three connections in 24 hours, all since disconnected. `ship
 then `ship-funny-family.sh`, ending 03:44Z, every check passing. Production after: the policy
 dated 2026-11-28.
 
-**Owed:** the owner's gift on one phone, its link opened on another.
+**The owner's phone leg, the same day:** a test gift given on one phone (no money sent; "I've
+paid" pressed), its link shared to a second phone, which showed the Christmas gift line and the
+pack card. The test code is unmatched, so it stops working by itself after 48 hours.
+
+**Owed:** nothing for this step.
 
 ~~RESUME HERE (2026-11-28, after Step 133; pushed and deployed).~~ — carried into the note
 below. Its text, kept for the record: Steps 122–133 are live (the
@@ -9055,11 +9059,11 @@ US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge l
 Multi's trader confirmation before 1 Feb 2027.
 
 **RESUME HERE (2026-11-28, after Step 134; pushed and deployed).** Steps 122–134 are live (the
-game at image `funny-multi:ef1fa9a`). **Next:** the owner gives one gift and opens its link on a
-second phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
+game at image `funny-multi:ef1fa9a`); the owner has given a test gift and opened it on a second
+phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
 Should itch.io switch sub-products on by 14 December, the itch.io step takes the next free number
 first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the
-owner's:** the gift on the phone; itch.io support's reply; the look at the reindeer's bells on the
+owner's:** itch.io support's reply; the look at the reindeer's bells on the
 phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125);
 the admin link on the phone; the live-badge look; Funny Multi's trader confirmation before
 1 Feb 2027.

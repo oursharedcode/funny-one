@@ -1209,7 +1209,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     deletes the room; `xm_bots` and a `/stats/` column count Christmas games with bots; the
     privacy page says so. en and ru the agent's, 21 machine drafts on B-3's pile. Seen in
     Chromium (52 checks: alone, two humans, joiners, the Android shell, ar/he/ta/de at 320 px,
-    the counts). Pushed as `f06fe59`, CI green, deployed 2026-11-26.
+    the counts). Pushed as `f06fe59`, CI green, deployed 2026-11-26; a game with bots seen on the
+    owner's phone 2026-11-28.
   - *Decisions 2026-11-27 (owner, on the agent's itch.io plan; D-6 amended the same day):* a
     visitor outside Australia can also buy the pack on **itch.io at US$1.00**, Payouts mode only
     (itch.io the merchant of record), its share set to 0% (about US$0.67 kept a sale; the first

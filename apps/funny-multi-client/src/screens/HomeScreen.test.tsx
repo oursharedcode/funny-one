@@ -42,9 +42,9 @@ vi.mock('../socket', () => ({ socket: socketMock }));
 // Imported after the mock is registered.
 const { default: HomeScreen } = await import('./HomeScreen');
 
-function renderHome(onJoined = vi.fn()) {
-  render(<HomeScreen onJoined={onJoined} />);
-  return { onJoined };
+function renderHome(onJoined = vi.fn(), onChristmas = vi.fn()) {
+  render(<HomeScreen onJoined={onJoined} onChristmas={onChristmas} />);
+  return { onJoined, onChristmas };
 }
 
 // By role, not placeholder: the nickname field is the only text input on this
@@ -244,6 +244,23 @@ describe('room:create payload', () => {
       language: 'ru',
     });
     expect(state.players).toEqual([{ id: 's1', nickname: 'hostie', isBot: false }]);
+  });
+
+  it("hands App the room's pack as the ack says it, so the snow carries on (Step 133)", () => {
+    const { onJoined } = renderHome();
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    const pack = { id: 'chr26', on: true, paid: false };
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1', pack });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ pack });
+  });
+
+  it("starts with no pack when an older server's ack has none: the lobby brings it", () => {
+    const { onJoined } = renderHome();
+    typeNickname('hostie');
+    fireEvent.click(screen.getByText('Create room'));
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1' });
+    expect(onJoined.mock.calls[0][0]).toMatchObject({ pack: null });
   });
 
   it('trims the nickname before sending it', () => {
@@ -742,39 +759,43 @@ describe('the Christmas dressing (B-29, 2026-11-26)', () => {
 
   it('dresses the create screen while a new room gets the free pack', () => {
     at('2026-12-01T10:00:00Z');
-    renderHome();
+    const { onChristmas } = renderHome();
     expect(screen.getByText(LINE)).toBeTruthy();
     expect(screen.getByRole('button', { name: PEEK })).toBeTruthy();
     // The reindeer holds up a bell in each hoof.
     expect(screen.getAllByTestId('peek-bell')).toHaveLength(2);
     expect(screen.getByTestId('christmas-lights')).toBeTruthy();
-    expect(screen.getByTestId('snowfall')).toBeTruthy();
+    // App draws the snow, behind every screen (Step 133): Home tells it when.
+    expect(onChristmas).toHaveBeenLastCalledWith(true);
   });
 
   it('follows the picked language: none for a language outside the pack', async () => {
     at('2026-12-01T10:00:00Z');
-    renderHome();
+    const { onChristmas } = renderHome();
     await chooseContentLanguage('ru');
     expect(screen.getByText('🔔 В каждой новой комнате — одна новогодняя история')).toBeTruthy();
+    expect(onChristmas).toHaveBeenLastCalledWith(true);
     await chooseContentLanguage('ar');
-    expect(screen.queryByTestId('snowfall')).toBeNull();
+    expect(onChristmas).toHaveBeenLastCalledWith(false);
     expect(screen.queryByTestId('christmas-lights')).toBeNull();
     expect(screen.queryByText(/🔔/)).toBeNull();
   });
 
   it('is gone once the free part has ended', () => {
     at('2027-07-03T00:00:00Z');
-    renderHome();
+    const { onChristmas } = renderHome();
     expect(screen.queryByText(LINE)).toBeNull();
-    expect(screen.queryByTestId('snowfall')).toBeNull();
+    expect(onChristmas).toHaveBeenCalledWith(false);
+    expect(onChristmas).not.toHaveBeenCalledWith(true);
   });
 
   it('stays off the join screen', () => {
     at('2026-12-01T10:00:00Z');
     setUrl('?room=abcd');
-    renderHome();
+    const { onChristmas } = renderHome();
     expect(screen.queryByText(LINE)).toBeNull();
     expect(screen.queryByTestId('christmas-lights')).toBeNull();
+    expect(onChristmas).not.toHaveBeenCalledWith(true);
   });
 
   it('rings the sleigh bells when the reindeer is tapped, and again from the start', () => {

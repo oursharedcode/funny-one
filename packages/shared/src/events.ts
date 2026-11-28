@@ -225,6 +225,9 @@ export interface RoomCreatePayload {
 export interface RoomCreateAck {
   roomCode: string;
   socketId: string;
+  // Step 133: the room's pack, as the `lobby:update` that follows says it, so
+  // the host's first lobby already knows it (Home's snow carries on into it).
+  pack: RoomPack | null;
   // Step 122: why `code` did not make the room paid; absent when no code was
   // sent or it did.
   codeError?: ErrorPayload;

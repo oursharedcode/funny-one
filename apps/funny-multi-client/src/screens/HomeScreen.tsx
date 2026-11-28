@@ -47,6 +47,9 @@
 // get the free Christmas pack (`packForRoom`), the create screen wears its
 // Christmas dressing — lights along the top, the gold-on-green line with the
 // peeking reindeer under the subtitle, and falling snow (ChristmasDressing).
+// Since Step 133 (B-29 #9, D1 A) App draws the snow, so that it carries on into
+// the room: Home tells it when (`onChristmas`), and the create ack brings the
+// room's pack, so the snow does not stop while the lobby waits to hear it.
 //
 // Step 132 (B-29, D4 A): a page App.tsx sends back here because its seat was
 // given up shows a line under the subtitle saying the player was away too
@@ -57,7 +60,7 @@ import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
 import { homeUrl } from '../basePath';
 import Wordmark from '../components/art/Wordmark';
-import { ChristmasLights, ChristmasPeek, Snowfall } from '../components/art/ChristmasDressing';
+import { ChristmasLights, ChristmasPeek } from '../components/art/ChristmasDressing';
 import QRCode from '../components/QRCode';
 import SourceFooter from '../components/SourceFooter';
 import ScrollBox from '../components/ScrollBox';
@@ -90,13 +93,18 @@ interface Props {
   // tests that don't care about the support screen need not pass it.
   support?: SupportConfig | null;
   onOpenSupport?: () => void;
+  /** Step 133: whether the Christmas dressing shows, for App's snow. */
+  onChristmas?: (on: boolean) => void;
 }
+
+const NO_SNOW_TOLD = (): void => {};
 
 export default function HomeScreen({
   onJoined,
   awayTooLong = false,
   support = null,
   onOpenSupport = () => {},
+  onChristmas = NO_SNOW_TOLD,
 }: Props) {
   const { t, i18n } = useTranslation();
 
@@ -135,6 +143,9 @@ export default function HomeScreen({
   const liveCode = packCode && isPackPaid(packCode.pack, Date.now()) ? packCode : null;
   // B-29: the Christmas dressing, while a new room here gets the free pack.
   const christmas = mode === 'create' && packForRoom(language, Date.now()) !== null;
+  useEffect(() => {
+    onChristmas(christmas);
+  }, [christmas, onChristmas]);
 
   // When the invite link carries the room language (`?room=CODE&lang=ru`),
   // render the join screen in that language immediately rather than waiting for
@@ -218,7 +229,8 @@ export default function HomeScreen({
           multiLanguage,
           myLanguage: language,
           players: [{ id: ack.socketId, nickname: nickname.trim(), isBot: false }],
-          pack: null,
+          // An older server's ack has none: the lobby:update after it brings it.
+          pack: ack.pack ?? null,
           codeError: ack.codeError ?? null,
         });
       },
@@ -294,9 +306,8 @@ export default function HomeScreen({
 
   return (
     <div
-      className={`isolate mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6 ${hasAnyRail(support) || christmas ? 'pt-14' : ''}`}
+      className={`mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6 ${hasAnyRail(support) || christmas ? 'pt-14' : ''}`}
     >
-      {christmas && <Snowfall />}
       {christmas && <ChristmasLights />}
       {hasAnyRail(support) && <SupportHeart onOpen={onOpenSupport} />}
       <Wordmark />

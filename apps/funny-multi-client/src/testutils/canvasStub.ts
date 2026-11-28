@@ -19,6 +19,15 @@ export interface Canvas2DStub extends Partial<CanvasRenderingContext2D> {
   calls: CanvasCall[];
 }
 
+/**
+ * jsdom has no Path2D either: a stand-in that keeps its path data, so that a
+ * test can tell which shape a `fill(path)` or `stroke(path)` drew (the ending
+ * card's pictures, Step 133).
+ */
+export class Path2DStub {
+  constructor(readonly d: string = '') {}
+}
+
 function makeContextStub(): Canvas2DStub {
   const calls: CanvasCall[] = [];
   const record =
@@ -52,6 +61,7 @@ function makeContextStub(): Canvas2DStub {
     strokeStyle: '',
     lineWidth: 1,
     lineJoin: 'miter',
+    lineCap: 'butt',
     font: '',
     textAlign: 'start',
     textBaseline: 'alphabetic',
@@ -60,7 +70,8 @@ function makeContextStub(): Canvas2DStub {
 
 /**
  * Points every `document.createElement('canvas')` and `HTMLCanvasElement`
- * instance at a fake 2D context, `toBlob`, and `captureStream`. Returns the
+ * instance at a fake 2D context, `toBlob`, and `captureStream`, and stubs
+ * the global `Path2D` (undone by `vi.unstubAllGlobals`). Returns the
  * context stub so a test can assert on `.calls`.
  */
 export function installCanvasStub(): Canvas2DStub {
@@ -79,5 +90,6 @@ export function installCanvasStub(): Canvas2DStub {
   // to already exist, so this one is assigned directly rather than spied.
   (HTMLCanvasElement.prototype as unknown as { captureStream: () => MediaStream }).captureStream =
     vi.fn(() => ({}) as MediaStream);
+  vi.stubGlobal('Path2D', Path2DStub);
   return ctx;
 }

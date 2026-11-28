@@ -14,6 +14,11 @@
 //   a speech bubble; a tap on either rings the clips' sleigh bells, shakes the
 //   reindeer and swings the bells.
 // - `Snowfall`: big six-armed snow crystals falling slowly behind the page.
+//   App draws it, over the background doodle and under the screens (Step 133,
+//   B-29 #9, D1 A): on Home while the dressing shows, and in the room — lobby,
+//   rounds, waiting, reveal, end — while the room's pack is on, so it comes
+//   and goes with the host's switch and carries on from Home into the room
+//   without starting over.
 //
 // All three are pictures: the lights and the snow are aria-hidden, and the
 // line is plain text. Under prefers-reduced-motion nothing moves (index.css);
@@ -277,7 +282,7 @@ export function Snowfall() {
     <div
       aria-hidden="true"
       data-testid="snowfall"
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      className="pointer-events-none fixed inset-0 overflow-hidden"
     >
       {FLAKES.map(([left, size, fall, delay, rest], index) => (
         <span

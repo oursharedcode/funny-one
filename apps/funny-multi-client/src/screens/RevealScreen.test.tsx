@@ -21,6 +21,8 @@ vi.mock('../funnel', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../funnel')>()),
   trackGoldenCartoon,
 }));
+const ringRevealBell = vi.fn();
+vi.mock('../revealBell', () => ({ ringRevealBell }));
 
 const { default: RevealScreen } = await import('./RevealScreen');
 
@@ -353,6 +355,29 @@ describe('Christmas stories (Step 117)', () => {
     const card = screen.getByTestId('ending-card');
     expect(card.getAttribute('lang')).toBe('de');
     expect(card.textContent).toContain(endingText(renderStory('de', reveal.optionIds), 'de'));
+  });
+
+  // Step 133 (D3 A): the bell, as the screen opens, for a golden story only.
+  it('rings for a golden story as the screen opens, once', () => {
+    ringRevealBell.mockClear();
+    const reveal = revealOf(GOLDEN);
+    renderReveal(reveal);
+    expect(ringRevealBell).toHaveBeenCalledTimes(1);
+    expect(ringRevealBell).toHaveBeenCalledWith(reveal);
+    // Retelling the story in another language rings nothing more.
+    switchStoryTo('Deutsch (Deutschland)');
+    socketMock.fire('reveal:pictureReady', { picture: PICTURE, imagePrompt: 'p', ending: ENDING });
+    expect(ringRevealBell).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['a slice story', { kind: 'slice', pack: 'chr26' }],
+    ['a paid story, whose clip rings', { kind: 'paid', pack: 'chr26' }],
+    ['a base story', { kind: 'base' }],
+  ] as const)('stays quiet for %s', (_name, content) => {
+    ringRevealBell.mockClear();
+    renderReveal(revealOf(content));
+    expect(ringRevealBell).not.toHaveBeenCalled();
   });
 
   it("counts a golden story's cartoon once it has come, and no other story's", () => {

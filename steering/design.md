@@ -581,6 +581,11 @@ fields. `recovery:mark`, no payload, goes to every connected page once a minute
 (`RECOVERY_MARK_MS`) and no client handles it: Socket.IO recovers a page only while the last
 message it got is still in the server's buffer, and a quiet lobby could otherwise outlast that.
 
+**Amended 2026-11-28 (Step 133, B-29 — the festive room look, §8.5):** one field, no events.
+`RoomCreateAck.pack`, the room's pack as the `lobby:update` after it says it, so the host's
+first lobby knows it and Home's snow carries on into the room. A client takes an ack without
+it, from an older server, as `null` until that `lobby:update`.
+
 ## 6. Server design — `apps/funny-multi-server`
 
 `game.ts` deltas (everything else per SRC):
@@ -851,6 +856,43 @@ opens on the create screen, and goes Home, where a line says "You were away too 
 room went on without you." (`home.awayTooLong`) until the next room is created or joined. A
 reveal or end screen stays, since the story and the gallery on it are this page's own. The
 lobby sends `room:leave` on a `pagehide` that is not `persisted` (§6).
+
+### 8.5 The festive room look (Step 133, B-29)
+
+**Snow** (D1 A). App.tsx draws Home's `Snowfall` (ChristmasDressing.tsx) itself, after the
+background doodle and before the screens' wrapper, which paints over it: on Home while
+HomeScreen says its Christmas dressing shows (`onChristmas`), and in the room, from the lobby to
+the end screen, while the room's pack is on (`pack.on`). It is one node from Home into the room,
+so the snow does not start over; the create ack brings the room's pack (§5) so that the host's
+lobby has it at once. The host's switch takes it off every phone and brings it back. Under
+reduced motion the crystals lie still (`index.css`), as on Home.
+
+**The golden story's bell** (D3 A; `revealBell.ts`). RevealScreen rings it when the story it
+shows is golden: the first 2.5 s of `sounds/sleigh-bells.mp3` at 0.5, fading out from 1.8 s,
+once per reveal — under 3 s, so no control to stop it (WCAG 1.4.2). A paid story's reveal stays
+quiet, its clip ringing already (§4.4). A reveal comes from the server, and a phone sounds only
+after a tap, so while the room's pack is on every tap and key press calls `wakeRevealBell`: the
+first opens one AudioContext inside the gesture, starts a silent sample, fetches the bells, and
+then lets the context idle, suspended. A context that has run once may start again outside a
+gesture, but not at once — 0.2–1.3 s in Chromium, too late at the reveal — so on the phone whose
+own story is golden (round 0's `content`: each phone starts on its own story and is shown it)
+App keeps the context running, silent, from the last round until it rings (`warmRevealBell`),
+and lets it idle when the reveal closes or a new game starts (`coolRevealBell`). A bell not ready
+within `LATE_MS` (2 s) of the call is dropped, not heard late. No Web Audio, bells that fail to
+load, or sound the phone refuses leave the reveal silent, with no error; like all Web Audio, the
+bell keeps to an iPhone's silent switch.
+
+**The ending card** (D2: card 1, "Holly", the owner's pick of 2026-11-28; `StoryEnding.tsx`,
+`videoFooter.ts` `drawEndingCard`). The card a story without an ending picture ends on (§4.4)
+has a green frame (`#15803d`), a holly sprig — two leaves, three red berries — on its top-left
+and bottom-right corners, and a gold bell with a red bow over the ending, in place of Step 117's
+pink frame and 🔔. Both pictures are paths in `components/art/hollyArt.ts`, drawn as SVG on the
+screen (`ArtSvg`, hidden from screen readers, so only the words are read out) and through
+`Path2D` on the clip's canvas, so the screen and the video look alike; a canvas without
+`Path2D` draws the frame and the words alone. The sprigs reach about 9 px past the card, into
+the padding round it (the reveal's 24 px, a gallery entry's 16 px). The bell is 56 px on the
+screen and 104 px on the clip's 640 px card. The clip's deployer logo stamp marks pictures, so
+when the clip ends on a card it fades out with the scene, as the screen's card has none.
 
 ## 9. i18n (D-2, FM-POOL-2/3/5)
 

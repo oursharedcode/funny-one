@@ -17,7 +17,7 @@
 import { describe, expect, it, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import { POOLS, POOL_TEXTS, QUESTIONS, SLOT_COUNT } from '@funny/shared';
-import type { PayConfig, RevealStartPayload, SlotIndex } from '@funny/shared';
+import type { PayConfig, RevealStartPayload, SlotIndex, StoryContent } from '@funny/shared';
 import { createSocketMock, setUrl } from './testutils/socketMock';
 import { screenSlide } from './styles/motion';
 import { renderStory } from './storyLanguage';
@@ -31,6 +31,15 @@ const trackChristmasGame = vi.fn();
 vi.mock('./funnel', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./funnel')>()),
   trackChristmasGame,
+}));
+const wakeRevealBell = vi.fn();
+const warmRevealBell = vi.fn();
+const coolRevealBell = vi.fn();
+vi.mock('./revealBell', () => ({
+  wakeRevealBell,
+  warmRevealBell,
+  coolRevealBell,
+  ringRevealBell: vi.fn(),
 }));
 
 const { default: App } = await import('./App');
@@ -298,6 +307,208 @@ describe('lobby:update', () => {
     renderInLobby();
     socketMock.fire('round:start', { roundNumber: 0, question: 'Who?', deadline: Date.now() });
     expect(trackChristmasGame).not.toHaveBeenCalled();
+  });
+});
+
+// Step 133 (B-29 #9, owner decisions D1 A and D3 A).
+describe("the room's snow, and the bell readied at a tap", () => {
+  const ON = { id: 'chr26', on: true, paid: false };
+  const OFF = { id: 'chr26', on: false, paid: false };
+
+  // A day of the pack's free part, so Home wears its dressing.
+  beforeEach(() => {
+    vi.setSystemTime(Date.parse('2026-12-01T10:00:00Z'));
+    wakeRevealBell.mockClear();
+    warmRevealBell.mockClear();
+    coolRevealBell.mockClear();
+  });
+  afterEach(() => {
+    vi.setSystemTime(vi.getRealSystemTime());
+  });
+
+  function snow(): Element[] {
+    return [...document.querySelectorAll('[data-testid="snowfall"]')];
+  }
+
+  /** The one snowfall on the page: by identity, since toEqual would pass a new one. */
+  function theSnow(): Element {
+    expect(snow()).toHaveLength(1);
+    return snow()[0]!;
+  }
+
+  function switchPack(pack: typeof ON | null): void {
+    socketMock.fire('lobby:update', {
+      players: [{ id: 's1', nickname: 'hostie', isBot: false }],
+      hostId: 's1',
+      pack,
+    });
+  }
+
+  /** Home, then a room made in it with the pack on, as the server now acks it. */
+  function createChristmasRoom() {
+    const view = render(<App />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'hostie' } });
+    fireEvent.click(screen.getByText('Create room'));
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1', pack: ON });
+    return view;
+  }
+
+  it("carries Home's snow on into the room, without starting it over", async () => {
+    render(<App />);
+    const flakes = theSnow();
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'hostie' } });
+    fireEvent.click(screen.getByText('Create room'));
+    socketMock.ackFor('room:create')({ roomCode: 'WXYZ', socketId: 's1', pack: ON });
+    await settle();
+    // The very same crystals, falling on from where they were, before the
+    // lobby's first update and after it.
+    expect(theSnow()).toBe(flakes);
+    switchPack(ON);
+    expect(theSnow()).toBe(flakes);
+  });
+
+  it('falls behind every screen of the room while the pack is on', async () => {
+    const { container } = createChristmasRoom();
+    const flakes = theSnow();
+    const reach: [string, () => void][] = [
+      [
+        'writing',
+        () =>
+          socketMock.fire('round:start', {
+            roundNumber: 0,
+            question: 'Who?',
+            deadline: Date.now(),
+          }),
+      ],
+      ['waiting', () => socketMock.fire('round:waiting', { submitted: 2, total: 3 })],
+      ['reveal', () => socketMock.fire('reveal:start', REVEAL)],
+      ['end', () => fireEvent.click(screen.getByText('Continue'))],
+    ];
+    for (const [phase, go] of reach) {
+      go();
+      await settle();
+      expect(phases(container)).toEqual([phase]);
+      expect(theSnow()).toBe(flakes);
+    }
+  });
+
+  it("goes and comes back on every phone with the host's switch", async () => {
+    createChristmasRoom();
+    await settle();
+    switchPack(OFF);
+    expect(snow()).toEqual([]);
+    switchPack(ON);
+    theSnow();
+  });
+
+  it('does not fall in a room offered no pack', async () => {
+    renderInLobby();
+    await settle();
+    switchPack(null);
+    expect(snow()).toEqual([]);
+  });
+
+  it('does not fall where Home wears no dressing', () => {
+    vi.setSystemTime(Date.parse('2027-07-03T00:00:00Z'));
+    render(<App />);
+    expect(snow()).toEqual([]);
+  });
+
+  it('readies the bell at every tap and key press while the pack is on, and only then', async () => {
+    const home = render(<App />);
+    fireEvent.click(document.body);
+    expect(wakeRevealBell).not.toHaveBeenCalled();
+    home.unmount();
+
+    createChristmasRoom();
+    await settle();
+    fireEvent.pointerUp(document.body);
+    fireEvent.touchEnd(document.body);
+    fireEvent.click(document.body);
+    fireEvent.keyDown(document.body, { key: 'Enter' });
+    expect(wakeRevealBell).toHaveBeenCalledTimes(4);
+
+    switchPack(OFF);
+    wakeRevealBell.mockClear();
+    fireEvent.click(document.body);
+    fireEvent.keyDown(document.body, { key: 'Enter' });
+    expect(wakeRevealBell).not.toHaveBeenCalled();
+  });
+
+  const GOLDEN: StoryContent = { kind: 'full', pack: 'chr26' };
+  const SLICE: StoryContent = { kind: 'slice', pack: 'chr26' };
+
+  /** Round `n` as the server deals it to this phone, then its wait. */
+  function playRound(n: number, content: StoryContent): void {
+    socketMock.fire('round:start', {
+      roundNumber: n,
+      question: 'Who?',
+      deadline: Date.now(),
+      content,
+    });
+    socketMock.fire('round:waiting', { submitted: 1, total: 3 });
+  }
+
+  it('keeps the bell warm on the golden phone from its last round until its reveal closes', async () => {
+    createChristmasRoom();
+    await settle();
+    // Round 0 is this phone's own story, the one it is shown at the reveal.
+    playRound(0, GOLDEN);
+    for (let n = 1; n < SLOT_COUNT - 1; n++) playRound(n, SLICE);
+    expect(warmRevealBell).not.toHaveBeenCalled();
+
+    socketMock.fire('round:start', {
+      roundNumber: SLOT_COUNT - 1,
+      question: 'Who?',
+      deadline: Date.now(),
+      content: SLICE,
+    });
+    expect(warmRevealBell).toHaveBeenCalledTimes(1);
+    socketMock.fire('round:waiting', { submitted: 1, total: 3 });
+    socketMock.fire('reveal:start', { ...REVEAL, content: GOLDEN });
+    await settle();
+    expect(warmRevealBell).toHaveBeenCalledTimes(1);
+    expect(coolRevealBell).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('Continue'));
+    await settle();
+    expect(coolRevealBell).toHaveBeenCalledTimes(1);
+  });
+
+  it('warms the last round straight into the reveal, for the last to answer', () => {
+    createChristmasRoom();
+    playRound(0, GOLDEN);
+    socketMock.fire('round:start', {
+      roundNumber: SLOT_COUNT - 1,
+      question: 'Who?',
+      deadline: Date.now(),
+      content: SLICE,
+    });
+    socketMock.fire('reveal:start', { ...REVEAL, content: GOLDEN });
+    expect(warmRevealBell).toHaveBeenCalledTimes(1);
+    expect(coolRevealBell).not.toHaveBeenCalled();
+  });
+
+  it('never warms it on a phone whose story is not golden', async () => {
+    createChristmasRoom();
+    await settle();
+    playRound(0, SLICE);
+    for (let n = 1; n < SLOT_COUNT; n++) playRound(n, n === 3 ? GOLDEN : SLICE);
+    socketMock.fire('reveal:start', { ...REVEAL, content: SLICE });
+    await settle();
+    expect(warmRevealBell).not.toHaveBeenCalled();
+  });
+
+  it("starts each game cold: a golden game's warmth does not carry into the next", () => {
+    createChristmasRoom();
+    playRound(0, GOLDEN);
+    playRound(SLOT_COUNT - 1, SLICE);
+    expect(warmRevealBell).toHaveBeenCalledTimes(1);
+    // The next game deals this phone a slice story.
+    playRound(0, SLICE);
+    expect(coolRevealBell).toHaveBeenCalledTimes(1);
+    playRound(SLOT_COUNT - 1, SLICE);
+    expect(warmRevealBell).toHaveBeenCalledTimes(1);
   });
 });
 

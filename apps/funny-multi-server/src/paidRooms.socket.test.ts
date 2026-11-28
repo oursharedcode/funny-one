@@ -113,6 +113,8 @@ describe('a code at the room’s creation', () => {
     const code = h.server.codes.mint('chr26');
     const { ack, roomCode, lobbies } = await roomOf(h, code.toLowerCase());
     expect(ack.codeError).toBeUndefined();
+    // Step 133: the ack says it as the lobby does.
+    expect(ack.pack).toEqual(PAID);
     for (const seen of lobbies) expect(seen.at(-1)?.pack).toEqual(PAID);
     expect(getRoom(roomCode)!.packCode).toBe(code);
     expect(JSON.stringify(lobbies)).not.toContain(code);
@@ -147,6 +149,7 @@ describe('a code at the room’s creation', () => {
     const wrong = code.slice(0, -1) + (code.endsWith('Z') ? 'Y' : 'Z');
     const { ack, roomCode, lobbies } = await roomOf(h, wrong);
     expect(ack.codeError?.code).toBe('CODE_INVALID');
+    expect(ack.pack).toEqual(FREE);
     expect(lobbies[0]!.at(-1)?.pack).toEqual(FREE);
     expect(getRoom(roomCode)!.packCode).toBeNull();
     expect(records(h, 'room')).toEqual([]);

@@ -15,6 +15,13 @@
 // round that page used to sit on a screen that never moved again; it now goes
 // Home, which says the player was away too long. A reveal or end screen stays,
 // since the story and the gallery on it are this page's own.
+//
+// Step 133 (B-29 #9, owner decisions D1 A and D3 A): Home's snow falls behind
+// every screen of a room whose pack is on — drawn here, between the doodle and
+// the screens, so that it neither slides with them nor starts over between
+// them — and comes and goes on every phone with the host's switch. While the
+// pack is on, every tap and key press also readies the bell a golden story's
+// reveal rings (revealBell.ts), since a phone sounds only after a tap.
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +33,7 @@ import WaitingScreen from './screens/WaitingScreen';
 import RevealScreen from './screens/RevealScreen';
 import EndScreen from './screens/EndScreen';
 import BackgroundDoodle from './components/art/BackgroundDoodle';
+import { Snowfall } from './components/art/ChristmasDressing';
 import PayScreen from './components/PayScreen';
 import SupportScreen from './components/SupportScreen';
 import { hasAnyRail } from './support';
@@ -33,6 +41,7 @@ import { trackChristmasGame, trackSupportOpen } from './funnel';
 import { clearPayLink, payLinkPack, type PayDoor } from './pay';
 import { isStoreShell } from './storeShell';
 import { canUnlockRoom } from './packCode';
+import { coolRevealBell, wakeRevealBell, warmRevealBell } from './revealBell';
 import { screenSlide } from './styles/motion';
 import { socket } from './socket';
 import { setReloadSafe } from './swReload';
@@ -55,12 +64,15 @@ import type {
   RoundWaitingPayload,
   SupportConfig,
 } from '@funny/shared';
-import { seatBotNumber } from '@funny/shared';
+import { BASE_CONTENT, SLOT_COUNT, isGolden, seatBotNumber } from '@funny/shared';
 
 export type GamePhase = 'home' | 'lobby' | 'writing' | 'waiting' | 'reveal' | 'end';
 
 /** The phases a lost seat strands a page in (Step 132). */
 const SEATED_PHASES: ReadonlySet<GamePhase> = new Set(['lobby', 'writing', 'waiting']);
+
+/** What counts as a tap or a key press, the moments a phone may start sound. */
+const WAKE_EVENTS = ['pointerup', 'touchend', 'click', 'keydown'] as const;
 
 /**
  * Drops an invite link's join parameters from the address, so the Home a
@@ -102,7 +114,8 @@ export interface LobbyState {
   /**
    * The Christmas pack the room was offered and whether the host has it on
    * (Step 117, owner decision 3A); null for a room offered none. From
-   * `lobby:update`, which every player gets right after creating or joining.
+   * `lobby:update`, which every player gets right after creating or joining,
+   * and for the host from the create ack before it (Step 133).
    */
   pack: RoomPack | null;
   /**
@@ -128,6 +141,11 @@ export default function App() {
   const [lostPlayer, setLostPlayer] = useState<string | null>(null);
   // Step 132: Home's "you were away too long" line, until the next room.
   const [awayTooLong, setAwayTooLong] = useState(false);
+  // Step 133: whether Home wears its Christmas dressing, as Home last said.
+  const [homeChristmas, setHomeChristmas] = useState(false);
+  // And whether this phone's own story is golden: the one it writes in round 0
+  // (everyone starts on their own) and the one it is shown at the reveal.
+  const [ownGolden, setOwnGolden] = useState(false);
   // The socket handlers below are registered once, so they read the phase here.
   const phaseRef = useRef(phase);
   useEffect(() => {
@@ -195,6 +213,7 @@ export default function App() {
 
   useEffect(() => {
     const onRoundStart = (data: RoundStartPayload): void => {
+      if (data.roundNumber === 0) setOwnGolden(isGolden(data.content ?? BASE_CONTENT));
       setRound(data);
       setWaiting(null);
       setReveal(null);
@@ -305,6 +324,28 @@ export default function App() {
     if (phase === 'writing' && roundNumber === 0 && pack) trackChristmasGame(pack.on, withBots);
   }, [phase, roundNumber, pack, withBots]);
 
+  // Step 133: the snow, and the bell readied at every tap, while the pack is on.
+  const packOn = pack?.on === true;
+  const snowing = phase === 'home' ? homeChristmas : packOn;
+  useEffect(() => {
+    if (!packOn) return;
+    const options = { capture: true, passive: true };
+    for (const name of WAKE_EVENTS) window.addEventListener(name, wakeRevealBell, options);
+    return () => {
+      for (const name of WAKE_EVENTS) window.removeEventListener(name, wakeRevealBell, options);
+    };
+  }, [packOn]);
+  // On the phone whose story is golden, the bell is kept warm from the last
+  // round until it rings as the reveal opens (revealBell.ts). The reveal is
+  // part of it, so the warmth does not lapse in between.
+  const lastRound = roundNumber === SLOT_COUNT - 1 && (phase === 'writing' || phase === 'waiting');
+  const bellWarm = ownGolden && (lastRound || phase === 'reveal');
+  useEffect(() => {
+    if (!bellWarm) return;
+    warmRevealBell();
+    return coolRevealBell;
+  }, [bellWarm]);
+
   // "Create a new room" on the host notice (spec §12): end the current game
   // for everyone (game:end → game:over → room deleted), then reload to a fresh
   // Create-mode Home screen.
@@ -368,6 +409,7 @@ export default function App() {
         awayTooLong={awayTooLong}
         support={support}
         onOpenSupport={openSupport}
+        onChristmas={setHomeChristmas}
       />
     );
   }
@@ -375,6 +417,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <BackgroundDoodle />
+      {snowing && <Snowfall />}
       <div className="relative min-h-screen overflow-x-hidden">
         {/* Forward slide-fade per spec §17 — see `screenSlide`, which holds the
             values precisely so that they stay direction-independent. No

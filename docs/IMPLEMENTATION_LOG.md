@@ -8857,7 +8857,7 @@ bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2 
 Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
 before 1 Feb 2027.
 
-**RESUME HERE (2026-11-27, after Step 132; pushed and deployed).** Steps 122–132 are live (the
+~~RESUME HERE (2026-11-27, after Step 132; pushed and deployed).~~ — carried into the note below. Its text, kept for the record: Steps 122–132 are live (the
 game at image `funny-multi:1b853fa`; Step 131 was a decision, no code); the owner has seen the
 lone host's grace on the phone. **Next, Step 133 — itch.io**, which waits on the owner's four
 setup ops (see Step 131). After them, the second deploy by 23 December: #10 gift a pack, #9 the
@@ -8866,3 +8866,110 @@ festive room look, #7 the whole-game video. No deploys 24–26 December, 31 Dece
 and a game with bots on the phone; the Play listing's "3–7 players", if wanted;
 the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look;
 Funny Multi's trader confirmation before 1 Feb 2027.
+
+## Step 133 (task B-29) — the festive room look (2026-11-28)
+
+B-29's #9, built while the itch.io step waits (below). Owner decisions 2026-11-28 ("A, A, A,
+A"): **D1 A** — Home's snow falls behind every room screen while the room's pack is on, going and
+coming back on every phone with the host's switch; **D2 A** — the agent drew three ending cards
+(holly, candy cane, snowy green) and the owner picked one from a phone picture: **card 1,
+"Holly"** ("1"); **D3 A** — only a golden story's reveal rings, so one phone in a free game, and
+a paid story's reveal stays quiet, its clip ringing already; **D4 A** — deployed on its own
+right after the step, when no visitor is connected.
+
+**Shipped:**
+- Snow — `App.tsx` draws Home's `Snowfall` itself, between the background doodle and the
+  screens: on Home while HomeScreen says its dressing shows (`onChristmas`), and in the room,
+  lobby to end screen, while `pack.on`. One node from Home into the room, so it does not start
+  over. `HomeScreen.tsx` no longer draws it; `ChristmasDressing.tsx`'s snow drops `-z-10`.
+  The server's create ack carries the room's pack (`RoomCreateAck.pack`, `events.ts`,
+  `index.ts`), so the host's first lobby has it; an older server's ack without it reads as
+  `null` until the `lobby:update`.
+- Bell — new `revealBell.ts`. While the pack is on, App calls `wakeRevealBell` on every tap and
+  key press: the first opens one AudioContext inside the gesture, starts a silent sample, fetches
+  `sounds/sleigh-bells.mp3`, then lets the context idle, suspended. `ringRevealBell`
+  (RevealScreen, golden stories only) plays the first 2.5 s at 0.5, fading from 1.8 s, once a
+  reveal; a bell not ready within `LATE_MS` (2 s) is dropped, not heard late. On the phone whose
+  own story is golden (round 0's `content`), App keeps the context running, silent, from the
+  last round until the reveal closes (`warmRevealBell`, `coolRevealBell`). `clipSound.ts`
+  exports `audioContextCtor` for it.
+- Card — new `components/art/hollyArt.ts` (the bell and the holly sprig as paths) and
+  `ArtSvg.tsx`. `StoryEnding.tsx`: a green frame, a sprig on the top-left and bottom-right
+  corners, the gold bell with its red bow over the ending; the pictures are hidden from screen
+  readers. `videoFooter.ts` `drawEndingCard` draws the same card on the clip's canvas through
+  `Path2D` (the frame and the words alone without it), and `recordWobble.ts` fades the
+  deployer's logo stamp out with the scene when the clip ends on a card.
+  `testutils/canvasStub.ts` stubs `Path2D`.
+- Steering: design §5 amended (the ack's `pack`) and a new §8.5 (the snow, the bell, the card);
+  the B-29 bullet in `steering/tasks.md` (the plan, the readings, the pick).
+- Tests: client `revealBell.test.ts` (13), App (10), Home (2), Reveal (4),
+  `StoryEnding.test.tsx` (3), `videoFooter.test.ts` (2), `recordWobble.test.ts` (2); server
+  `pack.socket.test.ts` (1), and `paidRooms.socket.test.ts` checks the ack's pack.
+
+**Seen** (`.screens/step133-check.mjs`, 94 checks, 0 problems; the production build, the server
+on 3000 and the Worker stand-in on 5185, Chromium at phone size. Chromium lets a page's own Web
+Audio start without a tap, so the tap rule is the unit tests'):
+- A — en, three phones (360, 360, 320): Home's snow went on into the host's lobby as the same
+  one snowfall, and fell on every phone through the lobby, the rounds, waiting, the reveal and
+  the end screen; the host's switch took it off all three phones and brought it back; nothing
+  was wider than the screen. One of the three stories was golden: its phone rang once as its
+  reveal opened (under 500 ms after it came), the first 2.5 s at 0.5, held to 1.8 s, its sound
+  running from the last round; the other two reveals stayed quiet, and every phone's sound was
+  idle as each round came.
+- B — reduced motion: the crystals lay still at rest, on Home and in the lobby.
+- C — de and ta at 320: Home and the lobby fit with the snow; an ar room, offered no pack, had
+  none.
+- D — the holly card, en, ru, de and ta at 320, each host alone with two bots, on the reveal of
+  the host's slice story and in the gallery: the bell and two sprigs, hidden from screen readers;
+  the green frame; no sprig cut by a box round the card; everything inside the width (ta's ending
+  in 5 lines on the reveal, 7 in the gallery). For en and ru the video downloaded and its last
+  frame is the card, with no logo stamp. The cards and both video frames were looked at in the
+  shots.
+- Noted, not failed: mid-slide, a screen reached 16 px past its box on each phone in A, inside
+  the stage that clips it; the Continue button floats over the card's bottom edge until the card
+  scrolls clear of it, as since Step 117 (`ending-room`). The check's cut test first flagged a
+  sprig below the bottom of the screen in the gallery; it now centres the card and judges each
+  axis by its own overflow.
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 711 + 505 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob, minimatch, i18next); CI owed after the push.
+
+**The agent's readings, the owner's to overturn:** under reduced motion the crystals lie still,
+as on Home; the snow carries on from Home into the room without starting over; the video's card
+takes the screen card's look; the bell is the first 2.5 s of the clips' sleigh bells at 0.5,
+fading from 1.8 s, with no control to stop it (under 3 s, WCAG 1.4.2), and silent, with no error,
+where the phone refuses sound; no new words. Added while building: the golden phone's sound runs,
+silent, from its last round until its bell rings (started only at the reveal it came 0.2–1.3 s
+late in Chromium); when a video ends on the card, the deployer's logo stamp fades out with the
+scene — the stamp marks pictures, the screen's card has none, and it would sit over the
+bottom-right sprig.
+
+**Also this session — B-29's itch.io step, waiting** (in `steering/tasks.md`): its plan, owner
+decisions 2026-11-27 ("A, A, A, A, A, A — go ahead"); the owner's itch.io ops 2026-11-27/28 —
+account `funny-family` in Payouts mode, the tax interview signed and waiting for itch.io's
+check, the project page a Draft. **It has no "Sub-products & DLC" page**: itch.io made
+sub-products admin-only in 2019. Owner decision 2026-11-28 ("A"): the owner emailed itch.io
+support (the agent drafted it) to switch sub-products on and to ask whether US$1 is allowed;
+sent the same day. If they are on by 14 December, the itch.io step takes the next free step
+number; if not, it waits for a later pack (B-10), and D-6(e)'s US$1 abroad is not in effect this
+Christmas.
+
+**Owed:** the push and CI; the deploy on its own (D4 A), when no visitor is connected; the
+owner's look on the phone.
+
+**RESUME HERE (2026-11-28, after Step 133; not yet pushed).** Steps 122–132 are live (the game at
+image `funny-multi:1b853fa`). Step 133 (the festive room look) is committed, not pushed or
+deployed. **Next:** the owner's push, CI, then Step 133's deploy on its own (D4 A) — it waits
+until no visitor is connected (check the server log first); `ship.sh` only. Then the owner's
+look on the phone: Home's snow going on into the room, off and back with the host's switch; the
+bell on the reveal of the one golden story; the holly card under a slice story, on its reveal,
+in the gallery and at the end of its video. **Next build, Step 134 — #10 gift a pack**
+(Australia's gift-card law checked first: a 3-year expiry against 1 August 2027); then #7 the
+whole-game video; both in the second deploy by 23 December. Should itch.io switch sub-products
+on by 14 December, the itch.io step takes the next free number first. No deploys 24–26
+December, 31 December–1 January or 6–7 January (#16). **Owed, the owner's:** the push and
+deploy of Step 133, and the look on the phone; itch.io support's reply; the look at the
+reindeer's bells and a game with bots on the phone; the Play listing's "3–7 players", if
+wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
+look; Funny Multi's trader confirmation before 1 Feb 2027.

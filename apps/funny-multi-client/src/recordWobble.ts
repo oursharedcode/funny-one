@@ -333,9 +333,14 @@ async function recordClip(
       }
     }
     ctx!.globalAlpha = 1;
-    // Deployer logo stamp (25×25, bottom-right of the picture rect).
-    if (logo) {
+    // Deployer logo stamp (25×25, bottom-right of the picture rect). It marks
+    // pictures, so over an ending card, which has none (as on the screen), it
+    // fades out with the scene (Step 133).
+    const stampShown = ending && !endingPicture ? 1 - endingShown : 1;
+    if (logo && stampShown > 0) {
+      ctx!.globalAlpha = stampShown;
       ctx!.drawImage(logo, picSize / 2 - 33, picSize / 2 - 33, 25, 25);
+      ctx!.globalAlpha = 1;
     }
     ctx!.restore();
 

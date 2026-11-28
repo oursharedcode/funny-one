@@ -874,7 +874,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       `/x26` and one Christmas picture, an email to the owner on a failure) in Step 126. After
       the deploy, in a second deploy by 23 December: #1 play alone with two bots (Step 130 since 2026-11-26, the deploy being 127; it
       changes the 3-player rule), #10 gift a pack (Australia's gift-card law checked first — a
-      3-year expiry against 1 August 2027), #9 a festive room look (snow, off under reduced
+      3-year expiry against 1 August 2027), #9 a festive room look (Step 133; snow, off under reduced
       motion; a festive ending card; a bell when a golden story is revealed), #7 the whole-game
       video. **#16, a rule from today: no deploys 24–26 December, 31 December–1 January or
       6–7 January** — until B-27 a deploy cuts off games in progress; `PACK_ROOMS=off` stays
@@ -1217,14 +1217,61 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     owner's PayPal, which only receives. **The Sponsors tier stays abroad at US$2.00**, as it
     is; Australia stays PayID. Delivery: an itch.io sub-product whose redeem URL lands on this
     site with itch.io's signed token; the server checks it, takes each `purchase_id` once and
-    makes the code work. Its own step, Step 133, after the lone host's grace (Step 132); which rail the page opens on abroad, and
-    the texts, are settled on that step's plan. **Owed by the owner first, one op at a time:**
+    makes the code work. Its own step after the lone host's grace (Step 132), numbered when it
+    runs (#9 took Step 133); which rail the page opens on abroad, and the texts, are settled on
+    that step's plan. **Owed by the owner first, one op at a time:**
     the itch.io account in Payouts mode with the tax interview and the PayPal address; a look
     that "Sub-products & DLC" shows on it (if not, the step stops); the US$1.00 sub-product
     with the redeem URL the agent gives; the project's secret token as a file on this PC.
     Unsettled until then: whether US$1 is allowed for a sub-product, whether a buyer can claim
     again after closing the tab, Australia's withholding rate. The counters showed 2 of 96 game
     visits from abroad in the 30 days to 2026-11-26.
+  - *The itch.io step's plan, owner decisions 2026-11-27 ("A, A, A, A, A, A — go ahead"):* D1 A, the
+    owner's four itch.io ops first, the build after them (if "Sub-products & DLC" is missing or
+    the tax interview stalls, #9 the festive room look is built meanwhile); D2 A, the pay page
+    abroad opens on itch.io, Sponsors second; D3 A, the price line reads "US$1 + local tax where
+    it applies"; D4 A, if itch.io refuses US$1 for a sub-product, the lowest price it allows, up
+    to US$2; D5 A, the itch.io page unlisted for now (public once a sale has worked end to end);
+    D6 A, deployed on its own right after the step. The agent's readings, the owner's to
+    overturn: the code is made before the purchase, as with Sponsors, and travels in the
+    purchase link's signed metadata; a buyer who lost it writes to the owner with itch.io's
+    receipt, matched on the admin page or replaced with "New code".
+  - *The owner's itch.io ops, 2026-11-27/28:* account `funny-family`, Payouts mode, tax interview
+    signed and waiting for itch.io's check (W-8BEN; 5% on US-source income, 0% otherwise). The
+    PayPal address is asked for only at the first payout request (US$5+). The project page
+    `funny-family.itch.io/christmas-pack` exists as a Draft, "$0 or donate", AI disclosure
+    Graphics, Text & Dialog and Code. **It has no "Sub-products & DLC" page.** itch.io's
+    changelog of 23 Oct 2019 marks sub-products "admin only", enabled by the site admins on
+    request, and forum moderators called them shelved in 2021. The owner sent the email on
+    2026-11-28 (drafted by the agent). External keys are no stand-in:
+    a page "cannot be listed as selling only a Steam Key or other external key"
+    (`/docs/creators/download-keys`). *Owner decision 2026-11-28 ("A"):* the owner emails
+    support@itch.io from the account's address, asking to switch on sub-products for the page
+    and whether US$1 is allowed. #9 the festive room look is built meanwhile, and Sponsors stays
+    the rail abroad. If itch.io switches sub-products on by 14 Dec, the itch.io step goes ahead
+    as planned (D2–D6 above stand). If not, itch.io waits for a later pack (B-10), and D-6(e)'s
+    US$1 abroad is not in effect this Christmas.
+  - *#9 the festive room look — Step 133's plan, owner decisions 2026-11-28 ("A, A, A, A"):*
+    D1 A, Home's snow crystals fall behind every room screen (lobby, writing, waiting, reveal,
+    end) while the room's pack is on, going and coming back on every phone with the host's
+    switch; D2 A, the agent draws three festive ending cards (holly, candy cane, snowy green)
+    and the owner picks one from a phone picture; D3 A, only a golden story's reveal rings —
+    each phone reveals its own story, so one phone a free game — and a paid story's reveal
+    stays quiet, its clip ringing already; D4 A, deployed on its own right after the step, when
+    no visitor is connected. The agent's readings, the owner's to overturn: under reduced motion
+    the crystals lie still, as on Home (the list's "off" read as "no movement"); the snow
+    carries on from Home into the room without starting over; the video's card takes the screen
+    card's look; the bell is the first 2.5 s of the clips' sleigh bells, soft and fading, as
+    the reveal screen opens beside "🔔 A Christmas story" — under 3 s, so no stop control
+    (WCAG 1.4.2) — and silent, with no error, where the phone refuses sound. No new words.
+    Added while building, also the owner's to overturn: the golden phone's sound is kept
+    running, silent, from its last round until its bell rings, since started again only as the
+    reveal opens it came 0.2–1.3 s late in Chromium; every other phone's idles after its first tap.
+    D2's pick: card 1, "Holly" (owner, 2026-11-28) — a green frame, a holly sprig on the
+    top-left and bottom-right corners, the gold bell with a red bow. Added while building it, the
+    owner's to overturn: when a video ends on the card, the deployer's logo stamp fades out with
+    the scene — the stamp marks pictures, the screen's card has none, and it would sit over the
+    bottom-right sprig.
   - **The lone host's grace — Step 132, 2026-11-27** (owner decisions "A, A, B, A, A" on the
     Step 127 finding above): D1 A, Socket.IO's recovery lengthened; D2 A, the window is the
     phase's — 10 min in the lobby, 65 s in a game as before (B14 stands) — and at Start anyone

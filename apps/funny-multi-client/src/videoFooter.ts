@@ -23,7 +23,11 @@
 // Step 122: a label too long for the column — a paid story's thank-you —
 // wraps, and its lines past the first push the URL down; the caller measures
 // the block with the same label it draws.
+//
+// Step 133: the ending card takes the screen's festive look (StoryEnding.tsx),
+// drawn from the same pictures (components/art/hollyArt.ts).
 
+import { BELL, HOLLY_FRAME, SPRIG, type Art } from './components/art/hollyArt';
 import i18n, { proseFontFamily, textDirection } from './i18n/index';
 import { LANDING_URL_TEXT, type FooterTarget } from './landingUrl';
 import { wrapText, type AuthoredLanguage } from '@funny/shared';
@@ -181,9 +185,55 @@ export function drawStoryText(
 // has no picture of its own — a slice story's, or a golden one's whose picture
 // could not be had — drawn as a card in the picture's square. The bell above
 // it, the ending in the story's own family below, as large as fits.
-const CARD_PINK = '#ec4899';
+//
+// Step 133 (the owner's pick of 2026-11-28, D2: card 1, "Holly"): the screen's
+// card, scaled to the clip's 640 px square — the green frame, a holly sprig
+// with its berries just outside the top-left and the bottom-right corners and
+// its leaves along their edges, the gold bell with its red bow.
 const CARD_MAX_PX = 52;
 const CARD_MIN_PX = 26;
+const CARD_FRAME_PX = 8;
+const CARD_BELL_PX = 104;
+/** A sprig's px to its picture's unit: its 32-unit leaves 80 px long. */
+const SPRIG_SCALE = 2.5;
+/** How far outside the frame's path a sprig's berries sit, each way. */
+const SPRIG_OUT = CARD_FRAME_PX / 2 + 3;
+
+/**
+ * Draws one of hollyArt.ts's pictures with its origin at (x, y), `scale` px
+ * to its unit, turned `turn` radians about the origin. A canvas with no
+ * Path2D draws none: the card is still its frame and its words.
+ */
+function drawArt(
+  ctx: CanvasRenderingContext2D,
+  art: Art,
+  opts: { x: number; y: number; scale: number; turn?: number },
+): void {
+  if (typeof Path2D !== 'function') return;
+  ctx.save();
+  ctx.translate(opts.x, opts.y);
+  if (opts.turn) ctx.rotate(opts.turn);
+  ctx.scale(opts.scale, opts.scale);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  for (const part of art.parts) {
+    ctx.save();
+    if (part.turn) ctx.rotate((part.turn * Math.PI) / 180);
+    if (part.shift) ctx.translate(part.shift, 0);
+    const path = new Path2D(part.d);
+    if (part.fill) {
+      ctx.fillStyle = part.fill;
+      ctx.fill(path);
+    }
+    if (part.stroke) {
+      ctx.strokeStyle = part.stroke;
+      ctx.lineWidth = part.width ?? 1;
+      ctx.stroke(path);
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
 
 export function drawEndingCard(
   ctx: CanvasRenderingContext2D,
@@ -192,7 +242,6 @@ export function drawEndingCard(
 ): void {
   const { x, y, size, language } = opts;
   const r = 36;
-  const inset = 6;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -207,20 +256,29 @@ export function drawEndingCard(
   ctx.closePath();
   ctx.fillStyle = '#ffffff';
   ctx.fill();
-  ctx.lineWidth = inset;
-  ctx.strokeStyle = CARD_PINK;
+  ctx.lineWidth = CARD_FRAME_PX;
+  ctx.strokeStyle = HOLLY_FRAME;
   ctx.stroke();
+  drawArt(ctx, SPRIG, { x: x - SPRIG_OUT, y: y - SPRIG_OUT, scale: SPRIG_SCALE });
+  drawArt(ctx, SPRIG, {
+    x: x + size + SPRIG_OUT,
+    y: y + size + SPRIG_OUT,
+    scale: SPRIG_SCALE,
+    turn: Math.PI,
+  });
 
   const cx = x + size / 2;
+  const bellTop = y + 48;
+  drawArt(ctx, BELL, {
+    x: cx - CARD_BELL_PX / 2,
+    y: bellTop,
+    scale: CARD_BELL_PX / BELL.box[2],
+  });
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.direction = textDirection(language);
-  ctx.font = '72px system-ui, sans-serif';
-  ctx.fillStyle = CARD_PINK;
-  const bellTop = y + 56;
-  ctx.fillText('🔔', cx, bellTop);
-
-  const textTop = bellTop + 110;
+  const textTop = bellTop + CARD_BELL_PX + 14;
   const maxHeight = y + size - 56 - textTop;
   let fontPx = CARD_MAX_PX;
   let lines: string[] = [];

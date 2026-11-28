@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Socket } from 'socket.io-client';
-import type { LobbyUpdatePayload, RoundStartPayload } from '@funny/shared';
+import type { LobbyUpdatePayload, RoomCreateAck, RoundStartPayload } from '@funny/shared';
 import { __resetRoomsForTest, getRoom } from './rooms.js';
 import {
   collect,
@@ -58,6 +58,26 @@ describe('the Christmas switch (owner decision 3A)', () => {
     for (const seen of lobbies) {
       expect(seen.at(-1)?.pack).toEqual({ id: 'chr26', on: true, paid: false });
     }
+  });
+
+  it('tells the host in the create ack what the lobby then says (Step 133)', async () => {
+    const h = await startTestServer();
+    harness = h;
+    const host = await h.connect();
+    const lobby = once<LobbyUpdatePayload>(host, 'lobby:update');
+    const en = await emitWithAck<RoomCreateAck>(host, 'room:create', {
+      nickname: 'host',
+      language: 'en',
+    });
+    expect(en.pack).toEqual({ id: 'chr26', on: true, paid: false });
+    expect((await lobby).pack).toEqual(en.pack);
+
+    const other = await h.connect();
+    const ar = await emitWithAck<RoomCreateAck>(other, 'room:create', {
+      nickname: 'host',
+      language: 'ar',
+    });
+    expect(ar.pack).toBeNull();
   });
 
   it('lets the host switch it off, and the game plays the base pools', async () => {

@@ -46,7 +46,8 @@ export interface ClipSound {
 
 type AudioContextCtor = new () => AudioContext;
 
-function audioContextCtor(): AudioContextCtor | null {
+/** The browser's AudioContext, or null without Web Audio (revealBell.ts too). */
+export function audioContextCtor(): AudioContextCtor | null {
   if (typeof window === 'undefined') return null;
   const w = window as unknown as {
     AudioContext?: AudioContextCtor;

@@ -668,7 +668,12 @@ export async function buildServer({
           typeof code === 'string' && code.trim() !== ''
             ? applyCode(room, code, 'create', ip, userAgent)
             : null;
-        ack({ roomCode: room.code, socketId: socket.id, ...(codeError ? { codeError } : {}) });
+        ack({
+          roomCode: room.code,
+          socketId: socket.id,
+          pack: room.pack,
+          ...(codeError ? { codeError } : {}),
+        });
         broadcastLobby(room);
         broadcastStats(io);
       } catch (err) {

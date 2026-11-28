@@ -25,6 +25,9 @@
 // brings with the scene, or the ending as a card (StoryEnding.tsx) — and a
 // golden story says so above its text.
 //
+// Step 133 (B-29 #9, D3 A): and a golden story's reveal rings, softly, as the
+// screen opens (revealBell.ts). A paid story's stays quiet: its clip rings.
+//
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { socket } from '../socket';
@@ -38,6 +41,7 @@ import { hoursUntilUtcMidnight } from '../capReset';
 import { textDirection } from '../i18n';
 import StoryEnding from '../components/StoryEnding';
 import { trackGoldenCartoon } from '../funnel';
+import { ringRevealBell } from '../revealBell';
 import { endingText, storyIn } from '../storyLanguage';
 import { BASE_CONTENT, isGolden } from '@funny/shared';
 import type {
@@ -101,6 +105,11 @@ export default function RevealScreen({ reveal, roomLanguage, defaultLanguage, on
       socket.off('reveal:pictureError', onError);
     };
   }, []);
+
+  // The bell beside "🔔 A Christmas story" (D3 A): once for this reveal.
+  useEffect(() => {
+    if (golden) ringRevealBell(reveal);
+  }, [golden, reveal]);
 
   // Reveal the funny wait control only once generation has run past the delay.
   useEffect(() => {

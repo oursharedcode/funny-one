@@ -7,7 +7,8 @@
 // 200, 400 … 5000 ms of clip time, which is what the character counts rest on.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installCanvasStub, type Canvas2DStub } from './testutils/canvasStub';
+import { installCanvasStub, type Canvas2DStub, type Path2DStub } from './testutils/canvasStub';
+import { BELL } from './components/art/hollyArt';
 import { setUrl } from './testutils/socketMock';
 import { LANDING_URL, LANDING_URL_TEXT, XMAS_URL, XMAS_URL_TEXT } from './landingUrl';
 import { resetCharacterTurn } from './videoCharacter';
@@ -385,8 +386,25 @@ describe('a Christmas story in the clip (Step 117)', () => {
     ).length;
   }
 
+  /** On how many frames the ending card's bell was drawn: its body's fills. */
   function bells(): number {
-    return ctx.calls.filter((c) => c.method === 'fillText' && c.args[0] === '🔔').length;
+    return ctx.calls.filter(
+      (c) => c.method === 'fill' && (c.args[0] as Path2DStub | undefined)?.d === BELL.parts[0]?.d,
+    ).length;
+  }
+
+  /** The alpha of each frame's logo stamp, where the logo loads. */
+  function stampAlphas(): number[] {
+    const alphas: number[] = [];
+    const draw = ctx.drawImage as (...args: unknown[]) => void;
+    ctx.drawImage = ((...args: unknown[]) => {
+      const source = args[0];
+      if (source instanceof HTMLImageElement && source.src.includes('deployer-logo')) {
+        alphas.push(Number(ctx.globalAlpha ?? 1));
+      }
+      draw(...args);
+    }) as CanvasRenderingContext2D['drawImage'];
+    return alphas;
   }
 
   function texts(): string[] {
@@ -432,6 +450,28 @@ describe('a Christmas story in the clip (Step 117)', () => {
     expect(file.name).toBe('funny-stories-Mika.webm');
     expect(drawsOf(ENDING_URL)).toBe(0);
     expect(bells()).toBe(13);
+  });
+
+  // Step 133: the stamp marks pictures; the card, as on the screen, has none.
+  it('fades the logo stamp out with the scene when the clip ends on a card', async () => {
+    installRecorderEnv({ failing: [] });
+    const alphas = stampAlphas();
+    await buildWobbleVideoFile({ ...story, ending: { pictureUrl: null, text: TEXT } });
+    expect(alphas).toHaveLength(13);
+    expect(alphas.slice(0, 12)).toEqual(Array<number>(12).fill(1));
+    expect(alphas[12]).toBeCloseTo(2 / 3);
+    expect(ctx.globalAlpha).toBe(1);
+  });
+
+  it('keeps the logo stamp on an ending picture', async () => {
+    installRecorderEnv({ failing: [] });
+    const alphas = stampAlphas();
+    await buildWobbleVideoFile({
+      ...story,
+      golden: true,
+      ending: { pictureUrl: ENDING_URL, text: TEXT },
+    });
+    expect(alphas).toEqual(Array<number>(25).fill(1));
   });
 
   it("leads a golden story's clip to the edition's page on the website", async () => {

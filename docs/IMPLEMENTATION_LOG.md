@@ -9102,8 +9102,15 @@ picture left out; the button from two pictures up; one footer by room; a made vi
 its story, language or picture changes; the stopped line only for leaving the screen (another
 failure just brings the button back); the count once per tab.
 
-**Owed:** the owner's phone look — make a whole-game video, play it, send it into a chat. Then
-the push, CI and the deploy (D5 A).
+**Pushed and deployed the same day** (`1739813`, "push it"); CI green (run 46131442854). Before
+the deploy no visitor was connected: every connection in the server's last 24 hours had since
+disconnected. `ship.sh` — image `funny-multi:1739813`, `/health` ok, assetlinks, the policy and
+the old address — then `ship-funny-family.sh` (the `/stats/` section), every check passing,
+ending 09:46Z. Production after: the running image is `1739813`'s, the policy names the new
+count, the served script holds the button.
+
+**Owed:** the owner's phone look — make a whole-game video, play it (the last second too), send
+it into a chat.
 
 ~~RESUME HERE (2026-11-28, after Step 134; pushed and deployed).~~ — carried into the note below.
 Its text, kept for the record: Steps 122–134 are live (the game at image `funny-multi:ef1fa9a`);
@@ -9115,12 +9122,11 @@ look at the reindeer's bells on the phone; the Play listing's "3–7 players", i
 US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny
 Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-28, after Step 135; built, not yet pushed or deployed).** Steps 122–134
-are live (the game at image `funny-multi:ef1fa9a`). **Next: push Step 135 on the owner's word,
-see CI green, deploy it on its own** when no visitor is connected (server log first, B-27), then
-the owner's phone look at the whole-game video. With it, every item of the second deploy's list
-is built. Should itch.io switch sub-products on by 14 December, the itch.io step takes the next
-free number first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed,
-the owner's:** the whole-game video on the phone; itch.io support's reply; the real US$2
-sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's
-trader confirmation before 1 Feb 2027.
+**RESUME HERE (2026-11-28, after Step 135; pushed and deployed).** Steps 122–135 are live (the
+game at image `funny-multi:1739813`). **Next: the owner's phone look at the whole-game video.**
+Every item of the second deploy's list is built and live, ahead of 23 December; the next build
+step is to be chosen. Should itch.io switch sub-products on by 14 December, the itch.io step
+takes the next free number first. No deploys 24–26 December, 31 December–1 January or 6–7
+January (#16). **Owed, the owner's:** the whole-game video on the phone; itch.io support's reply;
+the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look;
+Funny Multi's trader confirmation before 1 Feb 2027.

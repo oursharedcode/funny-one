@@ -1271,7 +1271,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     top-left and bottom-right corners, the gold bell with a red bow. Added while building it, the
     owner's to overturn: when a video ends on the card, the deployer's logo stamp fades out with
     the scene — the stamp marks pictures, the screen's card has none, and it would sit over the
-    bottom-right sprig.
+    bottom-right sprig. Pushed as `5438de9`, CI green, deployed 2026-11-28; the owner's look on
+    the phone is owed.
   - **The lone host's grace — Step 132, 2026-11-27** (owner decisions "A, A, B, A, A" on the
     Step 127 finding above): D1 A, Socket.IO's recovery lengthened; D2 A, the window is the
     phase's — 10 min in the lobby, 65 s in a game as before (B14 stands) — and at Start anyone

@@ -8958,7 +8958,16 @@ Christmas.
 **Owed:** the push and CI; the deploy on its own (D4 A), when no visitor is connected; the
 owner's look on the phone.
 
-**RESUME HERE (2026-11-28, after Step 133; not yet pushed).** Steps 122–132 are live (the game at
+**Deployed the same day** (owner: "push and deploy"): pushed as `5438de9`, CI green (run
+46085655471). Before the deploy no socket was open: the last of the log's 6 connections had gone
+at 08:17Z the day before (checked 00:04Z). `ship.sh` only, 00:04–00:08Z — image
+`funny-multi:5438de9`, the running container's image; `/health` ok, assetlinks, privacy and the
+old path's 301 as expected. The live bundle (`index-C8a1Y6nd.js`, precached by `sw.js`) carries
+the holly sprig's and the bell's paths, the green frame and the taps that ready the bell; the
+running server's create ack sends the room's pack; its log since the start has no error.
+
+~~RESUME HERE (2026-11-28, after Step 133; not yet pushed).~~ — pushed as `5438de9`, CI green,
+deployed; carried into the note below. Its text, kept for the record: Steps 122–132 are live (the game at
 image `funny-multi:1b853fa`). Step 133 (the festive room look) is committed, not pushed or
 deployed. **Next:** the owner's push, CI, then Step 133's deploy on its own (D4 A) — it waits
 until no visitor is connected (check the server log first); `ship.sh` only. Then the owner's
@@ -8973,3 +8982,17 @@ deploy of Step 133, and the look on the phone; itch.io support's reply; the look
 reindeer's bells and a game with bots on the phone; the Play listing's "3–7 players", if
 wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-28, after Step 133; pushed and deployed).** Steps 122–133 are live (the
+game at image `funny-multi:5438de9`; Step 131 was a decision, no code). **Next, the owner's look
+on the phone** at the festive room look: Home's snow going on into the room, off and back with
+the host's switch; the bell on the reveal of the one golden story; the holly card under a slice
+story, on its reveal, in the gallery and at the end of its video. **Next build, Step 134 — #10
+gift a pack** (Australia's gift-card law checked first: a 3-year expiry against 1 August 2027);
+then #7 the whole-game video; both in the second deploy by 23 December. Should itch.io switch
+sub-products on by 14 December, the itch.io step takes the next free number first. No deploys
+24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the owner's:** the look on
+the phone at Step 133; itch.io support's reply; the look at the reindeer's bells and a game with
+bots on the phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of
+Step 125); the admin link on the phone; the live-badge look; Funny Multi's trader confirmation
+before 1 Feb 2027.

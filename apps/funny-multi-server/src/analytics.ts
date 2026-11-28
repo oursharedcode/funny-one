@@ -44,6 +44,7 @@ export const STAT_EVENTS = [
   'xm_card',
   'xm_page',
   'xm_pay',
+  'xm_giftpay',
 ] as const;
 export type StatEvent = (typeof STAT_EVENTS)[number];
 
@@ -101,6 +102,8 @@ const PACK_SWITCH = ['on', 'off'] as const;
 // Christmas game (`xm_card`); the pay page opened, from that card or by a
 // link — the /x26 address on a Christmas story's download (`xm_page`); and
 // its pay button pressed, by rail (`xm_pay`). Website only, as above.
+// Step 134: the pay button pressed to buy the pack for a friend
+// (`xm_giftpay`) is counted apart; PayID only, so it names no rail.
 const PAY_PAGE_DOORS = ['card', 'link'] as const;
 const PAY_RAILS = ['payid', 'sponsors'] as const;
 
@@ -120,6 +123,7 @@ const SPEC: Record<StatEvent, Partial<Record<Field, readonly string[]>>> = {
   xm_card: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
   xm_page: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: PAY_PAGE_DOORS },
   xm_pay: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES, t: PAY_RAILS },
+  xm_giftpay: { v: VARIANTS, l: LANGUAGE_CODES, s: SOURCES },
 };
 
 /** Step 79: the events whose country is counted — the visits. */

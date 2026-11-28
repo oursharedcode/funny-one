@@ -32,7 +32,9 @@
     "packCodeRemove": "Rimuovi",
     "packEnded": "La tua edizione Natale 2026 è finita. Grazie per aver giocato!",
     "christmasLine": "🔔 Una storia di Natale in ogni nuova stanza",
-    "christmasPeek": "Pacchetto di Natale — gratis!"
+    "christmasPeek": "Pacchetto di Natale — gratis!",
+    "giftWelcome": "🎁 Un regalo di Natale: tutte le storie di Natale, in ogni partita, fino al {{date}}.",
+    "giftKept": "🎁 Questo telefono ha già il pacchetto, quindi il regalo non è stato usato qui. Il suo link funziona ancora su un altro telefono."
   },
   "lobby": {
     "roomCodeLabel": "Codice stanza",
@@ -153,7 +155,17 @@
     "leaveText": "Premi prima «Pagato», così il tuo codice funziona subito. Non hai ancora pagato? Il codice resta su questo telefono: riapri questa pagina quando hai pagato.",
     "leaveAnyway": "Non ancora — chiudi",
     "paidTitle": "Grazie! Il tuo codice ora funziona.",
-    "paidCheck": "Controlliamo a mano che il pagamento sia arrivato. Se non arriva entro 2 giorni, il codice smette di funzionare."
+    "paidCheck": "Controlliamo a mano che il pagamento sia arrivato. Se non arriva entro 2 giorni, il codice smette di funzionare.",
+    "giftButton": "Regala",
+    "giftPitch": "Un regalo per un amico: tutte le storie di Natale, in ogni partita, fino al {{date}}. Ricevi un link da mandargli. Sul tuo telefono non cambia nulla.",
+    "giftBack": "Indietro",
+    "giftPaidWarning": "Hai inviato i soldi? Premi «Pagato»: allora compare il link regalo. Se chiudi prima la pagina, il codice aspetta finché non troviamo il pagamento a mano.",
+    "giftLeaveText": "Premi prima «Pagato» per avere il link regalo. Non hai ancora pagato? Il codice resta su questo telefono: riapri questa pagina dopo.",
+    "giftReady": "Il tuo regalo è pronto!",
+    "giftSend": "Manda questo link al tuo amico. Funziona fino al {{date}}.",
+    "giftCheck": "Controlliamo a mano che il pagamento sia arrivato. Se non arriva entro 2 giorni, il regalo smette di funzionare.",
+    "giftList": "I tuoi regali",
+    "giftShareText": "Un regalo di Natale per te: tutte le storie di Natale, fino al {{date}}."
   },
   "gallery": {
     "share": "Condividi le immagini della stanza",

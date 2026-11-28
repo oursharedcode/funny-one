@@ -31,7 +31,9 @@
     "packCodeRemove": "Remove",
     "packEnded": "Your Christmas 2026 edition has ended. Thank you for playing!",
     "christmasLine": "🔔 One Christmas story in every new room",
-    "christmasPeek": "Christmas pack — free!"
+    "christmasPeek": "Christmas pack — free!",
+    "giftWelcome": "🎁 A Christmas gift: all the Christmas stories, in every game, until {{date}}.",
+    "giftKept": "🎁 This phone already has the pack, so the gift was not used here. Its link still works on another phone."
   },
   "lobby": {
     "roomCodeLabel": "Room code",
@@ -152,7 +154,17 @@
     "leaveText": "Press “I’ve paid” first, so your code works now. Not paid yet? Your code stays on this phone: open this page again when you have.",
     "leaveAnyway": "Not yet — close",
     "paidTitle": "Thank you! Your code works now.",
-    "paidCheck": "We check by hand that your payment has arrived. If it hasn’t within 2 days, the code stops working."
+    "paidCheck": "We check by hand that your payment has arrived. If it hasn’t within 2 days, the code stops working.",
+    "giftButton": "Give as a gift",
+    "giftPitch": "A gift for a friend: all the Christmas stories, in every game, until {{date}}. You get a link to send them. Your own phone does not change.",
+    "giftBack": "Back",
+    "giftPaidWarning": "Sent the money? Press “I’ve paid”: the gift link appears then. If you close this page first, the code waits until we find your payment by hand.",
+    "giftLeaveText": "Press “I’ve paid” first to get the gift link. Not paid yet? The code stays on this phone: open this page again when you have.",
+    "giftReady": "Your gift is ready!",
+    "giftSend": "Send this link to your friend. It works until {{date}}.",
+    "giftCheck": "We check by hand that your payment has arrived. If it hasn’t within 2 days, the gift stops working.",
+    "giftList": "Your gifts",
+    "giftShareText": "A Christmas gift for you: all the Christmas stories, until {{date}}."
   },
   "gallery": {
     "share": "Share the room's pictures",

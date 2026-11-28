@@ -32,7 +32,9 @@
     "packCodeRemove": "Remover",
     "packEnded": "Sua edição de Natal 2026 terminou. Obrigado por jogar!",
     "christmasLine": "🔔 Uma história de Natal em cada nova sala",
-    "christmasPeek": "Pacote de Natal — grátis!"
+    "christmasPeek": "Pacote de Natal — grátis!",
+    "giftWelcome": "🎁 Um presente de Natal: todas as histórias de Natal, em todos os jogos, até {{date}}.",
+    "giftKept": "🎁 Este celular já tem o pacote, então o presente não foi usado aqui. O link ainda funciona em outro celular."
   },
   "lobby": {
     "roomCodeLabel": "Código da sala",
@@ -153,7 +155,17 @@
     "leaveText": "Toque primeiro em “Pago”, para seu código funcionar já. Ainda não pagou? Seu código fica neste celular: abra esta página de novo quando tiver pago.",
     "leaveAnyway": "Ainda não — fechar",
     "paidTitle": "Obrigado! Seu código já funciona.",
-    "paidCheck": "Conferimos manualmente se seu pagamento chegou. Se ele não chegar em até 2 dias, o código deixa de funcionar."
+    "paidCheck": "Conferimos manualmente se seu pagamento chegou. Se ele não chegar em até 2 dias, o código deixa de funcionar.",
+    "giftButton": "Dar de presente",
+    "giftPitch": "Um presente para alguém: todas as histórias de Natal, em todos os jogos, até {{date}}. Você recebe um link para enviar. Nada muda no seu celular.",
+    "giftBack": "Voltar",
+    "giftPaidWarning": "Já enviou o dinheiro? Toque em “Pago”: o link do presente aparece em seguida. Se fechar a página antes, o código espera até encontrarmos seu pagamento manualmente.",
+    "giftLeaveText": "Toque primeiro em “Pago” para receber o link do presente. Ainda não pagou? O código fica neste celular: abra esta página de novo depois de pagar.",
+    "giftReady": "Seu presente está pronto!",
+    "giftSend": "Envie este link para a pessoa presenteada. Funciona até {{date}}.",
+    "giftCheck": "Conferimos manualmente se o pagamento chegou. Se não chegar em 2 dias, o presente para de funcionar.",
+    "giftList": "Seus presentes",
+    "giftShareText": "Um presente de Natal para você: todas as histórias de Natal, até {{date}}."
   },
   "gallery": {
     "share": "Compartilhar as imagens da sala",

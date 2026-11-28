@@ -483,6 +483,28 @@ export function optionsFor(slot: SlotIndex, content: StoryContent): readonly Ans
   `payid` or `sponsors`), each once per page load, website only, with nothing about the buyer
   or the payment. `/stats/` shows them per language in a second table of its Christmas
   section, "Paying for it". A press is not a payment: payments are in the receipt log.
+- **Giving the pack as a gift** (Step 134, #10, owner decisions 2026-11-28; `PayScreen`,
+  `pay.ts`, `packCode.ts`). The pay page has "🎁 Give as a gift" while it is on **PayID** (D3 A:
+  never on Sponsors), under the sale and also under "You already have this pack.", where a phone
+  placed abroad has "In Australia?" to switch. Home's pack card links "🎁 Give as a gift" to the
+  page while that pack is on sale (owner decision 2026-11-28, A): on PayID it opens on the gift;
+  the opening is not counted as a pay-page door. It buys a
+  **second code**, price and transfer as the buyer's own: `POST /pay/payid` takes `gift: true`,
+  which only marks the issue record (`gift: true`; the admin card says "a gift for a friend",
+  and an owner's code replacing it keeps the mark). The phone keeps the gift's waiting code
+  apart (`funny37.pendingGift`), never as its own pack; the close guard asks about it in the
+  gift's words. "I've paid" turns the panel into the **gift link** `?code=<code>&gift=1` with
+  Share and Copy (D1 A: a link, no picture card or QR, so a code is never on a download), and
+  the phone lists its gifts there (`funny37.gifts`) to send again. No name or address of the
+  friend is asked. The friend's website keeps the code as any pay link's and Home says once "A
+  Christmas gift: … until {date}."; a phone that has another working pack keeps its own and is
+  told the gift's link still works on another phone. The Android app shows none of it and keeps
+  no code. **The end date is on every gift text** (D2 A): a gift card must last three years
+  unless it is only for a good available for a specified period and ends with that period
+  (Competition and Consumer Regulations 2010 reg 89C(1)(a), compilation 100 of 1 September
+  2026), which the pack's 1 August 2027 is; the date must be shown and no fee charged after
+  the sale. `xm_giftpay` counts the gift's pay button apart from `xm_pay` ("Gift pay pressed"
+  on `/stats/`).
 - **Sleigh bells, the landing line, the invitation and the alarm** (Step 126, owner decisions
   of 2026-11-25, third set). **The 5 s video of a golden story or of a paid game's story**
   (D2 A; an ordinary story's stays silent) rings with sleigh bells (`clipSound.ts`, until

@@ -64,7 +64,7 @@ import type {
   RoundWaitingPayload,
   SupportConfig,
 } from '@funny/shared';
-import { BASE_CONTENT, SLOT_COUNT, isGolden, seatBotNumber } from '@funny/shared';
+import { BASE_CONTENT, SLOT_COUNT, isGolden, isPackFree, seatBotNumber } from '@funny/shared';
 
 export type GamePhase = 'home' | 'lobby' | 'writing' | 'waiting' | 'reveal' | 'end';
 
@@ -410,6 +410,11 @@ export default function App() {
         support={support}
         onOpenSupport={openSupport}
         onChristmas={setHomeChristmas}
+        gift={
+          pay && !isStoreShell() && isPackFree(pay.pack, Date.now())
+            ? { pack: pay.pack, open: () => setPayPage({ pack: pay.pack, door: 'home' }) }
+            : null
+        }
       />
     );
   }

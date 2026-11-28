@@ -9,6 +9,7 @@ import i18n from './i18n';
 import { setUrl } from './testutils/socketMock';
 import {
   __resetFunnelForTest,
+  trackGiftPayPress,
   initFunnel,
   trackChristmasGame,
   trackGift,
@@ -148,6 +149,7 @@ describe("the Christmas 2026 edition's pay card and pay page", () => {
   it('counts the pay page once per page load, by the door it was first opened from', () => {
     setUrl('');
     initFunnel();
+    trackPayPage('home');
     trackPayPage('card');
     trackPayPage('link');
     expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'en', t: 'card' }]);
@@ -173,6 +175,12 @@ describe("the Christmas 2026 edition's pay card and pay page", () => {
     await i18n.changeLanguage('ru');
     trackPayPage('card');
     expect(sent().slice(1)).toEqual([{ e: 'xm_page', s: 'direct', l: 'ru', t: 'card' }]);
+  });
+
+  it('counts the first gift pay press of a page load, apart from the pay press (Step 134)', () => {
+    trackGiftPayPress();
+    trackGiftPayPress();
+    expect(sent()).toEqual([expect.objectContaining({ e: 'xm_giftpay', s: 'direct' })]);
   });
 
   it('counts the first pay press of a page load, by its rail, and no other', () => {
@@ -214,6 +222,7 @@ describe('inside the Android store app', () => {
     trackPayCard();
     trackPayPage('link');
     trackPayPress('payid');
+    trackGiftPayPress();
     expect(sent()).toEqual([{ e: 'fm_view', s: 'app', l: 'en' }]);
   });
 

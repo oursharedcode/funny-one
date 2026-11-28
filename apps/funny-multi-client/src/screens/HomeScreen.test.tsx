@@ -665,6 +665,35 @@ describe('the paid code (Step 122)', () => {
     expect(onJoined.mock.calls[0][0]).toMatchObject({ roomCode: 'WXYZ', codeError });
   });
 
+  it('welcomes a gift link once the code is on the phone (Step 134)', () => {
+    setUrl(`?code=${CODE}&gift=1`);
+    capturePackCodeFromUrl();
+    renderHome();
+    expect(document.querySelector('[data-gift="new"]')?.textContent).toBe(
+      '🎁 A Christmas gift: all the Christmas stories, in every game, until 1 August 2027.',
+    );
+    expect(screen.getByText(CODE)).toBeTruthy();
+  });
+
+  it('says a gift was not used on a phone that has a pack (Step 134)', () => {
+    rememberPackCode('XMAS26-AAAA-BBBB');
+    setUrl(`?code=${CODE}&gift=1`);
+    capturePackCodeFromUrl();
+    renderHome();
+    expect(document.querySelector('[data-gift="kept"]')?.textContent).toBe(i18n.t('home.giftKept'));
+    expect(screen.getByText('XMAS26-AAAA-BBBB')).toBeTruthy();
+  });
+
+  it('links the pack card to giving it, only while that pack is on sale (Step 134)', () => {
+    rememberPackCode(CODE);
+    const open = vi.fn();
+    const { rerender } = render(<HomeScreen onJoined={vi.fn()} />);
+    expect(document.querySelector('[data-home-gift]')).toBeNull();
+    rerender(<HomeScreen onJoined={vi.fn()} gift={{ pack: 'chr26', open }} />);
+    fireEvent.click(document.querySelector('[data-home-gift]')!);
+    expect(open).toHaveBeenCalledOnce();
+  });
+
   it('forgets the code on Remove, and creates the next room without it', () => {
     rememberPackCode(CODE);
     renderHome();

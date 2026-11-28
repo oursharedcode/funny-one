@@ -14,7 +14,10 @@ import {
   clearPayLink,
   forgetPendingPayId,
   forgetPendingSponsors,
+  giftLink,
+  keepGift,
   payLinkPack,
+  readGifts,
   readPendingPayId,
   readPendingSponsors,
   startPayment,
@@ -226,7 +229,7 @@ describe('the waiting PayID code', () => {
   it('is forgotten on request, and read only for its own pack while its codes work', async () => {
     stubFetch({ ok: true, ...TRANSFER });
     await startPayment({ pack: 'chr26', policy: '2026-11-24', rail: 'payid' });
-    expect(readPendingPayId('chr26', Date.parse('2027-08-03T00:00:00Z'))).toBeNull();
+    expect(readPendingPayId('chr26', false, Date.parse('2027-08-03T00:00:00Z'))).toBeNull();
     forgetPendingPayId();
     expect(readPendingPayId('chr26')).toBeNull();
     expect(localStorage.getItem('funny37.pendingPayId')).toBeNull();
@@ -254,5 +257,51 @@ describe("I've paid", () => {
       vi.fn(async () => Promise.reject(new Error('offline'))),
     );
     expect(await claimPayId(TRANSFER.code)).toEqual({ ok: false, error: 'NETWORK' });
+  });
+});
+
+describe('a pack bought as a gift (Step 134)', () => {
+  const request = { pack: 'chr26', policy: '2026-11-24', rail: 'payid' } as const;
+  const OTHER = { ...TRANSFER, code: 'XMAS26-AAAA-BBBB' };
+
+  it('is a code of its own, asked for as a gift and kept apart from the buyer’s', async () => {
+    stubFetch({ ok: true, ...TRANSFER });
+    await startPayment(request);
+    const fetch = stubFetch({ ok: true, ...OTHER });
+    const started = await startPayment({ ...request, gift: true });
+    expect(started.transfer?.code).toBe(OTHER.code);
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/pay/payid',
+      expect.objectContaining({
+        body: JSON.stringify({ pack: 'chr26', policy: '2026-11-24', gift: true }),
+      }),
+    );
+    expect(readPendingPayId('chr26')?.code).toBe(TRANSFER.code);
+    expect(readPendingPayId('chr26', true)?.code).toBe(OTHER.code);
+    forgetPendingPayId(true);
+    expect(readPendingPayId('chr26', true)).toBeNull();
+    expect(readPendingPayId('chr26')?.code).toBe(TRANSFER.code);
+  });
+
+  it('lists the gifts bought, oldest first, each once, and none in the app', () => {
+    keepGift('chr26', TRANSFER.code);
+    keepGift('chr26', OTHER.code);
+    keepGift('chr26', TRANSFER.code);
+    __resetPayForTest();
+    expect(readGifts('chr26')).toEqual([OTHER.code, TRANSFER.code]);
+    expect(readGifts('chr26', Date.parse('2027-08-03T00:00:00Z'))).toEqual([]);
+    setUrl('?shell=android');
+    expect(readGifts('chr26')).toEqual([]);
+  });
+
+  it('does not read what is not a list of codes', () => {
+    localStorage.setItem('funny37.gifts', '{"code":1}');
+    expect(readGifts('chr26')).toEqual([]);
+    localStorage.setItem('funny37.gifts', '["nope", 3, "XMAS26-K7QM-3FPA"]');
+    expect(readGifts('chr26')).toEqual([TRANSFER.code]);
+  });
+
+  it('links to the game with the code, marked as a gift', () => {
+    expect(giftLink(TRANSFER.code)).toMatch(/^https?:\/\/.+\?code=XMAS26-K7QM-3FPA&gift=1$/);
   });
 });

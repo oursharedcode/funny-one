@@ -12,6 +12,10 @@
 // one Chrome remembers from the website, whose storage a TWA shares. A room
 // someone else paid for still plays paid in the app.
 //
+// Step 134: a gift's link carries `&gift=1` beside the code. It is kept the
+// same way, and Home says what arrived — unless this phone already has a
+// working pack, which a gift never replaces.
+//
 // Storage reads and writes are wrapped, as in storeShell.ts: a browser that
 // blocks storage keeps the code for this page load only.
 
@@ -27,12 +31,18 @@ import {
 import { isStoreShell } from './storeShell';
 
 const PARAM = 'code';
+const GIFT_PARAM = 'gift';
 const STORAGE_KEY = 'funny37.packCode';
 
 // The code where storage is blocked; also set where it is not.
 let memory: string | null = null;
 // This page load's link carried something that is not a code.
 let linkRefused = false;
+// This page load's link was a gift: kept, or not used.
+let gift: GiftArrival | null = null;
+
+/** `new`: the gift is now this phone's pack. `kept`: the phone had one, so it was not used. */
+export type GiftArrival = 'new' | 'kept';
 
 /** Takes a pay link's code off the address bar and keeps it. Before the first render. */
 export function capturePackCodeFromUrl(): void {
@@ -40,11 +50,27 @@ export function capturePackCodeFromUrl(): void {
   const url = new URL(window.location.href);
   const raw = url.searchParams.get(PARAM);
   if (raw === null) return;
+  const isGift = url.searchParams.get(GIFT_PARAM) === '1';
   url.searchParams.delete(PARAM);
+  url.searchParams.delete(GIFT_PARAM);
   window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
   const code = parseCode(raw);
-  if (code) rememberPackCode(code.code);
-  else linkRefused = true;
+  if (!code) {
+    linkRefused = true;
+    return;
+  }
+  const own = isGift ? readPackCode() : null;
+  if (own && own.code !== code.code && isPackPaid(own.pack, Date.now())) {
+    gift = 'kept';
+    return;
+  }
+  rememberPackCode(code.code);
+  if (isGift && isPackPaid(code.pack, Date.now())) gift = 'new';
+}
+
+/** What this page load's gift link did, or null for no gift. */
+export function giftArrival(): GiftArrival | null {
+  return gift;
 }
 
 /** True when this page load's link carried something that is not a code. */
@@ -103,4 +129,5 @@ export function canUnlockRoom(
 export function __resetPackCodeForTest(): void {
   memory = null;
   linkRefused = false;
+  gift = null;
 }

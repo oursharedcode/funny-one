@@ -7,6 +7,8 @@
 //                    pending code (codes.ts), which is the transfer's
 //                    reference (D4 of 2026-11-05), and answers with the PayID,
 //                    its account name and the amount — the transfer to make.
+//                    Step 134: with `gift: true` the code is bought for a
+//                    friend; the issue record says so, nothing else differs.
 //   POST /pay/claim  the buyer's "I've paid": the pending code works at once,
 //                    for 48 hours (B-29 #5), unless the owner matches the
 //                    payment on the admin page first (admin.ts), which makes it
@@ -91,7 +93,7 @@ export function registerPayRoutes(fastify: FastifyInstance, options: PayRoutesOp
     { bodyLimit: 1024 },
     async (request, reply): Promise<PayIdAnswer> => {
       reply.header('cache-control', 'no-store');
-      const { pack: asked, policy } = body(request);
+      const { pack: asked, policy, gift } = body(request);
       const pack = codes.enabled ? packOnSale() : null;
       const { payId, payIdName } = support;
       if (!pack || asked !== pack || !payId || !payIdName) return refuse(reply, 409, 'NOT_ON_SALE');
@@ -108,6 +110,7 @@ export function registerPayRoutes(fastify: FastifyInstance, options: PayRoutesOp
             ? policy
             : REFUND_POLICY_VERSION,
         pending: true,
+        ...(gift === true ? { gift: true as const } : {}),
       });
       return { ok: true, code, payId, payIdName, amount };
     },

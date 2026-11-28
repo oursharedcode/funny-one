@@ -32,7 +32,9 @@
     "packCodeRemove": "Quitar",
     "packEnded": "Tu edición Navidad 2026 terminó. ¡Gracias por jugar!",
     "christmasLine": "🔔 Una historia de Navidad en cada nueva sala",
-    "christmasPeek": "¡Paquete de Navidad gratis!"
+    "christmasPeek": "¡Paquete de Navidad gratis!",
+    "giftWelcome": "🎁 Un regalo de Navidad: todas las historias navideñas, en cada partida, hasta el {{date}}.",
+    "giftKept": "🎁 Este teléfono ya tiene el paquete, así que el regalo no se usó aquí. Su enlace sigue funcionando en otro teléfono."
   },
   "lobby": {
     "roomCodeLabel": "Código de la sala",
@@ -153,7 +155,17 @@
     "leaveText": "Presiona primero «Pagado» para que tu código funcione ya. ¿Todavía no pagaste? Tu código se queda en este teléfono: abre esta página otra vez cuando hayas pagado.",
     "leaveAnyway": "Todavía no — cerrar",
     "paidTitle": "¡Gracias! Tu código ya funciona.",
-    "paidCheck": "Comprobamos a mano que tu pago haya llegado. Si no llega en 2 días, el código dejará de funcionar."
+    "paidCheck": "Comprobamos a mano que tu pago haya llegado. Si no llega en 2 días, el código dejará de funcionar.",
+    "giftButton": "Regalar",
+    "giftPitch": "Un regalo para un amigo: todas las historias navideñas, en cada partida, hasta el {{date}}. Recibes un enlace para enviarle. Tu teléfono no cambia.",
+    "giftBack": "Volver",
+    "giftPaidWarning": "¿Ya enviaste el dinero? Toca «Pagado»: entonces aparece el enlace de regalo. Si cierras antes la página, el código espera hasta que encontremos tu pago a mano.",
+    "giftLeaveText": "Primero toca «Pagado» para obtener el enlace de regalo. ¿Aún no pagas? El código queda en este teléfono: vuelve a abrir esta página cuando pagues.",
+    "giftReady": "¡Tu regalo está listo!",
+    "giftSend": "Envía este enlace a tu amigo. Funciona hasta el {{date}}.",
+    "giftCheck": "Revisamos a mano que tu pago haya llegado. Si no llega en 2 días, el regalo deja de funcionar.",
+    "giftList": "Tus regalos",
+    "giftShareText": "Un regalo de Navidad para ti: todas las historias navideñas, hasta el {{date}}."
   },
   "gallery": {
     "share": "Compartir las imágenes de la sala",

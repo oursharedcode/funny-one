@@ -263,14 +263,15 @@ describe('renderStats', () => {
           'xm_page||ar|direct|link||': 4,
           'xm_pay||de|direct|sponsors||': 2,
           'xm_pay|a|en|hub|payid||': 1,
+          'xm_giftpay||de|direct|||': 1,
         },
       },
     });
     expect(tableOf(root, 'The Christmas 2026 edition', 1)).toEqual([
-      ['All', '8', '3', '5', '1', '2'],
-      ['Deutsch (Deutschland)', '6', '3', '1', '0', '2'],
-      ['English (United Kingdom)', '2', '0', '0', '1', '0'],
-      ['ar', '0', '0', '4', '0', '0'],
+      ['All', '8', '3', '5', '1', '2', '1'],
+      ['Deutsch (Deutschland)', '6', '3', '1', '0', '2', '1'],
+      ['English (United Kingdom)', '2', '0', '0', '1', '0', '0'],
+      ['ar', '0', '0', '4', '0', '0', '0'],
     ]);
     // The paying half adds nothing to the playing half's table.
     expect(tableOf(root, 'The Christmas 2026 edition')).toEqual([
@@ -278,7 +279,7 @@ describe('renderStats', () => {
     ]);
     // Nothing paid for yet: the row of totals alone, all nought.
     expect(tableOf(render(), 'The Christmas 2026 edition', 1)).toEqual([
-      ['All', '0', '0', '0', '0', '0'],
+      ['All', '0', '0', '0', '0', '0', '0'],
     ]);
   });
 

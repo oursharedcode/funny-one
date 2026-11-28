@@ -374,6 +374,35 @@ describe('the admin routes', () => {
     });
     const shown = await page(ADMIN_SECRET, `?done=new&code=${made}`);
     expect(shown.body).toContain(`?code=${made}`);
+    expect(shown.body).not.toContain('a gift for a friend');
+  });
+
+  it('keeps the gift mark and the gift link on a code that replaces a gift (Step 134)', async () => {
+    const server = await boot();
+    const old = server.codes.issue({
+      pack: 'chr26',
+      rail: 'payid',
+      ref: '',
+      amount: 'A$2.60',
+      delivered: 'pay page',
+      policy: REFUND_POLICY_VERSION,
+      pending: false,
+      gift: true,
+    });
+    const res = await act({ action: 'new', replaces: old });
+    const made = new URL(res.headers.location as string, 'http://x').searchParams.get('code')!;
+    expect(server.receipts.records().at(-1)).toMatchObject({ code: made, gift: true });
+    const shown = await page(ADMIN_SECRET, `?done=new&code=${made}`);
+    expect(shown.body).toContain(`?code=${made}&#38;gift=1`);
+    expect((await page(ADMIN_SECRET, `?q=${made}`)).body).toContain('a gift for a friend');
+  });
+
+  it('marks a gift, and a code made in its place stays one (Step 134)', () => {
+    const rows = codeRows([
+      { ...issue('XMAS26-AAAA-1111', ago(HOUR)), gift: true } as ReceiptRecord,
+    ]);
+    expect(rows[0]?.gift).toBe(true);
+    expect(codeRows([issue('XMAS26-BBBB-2222', ago(HOUR))])[0]?.gift).toBe(false);
   });
 
   it('makes a code for a sponsorship GitHub reported with none, and lists it no more', async () => {

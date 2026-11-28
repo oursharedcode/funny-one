@@ -83,6 +83,18 @@ describe('POST /pay/payid', () => {
     ]);
   });
 
+  it('logs a code bought as a gift as one, and nothing but true says so (Step 134)', async () => {
+    const server = await boot();
+    await post('/pay/payid', { pack: 'chr26', gift: true });
+    await post('/pay/payid', { pack: 'chr26', gift: 'yes' });
+    await post('/pay/payid', { pack: 'chr26' });
+    expect(server.receipts.records().map((r) => (r.type === 'issue' ? r.gift : null))).toEqual([
+      true,
+      undefined,
+      undefined,
+    ]);
+  });
+
   it('logs the refund policy the page showed, and the current one for anything else', async () => {
     const server = await boot();
     await post('/pay/payid', { pack: 'chr26', policy: '2026-01-02' });

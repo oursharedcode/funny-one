@@ -140,6 +140,13 @@ describe('statKey', () => {
     }
   });
 
+  it('keys a gift pay press, website only (Step 134)', () => {
+    expect(statKey({ e: 'xm_giftpay', s: 'direct', l: 'en' })).toBe('xm_giftpay||en|direct|||');
+    expect(statKey({ e: 'xm_giftpay', s: 'hub', v: 'a', l: 'ru' })).toBe('xm_giftpay|a|ru|hub|||');
+    expect(statKey({ e: 'xm_giftpay', s: 'direct', l: 'en', t: 'payid' })).toBeNull();
+    expect(statKey({ e: 'xm_giftpay', s: 'app', l: 'en' })).toBeNull();
+  });
+
   it("keys a hub visit sent by /x26/ and the hub's two Christmas buttons (Step 119)", () => {
     expect(statKey({ e: 'hub_view', v: 'a', l: 'de', r: 'xmas', d: 'm' })).toBe(
       'hub_view|a|de|||xmas|m',

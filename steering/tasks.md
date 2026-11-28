@@ -1274,6 +1274,19 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     the scene — the stamp marks pictures, the screen's card has none, and it would sit over the
     bottom-right sprig. Pushed as `5438de9`, CI green, deployed 2026-11-28; seen on the owner's
     phone the same day.
+  - *#10 gift a pack — Step 134, owner decisions 2026-11-28 ("A, A, A, A — go ahead"):* D1 A,
+    "Give as a gift" on the pay page makes a code of its own and ends with a link to share (no
+    picture card or QR); D2 A, the gift ends 1 August 2027 as every code does, relying on the
+    limited-period exemption from the three-year gift-card rule (Competition and Consumer
+    Regulations 2010 reg 89C(1)(a), read in compilation 100 on 2026-11-28; not legal advice),
+    the date shown to buyer and friend; D3 A, PayID only; D4 A, deployed on its own right after
+    the step, when no visitor is connected. Design §4.4. The agent's readings, the owner's to
+    overturn: no friend's name or address is asked; a gift costs a pack's price; the buyer's
+    phone lists its gifts; a gift link never replaces another working pack; the Android app
+    shows none of it. The privacy policy changed in all 23 languages (what the phone and the
+    receipt log keep, the gift button's count). en and ru the agent's, 21 machine drafts on
+    B-3's pile. Then, same day ("A, then commit and push"): Home's pack card links to giving it,
+    and the pay page gives a pack owner placed abroad the "In Australia?" switch.
   - **The lone host's grace — Step 132, 2026-11-27** (owner decisions "A, A, B, A, A" on the
     Step 127 finding above): D1 A, Socket.IO's recovery lengthened; D2 A, the window is the
     phase's — 10 min in the lobby, 65 s in a game as before (B14 stands) — and at Start anyone

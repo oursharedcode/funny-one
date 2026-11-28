@@ -564,6 +564,7 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
     (match) => total(rows, { ...match, e: 'xm_page', t: 'link' }),
     (match) => total(rows, { ...match, e: 'xm_pay', t: 'payid' }),
     (match) => total(rows, { ...match, e: 'xm_pay', t: 'sponsors' }),
+    (match) => total(rows, { ...match, e: 'xm_giftpay' }),
   ];
   return section(
     'The Christmas 2026 edition',
@@ -594,11 +595,12 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
         'Pay page opened from /x26',
         'Pay pressed: PayID',
         'Pay pressed: GitHub Sponsors',
+        'Gift pay pressed',
       ],
       byLanguage(rows, names, paying, [0, 2, 1]),
     ),
     note(
-      'Website only. Each tab counts the pay card once, shown on the end screen after a free Christmas game; the pay page once, by the door it was first opened from, the card’s button or the /x26 address; and the first press of its pay button, by the way to pay. A press is not a payment: payments are in the receipt log, not here.',
+      'Website only. Each tab counts the pay card once, shown on the end screen after a free Christmas game; the pay page once, by the door it was first opened from, the card’s button or the /x26 address; and the first press of its pay button, by the way to pay. “Gift pay pressed” is the same button when the pack is bought for a friend (PayID only), and is not in the PayID column. A press is not a payment: payments are in the receipt log, not here.',
     ),
   );
 }

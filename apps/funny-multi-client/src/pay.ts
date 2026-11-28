@@ -26,6 +26,11 @@
 // asks the server whether it works yet (POST /pay/status, `checkPayStatus`):
 // it works once GitHub's webhook reports the sponsorship, or once the owner
 // presses Received — never on the buyer's word alone (D2 A).
+//
+// Step 134 (owner decisions 2026-11-28): a pack bought for a friend, by PayID
+// only (D3 A). It is a code of its own: the phone keeps the one waiting for
+// its payment apart from the buyer's own, never as this phone's pack, and
+// once claimed lists it so the buyer can send its link again (D1 A).
 
 import {
   isPackPaid,
@@ -39,7 +44,7 @@ import {
   type PaySponsorsAnswer,
   type PayStatusAnswer,
 } from '@funny/shared';
-import { serverOrigin, withBase } from './basePath';
+import { homeUrl, serverOrigin, withBase } from './basePath';
 import { isStoreShell } from './storeShell';
 
 const PARAM = 'pay';
@@ -48,7 +53,7 @@ const PARAM = 'pay';
 const LINK_PACKS: ReadonlyMap<string, PackId> = new Map([['x26', 'chr26']]);
 
 /** How the pay page was reached: the end screen's card, or a link. */
-export type PayDoor = 'card' | 'link';
+export type PayDoor = 'card' | 'link' | 'home';
 
 /**
  * Each pack's tier on GitHub Sponsors, as GitHub shows it — in English,
@@ -81,6 +86,8 @@ export interface PaymentRequest {
   policy: string;
   /** On Sponsors: the GitHub name the buyer will pay with, as typed. */
   login?: string;
+  /** On PayID: the pack is for a friend (Step 134). */
+  gift?: boolean;
 }
 
 /** A PayID transfer to make: the server's answer, kept on the phone until claimed. */
@@ -117,9 +124,12 @@ export interface PaymentStart {
 
 type Starter = (request: PaymentRequest) => Promise<PaymentStart>;
 
+// The buyer's own waiting code and a gift's are kept apart (Step 134).
 const PENDING_KEY = 'funny37.pendingPayId';
-// Where storage is blocked: this page load's waiting code.
+const PENDING_GIFT_KEY = 'funny37.pendingGift';
+// Where storage is blocked: this page load's waiting codes.
 let pendingMemory: PayIdTransfer | null = null;
+let pendingGiftMemory: PayIdTransfer | null = null;
 
 function readTransfer(raw: unknown): PayIdTransfer | null {
   if (typeof raw !== 'object' || raw === null) return null;
@@ -137,12 +147,19 @@ function readTransfer(raw: unknown): PayIdTransfer | null {
   };
 }
 
-/** The PayID code this phone is waiting to claim for `pack`, or null; always null in the Android app. */
-export function readPendingPayId(pack: PackId, now = Date.now()): PayIdTransfer | null {
+/**
+ * The PayID code this phone is waiting to claim for `pack` — its own, or a
+ * gift's — or null; always null in the Android app.
+ */
+export function readPendingPayId(
+  pack: PackId,
+  gift = false,
+  now = Date.now(),
+): PayIdTransfer | null {
   if (isStoreShell() || !isPackPaid(pack, now)) return null;
-  let kept: PayIdTransfer | null = pendingMemory;
+  let kept: PayIdTransfer | null = gift ? pendingGiftMemory : pendingMemory;
   try {
-    const stored = localStorage.getItem(PENDING_KEY);
+    const stored = localStorage.getItem(gift ? PENDING_GIFT_KEY : PENDING_KEY);
     if (stored !== null) kept = readTransfer(JSON.parse(stored));
   } catch {
     // Storage blocked, or what it holds does not read: this page load's, if any.
@@ -150,22 +167,59 @@ export function readPendingPayId(pack: PackId, now = Date.now()): PayIdTransfer 
   return kept?.pack === pack ? kept : null;
 }
 
-function keepPendingPayId(transfer: PayIdTransfer): void {
-  pendingMemory = transfer;
+function keepPendingPayId(transfer: PayIdTransfer, gift: boolean): void {
+  if (gift) pendingGiftMemory = transfer;
+  else pendingMemory = transfer;
   try {
-    localStorage.setItem(PENDING_KEY, JSON.stringify(transfer));
+    localStorage.setItem(gift ? PENDING_GIFT_KEY : PENDING_KEY, JSON.stringify(transfer));
   } catch {
     // Storage blocked — kept for this page load.
   }
 }
 
-export function forgetPendingPayId(): void {
-  pendingMemory = null;
+export function forgetPendingPayId(gift = false): void {
+  if (gift) pendingGiftMemory = null;
+  else pendingMemory = null;
   try {
-    localStorage.removeItem(PENDING_KEY);
+    localStorage.removeItem(gift ? PENDING_GIFT_KEY : PENDING_KEY);
   } catch {
     // Storage blocked — nothing was kept there.
   }
+}
+
+const GIFTS_KEY = 'funny37.gifts';
+let giftsMemory: string[] = [];
+
+/** The gifts this phone has bought of `pack`, oldest first; none in the Android app. */
+export function readGifts(pack: PackId, now = Date.now()): string[] {
+  if (isStoreShell() || !isPackPaid(pack, now)) return [];
+  let kept: unknown = giftsMemory;
+  try {
+    const stored = localStorage.getItem(GIFTS_KEY);
+    if (stored !== null) kept = JSON.parse(stored);
+  } catch {
+    // Storage blocked, or what it holds does not read: this page load's.
+  }
+  if (!Array.isArray(kept)) return [];
+  return kept.flatMap((raw: unknown) => {
+    const code = parseCode(raw);
+    return code?.pack === pack ? [code.code] : [];
+  });
+}
+
+/** A gift claimed: kept so its link can be sent again. */
+export function keepGift(pack: PackId, code: string): void {
+  giftsMemory = [...readGifts(pack).filter((c) => c !== code), code];
+  try {
+    localStorage.setItem(GIFTS_KEY, JSON.stringify(giftsMemory));
+  } catch {
+    // Storage blocked — kept for this page load.
+  }
+}
+
+/** The link that gives the friend's phone the gift (packCode.ts reads it). */
+export function giftLink(code: string): string {
+  return `${homeUrl()}?code=${code}&gift=1`;
 }
 
 const SPONSORS_KEY = 'funny37.pendingSponsors';
@@ -222,17 +276,19 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function startPayId(request: PaymentRequest): Promise<PaymentStart> {
-  const kept = readPendingPayId(request.pack);
+  const gift = request.gift === true;
+  const kept = readPendingPayId(request.pack, gift);
   if (kept) return { ok: true, transfer: kept };
   const answer = await postJson<PayIdAnswer>('pay/payid', {
     pack: request.pack,
     policy: request.policy,
+    ...(gift ? { gift: true } : {}),
   });
   if (!answer.ok) return { ok: false };
   const transfer = readTransfer({ ...answer, pack: request.pack });
   // The amount is the server's, which logs it: the page shows what it says.
   if (!transfer) return { ok: false };
-  keepPendingPayId(transfer);
+  keepPendingPayId(transfer, gift);
   return { ok: true, transfer };
 }
 
@@ -302,5 +358,7 @@ export async function checkPayStatus(code: string): Promise<ClaimResult> {
 
 export function __resetPayForTest(): void {
   pendingMemory = null;
+  pendingGiftMemory = null;
+  giftsMemory = [];
   sponsorsMemory = null;
 }

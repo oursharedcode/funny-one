@@ -41,7 +41,8 @@
 // Create, with the last day it works and a Remove button, and goes with every
 // room created while the pack's paid part lasts. A refused code still creates
 // the room; the ack says why and the lobby shows it. Once the paid part has
-// ended the box says so instead, and nothing is sent.
+// ended the box says so instead, and nothing is sent. Since Step 134 the box
+// also links to giving the pack as a gift, while it is on sale.
 //
 // B-29 (owner's picks, 2026-11-26): while a room in the picked language would
 // get the free Christmas pack (`packForRoom`), the create screen wears its
@@ -69,7 +70,7 @@ import PackCodeLine from '../components/PackCodeLine';
 import SupportHeart from '../components/SupportHeart';
 import { hasAnyRail } from '../support';
 import { CONTENT_LANGUAGES, isAuthoredLanguage } from '../storyLanguage';
-import { forgetPackCode, linkCodeRefused, readPackCode } from '../packCode';
+import { forgetPackCode, giftArrival, linkCodeRefused, readPackCode } from '../packCode';
 import { lastPaidDay } from '../packDay';
 import {
   LANGUAGES,
@@ -80,7 +81,13 @@ import {
   packForRoom,
 } from '@funny/shared';
 import type { LobbyState } from '../App';
-import type { AuthoredLanguage, Language, StatsPayload, SupportConfig } from '@funny/shared';
+import type {
+  AuthoredLanguage,
+  Language,
+  PackId,
+  StatsPayload,
+  SupportConfig,
+} from '@funny/shared';
 
 interface Props {
   onJoined: (state: LobbyState) => void;
@@ -95,6 +102,8 @@ interface Props {
   onOpenSupport?: () => void;
   /** Step 133: whether the Christmas dressing shows, for App's snow. */
   onChristmas?: (on: boolean) => void;
+  /** Step 134: the pack on sale and the way to give it; null where nothing is sold. */
+  gift?: { pack: PackId; open: () => void } | null;
 }
 
 const NO_SNOW_TOLD = (): void => {};
@@ -105,6 +114,7 @@ export default function HomeScreen({
   support = null,
   onOpenSupport = () => {},
   onChristmas = NO_SNOW_TOLD,
+  gift = null,
 }: Props) {
   const { t, i18n } = useTranslation();
 
@@ -313,6 +323,18 @@ export default function HomeScreen({
       <Wordmark />
       <p className="text-center text-gray-700">{t('home.subtitle')}</p>
       {christmas && <ChristmasPeek />}
+      {/* Step 134: a gift link brought this visit; the pack card follows below. */}
+      {liveCode && giftArrival() && (
+        <p
+          className="w-full break-words rounded border-2 border-pink-300 bg-white p-3 text-center font-semibold text-gray-800"
+          role="status"
+          data-gift={giftArrival()}
+        >
+          {giftArrival() === 'new'
+            ? t('home.giftWelcome', { date: lastPaidDay(liveCode.pack, i18n.language) })
+            : t('home.giftKept')}
+        </p>
+      )}
       {awayTooLong && (
         <p
           className="w-full break-words rounded border-2 border-pink-300 bg-white p-3 text-center font-semibold text-gray-800"
@@ -383,6 +405,16 @@ export default function HomeScreen({
                     <p className="text-sm text-gray-600">
                       {t('home.packCodeHint', { date: lastPaidDay(packCode.pack, i18n.language) })}
                     </p>
+                    {gift?.pack === packCode.pack && (
+                      <button
+                        type="button"
+                        className="mt-1 text-sm font-semibold text-pink-600 underline"
+                        onClick={gift.open}
+                        data-home-gift
+                      >
+                        🎁 {t('pay.giftButton')}
+                      </button>
+                    )}
                   </>
                 ) : (
                   <p className="text-gray-700">{t('home.packEnded')}</p>

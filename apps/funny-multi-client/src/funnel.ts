@@ -30,6 +30,9 @@
 // Step 130 (B-29 #1): a Christmas game that bots helped fill — fewer than
 // three people, bots in the empty seats — counts once more as `xm_bots`, with
 // its `xm_game`, so /stats/ can tell whether playing alone brings players.
+//
+// Step 134: the pay button pressed to buy the pack for a friend
+// (`xm_giftpay`) is counted apart from `xm_pay`.
 
 import { isLanguage, type Language, type PayRail } from '@funny/shared';
 import i18n from './i18n';
@@ -49,6 +52,7 @@ let goldenSent = false;
 let payCardSent = false;
 let payPageSent = false;
 let payPressSent = false;
+let giftPressSent = false;
 
 function trackingRefused(): boolean {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
@@ -144,7 +148,8 @@ export function trackPayCard(): void {
  * language is read here, as the visit's is.
  */
 export function trackPayPage(door: PayDoor): void {
-  if (payPageSent) return;
+  // Home's gift link (Step 134) is not a door of the sale: its pay press is counted.
+  if (door === 'home' || payPageSent) return;
   payPageSent = true;
   const urlLanguage = new URLSearchParams(window.location.search).get('lang');
   send(
@@ -160,6 +165,13 @@ export function trackPayPress(rail: PayRail): void {
   send({ e: 'xm_pay', t: rail });
 }
 
+/** The pay button pressed for a gift (Step 134). Only the first in a page load counts. */
+export function trackGiftPayPress(): void {
+  if (giftPressSent) return;
+  giftPressSent = true;
+  send({ e: 'xm_giftpay' });
+}
+
 export function __resetFunnelForTest(): void {
   origin = { s: 'direct' };
   supportSent = false;
@@ -169,4 +181,5 @@ export function __resetFunnelForTest(): void {
   payCardSent = false;
   payPageSent = false;
   payPressSent = false;
+  giftPressSent = false;
 }

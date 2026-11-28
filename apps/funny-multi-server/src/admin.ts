@@ -79,6 +79,8 @@ export interface CodeRow {
   ref: string;
   /** A Sponsors code's GitHub name, or the one a code by hand was made for; else empty. */
   login: string;
+  /** Step 134: bought for a friend — the buyer is not the one who plays with it. */
+  gift: boolean;
   issuedAt: number | null;
   /** Still a PayID or Sponsors code waiting for its payment to be matched. */
   pending: boolean;
@@ -118,6 +120,7 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
         amount: '',
         ref: '',
         login: '',
+        gift: false,
         issuedAt: null,
         pending: false,
         sponsoredAt: null,
@@ -146,6 +149,7 @@ export function codeRows(records: readonly ReceiptRecord[]): CodeRow[] {
         row.amount = record.amount;
         row.ref = record.ref;
         row.login = record.login ?? '';
+        row.gift = record.gift === true;
         row.issuedAt = at;
         row.pending = record.state === 'pending';
         break;
@@ -354,7 +358,8 @@ function card(row: CodeRow, path: string, now: number): string {
       ? ` · replaces ${esc(row.ref)}`
       : ` · for sponsorship ${esc(row.ref)}`;
   const login = row.login ? ` · GitHub @${esc(row.login)}` : '';
-  lines.push(`<p>${esc(what)}${login}${ref}</p>`);
+  const gift = row.gift ? ' · <b>a gift for a friend</b>' : '';
+  lines.push(`<p>${esc(what)}${gift}${login}${ref}</p>`);
   const times = [`issued ${time(row.issuedAt)}`];
   if (row.claimedAt !== null) times.push(`“I’ve paid” ${time(row.claimedAt)}`);
   if (row.sponsoredAt !== null) times.push(`GitHub reported it paid ${time(row.sponsoredAt)}`);
@@ -398,7 +403,9 @@ export function renderAdminPage(page: AdminPage): string {
   const parts: string[] = [];
 
   if (done === 'new' && doneCode) {
-    const link = `${gameUrl}?code=${doneCode}`;
+    // A gift's new code keeps its welcome line for the friend (Step 134).
+    const gift = rows.some((r) => r.code === doneCode && r.gift) ? '&gift=1' : '';
+    const link = `${gameUrl}?code=${doneCode}${gift}`;
     parts.push(
       `<section class="card flash"><p>New code:</p><p class="code">${esc(doneCode)}</p><p class="small">For the buyer — opening this link keeps it on their phone:</p><p class="link">${esc(link)}</p><button type="button" data-copy="${esc(link)}">Copy link</button></section>`,
     );
@@ -652,6 +659,9 @@ export function registerAdminRoutes(
           rail: 'owner',
           ref: sponsorship?.ref ?? replaced?.code ?? '',
           ...(sponsorship ? { login: sponsorship.login } : {}),
+          ...(codeRows(receipts.records()).some((r) => r.code === replaced?.code && r.gift)
+            ? { gift: true as const }
+            : {}),
           amount: '',
           delivered: OWNER_DELIVERED,
           policy: REFUND_POLICY_VERSION,

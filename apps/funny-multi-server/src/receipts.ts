@@ -69,6 +69,11 @@ export interface IssueRecord {
    * GitHub's webhook finds the code.
    */
   login?: string;
+  /**
+   * Step 134: bought on the pay page for a friend (PayID only), or given by
+   * hand in place of such a code.
+   */
+  gift?: true;
 }
 
 export interface ClaimRecord {

@@ -32,7 +32,9 @@
     "packCodeRemove": "Ondoa",
     "packEnded": "Toleo lako la Krismasi 2026 limekwisha. Asante kwa kucheza!",
     "christmasLine": "🔔 Hadithi moja ya Krismasi katika kila chumba kipya",
-    "christmasPeek": "Kifurushi cha Krismasi — bure!"
+    "christmasPeek": "Kifurushi cha Krismasi — bure!",
+    "giftWelcome": "🎁 Zawadi ya Krismasi: hadithi zote za Krismasi, katika kila mchezo, hadi {{date}}.",
+    "giftKept": "🎁 Simu hii tayari ina kifurushi, kwa hivyo zawadi haikutumika hapa. Kiungo chake bado kinafanya kazi kwenye simu nyingine."
   },
   "lobby": {
     "roomCodeLabel": "Msimbo wa chumba",
@@ -153,7 +155,17 @@
     "leaveText": "Bonyeza “Nimelipa” kwanza ili msimbo wako ufanye kazi sasa hivi. Bado hujalipa? Msimbo wako utabaki kwenye simu hii: fungua ukurasa huu tena ukishalipa.",
     "leaveAnyway": "Bado — funga",
     "paidTitle": "Asante! Msimbo wako unafanya kazi sasa.",
-    "paidCheck": "Tunakagua kwa mkono kwamba malipo yako yamefika. Yasipofika ndani ya siku 2, msimbo utaacha kufanya kazi."
+    "paidCheck": "Tunakagua kwa mkono kwamba malipo yako yamefika. Yasipofika ndani ya siku 2, msimbo utaacha kufanya kazi.",
+    "giftButton": "Mpe kama zawadi",
+    "giftPitch": "Zawadi kwa rafiki: hadithi zote za Krismasi, katika kila mchezo, hadi {{date}}. Utapata kiungo cha kumtumia. Hakuna kinachobadilika kwenye simu yako.",
+    "giftBack": "Rudi",
+    "giftPaidWarning": "Umetuma pesa? Bonyeza “Nimelipa”: kisha kiungo cha zawadi kitaonekana. Ukifunga ukurasa kwanza, msimbo utasubiri hadi tupate malipo yako kwa mkono.",
+    "giftLeaveText": "Bonyeza “Nimelipa” kwanza ili upate kiungo cha zawadi. Bado hujalipa? Msimbo unabaki kwenye simu hii: fungua ukurasa huu tena ukishalipa.",
+    "giftReady": "Zawadi yako iko tayari!",
+    "giftSend": "Mtumie rafiki yako kiungo hiki. Kinafanya kazi hadi {{date}}.",
+    "giftCheck": "Tunakagua kwa mkono kama malipo yako yamefika. Yasipofika ndani ya siku 2, zawadi itaacha kufanya kazi.",
+    "giftList": "Zawadi zako",
+    "giftShareText": "Zawadi ya Krismasi kwako: hadithi zote za Krismasi, hadi {{date}}."
   },
   "gallery": {
     "share": "Shiriki picha za chumba",

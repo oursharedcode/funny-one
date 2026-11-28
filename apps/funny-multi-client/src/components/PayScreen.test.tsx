@@ -15,14 +15,21 @@ import {
   readPackCode,
   rememberPackCode,
 } from '../packCode';
-import { __resetPayForTest, readPendingPayId, readPendingSponsors, type PayDoor } from '../pay';
+import {
+  __resetPayForTest,
+  readGifts,
+  readPendingPayId,
+  readPendingSponsors,
+  type PayDoor,
+} from '../pay';
 
 // The funnel itself is funnel.test.ts's; here, only what the page reports.
-const { trackPayPage, trackPayPress } = vi.hoisted(() => ({
+const { trackGiftPayPress, trackPayPage, trackPayPress } = vi.hoisted(() => ({
+  trackGiftPayPress: vi.fn(),
   trackPayPage: vi.fn(),
   trackPayPress: vi.fn(),
 }));
-vi.mock('../funnel', () => ({ trackPayPage, trackPayPress }));
+vi.mock('../funnel', () => ({ trackGiftPayPress, trackPayPage, trackPayPress }));
 
 const { default: PayScreen } = await import('./PayScreen');
 
@@ -97,6 +104,7 @@ beforeEach(async () => {
   stubFetch();
   trackPayPage.mockClear();
   trackPayPress.mockClear();
+  trackGiftPayPress.mockClear();
   await i18n.changeLanguage('en');
   vi.useFakeTimers({ now: Date.parse('2026-12-20T09:00:00Z'), toFake: ['Date'] });
 });
@@ -530,5 +538,107 @@ describe('instead of the offer', () => {
     expect(screen.getByText('🔔 Christmas 2026 edition')).toBeTruthy();
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(screen.queryByText(/come back later/)).toBeNull();
+  });
+});
+
+describe('a pack bought as a gift (Step 134)', () => {
+  const OWN = 'XMAS26-AAAA-BBBB';
+  const LINK = `?code=${CODE}&gift=1`;
+
+  async function startGift(): Promise<void> {
+    fireEvent.click(screen.getByRole('button', { name: '🎁 Give as a gift' }));
+    await startPayId();
+  }
+
+  it('is offered on PayID only', () => {
+    renderPay({ pay: SPONSORS });
+    expect(document.querySelector('[data-gift-open]')).toBeNull();
+  });
+
+  it('lets a phone that has the pack, placed abroad, switch to PayID and give one', () => {
+    rememberPackCode(OWN);
+    renderPay({ pay: SPONSORS });
+    expect(document.querySelector('[data-gift-open]')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'In Australia?' }));
+    expect(document.querySelector('[data-gift-open]')).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'In Australia?' })).toBeNull();
+  });
+
+  it("opens on the gift from Home's link, on PayID only", () => {
+    rememberPackCode(OWN);
+    const { unmount } = renderPay({ pay: PAYID, door: 'home' });
+    expect(document.querySelector('[data-gift-pitch]')).not.toBeNull();
+    unmount();
+    renderPay({ pay: SPONSORS, door: 'home' });
+    expect(document.querySelector('[data-gift-pitch]')).toBeNull();
+    expect(screen.getByRole('button', { name: 'In Australia?' })).toBeTruthy();
+  });
+
+  it('is paid for like a pack, then gives a link and leaves this phone without one', async () => {
+    const fetch = stubFetch({ ok: true, ...TRANSFER }, { ok: true });
+    const onPaid = vi.fn();
+    const onClose = vi.fn();
+    renderPay({ pay: PAYID, onPaid, onClose });
+    await startGift();
+    expect(document.querySelector('[data-gift-pitch]')?.textContent).toContain('1 August 2027');
+    expect(fetch.mock.calls[0]![1]).toMatchObject({
+      body: expect.stringContaining('"gift":true'),
+    });
+    expect(trackGiftPayPress).toHaveBeenCalledTimes(1);
+    expect(trackPayPress).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: PAID }));
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('Your gift is ready!'));
+    expect(document.querySelector(`[data-gift-link="${CODE}"]`)?.textContent).toContain(LINK);
+    expect(
+      screen.getByText(/Send this link to your friend. It works until 1 August 2027\./),
+    ).toBeTruthy();
+    expect(onPaid).not.toHaveBeenCalled();
+    expect(readPackCode()).toBeNull();
+    expect(readGifts('chr26')).toEqual([CODE]);
+    expect(readPendingPayId('chr26', true)).toBeNull();
+    fireEvent.click(screen.getByText('Close'));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('is offered to a phone that has the pack, which keeps its own code', async () => {
+    rememberPackCode(OWN);
+    stubFetch({ ok: true, ...TRANSFER }, { ok: true });
+    renderPay({ pay: PAYID });
+    await startGift();
+    fireEvent.click(screen.getByRole('button', { name: PAID }));
+    await waitFor(() => expect(readGifts('chr26')).toEqual([CODE]));
+    expect(readPackCode()?.code).toBe(OWN);
+    // Back on the owner's page, the gift is listed to send again.
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByText('Your gifts')).toBeTruthy();
+    expect(document.querySelectorAll('[data-gift-link]')).toHaveLength(1);
+  });
+
+  it('shares the link with the day it stops working, or copies it', async () => {
+    stubFetch({ ok: true, ...TRANSFER }, { ok: true });
+    const share = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, share });
+    renderPay({ pay: PAYID });
+    await startGift();
+    fireEvent.click(screen.getByRole('button', { name: PAID }));
+    await waitFor(() => expect(screen.getByRole('status')).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('gallery.shareButton') }));
+    expect(share).toHaveBeenCalledWith({
+      text: expect.stringContaining('1 August 2027'),
+      url: expect.stringContaining(LINK),
+    });
+  });
+
+  it('asks before closing on an unclaimed gift, and comes back to it', async () => {
+    stubFetch({ ok: true, ...TRANSFER });
+    const onClose = vi.fn();
+    const view = renderPay({ pay: PAYID, onClose });
+    await startGift();
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(screen.getByRole('dialog').textContent).toContain(i18n.t('pay.giftLeaveText'));
+    view.unmount();
+    renderPay({ pay: PAYID });
+    expect(document.querySelector(`[data-transfer-panel="${CODE}"]`)).toBeTruthy();
+    expect(document.querySelector('[data-gift-pitch]')).toBeTruthy();
   });
 });

@@ -10,6 +10,7 @@ import {
   canUnlockRoom,
   capturePackCodeFromUrl,
   forgetPackCode,
+  giftArrival,
   linkCodeRefused,
   readPackCode,
   rememberPackCode,
@@ -168,5 +169,58 @@ describe('canUnlockRoom', () => {
     expect(canUnlockRoom(null, 'en', JULY)).toBe(true);
     expect(canUnlockRoom(null, 'en', AUTUMN)).toBe(false);
     expect(canUnlockRoom(FREE_ROOM, 'en', AUTUMN)).toBe(false);
+  });
+});
+
+describe('a gift link (Step 134)', () => {
+  const OTHER = 'XMAS26-AAAA-BBBB';
+
+  beforeEach(() => {
+    vi.useFakeTimers({ now: DECEMBER, toFake: ['Date'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('keeps the code, takes both parameters off the address and says a gift came', () => {
+    setUrl(`?code=${CODE}&gift=1&lang=de`);
+    capturePackCodeFromUrl();
+    expect(window.location.search).toBe('?lang=de');
+    expect(localStorage.getItem(KEY)).toBe(CODE);
+    expect(giftArrival()).toBe('new');
+  });
+
+  it('says nothing for an ordinary code link', () => {
+    setUrl(`?code=${CODE}`);
+    capturePackCodeFromUrl();
+    expect(giftArrival()).toBeNull();
+  });
+
+  it('never replaces a working pack the phone already has', () => {
+    rememberPackCode(OTHER);
+    setUrl(`?code=${CODE}&gift=1`);
+    capturePackCodeFromUrl();
+    expect(window.location.search).toBe('');
+    expect(localStorage.getItem(KEY)).toBe(OTHER);
+    expect(giftArrival()).toBe('kept');
+  });
+
+  it('is welcomed again on the phone that already took it', () => {
+    rememberPackCode(CODE);
+    setUrl(`?code=${CODE}&gift=1`);
+    capturePackCodeFromUrl();
+    expect(giftArrival()).toBe('new');
+  });
+
+  it('is refused like any code link that does not read, and not welcomed past its end', () => {
+    setUrl('?code=hello&gift=1');
+    capturePackCodeFromUrl();
+    expect(linkCodeRefused()).toBe(true);
+    expect(giftArrival()).toBeNull();
+    __resetPackCodeForTest();
+    vi.setSystemTime(AUTUMN);
+    setUrl(`?code=${CODE}&gift=1`);
+    capturePackCodeFromUrl();
+    expect(giftArrival()).toBeNull();
   });
 });

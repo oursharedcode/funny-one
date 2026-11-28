@@ -32,7 +32,9 @@
     "packCodeRemove": "Entfernen",
     "packEnded": "Deine Weihnachtsausgabe 2026 ist zu Ende. Danke fürs Spielen!",
     "christmasLine": "🔔 Eine Weihnachtsgeschichte in jedem neuen Raum",
-    "christmasPeek": "Weihnachtspaket — gratis!"
+    "christmasPeek": "Weihnachtspaket — gratis!",
+    "giftWelcome": "🎁 Ein Weihnachtsgeschenk: alle Weihnachtsgeschichten, in jedem Spiel, bis {{date}}.",
+    "giftKept": "🎁 Dieses Handy hat das Paket schon, daher wurde das Geschenk hier nicht eingelöst. Sein Link funktioniert weiter auf einem anderen Handy."
   },
   "lobby": {
     "roomCodeLabel": "Raumcode",
@@ -153,7 +155,17 @@
     "leaveText": "Tippe zuerst auf „Bezahlt“, dann funktioniert dein Code sofort. Noch nicht bezahlt? Dein Code bleibt auf diesem Handy: Öffne diese Seite wieder, wenn du bezahlt hast.",
     "leaveAnyway": "Noch nicht — schließen",
     "paidTitle": "Danke! Dein Code funktioniert jetzt.",
-    "paidCheck": "Wir prüfen von Hand, ob deine Zahlung angekommen ist. Kommt sie nicht innerhalb von 2 Tagen an, funktioniert der Code nicht mehr."
+    "paidCheck": "Wir prüfen von Hand, ob deine Zahlung angekommen ist. Kommt sie nicht innerhalb von 2 Tagen an, funktioniert der Code nicht mehr.",
+    "giftButton": "Verschenken",
+    "giftPitch": "Ein Geschenk für Freunde: alle Weihnachtsgeschichten, in jedem Spiel, bis {{date}}. Du bekommst einen Link zum Verschicken. An deinem Handy ändert sich nichts.",
+    "giftBack": "Zurück",
+    "giftPaidWarning": "Geld gesendet? Drücke „Bezahlt“: Dann erscheint der Geschenklink. Schließt du die Seite vorher, wartet der Code, bis wir deine Zahlung von Hand finden.",
+    "giftLeaveText": "Drücke zuerst „Bezahlt“, um den Geschenklink zu bekommen. Noch nicht bezahlt? Der Code bleibt auf diesem Handy: Öffne diese Seite danach wieder.",
+    "giftReady": "Dein Geschenk ist fertig!",
+    "giftSend": "Schicke diesen Link an die beschenkte Person. Er gilt bis {{date}}.",
+    "giftCheck": "Wir prüfen von Hand, ob deine Zahlung angekommen ist. Ist sie nach 2 Tagen nicht da, funktioniert das Geschenk nicht mehr.",
+    "giftList": "Deine Geschenke",
+    "giftShareText": "Ein Weihnachtsgeschenk für dich: alle Weihnachtsgeschichten, bis {{date}}."
   },
   "gallery": {
     "share": "Die Bilder des Raums teilen",

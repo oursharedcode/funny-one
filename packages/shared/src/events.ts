@@ -353,6 +353,11 @@ export interface PayIdRequest {
   pack: PackId;
   /** The refund policy the buyer read: REFUND_POLICY_VERSION. */
   policy: string;
+  /**
+   * Step 134: the pack is bought for a friend — a code of its own, which the
+   * buyer's phone does not keep. The receipt log says so.
+   */
+  gift?: true;
 }
 
 /**

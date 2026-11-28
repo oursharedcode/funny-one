@@ -32,7 +32,9 @@
     "packCodeRemove": "Supprimer",
     "packEnded": "Ton édition Noël 2026 est terminée. Merci d'avoir joué !",
     "christmasLine": "🔔 Une histoire de Noël dans chaque nouvelle salle",
-    "christmasPeek": "Pack de Noël — gratuit !"
+    "christmasPeek": "Pack de Noël — gratuit !",
+    "giftWelcome": "🎁 Un cadeau de Noël : toutes les histoires de Noël, dans chaque partie, jusqu’au {{date}}.",
+    "giftKept": "🎁 Ce téléphone a déjà le pack : le cadeau n’a pas été utilisé ici. Son lien fonctionne toujours sur un autre téléphone."
   },
   "lobby": {
     "roomCodeLabel": "Code de la salle",
@@ -153,7 +155,17 @@
     "leaveText": "Appuie d'abord sur « Payé » : ton code fonctionnera tout de suite. Pas encore payé ? Ton code reste sur ce téléphone : rouvre cette page quand ce sera fait.",
     "leaveAnyway": "Pas encore — fermer",
     "paidTitle": "Merci ! Ton code fonctionne maintenant.",
-    "paidCheck": "Nous vérifions à la main que ton paiement est bien arrivé. S'il n'arrive pas sous 2 jours, le code cesse de fonctionner."
+    "paidCheck": "Nous vérifions à la main que ton paiement est bien arrivé. S'il n'arrive pas sous 2 jours, le code cesse de fonctionner.",
+    "giftButton": "Offrir en cadeau",
+    "giftPitch": "Un cadeau pour un proche : toutes les histoires de Noël, dans chaque partie, jusqu’au {{date}}. Tu reçois un lien à lui envoyer. Rien ne change sur ton téléphone.",
+    "giftBack": "Retour",
+    "giftPaidWarning": "Argent envoyé ? Appuie sur « Payé » : le lien cadeau apparaît alors. Si tu fermes la page avant, le code attend que nous retrouvions ton paiement à la main.",
+    "giftLeaveText": "Appuie d’abord sur « Payé » pour obtenir le lien cadeau. Pas encore payé ? Le code reste sur ce téléphone : rouvre cette page ensuite.",
+    "giftReady": "Ton cadeau est prêt !",
+    "giftSend": "Envoie ce lien à ton proche. Il fonctionne jusqu’au {{date}}.",
+    "giftCheck": "Nous vérifions à la main que ton paiement est arrivé. S’il n’est pas là sous 2 jours, le cadeau cesse de fonctionner.",
+    "giftList": "Tes cadeaux",
+    "giftShareText": "Un cadeau de Noël pour toi : toutes les histoires de Noël, jusqu’au {{date}}."
   },
   "gallery": {
     "share": "Partager les images de la salle",

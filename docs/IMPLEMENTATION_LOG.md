@@ -8992,7 +8992,54 @@ reindeer's bells and a game with bots on the phone; the Play listing's "3–7 pl
 wanted; the real US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge
 look; Funny Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-28, after Step 133; pushed and deployed).** Steps 122–133 are live (the
+## Step 134 (task B-29) — give the pack as a gift (2026-11-28)
+
+**Plan, owner decisions** ("A, A, A, A — go ahead"): D1 A, a button making a code of its own,
+ending with a link to share; D2 A, rely on the limited-period exemption, the gift ending 1 August
+2027 with the date shown; D3 A, PayID only; D4 A, deployed on its own right after the step.
+Then, on the first report's gap ("A, then commit and push"): Home's pack card links to giving
+it, and a pack owner placed abroad gets the "In Australia?" switch.
+
+**The law, checked first** (legislation.gov.au, Competition and Consumer Regulations 2010,
+compilation 100 of 1 September 2026): reg 89C(1)(a) takes out of the three-year rule a gift card
+that is only redeemable for a good or service only available for a specified period, and stops
+being redeemable at that period's end. Every code ends 1 August 2027, as the pack does. The
+expiry date must still be shown and no fee charged after the sale. Not legal advice.
+
+**Shipped:** as design §4.4 "Giving the pack as a gift". `PayIdRequest.gift`; the issue record's
+`gift`; the admin card's "a gift for a friend", kept by a replacing code; the pay page's gift
+view, link, Share, Copy and list; the gift link's welcome on Home; `xm_giftpay` and "Gift pay
+pressed" on `/stats/`; 12 texts in 23 languages (en and ru the agent's, 21 machine drafts on
+B-3's pile); the privacy policy's three lists in all 23 languages, dated 2026-11-28; Home's
+gift link (`PayDoor` 'home', which `xm_page` does not count) and the owner's rail switch, both
+with texts already there.
+
+**Seen** (Chromium, `.screens/step134-check.mjs`, the real server with a throwaway secret and
+PayID, 88 checks): a buyer without a pack gave a gift and still had none; the page listed it
+again; the friend's phone showed the welcome line once, the pack card and a paid room; the admin
+card marked the sale; a buyer with a pack gave one and kept their own code, and a gift link on
+that phone changed nothing and said so; ar, he, ta and de at 320 px fit; the Android app showed
+nothing, kept no code and made a free room. The buyer with a pack was given an Australian
+`/config` answer (no address file locally); on it Home's link opened on the gift. A friend's
+phone, placed abroad, went from Home's link to "In Australia?" and gave a gift.
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(552 + 731 + 509 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob, minimatch, i18next); CI owed after the push. One server test,
+`disconnect.socket.test.ts` "deletes the room once the last player's window closes", failed once
+in the full run and passed on the two runs after.
+
+**The agent's readings, the owner's to overturn:** no friend's name or address is asked; a gift
+costs a pack's price; the buyer's phone lists its gifts; a gift link never replaces another
+working pack; the app shows none of it; Home's link shows wherever the pack is on sale, so a
+visitor really abroad who follows it finds only "In Australia?".
+
+**Owed:** the push and CI; the deploy on its own (D4 A), when no visitor is connected —
+`ship.sh`, and `ship-funny-family.sh` for `/stats/`; the owner's gift on one phone, its link
+opened on another.
+
+~~RESUME HERE (2026-11-28, after Step 133; pushed and deployed).~~ — carried into the note
+below. Its text, kept for the record: Steps 122–133 are live (the
 game at image `funny-multi:5438de9`; Step 131 was a decision, no code); the owner has seen the
 festive room look on the phone. **Next build, Step 134 — #10 gift a pack** (Australia's
 gift-card law checked first: a 3-year expiry against 1 August 2027); then #7 the whole-game
@@ -9002,3 +9049,16 @@ December–1 January or 6–7 January (#16). **Owed, the owner's:** itch.io supp
 look at the reindeer's bells on the phone; the Play listing's "3–7 players", if wanted; the real
 US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny
 Multi's trader confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-28, after Step 134; not yet pushed).** Steps 122–133 are live (the game
+at image `funny-multi:5438de9`). Step 134 (give the pack as a gift) is built and gated, not pushed or
+deployed. **Next:** the owner's push, CI, then Step 134's deploy on its own (D4 A) once no
+visitor is connected (check the server log first): `deploy/ship.sh`, then
+`deploy/ship-funny-family.sh` for `/stats/`. Then the owner gives one gift and opens its link on
+a second phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
+Should itch.io switch sub-products on by 14 December, the itch.io step takes the next free number
+first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the
+owner's:** the push of Step 134; itch.io support's reply; the look at the reindeer's bells on the
+phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125);
+the admin link on the phone; the live-badge look; Funny Multi's trader confirmation before
+1 Feb 2027.

@@ -32,7 +32,9 @@
     "packCodeRemove": "Yọ kúrò",
     "packEnded": "Ẹ̀dà Kérésìmesì 2026 rẹ ti parí. O ṣeun fún ṣíṣeré!",
     "christmasLine": "🔔 Ìtàn Kérésìmesì kan nínú yàrá tuntun kọ̀ọ̀kan",
-    "christmasPeek": "Àpò Kérésìmesì — lọ́fẹ̀ẹ́!"
+    "christmasPeek": "Àpò Kérésìmesì — lọ́fẹ̀ẹ́!",
+    "giftWelcome": "🎁 Ẹ̀bùn Kérésìmesì: gbogbo àwọn ìtàn Kérésìmesì, nínú gbogbo eré, títí di {{date}}.",
+    "giftKept": "🎁 Fóònù yìí ti ní àpò náà tẹ́lẹ̀, nítorí náà a kò lo ẹ̀bùn náà níbí. Ìjápọ̀ rẹ̀ ṣì ń ṣiṣẹ́ lórí fóònù mìíràn."
   },
   "lobby": {
     "roomCodeLabel": "Kóòdù yàrá",
@@ -153,7 +155,17 @@
     "leaveText": "Tẹ “Mo ti sanwó” kọ́kọ́, kí kóòdù rẹ lè ṣiṣẹ́ nísinsìnyí. O kò tíì sanwó? Kóòdù rẹ yóò wà lórí fóònù yìí: ṣí ojú ìwé yìí padà nígbà tí o bá ti sanwó.",
     "leaveAnyway": "Kò tíì — ti í",
     "paidTitle": "O ṣé! Kóòdù rẹ ti ń ṣiṣẹ́ báyìí.",
-    "paidCheck": "À ń ṣàyẹ̀wò pẹ̀lú ọwọ́ pé ìsanwó rẹ ti dé. Bí kò bá dé láàrin ọjọ́ 2, kóòdù náà yóò dáwọ́ iṣẹ́ dúró."
+    "paidCheck": "À ń ṣàyẹ̀wò pẹ̀lú ọwọ́ pé ìsanwó rẹ ti dé. Bí kò bá dé láàrin ọjọ́ 2, kóòdù náà yóò dáwọ́ iṣẹ́ dúró.",
+    "giftButton": "Fi ṣe ẹ̀bùn",
+    "giftPitch": "Ẹ̀bùn fún ọ̀rẹ́: gbogbo àwọn ìtàn Kérésìmesì, nínú gbogbo eré, títí di {{date}}. Wàá gba ìjápọ̀ láti fi ránṣẹ́ sí wọn. Kò sí ohun tó yí padà lórí fóònù rẹ.",
+    "giftBack": "Padà",
+    "giftPaidWarning": "Ṣé o ti fi owó ránṣẹ́? Tẹ “Mo ti sanwó”: nígbà náà ìjápọ̀ ẹ̀bùn yóò hàn. Bí o bá kọ́kọ́ ti ojú-ewé yìí, kóòdù náà yóò dúró títí a ó fi fọwọ́ wá owó rẹ rí.",
+    "giftLeaveText": "Kọ́kọ́ tẹ “Mo ti sanwó” láti gba ìjápọ̀ ẹ̀bùn. Ṣé o kò tíì sanwó? Kóòdù náà wà lórí fóònù yìí: ṣí ojú-ewé yìí lẹ́ẹ̀kansí lẹ́yìn tí o bá sanwó.",
+    "giftReady": "Ẹ̀bùn rẹ ti ṣetán!",
+    "giftSend": "Fi ìjápọ̀ yìí ránṣẹ́ sí ọ̀rẹ́ rẹ. Ó ń ṣiṣẹ́ títí di {{date}}.",
+    "giftCheck": "A máa ń fọwọ́ ṣàyẹ̀wò pé owó rẹ ti dé. Bí kò bá dé láàrin ọjọ́ 2, ẹ̀bùn náà yóò dẹ́kun iṣẹ́.",
+    "giftList": "Àwọn ẹ̀bùn rẹ",
+    "giftShareText": "Ẹ̀bùn Kérésìmesì fún ọ: gbogbo àwọn ìtàn Kérésìmesì, títí di {{date}}."
   },
   "gallery": {
     "share": "Pín àwọn àwòrán yàrá yìí",

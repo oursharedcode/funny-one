@@ -32,7 +32,9 @@
     "packCodeRemove": "Hapus",
     "packEnded": "Edisi Natal 2026 milikmu sudah berakhir. Terima kasih sudah bermain!",
     "christmasLine": "🔔 Satu cerita Natal di setiap ruangan baru",
-    "christmasPeek": "Paket Natal — gratis!"
+    "christmasPeek": "Paket Natal — gratis!",
+    "giftWelcome": "🎁 Hadiah Natal: semua cerita Natal, di setiap permainan, sampai {{date}}.",
+    "giftKept": "🎁 Ponsel ini sudah punya paketnya, jadi hadiah tidak dipakai di sini. Tautannya masih bisa dipakai di ponsel lain."
   },
   "lobby": {
     "roomCodeLabel": "Kode ruangan",
@@ -153,7 +155,17 @@
     "leaveText": "Tekan “Sudah bayar” dulu agar kodemu langsung berfungsi. Belum bayar? Kodemu tetap ada di ponsel ini: buka halaman ini lagi setelah kamu bayar.",
     "leaveAnyway": "Belum — tutup",
     "paidTitle": "Terima kasih! Kodemu sudah berfungsi.",
-    "paidCheck": "Kami memeriksa secara manual bahwa pembayaranmu sudah masuk. Jika dalam 2 hari belum masuk, kodemu berhenti berfungsi."
+    "paidCheck": "Kami memeriksa secara manual bahwa pembayaranmu sudah masuk. Jika dalam 2 hari belum masuk, kodemu berhenti berfungsi.",
+    "giftButton": "Jadikan hadiah",
+    "giftPitch": "Hadiah untuk teman: semua cerita Natal, di setiap permainan, sampai {{date}}. Kamu mendapat tautan untuk dikirimkan. Ponselmu sendiri tidak berubah.",
+    "giftBack": "Kembali",
+    "giftPaidWarning": "Sudah kirim uangnya? Tekan “Sudah bayar”: tautan hadiah akan muncul. Kalau halaman ditutup dulu, kodenya menunggu sampai kami menemukan pembayaranmu secara manual.",
+    "giftLeaveText": "Tekan “Sudah bayar” dulu untuk mendapat tautan hadiah. Belum bayar? Kode tetap ada di ponsel ini: buka halaman ini lagi setelah kamu bayar.",
+    "giftReady": "Hadiahmu siap!",
+    "giftSend": "Kirim tautan ini ke temanmu. Berlaku sampai {{date}}.",
+    "giftCheck": "Kami memeriksa secara manual apakah pembayaranmu sudah masuk. Jika dalam 2 hari belum masuk, hadiahnya berhenti berfungsi.",
+    "giftList": "Hadiahmu",
+    "giftShareText": "Hadiah Natal untukmu: semua cerita Natal, sampai {{date}}."
   },
   "gallery": {
     "share": "Bagikan gambar-gambar ruangan",

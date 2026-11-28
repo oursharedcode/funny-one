@@ -19,8 +19,13 @@ vi.mock('qrcode', () => ({ default: { toCanvas } }));
 const downloadFile = vi.fn();
 vi.mock('./share', () => ({ downloadFile }));
 
-const { buildWobbleVideoFile, isVideoRecordingSupported, recordWobbleVideo } =
-  await import('./recordWobble');
+const {
+  buildGameVideoFile,
+  buildWobbleVideoFile,
+  isVideoRecordingSupported,
+  RecordingStopped,
+  recordWobbleVideo,
+} = await import('./recordWobble');
 
 class FakeMediaRecorder {
   static isTypeSupported(mime: string): boolean {
@@ -805,5 +810,200 @@ describe('the clip’s sound: sleigh bells and the ho-ho-ho', () => {
     expect(ring.connect).toHaveBeenCalledWith(ctx.streamDestination);
     expect(ring.start).toHaveBeenCalledTimes(1);
     expect(ctx.playing(VOICE)).toBeUndefined();
+  });
+});
+
+// Step 135 (B-29 #7): the whole game's video — each story's own 5 s clip, one
+// after another. Three stories are 75 frames: 24 of the first, 25 of the
+// second, 26 of the last, which keeps the closing frame.
+describe('the whole-game video', () => {
+  const TRACK = { kind: 'audio' } as unknown as MediaStreamTrack;
+  const stories = ['Ada', 'Ben', 'Cy'].map((nickname) => ({
+    ...story,
+    nickname,
+    pictureUrl: `https://img.example/i/${nickname}.png`,
+  }));
+  const footer = { golden: false, paid: false };
+  let ctx: Canvas2DStub;
+  let starts: Array<{ buffer: string; args: unknown[] }>;
+  let contexts: number;
+
+  class FakeAudio {
+    currentTime = 2;
+    destination = {};
+    resume = (): Promise<void> => Promise.resolve();
+    close = (): Promise<void> => Promise.resolve();
+    decodeAudioData = (bytes: ArrayBuffer): Promise<unknown> =>
+      Promise.resolve({ name: bytes.byteLength === 4 ? 'voice' : 'bells', duration: 1 });
+    createMediaStreamDestination = (): unknown => ({
+      stream: { getAudioTracks: () => [TRACK] },
+    });
+    createGain = (): unknown => ({
+      gain: { setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
+      connect: vi.fn(),
+    });
+    createBufferSource = (): unknown => {
+      const source = {
+        buffer: null as { name: string } | null,
+        connect: vi.fn(),
+        stop: vi.fn(),
+        start: (...args: unknown[]) => starts.push({ buffer: source.buffer!.name, args }),
+      };
+      return source;
+    };
+    constructor() {
+      contexts += 1;
+    }
+  }
+
+  beforeEach(() => {
+    ctx = installCanvasStub();
+    installRecorderEnv();
+    toCanvas.mockClear();
+    starts = [];
+    contexts = 0;
+    resetCharacterTurn();
+    vi.spyOn(Math, 'random').mockReturnValue(0.2);
+    (HTMLCanvasElement.prototype as unknown as { captureStream: () => unknown }).captureStream =
+      () => ({ addTrack: vi.fn(), removeTrack: vi.fn() });
+    vi.stubGlobal('AudioContext', FakeAudio);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(url.includes('ho-ho-ho') ? 4 : 8)),
+        }),
+      ),
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    resetCharacterTurn();
+  });
+
+  const named = (name: string): number =>
+    ctx.calls.filter((c) => c.method === 'fillText' && c.args[0] === name).length;
+
+  it('plays every story in turn in one file, under one footer', async () => {
+    const onPart = vi.fn();
+    const file = await buildGameVideoFile({ stories, footer, onPart });
+    expect(file.name).toBe('funny-stories-whole-game.webm');
+    expect([named('Ada'), named('Ben'), named('Cy')]).toEqual([24, 25, 26]);
+    expect(onPart.mock.calls).toEqual([
+      [1, 3],
+      [2, 3],
+      [3, 3],
+    ]);
+    expect(toCanvas).toHaveBeenCalledTimes(1);
+    expect(document.body.querySelector('canvas')).toBeNull();
+  });
+
+  it('stays silent when no story of it rings', async () => {
+    await buildGameVideoFile({ stories, footer });
+    expect(contexts).toBe(0);
+  });
+
+  // A free Christmas game: quiet until the golden finale.
+  it('rings, and says ho-ho-ho, only in the golden story’s part', async () => {
+    await buildGameVideoFile({
+      stories: [stories[0]!, stories[1]!, { ...stories[2]!, golden: true }],
+      footer: { golden: true, paid: false },
+    });
+    expect(contexts).toBe(1);
+    // The bells 10 s into the video, the voice 3 s after them (the clock at 2).
+    expect(starts).toEqual([
+      { buffer: 'voice', args: [15] },
+      { buffer: 'bells', args: [12] },
+    ]);
+  });
+
+  it('rings in every part of a paid game, with each character in turn', async () => {
+    await buildGameVideoFile({
+      stories: stories.map((s) => ({ ...s, paid: true })),
+      footer: { golden: false, paid: true },
+    });
+    expect(contexts).toBe(1);
+    const startsOf = (buffer: string): unknown[] =>
+      starts.filter((s) => s.buffer === buffer).map((s) => s.args);
+    expect(startsOf('bells')).toEqual([[], [7], [12]]);
+    expect(startsOf('voice')).toEqual([[5], [10], [15]]);
+    expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
+      '/sounds/sleigh-bells.mp3',
+      '/sounds/ho-ho-ho-reindeer.mp3',
+      '/sounds/ho-ho-ho-santa.mp3',
+    ]);
+    expect(toCanvas).toHaveBeenCalledWith(expect.anything(), XMAS_URL, expect.anything());
+  });
+
+  it('leaves out a story whose picture cannot be had', async () => {
+    installRecorderEnv({ failing: ['deployer-logo', '/Ben.png'] });
+    const onPart = vi.fn();
+    await buildGameVideoFile({ stories, footer, onPart });
+    expect(named('Ben')).toBe(0);
+    expect(onPart.mock.calls.at(-1)).toEqual([2, 2]);
+  });
+
+  it('fails when no picture can be had at all', async () => {
+    installRecorderEnv({ failing: ['/i/'] });
+    await expect(buildGameVideoFile({ stories, footer })).rejects.toThrow('No story picture');
+  });
+
+  it.each(['the page is left', 'the gallery closes'])('gives no file when %s', async (how) => {
+    // No frame is ever drawn: the recording stays in progress.
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn(() => 1),
+    );
+    let started = false;
+    vi.stubGlobal(
+      'MediaRecorder',
+      class extends FakeMediaRecorder {
+        override start(): void {
+          started = true;
+        }
+      },
+    );
+    const release = vi.fn(() => Promise.resolve());
+    const request = vi.fn(() => Promise.resolve({ release }));
+    Object.defineProperty(navigator, 'wakeLock', { value: { request }, configurable: true });
+    const closing = new AbortController();
+    const recording = buildGameVideoFile({ stories, footer, signal: closing.signal });
+    const outcome = expect(recording).rejects.toBeInstanceOf(RecordingStopped);
+    await vi.waitFor(() => expect(started).toBe(true));
+    // The screen is kept on while it records.
+    expect(request).toHaveBeenCalledWith('screen');
+    if (how === 'the page is left') {
+      vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    } else {
+      closing.abort();
+    }
+    await outcome;
+    await vi.waitFor(() => expect(release).toHaveBeenCalled());
+    expect(document.body.querySelector('canvas')).toBeNull();
+    Reflect.deleteProperty(navigator, 'wakeLock');
+  });
+
+  // D3 B: Photos on an iPhone takes MP4, and Safari records both kinds.
+  it('records MP4 first on an Apple device, the 5 s clip too', async () => {
+    vi.stubGlobal(
+      'MediaRecorder',
+      class extends FakeMediaRecorder {
+        static override isTypeSupported(mime: string): boolean {
+          return mime === 'video/mp4' || mime === 'video/webm;codecs=vp9';
+        }
+      },
+    );
+    expect((await buildWobbleVideoFile(story)).name).toBe('funny-stories-Mika.webm');
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+    );
+    expect((await buildWobbleVideoFile(story)).name).toBe('funny-stories-Mika.mp4');
+    expect((await buildGameVideoFile({ stories, footer })).name).toBe(
+      'funny-stories-whole-game.mp4',
+    );
   });
 });

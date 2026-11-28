@@ -605,6 +605,24 @@ function christmasSection(rows: readonly Row[], names: Record<string, string>): 
   );
 }
 
+// Step 135: the videos of a whole game, a Christmas game's and the rest apart.
+function videoSection(rows: readonly Row[], names: Record<string, string>): HTMLElement {
+  const columns: readonly Column[] = [
+    (match) => total(rows, { ...match, e: 'fm_video', t: 'xm' }),
+    (match) => total(rows, { ...match, e: 'fm_video', t: 'base' }),
+  ];
+  return section(
+    'Videos of the whole game',
+    table(
+      ['Language', 'Of a Christmas game', 'Of an ordinary game'],
+      byLanguage(rows, names, columns, [0, 1]),
+    ),
+    note(
+      'Website only. Each tab counts the first whole-game video it makes, once the video is ready, whether or not it is then saved or shared. The language is the one the player’s screen is in.',
+    ),
+  );
+}
+
 /** The whole page below the period buttons. */
 export function renderStats(summary: Summary, names: Record<string, string>): DocumentFragment {
   const rows = rowsOf(summary);
@@ -689,6 +707,7 @@ export function renderStats(summary: Summary, names: Record<string, string>): Do
   );
 
   fragment.append(christmasSection(rows, names));
+  fragment.append(videoSection(rows, names));
 
   const arms = (['a', 'b'] as const).map((v) => ({
     v,

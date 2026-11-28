@@ -181,8 +181,14 @@
     "next": "Historia siguiente",
     "download": "Descargar historia e imagen fija",
     "downloadStoryOnly": "Descargar historia",
-    "downloadVideo": "Descargar video de 5 s",
-    "recording": "Grabando…"
+    "downloadVideo": "Hacer video de 5 s",
+    "recording": "Grabando…",
+    "gameVideo": "Video de toda la partida",
+    "gameVideoPreparing": "Preparando el video…",
+    "gameVideoRecording": "Grabando la historia {{number}} de {{total}}…",
+    "gameVideoStopped": "La grabación se detuvo: deja esta pantalla abierta hasta que termine.",
+    "videoSave": "Guardar video",
+    "videoShare": "Compartir video"
   },
   "playerLost": {
     "label": "{{nickname}} salió",

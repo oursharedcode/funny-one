@@ -33,6 +33,9 @@
 //
 // Step 134: the pay button pressed to buy the pack for a friend
 // (`xm_giftpay`) is counted apart from `xm_pay`.
+//
+// Step 135 (B-29 #7, owner decision D4 A): a video of the whole game made
+// (`fm_video`), Christmas games and ordinary ones apart.
 
 import { isLanguage, type Language, type PayRail } from '@funny/shared';
 import i18n from './i18n';
@@ -53,6 +56,7 @@ let payCardSent = false;
 let payPageSent = false;
 let payPressSent = false;
 let giftPressSent = false;
+let gameVideoSent = false;
 
 function trackingRefused(): boolean {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
@@ -172,6 +176,13 @@ export function trackGiftPayPress(): void {
   send({ e: 'xm_giftpay' });
 }
 
+/** A whole-game video made (Step 135). Only the first in a page load counts. */
+export function trackGameVideo(christmas: boolean): void {
+  if (gameVideoSent) return;
+  gameVideoSent = true;
+  send({ e: 'fm_video', t: christmas ? 'xm' : 'base' });
+}
+
 export function __resetFunnelForTest(): void {
   origin = { s: 'direct' };
   supportSent = false;
@@ -182,4 +193,5 @@ export function __resetFunnelForTest(): void {
   payPageSent = false;
   payPressSent = false;
   giftPressSent = false;
+  gameVideoSent = false;
 }

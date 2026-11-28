@@ -181,8 +181,14 @@
     "next": "அடுத்த கதை",
     "download": "கதையையும் படத்தையும் பதிவிறக்கு",
     "downloadStoryOnly": "கதையைப் பதிவிறக்கு",
-    "downloadVideo": "5 வினாடி வீடியோவைப் பதிவிறக்கு",
-    "recording": "பதிவு செய்கிறது…"
+    "downloadVideo": "5 வினாடி வீடியோ உருவாக்கு",
+    "recording": "பதிவு செய்கிறது…",
+    "gameVideo": "முழு விளையாட்டின் வீடியோ",
+    "gameVideoPreparing": "வீடியோ தயாராகிறது…",
+    "gameVideoRecording": "{{total}} கதைகளில் {{number}}-ஆவது பதிவாகிறது…",
+    "gameVideoStopped": "பதிவு நின்றுவிட்டது: முடியும் வரை இந்தத் திரையைத் திறந்தே வையுங்கள்.",
+    "videoSave": "வீடியோவைச் சேமி",
+    "videoShare": "வீடியோவைப் பகிர்"
   },
   "playerLost": {
     "label": "{{nickname}} வெளியேறிவிட்டார்",

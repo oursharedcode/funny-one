@@ -109,6 +109,20 @@ describe('privacy.html', () => {
     }
   });
 
+  it('names the count of whole-game videos in every section (Step 135)', () => {
+    expect(html.replace(/\s+/g, ' ')).toContain(
+      'On the website, a video made of the whole game is counted too, Christmas games and other games apart.',
+    );
+    const sections = html.split(/(?=<section id="privacy-)/).slice(1);
+    expect(sections).toHaveLength(23);
+    for (const section of sections) {
+      // The line after the gift pay press's, the last of the visit counts'.
+      const lists = section.match(/<ul>[\s\S]*?<\/ul>/g) ?? [];
+      const counts = lists.find((list) => list.includes('www.funny-family.oursharedcode.com'));
+      expect(counts?.match(/<li>/g), section.slice(0, 40)).toHaveLength(7);
+    }
+  });
+
   it('loads nothing: no scripts, stylesheets, images, fonts or frames', () => {
     // The page states that the game makes no third-party requests; it must not
     // make any of its own, to anyone.

@@ -181,8 +181,14 @@
     "next": "Ìtàn tó kàn",
     "download": "Ṣe ìgbàsílẹ̀ ìtàn àti àwòrán tí kì í rìn",
     "downloadStoryOnly": "Ṣe ìgbàsílẹ̀ ìtàn",
-    "downloadVideo": "Ṣe ìgbàsílẹ̀ fídíò ìṣẹ́jú-àáyá 5",
-    "recording": "À ń ṣe fídíò…"
+    "downloadVideo": "Ṣe fídíò ìṣẹ́jú-àáyá 5",
+    "recording": "À ń ṣe fídíò…",
+    "gameVideo": "Fídíò gbogbo eré náà",
+    "gameVideoPreparing": "A ń pèsè fídíò náà…",
+    "gameVideoRecording": "A ń gba ìtàn {{number}} nínú {{total}} sílẹ̀…",
+    "gameVideoStopped": "Ìgbasílẹ̀ náà dúró: fi ojú-ìwé yìí sílẹ̀ ní ṣíṣí títí yóò fi parí.",
+    "videoSave": "Fi fídíò pamọ́",
+    "videoShare": "Pín fídíò"
   },
   "playerLost": {
     "label": "{{nickname}} ti jáde",

@@ -173,8 +173,14 @@
     "next": "পরের গল্প",
     "download": "গল্প আর স্থির ছবি ডাউনলোড করো",
     "downloadStoryOnly": "গল্প ডাউনলোড করো",
-    "downloadVideo": "5 সেকেন্ডের ভিডিও ডাউনলোড করো",
-    "recording": "রেকর্ড হচ্ছে…"
+    "downloadVideo": "৫ সেকেন্ডের ভিডিও বানান",
+    "recording": "রেকর্ড হচ্ছে…",
+    "gameVideo": "পুরো খেলার ভিডিও",
+    "gameVideoPreparing": "ভিডিও তৈরি হচ্ছে…",
+    "gameVideoRecording": "{{total}}টির মধ্যে {{number}} নম্বর গল্প রেকর্ড হচ্ছে…",
+    "gameVideoStopped": "রেকর্ডিং থেমে গেছে: শেষ না হওয়া পর্যন্ত এই স্ক্রিন খোলা রাখুন।",
+    "videoSave": "ভিডিও সংরক্ষণ করুন",
+    "videoShare": "ভিডিও শেয়ার করুন"
   },
   "playerLost": {
     "label": "{{nickname}} বেরিয়ে গেছে",

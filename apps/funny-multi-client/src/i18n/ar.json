@@ -181,8 +181,14 @@
     "next": "الحكاية التالية",
     "download": "تنزيل الحكاية والصورة الثابتة",
     "downloadStoryOnly": "تنزيل الحكاية",
-    "downloadVideo": "تنزيل فيديو مدته 5 ثوان",
-    "recording": "يجري التسجيل…"
+    "downloadVideo": "إنشاء فيديو (5 ثوانٍ)",
+    "recording": "يجري التسجيل…",
+    "gameVideo": "فيديو اللعبة كلها",
+    "gameVideoPreparing": "جارٍ تجهيز الفيديو…",
+    "gameVideoRecording": "جارٍ تسجيل القصة {{number}} من {{total}}…",
+    "gameVideoStopped": "توقف التسجيل: أبقِ هذه الشاشة مفتوحة حتى ينتهي.",
+    "videoSave": "حفظ الفيديو",
+    "videoShare": "مشاركة الفيديو"
   },
   "playerLost": {
     "label": "{{nickname}} خارج اللعبة",

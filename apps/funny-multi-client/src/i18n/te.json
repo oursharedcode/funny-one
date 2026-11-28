@@ -181,8 +181,14 @@
     "next": "తర్వాతి కథ",
     "download": "కథను, బొమ్మను డౌన్‌లోడ్ చేయి",
     "downloadStoryOnly": "కథను డౌన్‌లోడ్ చేయి",
-    "downloadVideo": "5 సెకన్ల వీడియో డౌన్‌లోడ్ చేయి",
-    "recording": "రికార్డ్ చేస్తున్నాం…"
+    "downloadVideo": "5 సెకన్ల వీడియో చేయండి",
+    "recording": "రికార్డ్ చేస్తున్నాం…",
+    "gameVideo": "ఆట మొత్తం వీడియో",
+    "gameVideoPreparing": "వీడియో సిద్ధమవుతోంది…",
+    "gameVideoRecording": "{{total}}లో {{number}}వ కథ రికార్డ్ అవుతోంది…",
+    "gameVideoStopped": "రికార్డింగ్ ఆగిపోయింది: పూర్తయ్యే వరకు ఈ స్క్రీన్‌ను తెరిచి ఉంచండి.",
+    "videoSave": "వీడియోను సేవ్ చేయండి",
+    "videoShare": "వీడియోను షేర్ చేయండి"
   },
   "playerLost": {
     "label": "{{nickname}} వెళ్ళిపోయారు",

@@ -868,6 +868,37 @@ silence.
   extra: missing, or not a sound — a host that answers a missing file with its start page — the
   clip rings with the bells alone, and without the bells there is no sound at all, as before.
 
+**Amended 2026-11-28 (Step 135, B-29 #7): the whole-game video, and Save / Share.**
+
+- **The button.** "Video of the whole game", under the gallery's arrows, in every game (D1 A),
+  once two stories have pictures and the browser can record. Each part is that story's own 5 s
+  clip (D2 A), in the gallery's order (a golden story last, as the finale), in the language the
+  gallery shows it, bot seats named as on their stills; a story without a picture is left out.
+- **One recording.** `recordWobble.ts` `recordClips` draws the parts one after another on one
+  canvas into one `MediaRecorder` (1.5 Mbit/s video, 96 kbit/s audio; 35 s for 7 stories came to
+  3.7 MB in Chromium). All pictures load before it starts; one that fails drops its story. One
+  footer for the whole video: the buyer's thank-you in a paid game, the edition's line in a free
+  Christmas game, the usual one otherwise.
+- **Sound** (`clipSound.ts`): each ringing part gets its bells and its character's voice; the
+  other parts are quiet. A game with no ringing story has no audio track. A free Christmas game
+  is therefore quiet until its golden finale; a paid game rings throughout.
+- **States and stopping.** "Preparing the video…", "Recording story 3 of 7…"; the screen is kept
+  awake (Wake Lock where there is one). Hiding the page or leaving the screen stops it, with no
+  file, and says "The recording stopped: keep this screen open until it finishes."
+- **Save and Share** (D3 B, every video, the 5 s clip's too): recording no longer downloads. The
+  made file is offered as "Save video" and "Share video" — a second tap, since a browser drops
+  the first one's permission while it records — and is kept until its story, language or picture
+  changes. Apple devices record MP4 first; others WebM first. A download's object URL is released
+  after 60 s, not at the click. The two buttons take a row each where a language's words need it.
+  The 5 s button reads "Make a 5s video".
+- **WebM length** (`webmDuration.ts`): Chromium 158 writes it itself; where a browser leaves it
+  out, one Duration element is added. The fallback has not met a file from a real older browser.
+- **Counts.** A paid game's video is one export once saved or shared. `fm_video` counts each
+  tab's first whole-game video once it is ready, Christmas (`xm`) and ordinary (`base`) apart,
+  website only (D4 A; "Videos of the whole game" on `/stats/`; named in the privacy policy).
+
+Not tried on an iPhone (B-14).
+
 ### 8.4 A seat lost while away (Step 132, B-29, DD-17)
 
 App.tsx listens for `connect`. A connection that is not `recovered`, while the page is in the

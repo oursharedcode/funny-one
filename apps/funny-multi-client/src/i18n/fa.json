@@ -181,8 +181,14 @@
     "next": "قصهٔ بعدی",
     "download": "دانلود قصه و عکس ثابت",
     "downloadStoryOnly": "دانلود قصه",
-    "downloadVideo": "دانلود ویدیوی 5 ثانیه‌ای",
-    "recording": "در حال ضبط…"
+    "downloadVideo": "ساخت ویدیوی ۵ ثانیه‌ای",
+    "recording": "در حال ضبط…",
+    "gameVideo": "ویدیوی کل بازی",
+    "gameVideoPreparing": "در حال آماده‌سازی ویدیو…",
+    "gameVideoRecording": "در حال ضبط داستان {{number}} از {{total}}…",
+    "gameVideoStopped": "ضبط متوقف شد: این صفحه را تا پایان ضبط باز نگه دارید.",
+    "videoSave": "ذخیره ویدیو",
+    "videoShare": "هم‌رسانی ویدیو"
   },
   "playerLost": {
     "label": "{{nickname}} بیرون رفت",

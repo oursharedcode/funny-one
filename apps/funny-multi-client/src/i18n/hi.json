@@ -181,8 +181,14 @@
     "next": "अगली कहानी",
     "download": "कहानी और तस्वीर डाउनलोड करें",
     "downloadStoryOnly": "कहानी डाउनलोड करें",
-    "downloadVideo": "5 सेकंड का वीडियो डाउनलोड करें",
-    "recording": "रिकॉर्ड हो रहा है…"
+    "downloadVideo": "5 सेकंड का वीडियो बनाएँ",
+    "recording": "रिकॉर्ड हो रहा है…",
+    "gameVideo": "पूरे खेल का वीडियो",
+    "gameVideoPreparing": "वीडियो तैयार हो रहा है…",
+    "gameVideoRecording": "{{total}} में से कहानी {{number}} रिकॉर्ड हो रही है…",
+    "gameVideoStopped": "रिकॉर्डिंग रुक गई: पूरी होने तक यह स्क्रीन खुली रखें।",
+    "videoSave": "वीडियो सहेजें",
+    "videoShare": "वीडियो शेयर करें"
   },
   "playerLost": {
     "label": "{{nickname}} खेल से बाहर हो गए",

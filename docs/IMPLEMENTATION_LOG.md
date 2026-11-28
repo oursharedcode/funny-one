@@ -9058,12 +9058,69 @@ look at the reindeer's bells on the phone; the Play listing's "3–7 players", i
 US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny
 Multi's trader confirmation before 1 Feb 2027.
 
-**RESUME HERE (2026-11-28, after Step 134; pushed and deployed).** Steps 122–134 are live (the
-game at image `funny-multi:ef1fa9a`); the owner has given a test gift and opened it on a second
-phone. **Next build — #7 the whole-game video**, in the second deploy by 23 December.
-Should itch.io switch sub-products on by 14 December, the itch.io step takes the next free number
-first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed, the
-owner's:** itch.io support's reply; the look at the reindeer's bells on the
-phone; the Play listing's "3–7 players", if wanted; the real US$2 sponsorship (D4 of Step 125);
-the admin link on the phone; the live-badge look; Funny Multi's trader confirmation before
-1 Feb 2027.
+## Step 135 (task B-29) — the whole-game video (2026-11-28)
+
+**The owner's two answers first:** the reindeer's bells on the phone — looked at, OK; the Play
+listing's "3–7 players" — not to be done. Both leave the "Owed" list.
+
+**Plan, owner decisions** ("A, A, B, A, A — go ahead"): D1 A every game; D2 A each story's own
+clip as its part; D3 B Save and Share after recording, MP4 first on Apple devices, every video;
+D4 A one count, privacy policy in 23 languages; D5 A deployed on its own right after the step.
+
+**Shipped:** as design §8.3's amendment. New `webmDuration.ts`; `recordWobble.ts` records many
+clips into one file; `clipSound.ts` schedules sound by part; `RoomGallery.tsx`'s button, states,
+Save and Share; 6 new texts and one changed in 23 catalogues (en and ru the agent's, 21 machine
+drafts on B-3's pile); `fm_video` and "Videos of the whole game" on `/stats/`; one line in the
+privacy policy's visit counts in all 23 languages.
+
+**Seen** (Chromium 158, `.screens/step135-check.mjs`, the built server with a local picture
+stand-in): ordinary 3 players 14.82 s, 1.87 MB, no audio track (its 5 s clip 4.43 s); free
+Christmas 7 players 34.92 s, 3.72 MB, quiet for six parts, ringing in the golden finale; paid 3
+players ringing in all three; solo with 2 bots in the app's address, leaving mid-recording showed
+the stopped line, gave no file, and the retry worked. Frames at each story's start and end showed
+the stories in order. The first run found Save and Share overflowing at 320 px (de, ta): fixed
+(they now wrap), and the de, ta, ar, he run after it fitted them. That fix, a change of classes,
+came after the four games above.
+
+**Left open from that check:**
+- Some headless recordings end short: ar 14.65 and 14.77 s, he 14.19 and 14.69 s for 15 (the 5 s
+  clip 4.43 s). Story changes fell on time, so the end is what is missing — probably frames the
+  software encoder had not finished at the stop. The stop rule is the 5 s clip's own from before
+  this step. Not measured on a phone.
+- At 320 px one Tamil story paragraph in the gallery was 261 px of text in 238 (one random draw).
+  The story's own prose, untouched here; not fixed.
+- iPhone not tried (B-14).
+
+**Gates:** typecheck 0, lint 0, format:check clean, `npm test` outside the sandbox all green
+(553 + 757 + 511 + 178 + 455 + 88 across 6 workspaces), `npm audit` exactly the three accepted
+ids (glob, minimatch, i18next); CI after the push. One client test, `App.test.tsx` "starts on
+Home", timed out once under load and passed in the full runs after. Android: a TWA of the live
+site, checked only as the `?shell=android` address.
+
+**The agent's readings, the owner's to overturn:** gallery order and languages; stories without a
+picture left out; the button from two pictures up; one footer by room; a made video kept until
+its story, language or picture changes; the stopped line only for leaving the screen (another
+failure just brings the button back); the count once per tab.
+
+**Owed:** the owner's phone look — make a whole-game video, play it, send it into a chat. Then
+the push, CI and the deploy (D5 A).
+
+~~RESUME HERE (2026-11-28, after Step 134; pushed and deployed).~~ — carried into the note below.
+Its text, kept for the record: Steps 122–134 are live (the game at image `funny-multi:ef1fa9a`);
+the owner has given a test gift and opened it on a second phone. **Next build — #7 the
+whole-game video**, in the second deploy by 23 December. Should itch.io switch sub-products on
+by 14 December, the itch.io step takes the next free number first. No deploys 24–26 December, 31
+December–1 January or 6–7 January (#16). **Owed, the owner's:** itch.io support's reply; the
+look at the reindeer's bells on the phone; the Play listing's "3–7 players", if wanted; the real
+US$2 sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny
+Multi's trader confirmation before 1 Feb 2027.
+
+**RESUME HERE (2026-11-28, after Step 135; built, not yet pushed or deployed).** Steps 122–134
+are live (the game at image `funny-multi:ef1fa9a`). **Next: push Step 135 on the owner's word,
+see CI green, deploy it on its own** when no visitor is connected (server log first, B-27), then
+the owner's phone look at the whole-game video. With it, every item of the second deploy's list
+is built. Should itch.io switch sub-products on by 14 December, the itch.io step takes the next
+free number first. No deploys 24–26 December, 31 December–1 January or 6–7 January (#16). **Owed,
+the owner's:** the whole-game video on the phone; itch.io support's reply; the real US$2
+sponsorship (D4 of Step 125); the admin link on the phone; the live-badge look; Funny Multi's
+trader confirmation before 1 Feb 2027.

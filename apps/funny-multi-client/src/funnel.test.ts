@@ -11,6 +11,7 @@ import {
   __resetFunnelForTest,
   trackGiftPayPress,
   initFunnel,
+  trackGameVideo,
   trackChristmasGame,
   trackGift,
   trackGoldenCartoon,
@@ -181,6 +182,16 @@ describe("the Christmas 2026 edition's pay card and pay page", () => {
     trackGiftPayPress();
     trackGiftPayPress();
     expect(sent()).toEqual([expect.objectContaining({ e: 'xm_giftpay', s: 'direct' })]);
+  });
+
+  it('counts the first whole-game video of a page load, Christmas or not (Step 135)', () => {
+    setUrl('');
+    initFunnel();
+    trackGameVideo(true);
+    trackGameVideo(false);
+    expect(sent().filter((event) => (event as { e: string }).e === 'fm_video')).toEqual([
+      { e: 'fm_video', t: 'xm', s: 'direct', l: 'en' },
+    ]);
   });
 
   it('counts the first pay press of a page load, by its rail, and no other', () => {

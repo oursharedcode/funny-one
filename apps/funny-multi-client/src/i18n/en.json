@@ -180,8 +180,14 @@
     "next": "Next story",
     "download": "Download story and still picture",
     "downloadStoryOnly": "Download story",
-    "downloadVideo": "Download 5s video",
-    "recording": "Recording…"
+    "downloadVideo": "Make a 5s video",
+    "recording": "Recording…",
+    "gameVideo": "Video of the whole game",
+    "gameVideoPreparing": "Preparing the video…",
+    "gameVideoRecording": "Recording story {{number}} of {{total}}…",
+    "gameVideoStopped": "The recording stopped: keep this screen open until it finishes.",
+    "videoSave": "Save video",
+    "videoShare": "Share video"
   },
   "playerLost": {
     "label": "{{nickname}} exited",

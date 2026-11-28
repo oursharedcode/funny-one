@@ -181,8 +181,14 @@
     "next": "Cerita berikutnya",
     "download": "Unduh cerita dan gambar diam",
     "downloadStoryOnly": "Unduh cerita",
-    "downloadVideo": "Unduh video 5 detik",
-    "recording": "Merekam…"
+    "downloadVideo": "Buat video 5 detik",
+    "recording": "Merekam…",
+    "gameVideo": "Video seluruh permainan",
+    "gameVideoPreparing": "Menyiapkan video…",
+    "gameVideoRecording": "Merekam cerita {{number}} dari {{total}}…",
+    "gameVideoStopped": "Perekaman berhenti: biarkan layar ini terbuka sampai selesai.",
+    "videoSave": "Simpan video",
+    "videoShare": "Bagikan video"
   },
   "playerLost": {
     "label": "{{nickname}} keluar",

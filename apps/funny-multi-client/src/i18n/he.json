@@ -173,8 +173,14 @@
     "next": "הסיפור הבא",
     "download": "הורדת הסיפור והציור",
     "downloadStoryOnly": "הורדת הסיפור",
-    "downloadVideo": "הורדת סרטון 5 שניות",
-    "recording": "מקליט…"
+    "downloadVideo": "יצירת סרטון של 5 שניות",
+    "recording": "מקליט…",
+    "gameVideo": "סרטון של כל המשחק",
+    "gameVideoPreparing": "מכינים את הסרטון…",
+    "gameVideoRecording": "מקליטים את סיפור {{number}} מתוך {{total}}…",
+    "gameVideoStopped": "ההקלטה נעצרה: השאירו את המסך הזה פתוח עד שתסתיים.",
+    "videoSave": "שמירת הסרטון",
+    "videoShare": "שיתוף הסרטון"
   },
   "playerLost": {
     "label": "{{nickname}} יצא מהמשחק",

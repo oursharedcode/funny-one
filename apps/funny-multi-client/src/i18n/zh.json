@@ -181,8 +181,14 @@
     "next": "下一个故事",
     "download": "下载故事和静态图片",
     "downloadStoryOnly": "下载故事",
-    "downloadVideo": "下载 5 秒视频",
-    "recording": "录制中…"
+    "downloadVideo": "制作 5 秒视频",
+    "recording": "录制中…",
+    "gameVideo": "整局游戏的视频",
+    "gameVideoPreparing": "正在准备视频…",
+    "gameVideoRecording": "正在录制第 {{number}} 个故事（共 {{total}} 个）…",
+    "gameVideoStopped": "录制已停止：录制完成前请保持此页面打开。",
+    "videoSave": "保存视频",
+    "videoShare": "分享视频"
   },
   "playerLost": {
     "label": "{{nickname}} 已退出",

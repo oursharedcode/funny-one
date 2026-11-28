@@ -2,7 +2,7 @@
 //
 // The sound of a golden story's and a paid story's 5 s video: sleigh bells
 // for the whole clip (Step 126, B-29, owner decisions 2026-11-25 D1 A and
-// D2 A) and, since the owner's request of 2026-11-26, the character's
+// D2 A), and of their parts of the whole-game video (Step 135), and, since the owner's request of 2026-11-26, the character's
 // "ho-ho-ho" when its balloon says so (videoCharacter.ts). The sound plays to the
 // phone's speaker and into the recording at once — Web Audio sources wired to
 // the speaker and to a MediaStream destination whose track rides along with
@@ -35,11 +35,20 @@ export const SLEIGH_BELLS_PATH = 'sounds/sleigh-bells.mp3';
 const DUCKED = 0.3;
 const DUCK_S = 0.15;
 
+/** One 5 s stretch of a video that rings: when it starts, and its character's voice. */
+export interface SoundPart {
+  atMs: number;
+  /** The voice's file, null for bells alone. */
+  voice: string | null;
+  /** How long into the part the voice comes. */
+  voiceAtMs: number;
+}
+
 export interface ClipSound {
   /** Resolves to the audio track for the recording, or null for silence. */
   ready: Promise<MediaStreamTrack | null>;
-  /** Starts the bells, and the voice at its moment, to the speaker and into the track. */
-  play(): void;
+  /** Schedules each part's bells and voice, to the speaker and into the track. */
+  play(parts: SoundPart[]): void;
   /** Stops them and lets the audio context go. Safe to call twice. */
   close(): void;
 }
@@ -57,11 +66,12 @@ export function audioContextCtor(): AudioContextCtor | null {
 }
 
 /**
- * Opens the clip's sound: the bells, and the voice at `voicePath` — null for
- * bells alone — which comes `voiceAtMs` after `play()`. Null where the
- * browser has no Web Audio at all.
+ * Opens a video's sound: the bells, and the voices at `voicePaths`. Which
+ * stretches of the video ring is said to `play` — the whole-game video rings
+ * only in its golden and paid stories' parts. Null where the browser has no
+ * Web Audio at all.
  */
-export function openClipSound(voicePath: string | null, voiceAtMs: number): ClipSound | null {
+export function openClipSound(voicePaths: string[]): ClipSound | null {
   const Ctor = audioContextCtor();
   if (!Ctor) return null;
   let ctx: AudioContext;
@@ -75,7 +85,7 @@ export function openClipSound(voicePath: string | null, voiceAtMs: number): Clip
   void ctx.resume?.().catch(() => undefined);
 
   let bells: AudioBuffer | null = null;
-  let voice: AudioBuffer | null = null;
+  const voices = new Map<string, AudioBuffer>();
   let destination: MediaStreamAudioDestinationNode | null = null;
   const sources: AudioBufferSourceNode[] = [];
   let closed = false;
@@ -86,11 +96,19 @@ export function openClipSound(voicePath: string | null, voiceAtMs: number): Clip
     return ctx.decodeAudioData(await response.arrayBuffer());
   }
 
+  async function loadVoice(path: string): Promise<void> {
+    try {
+      voices.set(path, await load(path));
+    } catch {
+      // A voice is an extra: its part rings with the bells alone.
+    }
+  }
+
   const ready = (async (): Promise<MediaStreamTrack | null> => {
     try {
-      [bells, voice] = await Promise.all([
+      [bells] = await Promise.all([
         load(SLEIGH_BELLS_PATH),
-        voicePath ? load(voicePath).catch(() => null) : null,
+        ...[...new Set(voicePaths)].map(loadVoice),
       ]);
       destination = ctx.createMediaStreamDestination();
       return destination.stream.getAudioTracks()[0] ?? null;
@@ -105,11 +123,14 @@ export function openClipSound(voicePath: string | null, voiceAtMs: number): Clip
     node.connect(into);
   }
 
-  // Schedules the voice and returns the gain that turns the bells down under
-  // it — null, and bells at full strength, if anything here fails.
-  function sayHoHoHo(buffer: AudioBuffer, into: MediaStreamAudioDestinationNode): GainNode | null {
+  // Schedules a voice at `at` and returns the gain that turns the bells down
+  // under it — null, and bells at full strength, if anything here fails.
+  function sayHoHoHo(
+    buffer: AudioBuffer,
+    at: number,
+    into: MediaStreamAudioDestinationNode,
+  ): GainNode | null {
     try {
-      const at = ctx.currentTime + voiceAtMs / 1000;
       const end = at + buffer.duration;
       const duck = ctx.createGain();
       duck.gain.setValueAtTime(1, Math.max(0, at - DUCK_S));
@@ -127,22 +148,28 @@ export function openClipSound(voicePath: string | null, voiceAtMs: number): Clip
     }
   }
 
-  function play(): void {
+  function play(parts: SoundPart[]): void {
     if (closed || !bells || !destination) return;
-    try {
-      const ring = ctx.createBufferSource();
-      ring.buffer = bells;
-      sources.push(ring);
-      const duck = voice ? sayHoHoHo(voice, destination) : null;
-      if (duck) {
-        ring.connect(duck);
-        wire(duck, destination);
-      } else {
-        wire(ring, destination);
+    const startedAt = ctx.currentTime;
+    for (const part of parts) {
+      try {
+        const at = startedAt + part.atMs / 1000;
+        const ring = ctx.createBufferSource();
+        ring.buffer = bells;
+        sources.push(ring);
+        const voice = part.voice ? voices.get(part.voice) : undefined;
+        const duck = voice ? sayHoHoHo(voice, at + part.voiceAtMs / 1000, destination) : null;
+        if (duck) {
+          ring.connect(duck);
+          wire(duck, destination);
+        } else {
+          wire(ring, destination);
+        }
+        if (part.atMs > 0) ring.start(at);
+        else ring.start();
+      } catch {
+        // Whatever did start, `close` stops.
       }
-      ring.start();
-    } catch {
-      // Whatever did start, `close` stops.
     }
   }
 

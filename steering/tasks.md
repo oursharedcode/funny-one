@@ -251,6 +251,8 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     is known to mishandle. Proposed: release it later; optionally a second "Share" tap after
     recording, so the clip can go to Photos or a chat (one tap cannot do both — Safari drops
     the tap's permission during the 5 s recording).
+  - *Step 135 (2026-11-28) took both proposals of Risks 1 and 2* (MP4 first on Apple devices;
+    Save and Share after recording; the download link released later). Untried on an iPhone.
   - *Risk 3 — auto-lock.* A phone locked for more than about a minute is dropped from its room
     (server recovery window 60 s; an iPhone locks after 30 s idle by default). Android has the
     same rule. Proposed, optional: keep the screen awake during a game (Screen Wake Lock,
@@ -876,7 +878,7 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
       changes the 3-player rule), #10 gift a pack (Australia's gift-card law checked first — a
       3-year expiry against 1 August 2027), #9 a festive room look (Step 133; snow, off under reduced
       motion; a festive ending card; a bell when a golden story is revealed), #7 the whole-game
-      video. **#16, a rule from today: no deploys 24–26 December, 31 December–1 January or
+      video (Step 135). **#16, a rule from today: no deploys 24–26 December, 31 December–1 January or
       6–7 January** — until B-27 a deploy cuts off games in progress; `PACK_ROOMS=off` stays
       the emergency lever. Later, in this order: #17 the server disk's backup schedule, #13 free
       full Christmas on 25 December (only if live before the 24 December freeze), #14 a
@@ -1307,6 +1309,17 @@ T-9.4's "gated off in store-shell builds" — travels with whichever of B-1/B-2 
     went to a bot at 65 s; a reloaded, navigated or closed lobby page gave its seat up at once; a
     restart sent ar, he, ta and de pages Home with the line at 320 px. iOS's `pagehide` not seen.
     Pushed as `1b853fa`, CI green, deployed 2026-11-27; seen on the owner's phone the same day.
+  - *#7 the whole-game video — Step 135.* As proposed 2026-11-21: every story in one clip with
+    sleigh bells, about 35 s for 7 stories; recordings fail more often on old phones and iPhones;
+    large files (more than a step). Owner decisions 2026-11-28 ("A, A, B, A, A — go ahead"): D1
+    A, every game gets the button; D2 A, each part is that story's own clip; D3 B, after
+    recording "Save" and "Share", MP4 first on Apple devices, for every video, the 5 s clip too;
+    D4 A, one count of whole-game videos, Christmas and ordinary apart, named in the privacy
+    policy in all 23 languages; D5 A, deployed on its own right after the step. Design §8.3. The
+    agent's readings, the owner's to overturn: gallery order and languages; stories without a
+    picture left out; the button from two pictures up; one footer by room; leaving the screen
+    stops the recording; a paid game's video is one export; the count is once per tab. Fitted in
+    one step. en and ru the agent's, 21 machine drafts on B-3's pile.
 - **B-29a** A Southern-Hemisphere summer edition for Australia and Brazil (owner decision
   2026-11-05, D5 under B-29): Christmas in summer — the beach and the barbecue that chr26 had
   until the owner's ru edit of 2026-11-05 are its seed. An edition of its own beside chr26, not

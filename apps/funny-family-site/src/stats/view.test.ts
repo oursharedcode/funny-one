@@ -283,6 +283,24 @@ describe('renderStats', () => {
     ]);
   });
 
+  it('counts whole-game videos, Christmas and ordinary apart (Step 135)', () => {
+    const root = render({
+      ...SUMMARY,
+      days: {
+        '2026-10-02': {
+          'fm_video||de|direct|xm||': 3,
+          'fm_video||de|direct|base||': 1,
+          'fm_video|a|en|hub|base||': 2,
+        },
+      },
+    });
+    expect(tableOf(root, 'Videos of the whole game')).toEqual([
+      ['All', '3', '3'],
+      ['Deutsch (Deutschland)', '3', '1'],
+      ['English (United Kingdom)', '0', '2'],
+    ]);
+  });
+
   it('draws the days as lines, and gives their numbers in a table, newest first', () => {
     const root = render();
     expect(root.querySelectorAll('.chart svg[role="img"] polyline')).toHaveLength(3);

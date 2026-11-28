@@ -180,8 +180,14 @@
     "next": "Следующая история",
     "download": "Скачать историю и картинку",
     "downloadStoryOnly": "Скачать историю",
-    "downloadVideo": "Скачать видео (5 сек)",
-    "recording": "Запись…"
+    "downloadVideo": "Сделать видео (5 сек)",
+    "recording": "Запись…",
+    "gameVideo": "Видео всей игры",
+    "gameVideoPreparing": "Готовим видео…",
+    "gameVideoRecording": "Записываем историю {{number}} из {{total}}…",
+    "gameVideoStopped": "Запись остановилась: не закрывайте этот экран, пока она не закончится.",
+    "videoSave": "Сохранить видео",
+    "videoShare": "Отправить видео"
   },
   "playerLost": {
     "label": "{{nickname}} больше не в игре",

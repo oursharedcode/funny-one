@@ -181,8 +181,14 @@
     "next": "다음 이야기",
     "download": "이야기와 정지 이미지 다운로드",
     "downloadStoryOnly": "이야기 다운로드",
-    "downloadVideo": "5초 동영상 다운로드",
-    "recording": "녹화 중…"
+    "downloadVideo": "5초 영상 만들기",
+    "recording": "녹화 중…",
+    "gameVideo": "게임 전체 영상",
+    "gameVideoPreparing": "영상을 준비하는 중…",
+    "gameVideoRecording": "이야기 {{total}}개 중 {{number}}번째 녹화 중…",
+    "gameVideoStopped": "녹화가 중단되었어요. 끝날 때까지 이 화면을 열어 두세요.",
+    "videoSave": "영상 저장",
+    "videoShare": "영상 공유"
   },
   "playerLost": {
     "label": "{{nickname}}이(가) 나갔습니다",

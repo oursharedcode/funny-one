@@ -181,8 +181,14 @@
     "next": "下一個故事",
     "download": "下載故事同靜態圖",
     "downloadStoryOnly": "下載故事",
-    "downloadVideo": "下載 5 秒影片",
-    "recording": "錄緊…"
+    "downloadVideo": "整一段 5 秒影片",
+    "recording": "錄緊…",
+    "gameVideo": "成場遊戲嘅影片",
+    "gameVideoPreparing": "準備緊影片…",
+    "gameVideoRecording": "錄緊第 {{number}} 個故事（共 {{total}} 個）…",
+    "gameVideoStopped": "錄影停咗：錄完之前唔好離開呢個畫面。",
+    "videoSave": "儲存影片",
+    "videoShare": "分享影片"
   },
   "playerLost": {
     "label": "{{nickname}} 走咗",

@@ -181,8 +181,14 @@
     "next": "Наступна історія",
     "download": "Завантажити історію та картинку",
     "downloadStoryOnly": "Завантажити історію",
-    "downloadVideo": "Завантажити відео (5 с)",
-    "recording": "Запис…"
+    "downloadVideo": "Зробити відео (5 с)",
+    "recording": "Запис…",
+    "gameVideo": "Відео всієї гри",
+    "gameVideoPreparing": "Готуємо відео…",
+    "gameVideoRecording": "Записуємо історію {{number}} з {{total}}…",
+    "gameVideoStopped": "Запис зупинився: не закривайте цей екран, доки він не завершиться.",
+    "videoSave": "Зберегти відео",
+    "videoShare": "Надіслати відео"
   },
   "playerLost": {
     "label": "{{nickname}} вийшов з гри",

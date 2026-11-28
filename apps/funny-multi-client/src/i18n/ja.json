@@ -181,8 +181,14 @@
     "next": "次の物語",
     "download": "物語と静止画をダウンロード",
     "downloadStoryOnly": "物語をダウンロード",
-    "downloadVideo": "5秒動画をダウンロード",
-    "recording": "録画中…"
+    "downloadVideo": "5秒の動画を作る",
+    "recording": "録画中…",
+    "gameVideo": "ゲーム全体の動画",
+    "gameVideoPreparing": "動画を準備中…",
+    "gameVideoRecording": "{{total}}話中{{number}}話目を録画中…",
+    "gameVideoStopped": "録画が止まりました。終わるまでこの画面を開いたままにしてください。",
+    "videoSave": "動画を保存",
+    "videoShare": "動画を共有"
   },
   "playerLost": {
     "label": "{{nickname}}が退出しました",

@@ -78,7 +78,8 @@ describe('shareFiles', () => {
 });
 
 describe('downloadFile', () => {
-  it('drives a synthetic anchor click and revokes the object URL', () => {
+  it('drives a synthetic anchor click and revokes the object URL a minute later', () => {
+    vi.useFakeTimers();
     const objectUrl = 'blob:stub';
     const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue(objectUrl);
     const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -89,7 +90,10 @@ describe('downloadFile', () => {
 
     expect(createObjectURL).toHaveBeenCalledWith(file);
     expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(60_000);
     expect(revokeObjectURL).toHaveBeenCalledWith(objectUrl);
+    vi.useRealTimers();
     expect(document.querySelectorAll('a[download]').length).toBe(0);
   });
 });

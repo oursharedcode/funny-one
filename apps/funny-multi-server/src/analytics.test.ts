@@ -147,6 +147,18 @@ describe('statKey', () => {
     expect(statKey({ e: 'xm_giftpay', s: 'app', l: 'en' })).toBeNull();
   });
 
+  it('keys a whole-game video, Christmas or not, website only (Step 135)', () => {
+    expect(statKey({ e: 'fm_video', s: 'direct', l: 'en', t: 'xm' })).toBe(
+      'fm_video||en|direct|xm||',
+    );
+    expect(statKey({ e: 'fm_video', s: 'hub', v: 'b', l: 'ru', t: 'base' })).toBe(
+      'fm_video|b|ru|hub|base||',
+    );
+    expect(statKey({ e: 'fm_video', s: 'direct', l: 'en' })).toBeNull();
+    expect(statKey({ e: 'fm_video', s: 'direct', l: 'en', t: 'on' })).toBeNull();
+    expect(statKey({ e: 'fm_video', s: 'app', l: 'en', t: 'xm' })).toBeNull();
+  });
+
   it("keys a hub visit sent by /x26/ and the hub's two Christmas buttons (Step 119)", () => {
     expect(statKey({ e: 'hub_view', v: 'a', l: 'de', r: 'xmas', d: 'm' })).toBe(
       'hub_view|a|de|||xmas|m',

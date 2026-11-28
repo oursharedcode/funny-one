@@ -181,8 +181,14 @@
     "next": "Hadithi inayofuata",
     "download": "Pakua hadithi na picha tuli",
     "downloadStoryOnly": "Pakua hadithi",
-    "downloadVideo": "Pakua video ya sekunde 5",
-    "recording": "Inarekodi…"
+    "downloadVideo": "Tengeneza video ya sekunde 5",
+    "recording": "Inarekodi…",
+    "gameVideo": "Video ya mchezo mzima",
+    "gameVideoPreparing": "Inaandaa video…",
+    "gameVideoRecording": "Inarekodi hadithi {{number}} kati ya {{total}}…",
+    "gameVideoStopped": "Kurekodi kumesimama: acha skrini hii wazi hadi imalizike.",
+    "videoSave": "Hifadhi video",
+    "videoShare": "Shiriki video"
   },
   "playerLost": {
     "label": "{{nickname}} ametoka",

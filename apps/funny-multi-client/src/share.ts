@@ -49,6 +49,10 @@ export async function shareFiles(
   }
 }
 
+// A download's object URL outlives the click: Safari reads it after the click
+// returns (B-14, Risk 2), and a whole-game video is several megabytes.
+const REVOKE_AFTER_MS = 60_000;
+
 // Saves a File to disk via a synthetic anchor click. Shared by the download
 // buttons and the Share buttons' unsupported-platform fallback.
 export function downloadFile(file: File): void {
@@ -59,5 +63,5 @@ export function downloadFile(file: File): void {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), REVOKE_AFTER_MS);
 }

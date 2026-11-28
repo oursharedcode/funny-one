@@ -9,7 +9,7 @@
 // boundary-mock pattern the screen suites use for the socket module.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { POOLS, SLOT_COUNT, optionsFor } from '@funny/shared';
 import i18n from '../i18n';
 import { endingText, renderStory } from '../storyLanguage';
@@ -21,7 +21,14 @@ vi.mock('../downloadStory', () => ({ buildStoryImageFile, downloadStoryImage }))
 
 const buildWobbleVideoFile = vi.fn();
 const isVideoRecordingSupported = vi.fn(() => false);
-vi.mock('../recordWobble', () => ({ buildWobbleVideoFile, isVideoRecordingSupported }));
+const buildGameVideoFile = vi.fn();
+class RecordingStopped extends Error {}
+vi.mock('../recordWobble', () => ({
+  buildGameVideoFile,
+  buildWobbleVideoFile,
+  isVideoRecordingSupported,
+  RecordingStopped,
+}));
 
 const canShareFiles = vi.fn(() => false);
 const downloadFile = vi.fn();
@@ -29,8 +36,10 @@ const shareFiles = vi.fn();
 vi.mock('../share', () => ({ canShareFiles, downloadFile, shareFiles }));
 
 const trackGoldenCartoon = vi.fn();
+const trackGameVideo = vi.fn();
 vi.mock('../funnel', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../funnel')>()),
+  trackGameVideo,
   trackGoldenCartoon,
 }));
 
@@ -103,6 +112,8 @@ beforeEach(async () => {
   buildStoryImageFile.mockReset().mockResolvedValue(new File(['x'], 'x.png'));
   downloadStoryImage.mockReset().mockResolvedValue(undefined);
   buildWobbleVideoFile.mockReset().mockResolvedValue(new File(['x'], 'x.webm'));
+  buildGameVideoFile.mockReset().mockResolvedValue(new File(['x'], 'all.webm'));
+  trackGameVideo.mockReset();
   isVideoRecordingSupported.mockReset().mockReturnValue(false);
   canShareFiles.mockReset().mockReturnValue(false);
   downloadFile.mockReset();
@@ -212,24 +223,28 @@ describe('video button', () => {
   it('is absent without a picture even when video recording is supported', () => {
     isVideoRecordingSupported.mockReturnValue(true);
     renderGallery([NO_PICTURE]);
-    expect(screen.queryByRole('button', { name: 'Download 5s video' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Make a 5s video' })).toBeNull();
   });
 
   it('is absent when video recording is unsupported even with a picture', () => {
     isVideoRecordingSupported.mockReturnValue(false);
     renderGallery([WITH_PICTURE]);
-    expect(screen.queryByRole('button', { name: 'Download 5s video' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Make a 5s video' })).toBeNull();
   });
 
-  it('records and downloads the clip when both are available', async () => {
+  it('records the clip, and saves it only when asked to (D3 B)', async () => {
     isVideoRecordingSupported.mockReturnValue(true);
     const file = new File(['x'], 'x.webm');
     buildWobbleVideoFile.mockResolvedValue(file);
     renderGallery([WITH_PICTURE]);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
 
-    await waitFor(() => expect(downloadFile).toHaveBeenCalledWith(file));
+    const save = await screen.findByRole('button', { name: 'Save video' });
+    expect(downloadFile).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Share video' })).toBeNull();
+    fireEvent.click(save);
+    expect(downloadFile).toHaveBeenCalledWith(file);
     expect(buildWobbleVideoFile).toHaveBeenCalledWith({
       nickname: 'Mika',
       prose: 'a pirate did stuff.',
@@ -251,7 +266,7 @@ describe('video button', () => {
     );
     renderGallery([WITH_PICTURE]);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
 
     const recordingButton = await screen.findByRole<HTMLButtonElement>('button', {
       name: 'Recording…',
@@ -259,11 +274,45 @@ describe('video button', () => {
     expect(recordingButton.disabled).toBe(true);
 
     resolveRecording(new File(['x'], 'x.webm'));
+    expect(await screen.findByRole('button', { name: 'Save video' })).toBeTruthy();
+  });
+
+  it("shares the made clip from a tap of its own, saving it where sharing can't", async () => {
+    isVideoRecordingSupported.mockReturnValue(true);
+    canShareFiles.mockReturnValue(true);
+    const file = new File(['x'], 'x.webm');
+    buildWobbleVideoFile.mockResolvedValue(file);
+    renderGallery([WITH_PICTURE]);
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Share video' }));
     await waitFor(() =>
-      expect(
-        screen.getByRole<HTMLButtonElement>('button', { name: 'Download 5s video' }).disabled,
-      ).toBe(false),
+      expect(shareFiles).toHaveBeenCalledWith([file], {
+        title: 'Funny Multi',
+        text: "Mika's story",
+      }),
     );
+    expect(downloadFile).not.toHaveBeenCalled();
+
+    shareFiles.mockResolvedValue('unsupported');
+    fireEvent.click(screen.getByRole('button', { name: 'Share video' }));
+    await waitFor(() => expect(downloadFile).toHaveBeenCalledWith(file));
+  });
+
+  it("keeps each story's made clip, and remakes it in another language", async () => {
+    isVideoRecordingSupported.mockReturnValue(true);
+    renderGallery([WITH_PICTURE, NO_PICTURE]);
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
+    await screen.findByRole('button', { name: 'Save video' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
+    expect(screen.queryByRole('button', { name: 'Save video' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Previous story' }));
+    expect(screen.getByRole('button', { name: 'Save video' })).toBeTruthy();
+
+    switchStoryTo('Italiano (Italia)');
+    expect(screen.queryByRole('button', { name: 'Save video' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Make a 5s video' })).toBeTruthy();
   });
 });
 
@@ -316,7 +365,7 @@ describe('story language (B-15)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
 
     await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
     expect(downloadStoryImage.mock.calls[0]?.[0]).toMatchObject({ prose, language: 'it' });
@@ -400,7 +449,7 @@ describe('Christmas stories (Step 117)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
 
     await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
     const still = { golden: true, endingUrl: ENDING.url, pictureUrl: SCENE.url };
@@ -418,7 +467,7 @@ describe('Christmas stories (Step 117)', () => {
   it("ends a slice story's video on its card, with no edition footer", async () => {
     isVideoRecordingSupported.mockReturnValue(true);
     renderGallery([SLICE_ENTRY]);
-    fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
     await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
     expect(buildWobbleVideoFile.mock.calls[0]?.[0]).toMatchObject({
       golden: false,
@@ -472,7 +521,7 @@ describe('Christmas stories (Step 117)', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
       fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
 
       await waitFor(() => expect(buildWobbleVideoFile).toHaveBeenCalledTimes(1));
       const still = { golden: false, paid: true, endingUrl: ENDING.url, pictureUrl: SCENE.url };
@@ -499,9 +548,16 @@ describe('Christmas stories (Step 117)', () => {
       await waitFor(() => expect(onExported).toHaveBeenCalledTimes(2));
       expect(onExported).toHaveBeenLastCalledWith('share');
 
-      fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
-      await waitFor(() => expect(onExported).toHaveBeenCalledTimes(3));
+      // The clip counts when it is saved or shared, not when it is made (D3 B).
+      fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
+      const save = await screen.findByRole('button', { name: 'Save video' });
+      expect(onExported).toHaveBeenCalledTimes(2);
+      fireEvent.click(save);
+      expect(onExported).toHaveBeenCalledTimes(3);
       expect(onExported).toHaveBeenLastCalledWith('download');
+      fireEvent.click(screen.getByRole('button', { name: 'Share video' }));
+      await waitFor(() => expect(onExported).toHaveBeenCalledTimes(4));
+      expect(onExported).toHaveBeenLastCalledWith('share');
     });
 
     it('reports a declined share as the download it became, a dismissed one not at all', async () => {
@@ -528,7 +584,8 @@ describe('Christmas stories (Step 117)', () => {
       for (let i = 0; i < 2; i++) {
         fireEvent.click(screen.getByRole('button', { name: 'Download story and still picture' }));
         fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-        fireEvent.click(screen.getByRole('button', { name: 'Download 5s video' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Make a 5s video' }));
+        fireEvent.click(await screen.findByRole('button', { name: 'Save video' }));
         await waitFor(() => expect(downloadFile).toHaveBeenCalledTimes(i + 1));
         fireEvent.click(screen.getByRole('button', { name: 'Next story' }));
       }
@@ -536,5 +593,140 @@ describe('Christmas stories (Step 117)', () => {
       expect(shareFiles).toHaveBeenCalledTimes(2);
       expect(onExported).not.toHaveBeenCalled();
     });
+  });
+});
+
+// Step 135 (B-29 #7): every story's clip, one after another, in one video.
+describe('the whole-game video (Step 135)', () => {
+  const OTHER: GalleryEntry = {
+    ...NO_PICTURE,
+    nickname: 'Bot 2',
+    seat: 2,
+    picture: { url: 'https://img.example/i/def.png', width: 1024, height: 1024 },
+  };
+  const GAME = [WITH_PICTURE, NO_PICTURE, OTHER];
+  const button = () => screen.getByRole('button', { name: 'Video of the whole game' });
+
+  beforeEach(() => isVideoRecordingSupported.mockReturnValue(true));
+
+  it('is offered once two stories have pictures', () => {
+    const { unmount } = renderGallery([WITH_PICTURE, NO_PICTURE]);
+    expect(screen.queryByRole('button', { name: 'Video of the whole game' })).toBeNull();
+    unmount();
+    renderGallery(GAME);
+    expect(button()).toBeTruthy();
+  });
+
+  it('is absent where video cannot be recorded', () => {
+    isVideoRecordingSupported.mockReturnValue(false);
+    renderGallery(GAME);
+    expect(screen.queryByRole('button', { name: 'Video of the whole game' })).toBeNull();
+  });
+
+  it("records the stories with pictures in the gallery's order and languages", async () => {
+    renderGallery(GAME);
+    switchStoryTo('Italiano (Italia)');
+    fireEvent.click(button());
+
+    await waitFor(() => expect(buildGameVideoFile).toHaveBeenCalledTimes(1));
+    const options = buildGameVideoFile.mock.calls[0]![0];
+    expect(options.footer).toEqual({ golden: false, paid: false });
+    expect(options.stories).toMatchObject([
+      { nickname: 'Mika', language: 'it', pictureUrl: WITH_PICTURE.picture!.url },
+      { nickname: 'Bot 2', language: 'en', pictureUrl: OTHER.picture!.url },
+    ]);
+    expect(trackGameVideo).toHaveBeenCalledWith(false);
+  });
+
+  it('says it is preparing, then which story it records, then offers the video', async () => {
+    canShareFiles.mockReturnValue(true);
+    const file = new File(['x'], 'all.webm');
+    let finish!: (file: File) => void;
+    let part!: (number: number, total: number) => void;
+    buildGameVideoFile.mockImplementation((options: { onPart: typeof part }) => {
+      part = options.onPart;
+      return new Promise<File>((resolve) => {
+        finish = resolve;
+      });
+    });
+    renderGallery(GAME);
+    fireEvent.click(button());
+
+    expect(
+      screen.getByRole<HTMLButtonElement>('button', { name: 'Preparing the video…' }).disabled,
+    ).toBe(true);
+    // One recording at a time.
+    expect(
+      screen.getByRole<HTMLButtonElement>('button', { name: 'Make a 5s video' }).disabled,
+    ).toBe(true);
+    act(() => part(2, 2));
+    expect(screen.getByRole('button', { name: 'Recording story 2 of 2…' })).toBeTruthy();
+
+    await act(async () => finish(file));
+    expect(downloadFile).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Save video' }));
+    expect(downloadFile).toHaveBeenCalledWith(file);
+    fireEvent.click(screen.getByRole('button', { name: 'Share video' }));
+    await waitFor(() =>
+      expect(shareFiles).toHaveBeenCalledWith([file], {
+        title: 'Funny Multi',
+        text: 'Video of the whole game',
+      }),
+    );
+  });
+
+  it('says so when the recording stopped, and offers to try again', async () => {
+    buildGameVideoFile.mockRejectedValueOnce(new RecordingStopped());
+    renderGallery(GAME);
+    fireEvent.click(button());
+
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'The recording stopped: keep this screen open until it finishes.',
+    );
+    expect(trackGameVideo).not.toHaveBeenCalled();
+    fireEvent.click(button());
+    await screen.findByRole('button', { name: 'Save video' });
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('gives the recording up when the screen is left', () => {
+    buildGameVideoFile.mockReturnValue(new Promise<File>(() => undefined));
+    const { unmount } = renderGallery(GAME);
+    fireEvent.click(button());
+    const { signal } = buildGameVideoFile.mock.calls[0]![0];
+    expect(signal.aborted).toBe(false);
+    unmount();
+    expect(signal.aborted).toBe(true);
+  });
+
+  it("takes one footer from the room, and counts a paid game's video as one export", async () => {
+    const paid = GAME.map((entry): GalleryEntry => ({
+      ...entry,
+      content: { kind: 'paid', pack: 'chr26' },
+    }));
+    const onExported = vi.fn();
+    renderGallery(paid, 'en', onExported);
+    fireEvent.click(button());
+
+    const save = await screen.findByRole('button', { name: 'Save video' });
+    expect(buildGameVideoFile.mock.calls[0]![0].footer).toEqual({ golden: false, paid: true });
+    expect(trackGameVideo).toHaveBeenCalledWith(true);
+    expect(onExported).not.toHaveBeenCalled();
+    fireEvent.click(save);
+    expect(onExported.mock.calls).toEqual([['download']]);
+  });
+
+  it("puts the edition's footer under a free Christmas game, and reports nothing", async () => {
+    const free = GAME.map((entry): GalleryEntry => ({
+      ...entry,
+      content: { kind: 'slice', pack: 'chr26' },
+    }));
+    const onExported = vi.fn();
+    renderGallery(free, 'en', onExported);
+    fireEvent.click(button());
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Save video' }));
+    expect(buildGameVideoFile.mock.calls[0]![0].footer).toEqual({ golden: true, paid: false });
+    expect(onExported).not.toHaveBeenCalled();
   });
 });
